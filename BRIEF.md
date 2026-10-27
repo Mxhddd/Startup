@@ -33,9 +33,27 @@ A free, Urdu-first web app (installable on the home screen) for one school van a
 7. Admin page at `/admin` protected by `ADMIN_TOKEN`: tap rate over the last 10 school days, parents joined, notifications delivered and failed, chutti taps, Paid ticks per family per month, vans under 80% flagged, switch off any link.
 8. Urdu (default, right-to-left) and English.
 
+### Added after the design review (round 2)
+
+9. Captain approves every new parent phone; parents say who they are (amma, abbu, grandparent, other).
+10. Mistaken taps: a 1-second hold on van-wide buttons, a 5-second undo on every tap, and undone taps counted as strikes for the captain and admin (no automatic action).
+11. Captain van management: rename, morning and afternoon times, stop order, switch off links, fee status, optional captain phone, van badges.
+12. Whole-van day off (holidays), shown to driver and parents.
+13. Parents with two or more children, in one or several vans.
+14. Driver practice run before the first real trip.
+15. Driver help: "I'm stuck" (late alert to captain and parents) and "Emergency" (captain gets location), plus 15 and 1122.
+16. Van badges for the Pohnch Baji line: woman driver, mother-driver, woman attendant, girls only.
+17. Paid from day one: [PRICE] per family per month, collected by the captain outside the app.
+
+Items 9–17 make version 1 noticeably bigger. Suggested split: 9, 10, 12 and 17 in version 1; 11, 13–16 in version 1.1 after the first pilot week. Decide before B2, because they change the database.
+
 ## Out of scope for version 1
 
-Live GPS tracking or maps, in-app chat, payments inside the app, accounts or passwords, school-side dashboards, more than one van per captain flow, native app-store apps, SMS fallback, driver undo of a mistaken tap.
+Live GPS tracking or maps (location is sent only in an emergency), in-app chat, payments inside the app, accounts or passwords, school-side dashboards, native app-store apps, SMS fallback, the Pohnch Baji marketplace and operator stages.
+
+## Brand
+
+`design/BRAND.md`: name, slogan "فکر کم، خبر پوری", logo, colours, type, voice and the Pohnch Baji sub-brand.
 
 ## Stack
 

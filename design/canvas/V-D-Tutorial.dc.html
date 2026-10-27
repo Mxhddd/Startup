@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver practice run</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+button{touch-action:none;user-select:none;-webkit-user-select:none}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; position: relative">
+  <div style="background: #F2B544; padding: 14px 18px; display: flex; align-items: center; gap: 10px">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B2525" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="7 4 19 12 7 20 7 4"></polygon></svg>
+    <span style="flex: 1; font-size: 18px; font-weight: 700">مشق · کسی کو خبر نہیں جائے گی</span>
+    <a href="V-D-Before.dc.html" style="font-size: 15px; font-weight: 800; color: #1B2525">چھوڑیں</a>
+  </div>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 22px 16px 16px">
+    <div style="display: flex; gap: 6px" aria-hidden="true">
+      <span style="flex: 1; height: 8px; border-radius: 4px; background: {{bar1}}"></span>
+      <span style="flex: 1; height: 8px; border-radius: 4px; background: {{bar2}}"></span>
+      <span style="flex: 1; height: 8px; border-radius: 4px; background: {{bar3}}"></span>
+    </div>
+    <span role="status" style="font-family: Gulzar, serif; font-size: 32px; line-height: 1.6">{{instruction}}</span>
+    <span style="font-size: 17px; font-weight: 600">{{hint}}</span>
+
+    <sc-if value="{{isHold}}" hint-placeholder-val="{{ true }}">
+      <button aria-label="نکل گئے: دبا کر رکھیں" onPointerDown="{{startHold}}" onPointerUp="{{stopHold}}" onPointerLeave="{{stopHold}}" style="position: relative; overflow: hidden; margin-top: 20px; height: 120px; border: 0; border-radius: 26px; background: #2747B8; color: #FFFFFF; font-family: inherit; cursor: pointer">
+        <span style="position: absolute; top: 0; bottom: 0; right: 0; width: {{progress}}%; background: #1A3486"></span>
+        <span style="position: relative; display: flex; flex-direction: column; align-items: center; line-height: 1.7">
+          <span style="font-size: 30px; font-weight: 700">نکل گئے</span>
+          <span style="font-size: 16px; font-weight: 700">دبا کر رکھیں</span>
+        </span>
+      </button>
+    </sc-if>
+
+    <sc-if value="{{isTap}}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{tapChild}}" style="margin-top: 20px; height: 104px; border: 0; border-radius: 26px; background: #0E7A3E; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 14px; padding: 0 18px; text-align: right; cursor: pointer">
+        <span style="width: 60px; height: 60px; border-radius: 18px; background: #FFFFFF; display: flex; align-items: center; justify-content: center"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0E7A3E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5"></path></svg></span>
+        <span style="display: flex; flex-direction: column; line-height: 1.6"><span style="font-size: 26px; font-weight: 700">علی</span><span style="font-size: 18px; font-weight: 600">بٹھا لیا</span></span>
+      </button>
+    </sc-if>
+
+    <sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center">
+        <span style="width: 110px; height: 110px; border-radius: 50%; background: #0E7A3E; display: flex; align-items: center; justify-content: center"><svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+        <a href="V-D-Before.dc.html" style="width: 100%; display: flex; align-items: center; justify-content: center; height: 68px; border-radius: 22px; background: #1E5C5A; color: #F6EFE2; text-decoration: none; font-size: 20px; font-weight: 700">آج کی فہرست کھولیں</a>
+        <button onClick="{{restart}}" style="height: 48px; border: 0; background: transparent; font-family: inherit; font-size: 16px; font-weight: 700; text-decoration: underline; color: #1B2525; cursor: pointer">دوبارہ مشق</button>
+      </div>
+    </sc-if>
+  </main>
+
+  <sc-if value="{{isUndo}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="position: absolute; left: 12px; right: 12px; bottom: 16px; background: #1B2525; color: #F6EFE2; border-radius: 26px; padding: 12px 12px 12px 16px; display: flex; align-items: center; gap: 12px">
+      <span style="width: 52px; height: 52px; border-radius: 50%; border: 4px solid #F2B544; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: #F2B544; box-sizing: border-box; flex: none">{{count}}</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.6"><span style="font-size: 17px; font-weight: 700">علی · بٹھا لیا</span><span style="font-size: 14px; font-weight: 600">{{count}} سیکنڈ میں والدین کو خبر</span></span>
+      <button onClick="{{undo}}" style="height: 64px; padding: 0 22px; border: 0; border-radius: 18px; background: #F2B544; color: #1B2525; font-family: inherit; font-size: 20px; font-weight: 800; cursor: pointer">واپس</button>
+    </div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { phase: 'hold', progress: 0, count: 5, undone: false };
+  }
+  componentWillUnmount() {
+    clearInterval(this.holdTimer);
+    clearInterval(this.countTimer);
+  }
+  renderVals() {
+    const s = this.state;
+    const startHold = () => {
+      clearInterval(this.holdTimer);
+      this.holdTimer = setInterval(() => {
+        const p = Math.min(100, this.state.progress + 10);
+        this.setState({ progress: p });
+        if (p >= 100) { clearInterval(this.holdTimer); this.setState({ phase: 'tap', progress: 0 }); }
+      }, 100);
+    };
+    const stopHold = () => {
+      clearInterval(this.holdTimer);
+      if (this.state.phase === 'hold') this.setState({ progress: 0 });
+    };
+    const tapChild = () => {
+      this.setState({ phase: 'undo', count: 5 });
+      clearInterval(this.countTimer);
+      this.countTimer = setInterval(() => {
+        const c = this.state.count - 1;
+        if (c <= 0) { clearInterval(this.countTimer); this.setState({ phase: 'done', count: 0 }); }
+        else this.setState({ count: c });
+      }, 1000);
+    };
+    const undo = () => { clearInterval(this.countTimer); this.setState({ phase: 'tap', undone: true }); };
+    const restart = () => this.setState({ phase: 'hold', progress: 0, count: 5, undone: false });
+    const text = {
+      hold: ['1 · بڑا بٹن دبا کر رکھیں', 'نیلا بٹن ایک سیکنڈ دبائے رکھیں جب تک بھر نہ جائے۔ اس سے غلطی سے نہیں دبتا۔'],
+      tap: [s.undone ? 'واپس ہو گیا! اب پھر ٹیپ کریں' : '2 · بچے کے لیے ایک ٹیپ', s.undone ? 'اس بار 5 سیکنڈ رکیں، خبر خود چلی جائے گی۔' : 'بچہ بیٹھ جائے تو اس کے نام پر ایک بار ٹیپ کریں۔'],
+      undo: ['3 · غلطی ہو تو واپس', 'نیچے گنتی چل رہی ہے۔ غلط دبا ہو تو "واپس" دبائیں۔'],
+      done: ['شاباش! آپ تیار ہیں', 'اسی طرح ہر روز۔ بس وین رکی ہو تو۔']
+    }[s.phase];
+    const step = { hold: 1, tap: 2, undo: 3, done: 4 }[s.phase];
+    const on = '#1E5C5A', off = '#DCCFB8';
+    return {
+      instruction: text[0], hint: text[1],
+      isHold: s.phase === 'hold', isTap: s.phase === 'tap', isUndo: s.phase === 'undo', isDone: s.phase === 'done',
+      progress: s.progress, count: s.count,
+      bar1: step >= 1 ? on : off, bar2: step >= 2 ? on : off, bar3: step >= 3 ? on : off,
+      startHold, stopHold, tapChild, undo, restart
+    };
+  }
+}
+</script>
+</body>
+</html>

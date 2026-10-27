@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain setup v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+input:focus{outline:3px solid #1E5C5A;outline-offset:2px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 20px 16px 16px; gap: 10px">
+  <div style="display: flex; align-items: center; gap: 8px">
+    <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5 L58 25 C59.5 26.2 58.7 28 56.8 28 H54 V33 C54 45 42 53 33.4 60.2 a2.2 2.2 0 0 1 -2.8 0 C22 53 10 45 10 33 V28 H7.2 C5.3 28 4.5 26.2 6 25 Z" fill="#1E5C5A"></path><path d="M22 35 l7 7 l14 -14" fill="none" stroke="#F2B544" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <span style="font-family: Gulzar, serif; font-size: 26px; line-height: 1.5; color: #1E5C5A">پہنچ</span>
+  </div>
+  <span style="font-family: Gulzar, serif; font-size: 36px; line-height: 1.6">اپنی وین بنائیں</span>
+
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <label for="v2-driver" style="font-size: 16px; font-weight: 700">ڈرائیور کا پہلا نام</label>
+    <input id="v2-driver" value="رفیق" style="height: 54px; border-radius: 16px; border: 2px solid #1B2525; background: #FFFBF3; padding: 0 14px; font-family: inherit; font-size: 18px; font-weight: 600; color: #1B2525; box-sizing: border-box">
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <label for="v2-school" style="font-size: 16px; font-weight: 700">اسکول کا نام</label>
+    <input id="v2-school" value="نور اسکول" style="height: 54px; border-radius: 16px; border: 2px solid #1B2525; background: #FFFBF3; padding: 0 14px; font-family: inherit; font-size: 18px; font-weight: 600; color: #1B2525; box-sizing: border-box">
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 2px">
+    <label for="v2-time" style="font-size: 16px; font-weight: 700">صبح وین کب نکلتی ہے؟</label>
+    <input id="v2-time" type="time" value="07:00" dir="ltr" style="height: 54px; border-radius: 16px; border: 2px solid #1B2525; background: #FFFBF3; padding: 0 14px; font-family: Nunito, sans-serif; font-size: 18px; font-weight: 800; color: #1B2525; box-sizing: border-box; text-align: right">
+  </div>
+
+  <div style="background: #FFFBF3; border-radius: 20px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px">
+    <span style="font-size: 15px; font-weight: 700">اختیاری · وین کی خوبیاں (باجی وین)</span>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px">
+      <sc-for list="{{badges}}" as="b" hint-placeholder-count="3">
+        <sc-if value="{{b.on}}" hint-placeholder-val="{{ false }}"><button aria-pressed="true" onClick="{{b.toggle}}" style="height: 44px; padding: 0 14px; border-radius: 999px; border: 2px solid #6E2C5A; background: #6E2C5A; color: #FFFFFF; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer">✓ {{b.label}}</button></sc-if>
+        <sc-if value="{{b.off}}" hint-placeholder-val="{{ true }}"><button aria-pressed="false" onClick="{{b.toggle}}" style="height: 44px; padding: 0 14px; border-radius: 999px; border: 2px solid #6E2C5A; background: #F3E3EC; color: #6E2C5A; font-family: inherit; font-size: 15px; font-weight: 700; cursor: pointer">{{b.label}}</button></sc-if>
+      </sc-for>
+    </div>
+  </div>
+
+  <a href="V-C-Share.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; height: 64px; border-radius: 22px; background: #1E5C5A; color: #F6EFE2; text-decoration: none; font-size: 20px; font-weight: 700">لنک بنائیں</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { on: { attendant: true } };
+  }
+  renderVals() {
+    const list = [{ id: 'driver', label: 'خاتون ڈرائیور' }, { id: 'attendant', label: 'خاتون اٹینڈنٹ' }, { id: 'girls', label: 'صرف بچیاں' }];
+    return {
+      badges: list.map((b) => {
+        const on = !!this.state.on[b.id];
+        return { ...b, on, off: !on, toggle: () => this.setState({ on: { ...this.state.on, [b.id]: !on } }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

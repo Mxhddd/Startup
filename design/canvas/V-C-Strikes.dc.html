@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain driver week</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 12px">
+  <div style="display: flex; align-items: center; gap: 8px">
+    <a href="V-C-Manage.dc.html" aria-label="واپس" style="width: 48px; height: 48px; border-radius: 16px; background: #FFFBF3; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2525" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+    <span style="font-family: Gulzar, serif; font-size: 30px; line-height: 1.6">رفیق بھائی · یہ ہفتہ</span>
+  </div>
+
+  <section style="background: #1E5C5A; color: #F6EFE2; border-radius: 26px; padding: 14px 18px; display: flex; align-items: center; gap: 14px">
+    <span style="font-size: 44px; font-weight: 900; line-height: 1">94%</span>
+    <span style="flex: 1; font-size: 16px; font-weight: 700">47 میں سے 44 ٹیپ وقت پر۔ پچھلے ہفتے 90%۔</span>
+  </section>
+
+  <section style="background: #FFFBF3; border-radius: 22px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+    <div style="display: grid; grid-template-columns: 64px repeat(5, minmax(0, 1fr)); gap: 6px; align-items: center; font-size: 14px; font-weight: 800; text-align: center">
+      <span></span><span>پیر</span><span>منگل</span><span>بدھ</span><span>جمعرات</span><span>جمعہ</span>
+      <span style="text-align: right">صبح</span>
+      <sc-for list="{{am}}" as="c" hint-placeholder-count="5"><span style="height: 36px; border-radius: 10px; box-sizing: border-box; border: {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; display: flex; align-items: center; justify-content: center">{{c.t}}</span></sc-for>
+      <span style="text-align: right">دوپہر</span>
+      <sc-for list="{{pm}}" as="c" hint-placeholder-count="5"><span style="height: 36px; border-radius: 10px; box-sizing: border-box; border: {{c.border}}; background: {{c.bg}}; color: {{c.fg}}; display: flex; align-items: center; justify-content: center">{{c.t}}</span></sc-for>
+    </div>
+    <div style="display: flex; gap: 12px; font-size: 14px; font-weight: 700; flex-wrap: wrap">
+      <span style="display: inline-flex; align-items: center; gap: 4px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #0E7A3E"></span>سب ٹیپ</span>
+      <span style="display: inline-flex; align-items: center; gap: 4px"><span style="width: 14px; height: 14px; border-radius: 4px; background: #F2B544"></span>کچھ رہ گئے</span>
+      <span style="display: inline-flex; align-items: center; gap: 4px"><span style="width: 14px; height: 14px; border-radius: 4px; border: 2px dashed #4A4339; box-sizing: border-box"></span>ابھی نہیں</span>
+    </div>
+  </section>
+
+  <section style="background: #FFFBF3; border-radius: 22px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+    <span style="font-size: 17px; font-weight: 700">واپس لیے گئے ٹیپ · 2</span>
+    <span style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; border-top: 1px solid #DCCFB8; padding-top: 4px"><span>منگل · عائشہ · بٹھا لیا</span><span>7:18</span></span>
+    <span style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700"><span>بدھ · نکل گئے</span><span>7:01</span></span>
+    <span style="font-size: 14px; font-weight: 600; color: #4A4339">واپس لیا گیا ٹیپ کسی والدین تک نہیں گیا۔ زیادہ ہوں تو ایک بار بات کر لیں۔</span>
+  </section>
+
+  <span style="font-size: 14px; font-weight: 700; text-align: center">پہنچ خود کوئی کارروائی نہیں کرتا۔ فیصلہ آپ کا۔</span>
+  <a href="https://wa.me/" style="margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; height: 60px; border-radius: 20px; background: #127A3F; color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 700">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z"></path></svg>
+    رفیق بھائی کو شکریہ بھیجیں
+  </a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const ok = { bg: '#0E7A3E', fg: '#FFFFFF', t: '✓', border: '0' };
+    const part = { bg: '#F2B544', fg: '#1B2525', t: '4/5', border: '0' };
+    const todo = { bg: 'transparent', fg: '#4A4339', t: '', border: '2px dashed #4A4339' };
+    return {
+      am: [ok, ok, part, ok, todo],
+      pm: [ok, ok, ok, todo, todo]
+    };
+  }
+}
+</script>
+</body>
+</html>

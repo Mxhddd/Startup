@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Lock-screen alerts v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 1000px; box-sizing: border-box; overflow: hidden; background: #1E5C5A; color: #F6EFE2; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 36px 12px 20px; gap: 10px">
+  <div dir="ltr" style="display: flex; flex-direction: column; align-items: center; margin-bottom: 10px; line-height: 1.1">
+    <span style="font-size: 64px; font-weight: 800">7:41</span>
+    <span style="font-size: 16px; font-weight: 700; margin-top: 6px">Tuesday 27 October</span>
+  </div>
+  <sc-for list="{{notes}}" as="n" hint-placeholder-count="6">
+    <article style="background: #FFFBF3; color: #1B2525; border-radius: 22px; padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start">
+      <span style="width: 40px; height: 40px; border-radius: 12px; background: {{n.bg}}; display: flex; align-items: center; justify-content: center; flex: none; margin-top: 4px">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{n.fg}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.d}}"></path></svg>
+      </span>
+      <div style="flex: 1; display: flex; flex-direction: column; min-width: 0">
+        <div style="display: flex; justify-content: space-between; font-size: 14px; font-weight: 700; color: #4A4339"><span>پہنچ · {{n.who}}</span><span>{{n.t}}</span></div>
+        <span style="font-size: 17px; font-weight: 700; line-height: 1.8">{{n.ur}}</span>
+        <span style="font-size: 14px; font-weight: 600">{{n.by}}</span>
+        <span dir="ltr" lang="en" style="font-size: 14px; font-weight: 700; color: #3A332B; line-height: 1.4; text-align: left">{{n.en}}</span>
+      </div>
+    </article>
+  </sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":1000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const van = 'M2 16V7a1 1 0 0 1 1-1h11l4 4h2a2 2 0 0 1 2 2v4 M9 17h6 M5 17a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M15 17a2 2 0 1 0 4 0a2 2 0 1 0-4 0';
+    return {
+      notes: [
+        { who: 'علی', t: '7:41', bg: '#7A4E00', fg: '#FFFFFF', d: 'M12 7v5l3 2 M12 3a9 9 0 1 0 0.01 0', ur: 'وین کو دیر ہو رہی ہے · ٹریفک جام', by: 'ڈرائیور نے بتایا', en: 'The van is running late (traffic), marked by the driver' },
+        { who: 'سارا', t: '7:22', bg: '#6E2C5A', fg: '#FFFFFF', d: van, ur: 'جوہر وین نکل گئی', by: '7:22 · شازیہ باجی نے مارک کیا', en: 'Johar van has left, 7:22, marked by the driver' },
+        { who: 'علی', t: '7:12', bg: '#0E7A3E', fg: '#FFFFFF', d: 'M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5', ur: 'علی وین میں ہے', by: '7:12 · ڈرائیور نے مارک کیا', en: 'Ali is in the van, 7:12, marked by the driver' },
+        { who: 'گلشن وین', t: '7:05', bg: '#2747B8', fg: '#FFFFFF', d: van, ur: 'وین نکل گئی', by: '7:05 · ڈرائیور نے مارک کیا', en: 'The van has left, 7:05, marked by the driver' },
+        { who: 'گلشن وین', t: 'کل', bg: '#1E5C5A', fg: '#FFFFFF', d: 'M5 12l5 5 9-10', ur: 'کیپٹن نے آپ کو شامل کر لیا', by: 'اب علی کی ہر خبر آپ کو آئے گی', en: 'The captain approved you. You will now get Ali’s updates.' },
+        { who: 'گلشن وین', t: 'جمعرات', bg: '#F2B544', fg: '#1B2525', d: 'M3 5h18v16H3z M3 10h18 M8 3v4 M16 3v4', ur: 'جمعہ کو وین نہیں آئے گی', by: 'اسکول کی چھٹی · کیپٹن نے بتایا', en: 'No van on Friday (school holiday), from the captain' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

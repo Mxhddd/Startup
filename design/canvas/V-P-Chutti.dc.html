@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent chutti v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 14px">
+  <div style="display: flex; align-items: center; gap: 8px">
+    <a href="V-P-Today.dc.html" aria-label="واپس" style="width: 48px; height: 48px; border-radius: 16px; background: #FFFBF3; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2525" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+    <span style="font-family: Gulzar, serif; font-size: 32px; line-height: 1.6">علی کی چھٹی</span>
+  </div>
+
+  <sc-if value="{{choosing}}" hint-placeholder-val="{{ true }}">
+    <span style="font-size: 18px; font-weight: 700">کون سا دن؟</span>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="2">
+        <sc-if value="{{d.on}}" hint-placeholder-val="{{ false }}"><button aria-pressed="true" onClick="{{d.pick}}" style="height: 76px; border-radius: 22px; border: 3px solid #1E5C5A; background: #1E5C5A; color: #F6EFE2; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.5; cursor: pointer"><span style="font-size: 22px; font-weight: 700">{{d.label}}</span><span style="font-size: 14px; font-weight: 700">{{d.sub}}</span></button></sc-if>
+        <sc-if value="{{d.off}}" hint-placeholder-val="{{ true }}"><button aria-pressed="false" onClick="{{d.pick}}" style="height: 76px; border-radius: 22px; border: 2px solid #DCCFB8; background: #FFFBF3; color: #1B2525; font-family: inherit; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.5; cursor: pointer"><span style="font-size: 22px; font-weight: 700">{{d.label}}</span><span style="font-size: 14px; font-weight: 700">{{d.sub}}</span></button></sc-if>
+      </sc-for>
+    </div>
+    <span style="font-size: 18px; font-weight: 700">کون سا چکر؟</span>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{trips}}" as="t" hint-placeholder-count="3">
+        <sc-if value="{{t.on}}" hint-placeholder-val="{{ false }}"><button aria-pressed="true" onClick="{{t.pick}}" style="height: 64px; border-radius: 20px; border: 3px solid #1E5C5A; background: #1E5C5A; color: #F6EFE2; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">{{t.label}}</button></sc-if>
+        <sc-if value="{{t.off}}" hint-placeholder-val="{{ true }}"><button aria-pressed="false" onClick="{{t.pick}}" style="height: 64px; border-radius: 20px; border: 2px solid #DCCFB8; background: #FFFBF3; color: #1B2525; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">{{t.label}}</button></sc-if>
+      </sc-for>
+    </div>
+    <div style="background: #EDE3D0; border-radius: 20px; padding: 12px 16px; font-size: 17px; font-weight: 700; color: #3A332B">{{summary}}</div>
+    <button onClick="{{mark}}" style="margin-top: auto; height: 66px; border-radius: 22px; border: 0; background: #1E5C5A; color: #F6EFE2; font-family: inherit; font-size: 20px; font-weight: 700; cursor: pointer">چھٹی لگائیں</button>
+  </sc-if>
+
+  <sc-if value="{{marked}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px">
+      <span style="width: 100px; height: 100px; border-radius: 50%; background: #5C5348; display: flex; align-items: center; justify-content: center"><svg width="54" height="54" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+      <span style="font-family: Gulzar, serif; font-size: 38px; line-height: 1.6">چھٹی لگ گئی</span>
+      <span style="font-size: 18px; font-weight: 700">{{summary}}</span>
+      <span style="font-size: 16px; font-weight: 600">رفیق بھائی کی فہرست میں علی کا نام چھٹی میں دکھے گا۔ وین نکلنے تک واپس لے سکتے ہیں۔</span>
+    </div>
+    <button onClick="{{undo}}" style="height: 64px; border-radius: 22px; border: 3px solid #1B2525; background: #FFFBF3; color: #1B2525; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">واپس لیں</button>
+    <a href="V-P-Today.dc.html" style="display: flex; align-items: center; justify-content: center; height: 64px; border-radius: 22px; background: #1E5C5A; color: #F6EFE2; text-decoration: none; font-size: 19px; font-weight: 700">ٹھیک ہے</a>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { day: 'tomorrow', trip: 'both', marked: false };
+  }
+  renderVals() {
+    const days = [{ id: 'today', label: 'آج', sub: 'منگل 27' }, { id: 'tomorrow', label: 'کل', sub: 'بدھ 28' }];
+    const trips = [{ id: 'morning', label: 'صبح' }, { id: 'afternoon', label: 'دوپہر' }, { id: 'both', label: 'دونوں' }];
+    const tripText = { morning: 'صرف صبح', afternoon: 'صرف دوپہر', both: 'صبح اور دوپہر' }[this.state.trip];
+    const day = days.find((d) => d.id === this.state.day);
+    return {
+      choosing: !this.state.marked, marked: this.state.marked,
+      days: days.map((d) => ({ ...d, on: d.id === this.state.day, off: d.id !== this.state.day, pick: () => this.setState({ day: d.id }) })),
+      trips: trips.map((t) => ({ ...t, on: t.id === this.state.trip, off: t.id !== this.state.trip, pick: () => this.setState({ trip: t.id }) })),
+      summary: (day.id === 'today' ? 'آج ' : 'کل ') + day.sub + ' اکتوبر · ' + tripText,
+      mark: () => this.setState({ marked: true }),
+      undo: () => this.setState({ marked: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

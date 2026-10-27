@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain marks a day off</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 12px">
+  <div style="display: flex; align-items: center; gap: 8px">
+    <a href="V-C-Manage.dc.html" aria-label="واپس" style="width: 48px; height: 48px; border-radius: 16px; background: #FFFBF3; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2525" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+    <span style="font-family: Gulzar, serif; font-size: 30px; line-height: 1.6">پوری وین کی چھٹی</span>
+  </div>
+  <span style="font-size: 15px; font-weight: 600">اسکول بند، ہڑتال یا وین کی چھٹی؟ دن چنیں۔ ڈرائیور اور سب والدین کو ایک خبر جائے گی۔</span>
+
+  <section style="background: #FFFBF3; border-radius: 24px; padding: 12px; display: flex; flex-direction: column; gap: 8px">
+    <span style="font-size: 17px; font-weight: 700; padding: 0 4px">اکتوبر / نومبر</span>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; text-align: center; font-size: 14px; font-weight: 800">
+      <span>پیر</span><span>منگل</span><span>بدھ</span><span>جمعرات</span><span>جمعہ</span>
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="10">
+        <sc-if value="{{d.on}}" hint-placeholder-val="{{ false }}"><button aria-pressed="true" onClick="{{d.pick}}" style="height: 52px; border-radius: 14px; border: 0; background: #F2B544; color: #1B2525; font-family: inherit; font-size: 18px; font-weight: 900; cursor: pointer">{{d.n}}</button></sc-if>
+        <sc-if value="{{d.off}}" hint-placeholder-val="{{ true }}"><button aria-pressed="false" onClick="{{d.pick}}" style="height: 52px; border-radius: 14px; border: 2px solid #DCCFB8; background: #F6EFE2; color: #1B2525; font-family: inherit; font-size: 18px; font-weight: 800; cursor: pointer">{{d.n}}</button></sc-if>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="background: #FFFBF3; border-radius: 22px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px">
+    <span style="font-size: 16px; font-weight: 700">وجہ (والدین کو دکھے گی)</span>
+    <div style="display: flex; flex-wrap: wrap; gap: 6px">
+      <span style="height: 40px; padding: 0 14px; border-radius: 999px; background: #1B2525; color: #F2B544; display: inline-flex; align-items: center; font-size: 15px; font-weight: 700">اسکول کی چھٹی</span>
+      <span style="height: 40px; padding: 0 14px; border-radius: 999px; border: 2px solid #DCCFB8; display: inline-flex; align-items: center; font-size: 15px; font-weight: 700">وین کی چھٹی</span>
+      <span style="height: 40px; padding: 0 14px; border-radius: 999px; border: 2px solid #DCCFB8; display: inline-flex; align-items: center; font-size: 15px; font-weight: 700">شہر بند</span>
+    </div>
+  </section>
+
+  <button style="margin-top: auto; height: 64px; border-radius: 22px; border: 0; background: #1E5C5A; color: #F6EFE2; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">{{cta}}</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { on: { 30: true } };
+  }
+  renderVals() {
+    const nums = [26, 27, 28, 29, 30, 2, 3, 4, 5, 6];
+    const picked = nums.filter((n) => this.state.on[n]);
+    return {
+      days: nums.map((n) => {
+        const on = !!this.state.on[n];
+        return { n, on, off: !on, pick: () => this.setState({ on: { ...this.state.on, [n]: !on } }) };
+      }),
+      cta: picked.length ? picked.length + ' دن کی چھٹی لگائیں اور سب کو بتائیں' : 'کوئی دن چنیں'
+    };
+  }
+}
+</script>
+</body>
+</html>

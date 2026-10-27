@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver no signal v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column">
+  <header data-component="TripHeader" style="background: #1E5C5A; color: #F6EFE2; padding: 14px 16px 14px; display: flex; align-items: center; gap: 10px">
+    <div style="flex: 1; display: flex; flex-direction: column; line-height: 1.7"><span style="font-size: 21px; font-weight: 700">صبح کا چکر</span><span style="font-size: 14px; font-weight: 600">نکل گئے 7:05 · گلشن وین</span></div>
+    <span style="font-size: 28px; font-weight: 900; line-height: 1">4/5</span>
+  </header>
+  <div data-component="OfflineBanner" role="status" style="background: #FFF1D2; border-radius: 0 0 28px 28px; padding: 12px 16px 14px; display: flex; align-items: center; gap: 12px; color: #3D2800">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#7A4E00" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M5 12.5a10 10 0 0 1 5.2-2.8"></path><path d="M19 12.5a10 10 0 0 0-2.5-1.8"></path><path d="M12 20h.01"></path></svg>
+    <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.7"><span style="font-size: 17px; font-weight: 700">سگنل نہیں · ٹیپ محفوظ ہیں</span><span style="font-size: 15px; font-weight: 600">سگنل آتے ہی خود چلے جائیں گے</span></span>
+    <span style="min-width: 58px; padding: 4px 8px; border-radius: 16px; background: #7A4E00; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; line-height: 1.4; box-sizing: border-box"><span style="font-size: 22px; font-weight: 900">3</span><span style="font-size: 14px; font-weight: 700">باقی</span></span>
+  </div>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 14px">
+    <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 16px; background: #FFFBF3; border-radius: 16px">
+      <span style="width: 28px; height: 28px; border-radius: 50%; background: #0E7A3E"></span>
+      <span style="flex: 1; font-size: 18px; font-weight: 700">علی</span><span style="font-size: 16px; font-weight: 800">7:12</span>
+    </div>
+    <sc-for list="{{queued}}" as="k" hint-placeholder-count="3">
+      <div data-component="ChildRow" data-state="queued" style="display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 16px; background: #FFFBF3; border: 3px dashed #7A4E00; border-radius: 16px">
+        <span style="width: 28px; height: 28px; border-radius: 50%; background: #0E7A3E"></span>
+        <span style="flex: 1; font-size: 18px; font-weight: 700">{{k.name}}</span>
+        <span style="font-size: 14px; font-weight: 800; color: #7A4E00">باقی</span>
+        <span style="font-size: 16px; font-weight: 800">{{k.t}}</span>
+      </div>
+    </sc-for>
+    <button data-component="TapButton" data-step="picked" data-size="next" style="display: flex; align-items: center; gap: 14px; height: 108px; padding: 0 18px; border: 0; border-radius: 26px; background: #0E7A3E; color: #FFFFFF; font-family: inherit; text-align: right; box-shadow: 0 5px 0 #075027; cursor: pointer">
+      <span style="width: 62px; height: 62px; border-radius: 20px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#0E7A3E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5"></path></svg></span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.6"><span style="font-size: 28px; font-weight: 700">زین</span><span style="font-size: 17px; font-weight: 700">بٹھا لیا · سگنل کے بغیر بھی</span></span>
+    </button>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { queued: [{ name: 'فاطمہ', t: '7:18' }, { name: 'حمزہ', t: '7:24' }, { name: 'عائشہ', t: '7:29' }] };
+  }
+}
+</script>
+</body>
+</html>

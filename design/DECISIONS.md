@@ -1,4 +1,30 @@
-# Design decisions (phase A)
+# Design decisions
+
+## Round 2 (current): brand, v2 screens, Pohnch Baji
+
+The v2 pages of the canvas (**Brand, WhatsApp cards, Print, v2 · Driver, v2 · Parent, v2 · Captain, Pohnch Baji concept**) replace the v1 look below. The brand is in `design/BRAND.md`. Where round 2 and round 1 disagree, round 2 wins; the round 1 reasoning still holds for anything not mentioned here.
+
+Builder's answers that drove round 2:
+
+1. **Look: Ghar's warmth with Saaf's clarity.** Cream ground, neem teal, rounded shapes, Gulzar + Noto Nastaliq + Nunito; driver buttons keep solid step colours and high contrast for sunlight.
+2. **Mistaken taps: 5-second undo on every tap, hold-to-confirm on van-wide taps, strikes for the captain.** "نکل گئے", "اسکول پہنچ گئے" and "اسکول سے نکلے" need a 1-second hold (they alert every parent); child taps are single taps. After any tap a bar counts down 5 seconds with a big "واپس" button; parents are notified only after it ends. Undone taps are recorded as strikes, shown to the captain and admin weekly; Pohnch takes no automatic action.
+3. **Captain approves every parent phone.** The parent picks the child and says who they are (امی، ابو، دادی/نانی، دادا/نانا، کوئی اور); the captain approves or rejects; a child with several approved phones is flagged.
+4. **Paid from day one**, price still open: every screen and poster shows a [PRICE] placeholder; the captain collects the fee outside the app and the admin ticks Paid.
+5. **New screens:** captain van management (rename, times, stop order, links, fee, captain phone, badges), parent with 2+ children or vans, driver practice run before the first trip, holidays / whole-van day off.
+6. **Driver safety tools:** "مدد" in the driver header opens "I'm stuck" (breakdown / traffic / road closed → captain and parents told the van is late) and "Emergency" (2-second hold → captain gets an alert with the driver's location; parents only if the captain decides), plus one-tap 15 and 1122. Location is sent only in an emergency and only to the captain.
+7. **Women-driven vans = separate sub-brand, پہنچ باجی (Pohnch Baji).** Three ways in: woman driver, mother-driver, woman attendant. In the app they appear only as van badges. Stage 1 software + badges, stage 2 marketplace, stage 3 operator model drafted as a competition concept (two A4 pages on the canvas).
+8. **Slogan: فکر کم، خبر پوری.** Hero is the parent's peace of mind, with the driver credited in every alert.
+
+New component names to add in code: **HoldButton** behaviour on TapButton (`data-hold`), **UndoBar**, **HelpSheet**, **VanBadge**, **ApprovalCard**, **RouteDots** (the progress dots in TripHeader).
+
+Open items:
+- [PRICE], [pohnch link], QR, recruitment phone number and Baji income figure are placeholders.
+- Undo is client-side (the tap waits 5 seconds on the phone before sending); undone taps are still sent afterwards as audit records so strikes can be counted.
+- An emergency needs the captain's phone number, which is optional in van management; without it the driver still has 15 and 1122.
+
+---
+
+# Round 1 (phase A, v1 pages)
 
 Canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy — pages A1 to A5. Start the clickable school day from the **A5 · Prototype & review** page, artboard "Start: a full school day" (press Play). The `.dc.html` files in `design/canvas/` are the canvas sources; open the canvas link to see them rendered.
 

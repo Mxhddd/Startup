@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent with two children</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 20px 16px 16px; gap: 14px">
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <span style="font-family: Gulzar, serif; font-size: 34px; line-height: 1.6">آج صبح</span>
+    <span style="font-size: 15px; font-weight: 700">منگل 27 اکتوبر</span>
+  </div>
+
+  <a href="V-P-Today.dc.html" style="background: #FFFBF3; border-radius: 28px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; color: #1B2525; text-decoration: none; border-right: 0">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 48px; height: 48px; border-radius: 50%; background: #1E5C5A; color: #F6EFE2; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700">ع</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.6"><span style="font-size: 21px; font-weight: 700">علی</span><span style="font-size: 14px; font-weight: 600">گلشن وین · رفیق بھائی</span></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #0E7A3E; color: #FFFFFF; border-radius: 18px; padding: 8px 14px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5"></path></svg>
+      <span style="flex: 1; font-size: 18px; font-weight: 700">وین میں ہے</span><span style="font-size: 16px; font-weight: 800">7:12</span>
+    </div>
+  </a>
+
+  <a href="V-P-Today.dc.html" style="background: #FFFBF3; border-radius: 28px; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px; color: #1B2525; text-decoration: none">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 48px; height: 48px; border-radius: 50%; background: #6E2C5A; color: #F6EFE2; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700">س</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.6"><span style="font-size: 21px; font-weight: 700">سارا</span><span style="font-size: 14px; font-weight: 600">جوہر وین · شازیہ باجی</span></span>
+      <span style="display: inline-flex; align-items: center; height: 30px; padding: 0 10px; border-radius: 999px; background: #F3E3EC; color: #6E2C5A; font-size: 14px; font-weight: 800">باجی وین</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #EDE3D0; border-radius: 18px; padding: 8px 14px">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B2525" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+      <span style="flex: 1; font-size: 18px; font-weight: 700">وین کا انتظار</span><span style="font-size: 15px; font-weight: 700">عام طور پر 7:20</span>
+    </div>
+  </a>
+
+  <button style="height: 56px; border-radius: 20px; border: 2px dashed #1B2525; background: transparent; color: #1B2525; font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer">+ ایک اور بچہ یا وین شامل کریں</button>
+  <span style="font-size: 15px; font-weight: 600">ہر بچے کی اطلاع میں اس کا نام سب سے پہلے آتا ہے، تاکہ دو وینوں کی خبریں نہ ملیں۔</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

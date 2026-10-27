@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent van off today</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 14px">
+  <header data-component="TripHeader" data-role="parent" style="display: flex; align-items: center; gap: 12px">
+    <span style="width: 48px; height: 48px; border-radius: 50%; background: #1E5C5A; color: #F6EFE2; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 700">ع</span>
+    <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.7"><span style="font-size: 21px; font-weight: 700">علی · آج</span><span style="font-size: 14px; font-weight: 600">گلشن وین · جمعہ 30 اکتوبر</span></span>
+  </header>
+
+  <section style="flex: 1; background: #F2B544; border-radius: 32px; padding: 24px 22px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px">
+    <svg width="180" height="130" viewBox="0 0 200 150" aria-hidden="true">
+      <circle cx="150" cy="40" r="26" fill="#FFFBF3"></circle>
+      <path d="M30 120 L80 78 L130 120 Z" fill="#C4643A"></path>
+      <rect x="44" y="116" width="72" height="30" rx="4" fill="#FFFBF3" stroke="#1B2525" stroke-width="3"></rect>
+      <rect x="72" y="124" width="16" height="22" rx="3" fill="#1E5C5A"></rect>
+    </svg>
+    <span style="font-family: Gulzar, serif; font-size: 40px; line-height: 1.6">آج وین نہیں آئے گی</span>
+    <span style="font-size: 17px; font-weight: 700">اسکول کی چھٹی ہے · کیپٹن سارہ باجی نے بتایا</span>
+    <span style="font-size: 16px; font-weight: 600">آج کوئی اطلاع نہیں آئے گی۔ آرام کریں!</span>
+  </section>
+
+  <div style="background: #FFFBF3; border-radius: 22px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1E5C5A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18M8 3v4M16 3v4"></path></svg>
+    <span style="flex: 1; font-size: 17px; font-weight: 700">اگلا چکر: پیر 2 نومبر · صبح 7:00</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver afternoon v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column">
+  <header data-component="TripHeader" style="background: #1E5C5A; color: #F6EFE2; border-radius: 0 0 28px 28px; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="flex: 1; display: flex; flex-direction: column; line-height: 1.7"><span style="font-size: 21px; font-weight: 700">دوپہر کا چکر</span><span style="font-size: 14px; font-weight: 600">گلشن وین · ترتیب الٹی</span></div>
+      <span style="font-size: 28px; font-weight: 900; line-height: 1">2/5</span>
+      <a href="V-D-Safety.dc.html" style="height: 52px; padding: 0 14px; border-radius: 18px; background: #F6EFE2; color: #1E5C5A; text-decoration: none; display: flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 700"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E5C5A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"></path></svg>مدد</a>
+    </div>
+    <div aria-hidden="true" style="display: flex; align-items: center; gap: 4px">
+      <span style="width: 30px; height: 30px; border-radius: 50%; background: #F2B544; flex: none"></span>
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="5">
+        <span style="flex: 1; border-top: 3px dotted #F6EFE2"></span>
+        <span style="width: 16px; height: 16px; border-radius: 50%; background: {{d.fill}}; border: 3px solid {{d.ring}}; box-sizing: border-box; flex: none"></span>
+      </sc-for>
+    </div>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 14px">
+    <div data-component="TapButton" data-step="left_school" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 16px; background: #FBE6B8; border-radius: 16px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1B2525" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5 M15 7l5 5-5 5 M20 12H9"></path></svg>
+      <span style="flex: 1; font-size: 17px; font-weight: 700">اسکول سے نکلے</span>
+      <span style="font-size: 16px; font-weight: 800">1:32</span>
+    </div>
+    <sc-for list="{{done}}" as="k" hint-placeholder-count="2">
+      <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 16px; background: #FFFBF3; border-radius: 16px">
+        <span style="width: 28px; height: 28px; border-radius: 50%; background: #1E5C5A; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+        <span style="flex: 1; font-size: 18px; font-weight: 700">{{k.name}}</span>
+        <span style="font-size: 16px; font-weight: 800">{{k.t}}</span>
+      </div>
+    </sc-for>
+
+    <button data-component="TapButton" data-step="dropped" data-size="next" style="display: flex; align-items: center; gap: 14px; height: 108px; padding: 0 18px; border: 0; border-radius: 26px; background: #1E5C5A; color: #FFFFFF; font-family: inherit; text-align: right; box-shadow: 0 5px 0 #123C3B; cursor: pointer">
+      <span style="width: 62px; height: 62px; border-radius: 20px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#1E5C5A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7 M5 10v10h14V10 M10 20v-6h4v6"></path></svg></span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.6"><span style="font-size: 28px; font-weight: 700">حمزہ</span><span style="font-size: 17px; font-weight: 700">گھر اتار دیا · ایک ٹیپ</span></span>
+      <span style="width: 38px; height: 38px; border-radius: 50%; border: 3px solid #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 900; box-sizing: border-box">3</span>
+    </button>
+
+    <sc-for list="{{waiting}}" as="k" hint-placeholder-count="2">
+      <button data-component="ChildRow" data-state="waiting" style="display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 16px; background: #FFFBF3; border: 3px solid #1E5C5A; border-radius: 18px; color: #1B2525; font-family: inherit; text-align: right; cursor: pointer">
+        <span style="width: 30px; height: 30px; border-radius: 50%; border: 2px solid #1B2525; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 900; box-sizing: border-box">{{k.n}}</span>
+        <span style="flex: 1; font-size: 19px; font-weight: 700">{{k.name}}</span>
+        <span style="font-size: 16px; font-weight: 700; color: #1E5C5A">گھر اتار دیا</span>
+      </button>
+    </sc-for>
+    <span style="margin-top: auto; text-align: center; font-size: 15px; font-weight: 700">مریم کی آج چھٹی ہے</span>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dot = (done) => ({ fill: done ? '#F2B544' : 'transparent', ring: done ? '#F2B544' : '#F6EFE2' });
+    return {
+      dots: [dot(true), dot(true), dot(false), dot(false), dot(false)],
+      done: [{ name: 'زین', t: '1:48' }, { name: 'عائشہ', t: '1:55' }],
+      waiting: [{ n: 4, name: 'فاطمہ' }, { n: 5, name: 'علی' }]
+    };
+  }
+}
+</script>
+</body>
+</html>

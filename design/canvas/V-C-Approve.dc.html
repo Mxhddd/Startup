@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain approves parents</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 12px">
+  <div style="display: flex; align-items: center; gap: 8px">
+    <a href="V-C-Manage.dc.html" aria-label="واپس" style="width: 48px; height: 48px; border-radius: 16px; background: #FFFBF3; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2525" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+    <span style="flex: 1; font-family: Gulzar, serif; font-size: 30px; line-height: 1.6">نئے فون</span>
+    <span style="min-width: 36px; height: 36px; border-radius: 18px; background: #F2B544; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 900">{{count}}</span>
+  </div>
+  <span style="font-size: 15px; font-weight: 600">صرف انہیں منظور کریں جنہیں آپ جانتی ہیں۔ منظوری کے بعد ہی انہیں بچے کی خبر جائے گی۔</span>
+
+  <sc-for list="{{reqs}}" as="r" hint-placeholder-count="3">
+    <div style="background: #FFFBF3; border-radius: 24px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; border: {{r.border}}">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="width: 44px; height: 44px; border-radius: 50%; background: #1E5C5A; color: #F6EFE2; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 700">{{r.initial}}</span>
+        <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.6"><span style="font-size: 18px; font-weight: 700">{{r.child}} · {{r.who}}</span><span style="font-size: 14px; font-weight: 600">{{r.when}}</span></span>
+      </div>
+      <sc-if value="{{r.warn}}" hint-placeholder-val="{{ false }}"><span style="font-size: 14px; font-weight: 700; color: #5C3B00; background: #FFF1D2; border-radius: 12px; padding: 2px 10px">{{r.warnText}}</span></sc-if>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+        <button onClick="{{r.approve}}" style="height: 52px; border-radius: 16px; border: 0; background: #1E5C5A; color: #F6EFE2; font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer">منظور</button>
+        <button onClick="{{r.reject}}" style="height: 52px; border-radius: 16px; border: 2px solid #B3261E; background: #FFFBF3; color: #B3261E; font-family: inherit; font-size: 17px; font-weight: 700; cursor: pointer">نہیں</button>
+      </div>
+    </div>
+  </sc-for>
+  <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+    <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 6px">
+      <span style="font-family: Gulzar, serif; font-size: 30px; line-height: 1.6">سب ہو گیا</span>
+      <span style="font-size: 16px; font-weight: 600">کوئی نیا فون منظوری کا منتظر نہیں۔</span>
+    </div>
+  </sc-if>
+  <span style="margin-top: auto; font-size: 14px; font-weight: 700; text-align: center">منظور شدہ: 9 فون · 6 بچے</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { done: {} };
+  }
+  renderVals() {
+    const all = [
+      { id: 1, child: 'علی', initial: 'ع', who: 'امی', when: '2 منٹ پہلے · اینڈرائیڈ', warn: false },
+      { id: 2, child: 'حمزہ', initial: 'ح', who: 'ابو', when: 'آج صبح · آئی فون', warn: false },
+      { id: 3, child: 'علی', initial: 'ع', who: 'کوئی اور', when: 'کل رات · اینڈرائیڈ', warn: true, warnText: 'علی کے پہلے سے 2 فون منظور ہیں' }
+    ];
+    const left = all.filter((r) => !this.state.done[r.id]);
+    const finish = (id) => () => this.setState({ done: { ...this.state.done, [id]: true } });
+    return {
+      count: left.length,
+      empty: left.length === 0,
+      reqs: left.map((r) => ({ ...r, border: r.warn ? '3px solid #7A4E00' : '0', approve: finish(r.id), reject: finish(r.id) }))
+    };
+  }
+}
+</script>
+</body>
+</html>

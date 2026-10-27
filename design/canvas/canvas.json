@@ -1,78 +1,953 @@
 {
-  "v": 3,
-  "createdOnFiles": {"v": 1, "at": "2026-10-27T14:05:00Z"},
-  "title": "Pohnch designs",
-  "launch": {"view": "canvas", "page": "a1"},
-  "pages": [
-    {"id": "a1", "name": "A1 · Directions"},
-    {"id": "driver", "name": "A2 · Driver"},
-    {"id": "parent", "name": "A3 · Parent"},
-    {"id": "captain", "name": "A4 · Captain & admin"},
-    {"id": "review", "name": "A5 · Prototype & review"}
-  ],
-  "boards": {
-    "A1-Saaf-Driver.dc.html": {"x": 0, "y": 0, "w": 360, "h": 780, "page": "a1", "title": "Saaf · driver mid-route"},
-    "A1-Saaf-Parent.dc.html": {"x": 440, "y": 0, "w": 360, "h": 780, "page": "a1", "title": "Saaf · parent timeline"},
-    "A1-Ghar-Driver.dc.html": {"x": 960, "y": 0, "w": 360, "h": 780, "page": "a1", "title": "Ghar · driver mid-route"},
-    "A1-Ghar-Parent.dc.html": {"x": 1400, "y": 0, "w": 360, "h": 780, "page": "a1", "title": "Ghar · parent timeline"},
-    "A1-Sadak-Driver.dc.html": {"x": 1920, "y": 0, "w": 360, "h": 780, "page": "a1", "title": "Sadak · driver mid-route"},
-    "A1-Sadak-Parent.dc.html": {"x": 2360, "y": 0, "w": 360, "h": 780, "page": "a1", "title": "Sadak · parent timeline"},
-
-    "D1-Welcome.dc.html": {"x": 0, "y": 0, "w": 360, "h": 780, "page": "driver", "title": "1 · First open of driver link", "is_interactive": true},
-    "D2-BeforeTrip.dc.html": {"x": 440, "y": 0, "w": 360, "h": 780, "page": "driver", "title": "2 · Today, before morning trip", "is_interactive": true},
-    "D3-MidRoute.dc.html": {"x": 880, "y": 0, "w": 360, "h": 780, "page": "driver", "title": "3 · Today, mid-route", "is_interactive": true},
-    "D3-MidRoute-EN.dc.html": {"x": 1320, "y": 0, "w": 360, "h": 780, "page": "driver", "title": "3 · Today, mid-route (English)"},
-    "D4-ReachedSchool.dc.html": {"x": 1760, "y": 0, "w": 360, "h": 780, "page": "driver", "title": "4 · Reached school", "is_interactive": true},
-    "D5-Afternoon.dc.html": {"x": 2200, "y": 0, "w": 360, "h": 780, "page": "driver", "title": "5 · Afternoon trip", "is_interactive": true},
-    "D6-Offline.dc.html": {"x": 2640, "y": 0, "w": 360, "h": 780, "page": "driver", "title": "6 · No signal"},
-    "D7-LinkOff.dc.html": {"x": 3080, "y": 0, "w": 360, "h": 780, "page": "driver", "title": "7 · Link switched off"},
-    "D8-OneChild.dc.html": {"x": 0, "y": 900, "w": 360, "h": 780, "page": "driver", "title": "Edge · 1 child"},
-    "D9-EighteenChildren.dc.html": {"x": 440, "y": 900, "w": 360, "h": 1040, "page": "driver", "title": "Edge · 18 children (full scroll)"},
-
-    "P1-Join.dc.html": {"x": 0, "y": 0, "w": 360, "h": 780, "page": "parent", "title": "1 · Open parents link", "is_interactive": true},
-    "P2-NotifyAndroid.dc.html": {"x": 440, "y": 0, "w": 360, "h": 780, "page": "parent", "title": "2 · Allow notifications (Android)", "is_interactive": true},
-    "P2-iPhoneGuide.dc.html": {"x": 880, "y": 0, "w": 360, "h": 780, "page": "parent", "title": "2 · iPhone: home screen first"},
-    "P3-Waiting.dc.html": {"x": 1320, "y": 0, "w": 360, "h": 780, "page": "parent", "title": "3a · Waiting for the van", "is_interactive": true},
-    "P3-VanLeft.dc.html": {"x": 1760, "y": 0, "w": 360, "h": 780, "page": "parent", "title": "3b · Van left", "is_interactive": true},
-    "P3-InVan.dc.html": {"x": 2200, "y": 0, "w": 360, "h": 780, "page": "parent", "title": "3c · Child in the van", "is_interactive": true},
-    "P3-ReachedSchool.dc.html": {"x": 2640, "y": 0, "w": 360, "h": 780, "page": "parent", "title": "3d · Reached school", "is_interactive": true},
-    "P4-ChuttiChoose.dc.html": {"x": 0, "y": 900, "w": 360, "h": 780, "page": "parent", "title": "4 · Aaj chutti: choose", "is_interactive": true},
-    "P4-ChuttiDone.dc.html": {"x": 440, "y": 900, "w": 360, "h": 780, "page": "parent", "title": "4 · Confirmed, with Undo", "is_interactive": true},
-    "P5-LockScreen.dc.html": {"x": 880, "y": 900, "w": 360, "h": 1080, "page": "parent", "title": "5 · Lock-screen notifications"},
-    "P6-Settings.dc.html": {"x": 1320, "y": 900, "w": 360, "h": 780, "page": "parent", "title": "6 · Settings"},
-    "P7-Empty.dc.html": {"x": 1760, "y": 900, "w": 360, "h": 780, "page": "parent", "title": "7 · Empty: van not started"},
-
-    "C1-Setup.dc.html": {"x": 0, "y": 0, "w": 360, "h": 780, "page": "captain", "title": "Captain · Set up your van", "is_interactive": true},
-    "C2-Share.dc.html": {"x": 440, "y": 0, "w": 360, "h": 1060, "page": "captain", "title": "Captain · Share links", "is_interactive": true},
-    "AD-Admin.dc.html": {"x": 880, "y": 0, "w": 1280, "h": 800, "page": "captain", "title": "Admin · vans (laptop)"},
-
-    "Main.dc.html": {"x": 0, "y": 0, "w": 360, "h": 780, "page": "review", "title": "Start: a full school day", "is_interactive": true},
-    "Components.dc.html": {"x": 440, "y": 0, "w": 1240, "h": 1700, "page": "review", "title": "Component sheet"},
-    "S-DriverLoading.dc.html": {"x": 1760, "y": 0, "w": 360, "h": 780, "page": "review", "title": "State · driver loading"},
-    "S-DriverError.dc.html": {"x": 2200, "y": 0, "w": 360, "h": 780, "page": "review", "title": "State · driver tap error"},
-    "S-ParentLoading.dc.html": {"x": 2640, "y": 0, "w": 360, "h": 780, "page": "review", "title": "State · parent loading"},
-    "S-ParentOffline.dc.html": {"x": 3080, "y": 0, "w": 360, "h": 780, "page": "review", "title": "State · parent offline"},
-    "S-ParentLinkOff.dc.html": {"x": 3520, "y": 0, "w": 360, "h": 780, "page": "review", "title": "State · parent link switched off"},
-    "S-SetupError.dc.html": {"x": 3960, "y": 0, "w": 360, "h": 780, "page": "review", "title": "State · setup error"}
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-27T14:05:00Z"
+ },
+ "title": "Pohnch designs",
+ "launch": {
+  "view": "canvas",
+  "page": "brand"
+ },
+ "pages": [
+  {
+   "id": "brand",
+   "name": "Brand"
   },
-  "order": [
-    "Main.dc.html",
-    "A1-Saaf-Driver.dc.html", "A1-Saaf-Parent.dc.html", "A1-Ghar-Driver.dc.html", "A1-Ghar-Parent.dc.html", "A1-Sadak-Driver.dc.html", "A1-Sadak-Parent.dc.html",
-    "D1-Welcome.dc.html", "D2-BeforeTrip.dc.html", "D3-MidRoute.dc.html", "D3-MidRoute-EN.dc.html", "D4-ReachedSchool.dc.html", "D5-Afternoon.dc.html", "D6-Offline.dc.html", "D7-LinkOff.dc.html", "D8-OneChild.dc.html", "D9-EighteenChildren.dc.html",
-    "P1-Join.dc.html", "P2-NotifyAndroid.dc.html", "P2-iPhoneGuide.dc.html", "P3-Waiting.dc.html", "P3-VanLeft.dc.html", "P3-InVan.dc.html", "P3-ReachedSchool.dc.html", "P4-ChuttiChoose.dc.html", "P4-ChuttiDone.dc.html", "P5-LockScreen.dc.html", "P6-Settings.dc.html", "P7-Empty.dc.html",
-    "C1-Setup.dc.html", "C2-Share.dc.html", "AD-Admin.dc.html",
-    "Components.dc.html", "S-DriverLoading.dc.html", "S-DriverError.dc.html", "S-ParentLoading.dc.html", "S-ParentOffline.dc.html", "S-ParentLinkOff.dc.html", "S-SetupError.dc.html"
-  ],
-  "notes": {
-    "t_a1": {"x": 0, "y": -300, "text": "A1 · Three directions: Saaf (picked) · Ghar · Sadak", "kind": "title1", "maxW": 2720, "page": "a1"},
-    "n_saaf": {"x": 0, "y": 900, "text": "SAAF (clear) — picked. White ground, black ink, one solid colour + icon per step, Noto Nastaliq Urdu. Built for a cheap screen in noon sun.", "w": 800, "size": "l", "fill": "green", "page": "a1"},
-    "n_ghar": {"x": 960, "y": 900, "text": "GHAR (home) — cream, deep teal, soft cards, Gulzar Nastaliq. Calmest and most familial, but tinted pills lose contrast outdoors.", "w": 800, "size": "l", "fill": "orange", "page": "a1"},
-    "n_sadak": {"x": 1920, "y": 900, "text": "SADAK (road) — road-sign black and yellow, Naskh bold. Unmissable in sun, but reads urgent, not calm.", "w": 800, "size": "l", "fill": "gray", "page": "a1"},
-    "n_edges": {"x": 880, "y": 900, "text": "1 child: same screen, no special case. 18 children: picked children fold into one row and absent ones shrink to chips, so the next child is still on the first screen (above 780 px). The list scrolls; the next TapButton is always scrolled into view after each tap.", "w": 560, "size": "m", "fill": "blue", "page": "driver"},
-    "t_driver": {"x": 0, "y": -300, "text": "A2 · Driver screens", "kind": "title1", "maxW": 3440, "page": "driver"},
-    "t_parent": {"x": 0, "y": -300, "text": "A3 · Parent screens", "kind": "title1", "maxW": 3000, "page": "parent"},
-    "t_captain": {"x": 0, "y": -300, "text": "A4 · Van captain and admin", "kind": "title1", "maxW": 2160, "page": "captain"},
-    "t_review": {"x": 0, "y": -300, "text": "A5 · Start the day prototype · components · states added in review", "kind": "title1", "maxW": 4320, "page": "review"}
+  {
+   "id": "whatsapp",
+   "name": "WhatsApp cards"
   },
-  "designSystems": []
+  {
+   "id": "print",
+   "name": "Print"
+  },
+  {
+   "id": "v2driver",
+   "name": "v2 · Driver"
+  },
+  {
+   "id": "v2parent",
+   "name": "v2 · Parent"
+  },
+  {
+   "id": "v2captain",
+   "name": "v2 · Captain"
+  },
+  {
+   "id": "concept",
+   "name": "Pohnch Baji concept"
+  },
+  {
+   "id": "a1",
+   "name": "v1 · A1 · Directions"
+  },
+  {
+   "id": "driver",
+   "name": "v1 · A2 · Driver"
+  },
+  {
+   "id": "parent",
+   "name": "v1 · A3 · Parent"
+  },
+  {
+   "id": "captain",
+   "name": "v1 · A4 · Captain & admin"
+  },
+  {
+   "id": "review",
+   "name": "v1 · A5 · Prototype & review"
+  }
+ ],
+ "boards": {
+  "A1-Saaf-Driver.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "a1",
+   "title": "Saaf · driver mid-route"
+  },
+  "A1-Saaf-Parent.dc.html": {
+   "x": 440,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "a1",
+   "title": "Saaf · parent timeline"
+  },
+  "A1-Ghar-Driver.dc.html": {
+   "x": 960,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "a1",
+   "title": "Ghar · driver mid-route"
+  },
+  "A1-Ghar-Parent.dc.html": {
+   "x": 1400,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "a1",
+   "title": "Ghar · parent timeline"
+  },
+  "A1-Sadak-Driver.dc.html": {
+   "x": 1920,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "a1",
+   "title": "Sadak · driver mid-route"
+  },
+  "A1-Sadak-Parent.dc.html": {
+   "x": 2360,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "a1",
+   "title": "Sadak · parent timeline"
+  },
+  "D1-Welcome.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "1 · First open of driver link",
+   "is_interactive": true
+  },
+  "D2-BeforeTrip.dc.html": {
+   "x": 440,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "2 · Today, before morning trip",
+   "is_interactive": true
+  },
+  "D3-MidRoute.dc.html": {
+   "x": 880,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "3 · Today, mid-route",
+   "is_interactive": true
+  },
+  "D3-MidRoute-EN.dc.html": {
+   "x": 1320,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "3 · Today, mid-route (English)"
+  },
+  "D4-ReachedSchool.dc.html": {
+   "x": 1760,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "4 · Reached school",
+   "is_interactive": true
+  },
+  "D5-Afternoon.dc.html": {
+   "x": 2200,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "5 · Afternoon trip",
+   "is_interactive": true
+  },
+  "D6-Offline.dc.html": {
+   "x": 2640,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "6 · No signal"
+  },
+  "D7-LinkOff.dc.html": {
+   "x": 3080,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "7 · Link switched off"
+  },
+  "D8-OneChild.dc.html": {
+   "x": 0,
+   "y": 900,
+   "w": 360,
+   "h": 780,
+   "page": "driver",
+   "title": "Edge · 1 child"
+  },
+  "D9-EighteenChildren.dc.html": {
+   "x": 440,
+   "y": 900,
+   "w": 360,
+   "h": 1040,
+   "page": "driver",
+   "title": "Edge · 18 children (full scroll)"
+  },
+  "P1-Join.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "1 · Open parents link",
+   "is_interactive": true
+  },
+  "P2-NotifyAndroid.dc.html": {
+   "x": 440,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "2 · Allow notifications (Android)",
+   "is_interactive": true
+  },
+  "P2-iPhoneGuide.dc.html": {
+   "x": 880,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "2 · iPhone: home screen first"
+  },
+  "P3-Waiting.dc.html": {
+   "x": 1320,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "3a · Waiting for the van",
+   "is_interactive": true
+  },
+  "P3-VanLeft.dc.html": {
+   "x": 1760,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "3b · Van left",
+   "is_interactive": true
+  },
+  "P3-InVan.dc.html": {
+   "x": 2200,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "3c · Child in the van",
+   "is_interactive": true
+  },
+  "P3-ReachedSchool.dc.html": {
+   "x": 2640,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "3d · Reached school",
+   "is_interactive": true
+  },
+  "P4-ChuttiChoose.dc.html": {
+   "x": 0,
+   "y": 900,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "4 · Aaj chutti: choose",
+   "is_interactive": true
+  },
+  "P4-ChuttiDone.dc.html": {
+   "x": 440,
+   "y": 900,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "4 · Confirmed, with Undo",
+   "is_interactive": true
+  },
+  "P5-LockScreen.dc.html": {
+   "x": 880,
+   "y": 900,
+   "w": 360,
+   "h": 1080,
+   "page": "parent",
+   "title": "5 · Lock-screen notifications"
+  },
+  "P6-Settings.dc.html": {
+   "x": 1320,
+   "y": 900,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "6 · Settings"
+  },
+  "P7-Empty.dc.html": {
+   "x": 1760,
+   "y": 900,
+   "w": 360,
+   "h": 780,
+   "page": "parent",
+   "title": "7 · Empty: van not started"
+  },
+  "C1-Setup.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "captain",
+   "title": "Captain · Set up your van",
+   "is_interactive": true
+  },
+  "C2-Share.dc.html": {
+   "x": 440,
+   "y": 0,
+   "w": 360,
+   "h": 1060,
+   "page": "captain",
+   "title": "Captain · Share links",
+   "is_interactive": true
+  },
+  "AD-Admin.dc.html": {
+   "x": 880,
+   "y": 0,
+   "w": 1280,
+   "h": 800,
+   "page": "captain",
+   "title": "Admin · vans (laptop)"
+  },
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "review",
+   "title": "Start: a full school day",
+   "is_interactive": true
+  },
+  "Components.dc.html": {
+   "x": 440,
+   "y": 0,
+   "w": 1240,
+   "h": 1700,
+   "page": "review",
+   "title": "Component sheet"
+  },
+  "S-DriverLoading.dc.html": {
+   "x": 1760,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "review",
+   "title": "State · driver loading"
+  },
+  "S-DriverError.dc.html": {
+   "x": 2200,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "review",
+   "title": "State · driver tap error"
+  },
+  "S-ParentLoading.dc.html": {
+   "x": 2640,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "review",
+   "title": "State · parent loading"
+  },
+  "S-ParentOffline.dc.html": {
+   "x": 3080,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "review",
+   "title": "State · parent offline"
+  },
+  "S-ParentLinkOff.dc.html": {
+   "x": 3520,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "review",
+   "title": "State · parent link switched off"
+  },
+  "S-SetupError.dc.html": {
+   "x": 3960,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "review",
+   "title": "State · setup error"
+  },
+  "BR-Board.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 2720,
+   "page": "brand",
+   "title": "Brand board"
+  },
+  "BR-Logo.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 1300,
+   "page": "brand",
+   "title": "Logo, mark and app icon"
+  },
+  "BR-Baji.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 1300,
+   "page": "brand",
+   "title": "Sub-brand · Pohnch Baji"
+  },
+  "M-WA-Parents.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1080,
+   "h": 1080,
+   "page": "whatsapp",
+   "title": "WhatsApp · to parents"
+  },
+  "M-WA-Join.dc.html": {
+   "x": 1160,
+   "y": 0,
+   "w": 1080,
+   "h": 1080,
+   "page": "whatsapp",
+   "title": "WhatsApp · how to join"
+  },
+  "M-WA-Status.dc.html": {
+   "x": 2320,
+   "y": 0,
+   "w": 1080,
+   "h": 1920,
+   "page": "whatsapp",
+   "title": "WhatsApp status 9:16"
+  },
+  "M-WA-BajiRecruit.dc.html": {
+   "x": 3480,
+   "y": 0,
+   "w": 1080,
+   "h": 1080,
+   "page": "whatsapp",
+   "title": "WhatsApp · Baji driver recruitment"
+  },
+  "M-Poster-A3.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1123,
+   "h": 1587,
+   "page": "print",
+   "title": "Poster A3 · school gate"
+  },
+  "M-Flyer-A5.dc.html": {
+   "x": 1203,
+   "y": 0,
+   "w": 559,
+   "h": 794,
+   "page": "print",
+   "title": "Flyer A5 · parents"
+  },
+  "M-Sticker.dc.html": {
+   "x": 1842,
+   "y": 0,
+   "w": 559,
+   "h": 794,
+   "page": "print",
+   "title": "Van window sticker (A5 sheet)"
+  },
+  "M-DriverCard-Front.dc.html": {
+   "x": 2481,
+   "y": 0,
+   "w": 559,
+   "h": 397,
+   "page": "print",
+   "title": "Driver card A6 · front"
+  },
+  "M-DriverCard-Back.dc.html": {
+   "x": 2481,
+   "y": 517,
+   "w": 559,
+   "h": 397,
+   "page": "print",
+   "title": "Driver card A6 · back"
+  },
+  "M-Baji-Poster-A3.dc.html": {
+   "x": 3120,
+   "y": 0,
+   "w": 1123,
+   "h": 1587,
+   "page": "print",
+   "title": "Poster A3 · Baji recruitment"
+  },
+  "V-D-Welcome.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "1 · Welcome + practice offer",
+   "is_interactive": true
+  },
+  "V-D-Tutorial.dc.html": {
+   "x": 440,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "2 · Practice run",
+   "is_interactive": true
+  },
+  "V-D-Before.dc.html": {
+   "x": 880,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "3 · Before trip: hold to start",
+   "is_interactive": true
+  },
+  "V-D-Hold.dc.html": {
+   "x": 1320,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "4 · Holding \"Nikal gaye\"",
+   "is_interactive": true
+  },
+  "V-D-Undo.dc.html": {
+   "x": 1760,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "5 · 5-second undo",
+   "is_interactive": true
+  },
+  "V-D-MidRoute.dc.html": {
+   "x": 2200,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "6 · Mid-route",
+   "is_interactive": true
+  },
+  "V-D-School.dc.html": {
+   "x": 2640,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "7 · Reached school",
+   "is_interactive": true
+  },
+  "V-D-Afternoon.dc.html": {
+   "x": 3080,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "8 · Afternoon",
+   "is_interactive": true
+  },
+  "V-D-Offline.dc.html": {
+   "x": 3520,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "9 · No signal",
+   "is_interactive": true
+  },
+  "V-D-Safety.dc.html": {
+   "x": 3960,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "10 · Help: stuck / emergency",
+   "is_interactive": true
+  },
+  "V-D-Holiday.dc.html": {
+   "x": 4400,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2driver",
+   "title": "11 · No school today",
+   "is_interactive": true
+  },
+  "V-P-Join.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2parent",
+   "title": "1 · Join: pick child + who you are",
+   "is_interactive": true
+  },
+  "V-P-Pending.dc.html": {
+   "x": 440,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2parent",
+   "title": "2 · Waiting for captain approval",
+   "is_interactive": true
+  },
+  "V-P-Today.dc.html": {
+   "x": 880,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2parent",
+   "title": "3 · Today (badges)",
+   "is_interactive": true
+  },
+  "V-P-Siblings.dc.html": {
+   "x": 1320,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2parent",
+   "title": "4 · Two children, two vans",
+   "is_interactive": true
+  },
+  "V-P-Chutti.dc.html": {
+   "x": 1760,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2parent",
+   "title": "5 · Aaj chutti",
+   "is_interactive": true
+  },
+  "V-P-Holiday.dc.html": {
+   "x": 2200,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2parent",
+   "title": "6 · Van off today",
+   "is_interactive": true
+  },
+  "V-P-Lock.dc.html": {
+   "x": 2640,
+   "y": 0,
+   "w": 360,
+   "h": 1000,
+   "page": "v2parent",
+   "title": "7 · Lock-screen alerts",
+   "is_interactive": true
+  },
+  "V-C-Setup.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2captain",
+   "title": "1 · Set up van + badges",
+   "is_interactive": true
+  },
+  "V-C-Share.dc.html": {
+   "x": 440,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2captain",
+   "title": "2 · Share links",
+   "is_interactive": true
+  },
+  "V-C-Approve.dc.html": {
+   "x": 880,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2captain",
+   "title": "3 · Approve parents",
+   "is_interactive": true
+  },
+  "V-C-Manage.dc.html": {
+   "x": 1320,
+   "y": 0,
+   "w": 360,
+   "h": 1200,
+   "page": "v2captain",
+   "title": "4 · Manage van",
+   "is_interactive": true
+  },
+  "V-C-Strikes.dc.html": {
+   "x": 1760,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2captain",
+   "title": "5 · Driver this week",
+   "is_interactive": true
+  },
+  "V-C-Holiday.dc.html": {
+   "x": 2200,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2captain",
+   "title": "6 · Mark a day off",
+   "is_interactive": true
+  },
+  "V-C-SafetyAlert.dc.html": {
+   "x": 2640,
+   "y": 0,
+   "w": 360,
+   "h": 780,
+   "page": "v2captain",
+   "title": "7 · Driver asked for help",
+   "is_interactive": true
+  },
+  "CON-Baji-1.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 794,
+   "h": 1123,
+   "page": "concept",
+   "title": "Concept p1 · Pohnch Baji"
+  },
+  "CON-Baji-2.dc.html": {
+   "x": 874,
+   "y": 0,
+   "w": 794,
+   "h": 1123,
+   "page": "concept",
+   "title": "Concept p2 · model and pilot"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "A1-Saaf-Driver.dc.html",
+  "A1-Saaf-Parent.dc.html",
+  "A1-Ghar-Driver.dc.html",
+  "A1-Ghar-Parent.dc.html",
+  "A1-Sadak-Driver.dc.html",
+  "A1-Sadak-Parent.dc.html",
+  "D1-Welcome.dc.html",
+  "D2-BeforeTrip.dc.html",
+  "D3-MidRoute.dc.html",
+  "D3-MidRoute-EN.dc.html",
+  "D4-ReachedSchool.dc.html",
+  "D5-Afternoon.dc.html",
+  "D6-Offline.dc.html",
+  "D7-LinkOff.dc.html",
+  "D8-OneChild.dc.html",
+  "D9-EighteenChildren.dc.html",
+  "P1-Join.dc.html",
+  "P2-NotifyAndroid.dc.html",
+  "P2-iPhoneGuide.dc.html",
+  "P3-Waiting.dc.html",
+  "P3-VanLeft.dc.html",
+  "P3-InVan.dc.html",
+  "P3-ReachedSchool.dc.html",
+  "P4-ChuttiChoose.dc.html",
+  "P4-ChuttiDone.dc.html",
+  "P5-LockScreen.dc.html",
+  "P6-Settings.dc.html",
+  "P7-Empty.dc.html",
+  "C1-Setup.dc.html",
+  "C2-Share.dc.html",
+  "AD-Admin.dc.html",
+  "Components.dc.html",
+  "S-DriverLoading.dc.html",
+  "S-DriverError.dc.html",
+  "S-ParentLoading.dc.html",
+  "S-ParentOffline.dc.html",
+  "S-ParentLinkOff.dc.html",
+  "S-SetupError.dc.html",
+  "BR-Board.dc.html",
+  "BR-Logo.dc.html",
+  "BR-Baji.dc.html",
+  "M-WA-Parents.dc.html",
+  "M-WA-Join.dc.html",
+  "M-WA-Status.dc.html",
+  "M-WA-BajiRecruit.dc.html",
+  "M-Poster-A3.dc.html",
+  "M-Flyer-A5.dc.html",
+  "M-Sticker.dc.html",
+  "M-DriverCard-Front.dc.html",
+  "M-DriverCard-Back.dc.html",
+  "M-Baji-Poster-A3.dc.html",
+  "V-D-Welcome.dc.html",
+  "V-D-Tutorial.dc.html",
+  "V-D-Before.dc.html",
+  "V-D-Hold.dc.html",
+  "V-D-Undo.dc.html",
+  "V-D-MidRoute.dc.html",
+  "V-D-School.dc.html",
+  "V-D-Afternoon.dc.html",
+  "V-D-Offline.dc.html",
+  "V-D-Safety.dc.html",
+  "V-D-Holiday.dc.html",
+  "V-P-Join.dc.html",
+  "V-P-Pending.dc.html",
+  "V-P-Today.dc.html",
+  "V-P-Siblings.dc.html",
+  "V-P-Chutti.dc.html",
+  "V-P-Holiday.dc.html",
+  "V-P-Lock.dc.html",
+  "V-C-Setup.dc.html",
+  "V-C-Share.dc.html",
+  "V-C-Approve.dc.html",
+  "V-C-Manage.dc.html",
+  "V-C-Strikes.dc.html",
+  "V-C-Holiday.dc.html",
+  "V-C-SafetyAlert.dc.html",
+  "CON-Baji-1.dc.html",
+  "CON-Baji-2.dc.html"
+ ],
+ "notes": {
+  "t_a1": {
+   "x": 0,
+   "y": -300,
+   "text": "A1 · Three directions: Saaf (picked) · Ghar · Sadak",
+   "kind": "title1",
+   "maxW": 2720,
+   "page": "a1"
+  },
+  "n_saaf": {
+   "x": 0,
+   "y": 900,
+   "text": "SAAF (clear) — picked. White ground, black ink, one solid colour + icon per step, Noto Nastaliq Urdu. Built for a cheap screen in noon sun.",
+   "w": 800,
+   "size": "l",
+   "fill": "green",
+   "page": "a1"
+  },
+  "n_ghar": {
+   "x": 960,
+   "y": 900,
+   "text": "GHAR (home) — cream, deep teal, soft cards, Gulzar Nastaliq. Calmest and most familial, but tinted pills lose contrast outdoors.",
+   "w": 800,
+   "size": "l",
+   "fill": "orange",
+   "page": "a1"
+  },
+  "n_sadak": {
+   "x": 1920,
+   "y": 900,
+   "text": "SADAK (road) — road-sign black and yellow, Naskh bold. Unmissable in sun, but reads urgent, not calm.",
+   "w": 800,
+   "size": "l",
+   "fill": "gray",
+   "page": "a1"
+  },
+  "n_edges": {
+   "x": 880,
+   "y": 900,
+   "text": "1 child: same screen, no special case. 18 children: picked children fold into one row and absent ones shrink to chips, so the next child is still on the first screen (above 780 px). The list scrolls; the next TapButton is always scrolled into view after each tap.",
+   "w": 560,
+   "size": "m",
+   "fill": "blue",
+   "page": "driver"
+  },
+  "t_driver": {
+   "x": 0,
+   "y": -300,
+   "text": "A2 · Driver screens",
+   "kind": "title1",
+   "maxW": 3440,
+   "page": "driver"
+  },
+  "t_parent": {
+   "x": 0,
+   "y": -300,
+   "text": "A3 · Parent screens",
+   "kind": "title1",
+   "maxW": 3000,
+   "page": "parent"
+  },
+  "t_captain": {
+   "x": 0,
+   "y": -300,
+   "text": "A4 · Van captain and admin",
+   "kind": "title1",
+   "maxW": 2160,
+   "page": "captain"
+  },
+  "t_review": {
+   "x": 0,
+   "y": -300,
+   "text": "A5 · Start the day prototype · components · states added in review",
+   "kind": "title1",
+   "maxW": 4320,
+   "page": "review"
+  },
+  "t_brand": {
+   "x": 0,
+   "y": -300,
+   "text": "Pohnch brand · فکر کم، خبر پوری",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "brand"
+  },
+  "t_wa": {
+   "x": 0,
+   "y": -300,
+   "text": "WhatsApp cards",
+   "kind": "title1",
+   "maxW": 4560,
+   "page": "whatsapp"
+  },
+  "t_print": {
+   "x": 0,
+   "y": -300,
+   "text": "Print · poster, flyer, sticker, driver card",
+   "kind": "title1",
+   "maxW": 4240,
+   "page": "print"
+  },
+  "t_v2d": {
+   "x": 0,
+   "y": -300,
+   "text": "v2 · Driver: hold, undo, practice, help",
+   "kind": "title1",
+   "maxW": 4760,
+   "page": "v2driver"
+  },
+  "t_v2p": {
+   "x": 0,
+   "y": -300,
+   "text": "v2 · Parent: approval, siblings, holidays",
+   "kind": "title1",
+   "maxW": 3000,
+   "page": "v2parent"
+  },
+  "t_v2c": {
+   "x": 0,
+   "y": -300,
+   "text": "v2 · Captain: approve, manage, strikes, help alerts",
+   "kind": "title1",
+   "maxW": 3000,
+   "page": "v2captain"
+  },
+  "t_con": {
+   "x": 0,
+   "y": -300,
+   "text": "Pohnch Baji · competition concept (draft)",
+   "kind": "title1",
+   "maxW": 1668,
+   "page": "concept"
+  }
+ },
+ "designSystems": []
 }

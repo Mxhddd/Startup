@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent join v2</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Nastaliq+Urdu:wght@400;600;700&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #1B2525; font-family: Nunito, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 20px 16px 16px; gap: 12px">
+  <div style="background: #1E5C5A; color: #F6EFE2; border-radius: 26px; padding: 14px 18px; display: flex; align-items: center; gap: 12px">
+    <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 5 L58 25 C59.5 26.2 58.7 28 56.8 28 H54 V33 C54 45 42 53 33.4 60.2 a2.2 2.2 0 0 1 -2.8 0 C22 53 10 45 10 33 V28 H7.2 C5.3 28 4.5 26.2 6 25 Z" fill="#F6EFE2"></path><path d="M22 35 l7 7 l14 -14" fill="none" stroke="#1E5C5A" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <span style="display: flex; flex-direction: column; line-height: 1.7"><span style="font-size: 21px; font-weight: 700">گلشن وین</span><span style="font-size: 15px; font-weight: 600">ڈرائیور رفیق بھائی · نور اسکول</span></span>
+  </div>
+
+  <span style="font-family: Gulzar, serif; font-size: 30px; line-height: 1.6">آپ کا بچہ کون سا ہے؟</span>
+  <div role="radiogroup" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+    <sc-for list="{{kids}}" as="k" hint-placeholder-count="6">
+      <sc-if value="{{k.on}}" hint-placeholder-val="{{ false }}"><button role="radio" aria-checked="true" onClick="{{k.pick}}" style="height: 56px; border-radius: 18px; border: 3px solid #1E5C5A; background: #1E5C5A; color: #F6EFE2; font-family: inherit; font-size: 18px; font-weight: 700; cursor: pointer">{{k.name}}</button></sc-if>
+      <sc-if value="{{k.off}}" hint-placeholder-val="{{ true }}"><button role="radio" aria-checked="false" onClick="{{k.pick}}" style="height: 56px; border-radius: 18px; border: 2px solid #DCCFB8; background: #FFFBF3; color: #1B2525; font-family: inherit; font-size: 18px; font-weight: 700; cursor: pointer">{{k.name}}</button></sc-if>
+    </sc-for>
+  </div>
+  <button style="height: 48px; border-radius: 16px; border: 2px dashed #1B2525; background: transparent; color: #1B2525; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer">+ نام فہرست میں نہیں؟ شامل کریں</button>
+
+  <span style="font-family: Gulzar, serif; font-size: 30px; line-height: 1.6">آپ کون ہیں؟</span>
+  <div role="radiogroup" style="display: flex; flex-wrap: wrap; gap: 8px">
+    <sc-for list="{{who}}" as="w" hint-placeholder-count="5">
+      <sc-if value="{{w.on}}" hint-placeholder-val="{{ false }}"><button role="radio" aria-checked="true" onClick="{{w.pick}}" style="height: 48px; padding: 0 18px; border-radius: 999px; border: 3px solid #1B2525; background: #1B2525; color: #F2B544; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer">{{w.label}}</button></sc-if>
+      <sc-if value="{{w.off}}" hint-placeholder-val="{{ true }}"><button role="radio" aria-checked="false" onClick="{{w.pick}}" style="height: 48px; padding: 0 18px; border-radius: 999px; border: 2px solid #DCCFB8; background: #FFFBF3; color: #1B2525; font-family: inherit; font-size: 16px; font-weight: 700; cursor: pointer">{{w.label}}</button></sc-if>
+    </sc-for>
+  </div>
+  <span style="font-size: 15px; font-weight: 600">کیپٹن سارہ باجی دیکھ کر منظوری دیں گی، تاکہ صرف گھر والوں کو خبر جائے۔</span>
+
+  <a href="V-P-Pending.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; height: 66px; border-radius: 22px; background: #1E5C5A; color: #F6EFE2; text-decoration: none; font-size: 19px; font-weight: 700">{{cta}}</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { kid: 'علی', who: 'امی' };
+  }
+  renderVals() {
+    const names = ['علی', 'فاطمہ', 'حمزہ', 'عائشہ', 'زین', 'مریم'];
+    const whos = ['امی', 'ابو', 'دادی / نانی', 'دادا / نانا', 'کوئی اور'];
+    return {
+      kids: names.map((n) => ({ name: n, on: n === this.state.kid, off: n !== this.state.kid, pick: () => this.setState({ kid: n }) })),
+      who: whos.map((w) => ({ label: w, on: w === this.state.who, off: w !== this.state.who, pick: () => this.setState({ who: w }) })),
+      cta: this.state.kid + ' · ' + this.state.who + ' · منظوری کے لیے بھیجیں'
+    };
+  }
+}
+</script>
+</body>
+</html>
