@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent settings</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F4FD1}a:hover{color:#163A9C}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF8F3; color: #121212; font-family: Inter, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column">
+  <header style="background: #FFFFFF; border-bottom: 2px solid #121212; padding: 10px 12px; display: flex; align-items: center; gap: 8px">
+    <button aria-label="واپس" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg>
+    </button>
+    <span style="font-size: 20px; font-weight: 700">ترتیبات</span>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 18px; padding: 16px">
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 17px; font-weight: 700">زبان · <span dir="ltr">Language</span></span>
+      <div role="radiogroup" style="background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 14px; display: flex; flex-direction: column">
+        <button role="radio" aria-checked="true" style="height: 56px; padding: 0 14px; border: 0; border-bottom: 1px solid #D6D2C8; background: transparent; color: #121212; font-family: inherit; display: flex; align-items: center; gap: 12px; text-align: right; cursor: pointer">
+          <span style="width: 24px; height: 24px; border-radius: 50%; border: 7px solid #121212; box-sizing: border-box"></span>
+          <span style="font-size: 18px; font-weight: 700">اردو</span>
+        </button>
+        <button role="radio" aria-checked="false" style="height: 56px; padding: 0 14px; border: 0; background: transparent; color: #121212; font-family: inherit; display: flex; align-items: center; gap: 12px; text-align: right; cursor: pointer">
+          <span style="width: 24px; height: 24px; border-radius: 50%; border: 2px solid #121212; box-sizing: border-box"></span>
+          <span dir="ltr" style="font-size: 17px; font-weight: 700">English</span>
+        </button>
+      </div>
+      <span style="font-size: 14px; font-weight: 600">اطلاعات بھی اسی زبان میں آئیں گی</span>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 17px; font-weight: 700">اطلاعات</span>
+      <div style="background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 14px; height: 56px; padding: 0 14px; display: flex; align-items: center; gap: 12px">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E7A3E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path></svg>
+        <span style="flex: 1; font-size: 17px; font-weight: 600">اس فون پر چالو ہیں</span>
+        <span style="font-size: 14px; font-weight: 700; color: #FFFFFF; background: #0E7A3E; border-radius: 999px; padding: 0 10px">چالو</span>
+      </div>
+    </section>
+
+    <section style="display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 17px; font-weight: 700">وین</span>
+      <div style="background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column">
+        <span style="font-size: 17px; font-weight: 700">گلشن وین · علی</span>
+        <span style="font-size: 15px; font-weight: 600">ڈرائیور رفیق بھائی · نور اسکول</span>
+      </div>
+    </section>
+
+    <button style="margin-top: auto; height: 56px; border-radius: 14px; border: 2px solid #B3261E; background: #FFFFFF; color: #B3261E; font-family: inherit; font-size: 18px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#B3261E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><path d="m16 17-5-5 5-5"></path><path d="M11 12h10"></path></svg>
+      اس وین کو چھوڑیں
+    </button>
+    <span style="font-size: 14px; font-weight: 600; text-align: center">چھوڑنے کے بعد اطلاعات بند ہو جائیں گی</span>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

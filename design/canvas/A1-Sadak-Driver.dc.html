@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Sadak driver mid-route</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800;900&family=Noto+Naskh+Arabic:wght@500;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#111111}a:hover{color:#000000}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FFFFFF; color: #111111; font-family: Archivo, 'Noto Naskh Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column">
+  <header data-component="TripHeader" style="background: #111111; color: #FFD400; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 6px solid #FFD400">
+    <div style="display: flex; flex-direction: column">
+      <span style="font-size: 22px; font-weight: 700">صبح · گلشن وین</span>
+      <span style="font-size: 14px; color: #FFFFFF; font-weight: 500">منگل 27 اکتوبر</span>
+    </div>
+    <span style="font-size: 34px; font-weight: 900">3/5</span>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px">
+    <div data-component="ChildRow" data-state="absent" style="display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 12px; background: repeating-linear-gradient(135deg, #F1F1F1 0 10px, #E2E2E2 10px 20px); border: 2px solid #111111">
+      <span style="flex: 1; font-size: 19px; font-weight: 700; color: #3A3A3A">6 · مریم</span>
+      <span data-component="AbsentChip" style="font-size: 15px; font-weight: 700; background: #111111; color: #FFFFFF; padding: 2px 10px">آج چھٹی</span>
+    </div>
+
+    <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 12px; background: #111111; color: #FFFFFF">
+      <span style="font-size: 18px; font-weight: 900; color: #FFD400">✓</span><span style="flex: 1; font-size: 18px; font-weight: 700">1 · علی</span><span style="font-size: 16px; font-weight: 700">7:12</span>
+    </div>
+    <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 12px; background: #111111; color: #FFFFFF">
+      <span style="font-size: 18px; font-weight: 900; color: #FFD400">✓</span><span style="flex: 1; font-size: 18px; font-weight: 700">2 · فاطمہ</span><span style="font-size: 16px; font-weight: 700">7:18</span>
+    </div>
+    <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 10px; height: 46px; padding: 0 12px; background: #111111; color: #FFFFFF">
+      <span style="font-size: 18px; font-weight: 900; color: #FFD400">✓</span><span style="flex: 1; font-size: 18px; font-weight: 700">3 · حمزہ</span><span style="font-size: 16px; font-weight: 700">7:24</span>
+    </div>
+
+    <button data-component="TapButton" data-step="picked" style="display: flex; align-items: center; gap: 14px; height: 110px; padding: 0 16px; border: 4px solid #111111; background: #FFD400; color: #111111; font-family: inherit; text-align: right; cursor: pointer">
+      <span style="font-size: 54px; font-weight: 900; line-height: 1">4</span>
+      <span style="display: flex; flex-direction: column">
+        <span style="font-size: 28px; font-weight: 700">عائشہ</span>
+        <span style="font-size: 18px; font-weight: 700">بٹھا لیا</span>
+      </span>
+    </button>
+
+    <button data-component="ChildRow" data-state="waiting" style="display: flex; align-items: center; gap: 10px; height: 64px; padding: 0 12px; border: 3px solid #111111; background: #FFFFFF; color: #111111; font-family: inherit; text-align: right; cursor: pointer">
+      <span style="flex: 1; font-size: 20px; font-weight: 700">5 · زین</span>
+      <span style="font-size: 16px; font-weight: 700">بٹھا لیا</span>
+    </button>
+
+    <button data-component="TapButton" data-step="reached_school" style="margin-top: auto; height: 64px; border: 0; background: #111111; color: #FFD400; font-family: inherit; font-size: 21px; font-weight: 700; cursor: pointer">اسکول پہنچ گئے</button>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

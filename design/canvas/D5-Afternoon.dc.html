@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver afternoon trip</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F4FD1}a:hover{color:#163A9C}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF8F3; color: #121212; font-family: Inter, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column">
+  <header data-component="TripHeader" style="background: #FFFFFF; border-bottom: 2px solid #121212; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px">
+    <div style="display: flex; align-items: center; justify-content: space-between">
+      <div style="display: flex; flex-direction: column">
+        <span style="font-size: 20px; font-weight: 700">دوپہر کا چکر</span>
+        <span style="font-size: 14px; color: #3A3A3A; font-weight: 600">گلشن وین · منگل 27 اکتوبر</span>
+      </div>
+      <div style="display: flex; flex-direction: column; align-items: center">
+        <span style="font-size: 26px; font-weight: 800; line-height: 1.2">2/5</span>
+        <span style="font-size: 14px; font-weight: 600">گھر پہنچے</span>
+      </div>
+    </div>
+    <div aria-hidden="true" style="display: flex; gap: 4px; height: 8px">
+      <span style="flex: 1; border-radius: 4px; background: #00707A"></span>
+      <span style="flex: 1; border-radius: 4px; background: #00707A"></span>
+      <span style="flex: 1; border-radius: 4px; background: #D6D2C8"></span>
+      <span style="flex: 1; border-radius: 4px; background: #D6D2C8"></span>
+      <span style="flex: 1; border-radius: 4px; background: #D6D2C8"></span>
+    </div>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 14px">
+    <div data-component="TapButton" data-step="left_school" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 14px; background: #EFE6FA; border: 2px solid #6B2FB3; border-radius: 12px">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6B2FB3" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5"></path><path d="m15 7 5 5-5 5"></path><path d="M20 12H9"></path></svg>
+      <span style="flex: 1; font-size: 17px; font-weight: 700">اسکول سے نکلے</span>
+      <span style="font-size: 16px; font-weight: 700">1:32</span>
+    </div>
+
+    <div data-component="ChildRow" data-state="absent" style="display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 10px 0 14px; background: #EEEBE4; border: 2px dashed #8A857A; border-radius: 12px">
+      <span style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #4D4D4D; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #4D4D4D; box-sizing: border-box">6</span>
+      <span style="flex: 1; font-size: 18px; font-weight: 700; color: #4D4D4D">مریم</span>
+      <span data-component="AbsentChip" style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: #4D4D4D; color: #FFFFFF; font-size: 15px; font-weight: 700">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18M8 3v4M16 3v4"></path><path d="m10 13 4 4M14 13l-4 4"></path></svg>
+        آج چھٹی
+      </span>
+    </div>
+
+    <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 14px; background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 12px">
+      <span style="width: 28px; height: 28px; border-radius: 50%; background: #00707A; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+      <span style="flex: 1; font-size: 18px; font-weight: 700">زین</span>
+      <span style="font-size: 16px; font-weight: 700">1:48</span>
+    </div>
+    <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 14px; background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 12px">
+      <span style="width: 28px; height: 28px; border-radius: 50%; background: #00707A; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+      <span style="flex: 1; font-size: 18px; font-weight: 700">عائشہ</span>
+      <span style="font-size: 16px; font-weight: 700">1:55</span>
+    </div>
+
+    <button data-component="TapButton" data-step="dropped" data-size="next" style="display: flex; align-items: center; gap: 14px; height: 104px; padding: 0 16px; border: 0; border-radius: 18px; background: #00707A; color: #FFFFFF; font-family: inherit; text-align: right; box-shadow: 0 4px 0 #00484F; cursor: pointer">
+      <span style="width: 60px; height: 60px; border-radius: 14px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#00707A" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg>
+      </span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.6">
+        <span style="font-size: 26px; font-weight: 700">حمزہ</span>
+        <span style="font-size: 18px; font-weight: 600">گھر اتار دیا</span>
+      </span>
+      <span style="width: 36px; height: 36px; border-radius: 50%; border: 2px solid #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; box-sizing: border-box">3</span>
+    </button>
+
+    <button data-component="ChildRow" data-state="waiting" style="display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 14px; background: #FFFFFF; border: 2px solid #00707A; border-radius: 12px; color: #121212; font-family: inherit; text-align: right; cursor: pointer">
+      <span style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #121212; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; box-sizing: border-box">4</span>
+      <span style="flex: 1; font-size: 19px; font-weight: 700">فاطمہ</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 700; color: #00707A">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00707A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg>
+        گھر اتار دیا
+      </span>
+    </button>
+    <button data-component="ChildRow" data-state="waiting" style="display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 14px; background: #FFFFFF; border: 2px solid #00707A; border-radius: 12px; color: #121212; font-family: inherit; text-align: right; cursor: pointer">
+      <span style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #121212; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; box-sizing: border-box">5</span>
+      <span style="flex: 1; font-size: 19px; font-weight: 700">علی</span>
+      <span style="display: inline-flex; align-items: center; gap: 6px; font-size: 16px; font-weight: 700; color: #00707A">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00707A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 11 12 4l9 7"></path><path d="M5 10v10h14V10"></path><path d="M10 20v-6h4v6"></path></svg>
+        گھر اتار دیا
+      </span>
+    </button>
+
+    <span style="margin-top: auto; font-size: 15px; font-weight: 600; text-align: center">دوپہر میں ترتیب الٹی ہے: آخری اسٹاپ پہلے</span>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Ghar parent timeline</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1E5C5A}a:hover{color:#123C3B}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #F6EFE2; color: #23302F; font-family: Nunito, Gulzar, serif; line-height: 2; display: flex; flex-direction: column; padding: 16px; gap: 14px">
+  <header data-component="TripHeader" data-role="parent" style="display: flex; align-items: center; gap: 12px; padding: 4px 2px">
+    <span style="width: 48px; height: 48px; border-radius: 50%; background: #1E5C5A; color: #F6EFE2; display: flex; align-items: center; justify-content: center; font-size: 20px">ع</span>
+    <div style="display: flex; flex-direction: column; line-height: 1.8">
+      <span style="font-size: 22px">علی کا دن</span>
+      <span style="font-size: 14px; color: #5C5348">گلشن وین · رفیق بھائی</span>
+    </div>
+  </header>
+
+  <section style="background: #FFFBF3; border-radius: 28px; padding: 22px 20px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center">
+    <span style="width: 72px; height: 72px; border-radius: 50%; background: #CFE3DA; display: flex; align-items: center; justify-content: center">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#1E5C5A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="7" r="4"></circle><path d="M2 21v-1a6 6 0 0 1 6-6h3"></path><path d="m14.5 18 2.5 2.5 5-5"></path></svg>
+    </span>
+    <span style="font-size: 28px; line-height: 1.8">علی وین میں ہے</span>
+    <span style="font-size: 15px; color: #5C5348">7:12 · ڈرائیور نے مارک کیا</span>
+  </section>
+
+  <ol style="list-style: none; margin: 0; padding: 0 6px; display: flex; flex-direction: column; gap: 10px">
+    <li data-component="TimelineEvent" style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: #1E5C5A"></span>
+      <span style="flex: 1; font-size: 18px">وین نکل گئی</span><span style="font-size: 15px; font-weight: 700">7:05</span>
+    </li>
+    <li data-component="TimelineEvent" style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 12px; height: 12px; border-radius: 50%; background: #1E5C5A"></span>
+      <span style="flex: 1; font-size: 18px">علی وین میں ہے</span><span style="font-size: 15px; font-weight: 700">7:12</span>
+    </li>
+    <li data-component="TimelineEvent" style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 12px; height: 12px; border-radius: 50%; border: 2px solid #5C5348; box-sizing: border-box"></span>
+      <span style="flex: 1; font-size: 18px; color: #5C5348">اسکول پہنچنا</span>
+    </li>
+  </ol>
+
+  <button style="margin-top: auto; height: 56px; border: 0; border-radius: 28px; background: #E9B872; color: #23302F; font-family: inherit; font-size: 19px; cursor: pointer">آج چھٹی</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

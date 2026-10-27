@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent joins van</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F4FD1}a:hover{color:#163A9C}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF8F3; color: #121212; font-family: Inter, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 22px 18px 18px; gap: 14px">
+  <div style="display: flex; align-items: center; gap: 8px">
+    <span style="width: 32px; height: 32px; border-radius: 9px; background: #121212; display: flex; align-items: center; justify-content: center">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5A7 7 0 0 1 19 9.5C19 14.8 12 21 12 21z"></path><path d="m9 9.6 2.2 2.2L15.5 7.6"></path></svg>
+    </span>
+    <span style="font-size: 20px; font-weight: 700">پہنچ</span>
+  </div>
+
+  <section style="background: #FFFFFF; border: 2px solid #121212; border-radius: 16px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">
+    <span style="width: 52px; height: 52px; border-radius: 14px; background: #E8EEFD; display: flex; align-items: center; justify-content: center; flex: none">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#1F4FD1" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 16V7a1 1 0 0 1 1-1h11l4 4h2a2 2 0 0 1 2 2v4"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle><path d="M9 17h6"></path></svg>
+    </span>
+    <span style="display: flex; flex-direction: column; line-height: 1.7">
+      <span style="font-size: 21px; font-weight: 700">گلشن وین</span>
+      <span style="font-size: 15px; font-weight: 600">ڈرائیور رفیق بھائی · نور اسکول</span>
+    </span>
+  </section>
+
+  <div style="display: flex; flex-direction: column">
+    <span style="font-size: 22px; font-weight: 700; line-height: 1.8">اپنے بچے کا نام چنیں</span>
+    <span style="font-size: 15px; font-weight: 600; color: #3A3A3A">صرف پہلے نام دکھائے جاتے ہیں</span>
+  </div>
+
+  <div role="radiogroup" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+    <button role="radio" aria-checked="true" style="height: 60px; border-radius: 14px; border: 3px solid #1F4FD1; background: #E8EEFD; color: #121212; font-family: inherit; font-size: 19px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F4FD1" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>علی
+    </button>
+    <button role="radio" aria-checked="false" style="height: 60px; border-radius: 14px; border: 2px solid #D6D2C8; background: #FFFFFF; color: #121212; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">فاطمہ</button>
+    <button role="radio" aria-checked="false" style="height: 60px; border-radius: 14px; border: 2px solid #D6D2C8; background: #FFFFFF; color: #121212; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">حمزہ</button>
+    <button role="radio" aria-checked="false" style="height: 60px; border-radius: 14px; border: 2px solid #D6D2C8; background: #FFFFFF; color: #121212; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">عائشہ</button>
+    <button role="radio" aria-checked="false" style="height: 60px; border-radius: 14px; border: 2px solid #D6D2C8; background: #FFFFFF; color: #121212; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">زین</button>
+    <button role="radio" aria-checked="false" style="height: 60px; border-radius: 14px; border: 2px solid #D6D2C8; background: #FFFFFF; color: #121212; font-family: inherit; font-size: 19px; font-weight: 700; cursor: pointer">مریم</button>
+  </div>
+
+  <button style="height: 56px; border-radius: 14px; border: 2px dashed #121212; background: transparent; color: #121212; font-family: inherit; font-size: 17px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+    میرا بچہ شامل کریں
+  </button>
+
+  <a href="P2-NotifyAndroid.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 10px; height: 64px; border-radius: 16px; background: #121212; color: #FFFFFF; text-decoration: none; font-size: 20px; font-weight: 700">
+    علی کی خبر لیں
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5"></path><path d="m11 6-6 6 6 6"></path></svg>
+  </a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

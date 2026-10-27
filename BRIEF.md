@@ -1,0 +1,50 @@
+# Pohnch (پہنچ) — brief
+
+> Drafted from `docs/BUILD_PROMPTS.md` and the phase A designs, because there was no separate "Final brief" export. Edit it if anything here is wrong; `CLAUDE.md` follows it.
+
+## The problem
+
+In Karachi, parents hand their children to a private school van and see nothing until the child is home. Drivers don't have time to message every family, and parents worry.
+
+## What Pohnch is
+
+A free, Urdu-first web app (installable on the home screen) for one school van at a time:
+
+- A parent **van captain** sets up the van with three fields and gets two invite links to share on WhatsApp: one for the driver, one for the other parents.
+- The **driver** taps big buttons only when the van is stopped: "نکل گئے" (left), one tap per child picked up, "اسکول پہنچ گئے" (reached school); in the afternoon "اسکول سے نکلے" (left school) and one tap per child dropped home.
+- Every **parent** gets a push notification for each tap that concerns them, and can mark "آج چھٹی" (absent) for today or tomorrow, morning, afternoon or both, so the driver skips that stop.
+- An **admin page** (only for the builder) shows whether each van is actually used.
+
+## Users
+
+- **Drivers**: cheap Android phones, bright sunlight, some read slowly. One main action per screen, buttons at least 64 px tall, each step with its own colour and icon.
+- **Parents**: busy and worried. They need a calm, trustworthy family utility, not a flashy startup.
+- **Van captain**: one parent per van who sets it up and shares links.
+- **Admin**: the builder, on a laptop.
+
+## Version 1 scope
+
+1. Captain setup at `/start` (driver's first name, school name, morning pickup time) and a share screen with two WhatsApp links.
+2. Login-free access through invite links `/j/[token]`; tokens are 32 random bytes, only their SHA-256 hash is stored; links can be switched off.
+3. Parents pick their child's first name or add a new one.
+4. Driver Today screen with offline tap queue (IndexedDB), optional location at tap time, absent children greyed out.
+5. Web push to parents (VAPID, `web-push` library), Urdu first, each message ending "ڈرائیور نے مارک کیا" (marked by the driver).
+6. "Aaj chutti" with Undo until that trip's "left" tap.
+7. Admin page at `/admin` protected by `ADMIN_TOKEN`: tap rate over the last 10 school days, parents joined, notifications delivered and failed, chutti taps, Paid ticks per family per month, vans under 80% flagged, switch off any link.
+8. Urdu (default, right-to-left) and English.
+
+## Out of scope for version 1
+
+Live GPS tracking or maps, in-app chat, payments inside the app, accounts or passwords, school-side dashboards, more than one van per captain flow, native app-store apps, SMS fallback, driver undo of a mistaken tap.
+
+## Stack
+
+Next.js (App Router, TypeScript), Supabase (Postgres, row-level security on, only server code with the service key reads or writes), web push with `web-push`, hand-written service worker, hosted on Vercel. Vitest for unit tests, Playwright for end-to-end tests.
+
+## Success measure for the pilot
+
+Driver tap rate of at least 80% over 10 school days (a school day counts when the morning "left", a "picked" for every child not on chutti, and "reached school" all arrived), and every alert reaching parents within seconds.
+
+## Designs
+
+The phase A canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy (sources in `design/canvas/`, decisions in `design/DECISIONS.md`).

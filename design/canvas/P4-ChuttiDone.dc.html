@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Chutti confirmed with undo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F4FD1}a:hover{color:#163A9C}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF8F3; color: #121212; font-family: Inter, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.9; display: flex; flex-direction: column; padding: 28px 18px 18px; gap: 16px">
+  <sc-if value="{{marked}}" hint-placeholder-val="{{ true }}">
+    <div role="status" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px">
+      <span style="width: 96px; height: 96px; border-radius: 50%; background: #4D4D4D; display: flex; align-items: center; justify-content: center">
+        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg>
+      </span>
+      <span style="font-size: 28px; font-weight: 700; line-height: 1.8">چھٹی لگ گئی</span>
+      <span style="font-size: 17px; font-weight: 700">علی · کل بدھ 28 اکتوبر</span>
+      <span style="font-size: 17px; font-weight: 600">صبح اور دوپہر دونوں</span>
+    </div>
+    <section style="background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 6px">
+      <span style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 16V7a1 1 0 0 1 1-1h11l4 4h2a2 2 0 0 1 2 2v4"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
+        رفیق بھائی کی فہرست میں علی کا نام چھٹی میں دکھے گا
+      </span>
+      <span style="display: flex; align-items: center; gap: 10px; font-size: 16px; font-weight: 600">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+        کل صبح وین نکلنے تک واپس لے سکتے ہیں
+      </span>
+    </section>
+    <button onClick="{{undo}}" style="height: 60px; border-radius: 14px; border: 3px solid #121212; background: #FFFFFF; color: #121212; font-family: inherit; font-size: 19px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 10px; cursor: pointer">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#121212" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 14l5-5-5-5"></path><path d="M20 9H9a5 5 0 0 0 0 10h3"></path></svg>
+      واپس لیں
+    </button>
+  </sc-if>
+
+  <sc-if value="{{undone}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px">
+      <span style="width: 96px; height: 96px; border-radius: 50%; background: #0E7A3E; display: flex; align-items: center; justify-content: center">
+        <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 16V7a1 1 0 0 1 1-1h11l4 4h2a2 2 0 0 1 2 2v4"></path><circle cx="7" cy="17" r="2"></circle><circle cx="17" cy="17" r="2"></circle></svg>
+      </span>
+      <span style="font-size: 28px; font-weight: 700; line-height: 1.8">چھٹی واپس لے لی</span>
+      <span style="font-size: 17px; font-weight: 600">کل علی کا اسٹاپ معمول کے مطابق رہے گا</span>
+    </div>
+    <button onClick="{{redo}}" style="height: 56px; border-radius: 14px; border: 2px solid #121212; background: #FFFFFF; color: #121212; font-family: inherit; font-size: 18px; font-weight: 700; cursor: pointer">دوبارہ چھٹی لگائیں</button>
+  </sc-if>
+
+  <a href="D5-Afternoon.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; height: 64px; border-radius: 16px; background: #121212; color: #FFFFFF; text-decoration: none; font-size: 20px; font-weight: 700">ٹھیک ہے</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { marked: true };
+  }
+  renderVals() {
+    return {
+      marked: this.state.marked,
+      undone: !this.state.marked,
+      undo: () => this.setState({ marked: false }),
+      redo: () => this.setState({ marked: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

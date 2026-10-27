@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Pohnch component sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F4FD1}a:hover{color:#163A9C}
+</style>
+</helmet>
+<div style="width: 1240px; height: 1700px; box-sizing: border-box; overflow: hidden; background: #FAF8F3; color: #121212; font-family: Inter, 'Noto Nastaliq Urdu', sans-serif; line-height: 1.4; padding: 40px; display: flex; flex-direction: column; gap: 32px">
+  <div style="display: flex; flex-direction: column; gap: 4px">
+    <span style="font-size: 32px; font-weight: 800">Pohnch components · Saaf</span>
+    <span style="font-size: 16px; font-weight: 600; color: #3A3A3A">Names here are the names in code: TapButton, ChildRow, AbsentChip, OfflineBanner, TripHeader, TimelineEvent, ShareLinkCard.</span>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <span style="font-size: 20px; font-weight: 800">Tokens</span>
+    <div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 12px">
+      <sc-for list="{{tokens}}" as="t" hint-placeholder-count="12">
+        <div style="display: flex; flex-direction: column; gap: 6px; background: #FFFFFF; border: 1px solid #D6D2C8; border-radius: 10px; padding: 8px">
+          <span style="height: 44px; border-radius: 6px; background: {{t.hex}}; border: 1px solid #D6D2C8"></span>
+          <span style="font-size: 14px; font-weight: 700">{{t.name}}</span>
+          <span style="font-size: 14px; font-weight: 600; color: #3A3A3A">{{t.hex}} · {{t.use}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <span style="font-size: 14px; font-weight: 600">Type: Noto Nastaliq Urdu for Urdu (line-height 1.9), Inter for Latin and all digits. Sizes 14 · 15 · 16 · 17 · 18 · 20 · 26 · 28 px; nothing under 14 px. Weights 600 / 700 / 800 only.</span>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <span style="font-size: 20px; font-weight: 800">TapButton · size "next" (104 px), one colour and one icon per step</span>
+    <div dir="rtl" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+        <div style="display: flex; flex-direction: column; gap: 8px">
+          <button data-component="TapButton" data-size="next" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; height: 128px; border: 0; border-radius: 18px; background: {{s.bg}}; color: {{s.fg}}; font-family: inherit; line-height: 1.7; cursor: pointer">
+            <span style="width: 52px; height: 52px; border-radius: 12px; background: {{s.chip}}; display: flex; align-items: center; justify-content: center">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="{{s.icon}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.d}}"></path></svg>
+            </span>
+            <span style="font-size: 20px; font-weight: 700">{{s.ur}}</span>
+          </button>
+          <div data-component="TapButton" data-state="done" style="display: flex; align-items: center; gap: 8px; height: 48px; padding: 0 10px; border-radius: 12px; background: {{s.tint}}; border: 2px solid {{s.bg}}">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="{{s.bg}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{s.d}}"></path></svg>
+            <span style="flex: 1; font-size: 15px; font-weight: 700; line-height: 1.9">{{s.ur}}</span>
+            <span style="font-size: 15px; font-weight: 700">7:05</span>
+          </div>
+          <span dir="ltr" style="font-size: 14px; font-weight: 700; text-align: center">{{s.id}} · {{s.en}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 12px">
+    <span style="font-size: 20px; font-weight: 800">ChildRow states · AbsentChip</span>
+    <div dir="rtl" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; line-height: 1.9">
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div data-component="ChildRow" data-state="pending" style="display: flex; align-items: center; gap: 12px; height: 60px; padding: 0 14px; background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 12px">
+          <span style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #121212; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; box-sizing: border-box">1</span>
+          <span style="flex: 1; font-size: 19px; font-weight: 700">علی</span>
+        </div>
+        <span dir="ltr" style="font-size: 14px; font-weight: 700">pending · before “left”</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <button data-component="ChildRow" data-state="waiting" style="display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 14px; background: #FFFFFF; border: 2px solid #0E7A3E; border-radius: 12px; color: #121212; font-family: inherit; text-align: right">
+          <span style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #121212; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; box-sizing: border-box">5</span>
+          <span style="flex: 1; font-size: 19px; font-weight: 700">زین</span>
+          <span style="font-size: 16px; font-weight: 700; color: #0E7A3E">بٹھا لیا</span>
+        </button>
+        <span dir="ltr" style="font-size: 14px; font-weight: 700">waiting · tappable, 64 px</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 14px; background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 12px">
+          <span style="width: 28px; height: 28px; border-radius: 50%; background: #0E7A3E; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+          <span style="flex: 1; font-size: 18px; font-weight: 700">علی</span>
+          <span style="font-size: 16px; font-weight: 700">7:12</span>
+        </div>
+        <span dir="ltr" style="font-size: 14px; font-weight: 700">done · sent</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div data-component="ChildRow" data-state="queued" style="display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 14px; background: #FFFFFF; border: 2px dashed #8A5A00; border-radius: 12px">
+          <span style="width: 28px; height: 28px; border-radius: 50%; background: #0E7A3E; display: flex; align-items: center; justify-content: center"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+          <span style="flex: 1; font-size: 18px; font-weight: 700">فاطمہ</span>
+          <span style="font-size: 14px; font-weight: 700; color: #6B4600">باقی</span>
+          <span style="font-size: 16px; font-weight: 700">7:18</span>
+        </div>
+        <span dir="ltr" style="font-size: 14px; font-weight: 700">queued · saved offline, not sent</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div data-component="ChildRow" data-state="absent" style="display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 10px 0 14px; background: #EEEBE4; border: 2px dashed #8A857A; border-radius: 12px">
+          <span style="width: 28px; height: 28px; border-radius: 50%; border: 2px solid #4D4D4D; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #4D4D4D; box-sizing: border-box">6</span>
+          <span style="flex: 1; font-size: 18px; font-weight: 700; color: #4D4D4D">مریم</span>
+          <span data-component="AbsentChip" style="display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px; background: #4D4D4D; color: #FFFFFF; font-size: 15px; font-weight: 700">آج چھٹی</span>
+        </div>
+        <span dir="ltr" style="font-size: 14px; font-weight: 700">absent · not tappable, pinned to top</span>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 4px">
+        <div data-component="ChildRow" data-state="done-group" style="display: flex; align-items: center; gap: 12px; height: 52px; padding: 0 14px; background: #FFFFFF; border: 2px solid #D6D2C8; border-radius: 12px">
+          <span style="width: 28px; height: 28px; border-radius: 50%; background: #0E7A3E"></span>
+          <span style="flex: 1; font-size: 17px; font-weight: 700">9 بچے بیٹھ گئے</span>
+          <span style="font-size: 15px; font-weight: 700; text-decoration: underline">دیکھیں</span>
+        </div>
+        <span dir="ltr" style="font-size: 14px; font-weight: 700">done-group · when more than 8 children</span>
+      </div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px">
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 20px; font-weight: 800">TripHeader · driver and parent</span>
+      <header data-component="TripHeader" dir="rtl" style="background: #FFFFFF; border: 2px solid #121212; border-radius: 12px; padding: 10px 16px; display: flex; flex-direction: column; gap: 6px; line-height: 1.9">
+        <div style="display: flex; align-items: center; justify-content: space-between">
+          <div style="display: flex; flex-direction: column"><span style="font-size: 20px; font-weight: 700">صبح کا چکر</span><span style="font-size: 14px; font-weight: 600; color: #3A3A3A">گلشن وین · منگل 27 اکتوبر</span></div>
+          <div style="display: flex; flex-direction: column; align-items: center"><span style="font-size: 26px; font-weight: 800; line-height: 1.2">3/5</span><span style="font-size: 14px; font-weight: 600">بیٹھ گئے</span></div>
+        </div>
+        <div aria-hidden="true" style="display: flex; gap: 4px; height: 8px"><span style="flex: 3; border-radius: 4px; background: #0E7A3E"></span><span style="flex: 2; border-radius: 4px; background: #D6D2C8"></span></div>
+      </header>
+      <header data-component="TripHeader" data-role="parent" dir="rtl" style="background: #FFFFFF; border: 2px solid #121212; border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; line-height: 1.9">
+        <div style="display: flex; flex-direction: column"><span style="font-size: 20px; font-weight: 700">علی · صبح کا چکر</span><span style="font-size: 14px; font-weight: 600; color: #3A3A3A">گلشن وین · ڈرائیور رفیق بھائی</span></div>
+        <span style="font-size: 14px; font-weight: 700; padding: 0 10px; border: 2px solid #121212; border-radius: 999px">منگل</span>
+      </header>
+      <span style="font-size: 20px; font-weight: 800">OfflineBanner</span>
+      <div data-component="OfflineBanner" dir="rtl" role="status" style="display: flex; align-items: center; gap: 12px; padding: 10px 16px; background: #FFF3D6; border: 3px solid #8A5A00; border-radius: 12px; line-height: 1.7; color: #3D2800">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#6B4600" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 2l20 20"></path><path d="M8.5 16.5a5 5 0 0 1 7 0"></path><path d="M5 12.5a10 10 0 0 1 5.2-2.8"></path><path d="M19 12.5a10 10 0 0 0-2.5-1.8"></path><path d="M12 20h.01"></path></svg>
+        <span style="flex: 1; display: flex; flex-direction: column"><span style="font-size: 17px; font-weight: 700">سگنل نہیں ہے</span><span style="font-size: 15px; font-weight: 600">ٹیپ محفوظ ہیں، سگنل آتے ہی خود چلے جائیں گے</span></span>
+        <span style="min-width: 56px; padding: 4px 8px; border-radius: 12px; background: #6B4600; color: #FFFFFF; display: flex; flex-direction: column; align-items: center; line-height: 1.5; box-sizing: border-box"><span style="font-size: 22px; font-weight: 800; line-height: 1.1">3</span><span style="font-size: 14px; font-weight: 700">باقی</span></span>
+      </div>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <span style="font-size: 20px; font-weight: 800">TimelineEvent · done, current, upcoming</span>
+      <ol dir="rtl" style="list-style: none; margin: 0; padding: 12px 16px; background: #FFFFFF; border: 1px solid #D6D2C8; border-radius: 12px; display: flex; flex-direction: column; line-height: 1.9">
+        <li data-component="TimelineEvent" style="display: flex; gap: 12px; min-height: 56px">
+          <div style="display: flex; flex-direction: column; align-items: center; width: 36px"><span style="width: 36px; height: 36px; border-radius: 50%; background: #1F4FD1; flex: none"></span><span style="flex: 1; width: 3px; background: #121212"></span></div>
+          <div style="flex: 1; display: flex; justify-content: space-between"><span style="font-size: 18px; font-weight: 700">وین نکل گئی</span><span style="font-size: 16px; font-weight: 700">7:05</span></div>
+        </li>
+        <li data-component="TimelineEvent" data-current="true" style="display: flex; gap: 12px; min-height: 56px">
+          <div style="display: flex; flex-direction: column; align-items: center; width: 36px"><span style="width: 36px; height: 36px; border-radius: 50%; background: #0E7A3E; box-shadow: 0 0 0 4px #CFE8D9; flex: none"></span><span style="flex: 1; width: 3px; background: repeating-linear-gradient(#3A3A3A 0 4px, transparent 4px 9px)"></span></div>
+          <div style="flex: 1; display: flex; justify-content: space-between"><span style="font-size: 18px; font-weight: 700">علی وین میں ہے</span><span style="font-size: 16px; font-weight: 700">7:12</span></div>
+        </li>
+        <li data-component="TimelineEvent" data-state="upcoming" style="display: flex; gap: 12px; min-height: 44px">
+          <div style="display: flex; flex-direction: column; align-items: center; width: 36px"><span style="width: 36px; height: 36px; border-radius: 50%; border: 2px dashed #3A3A3A; box-sizing: border-box"></span></div>
+          <span style="font-size: 18px; font-weight: 600; color: #3A3A3A">اسکول پہنچنا</span>
+        </li>
+      </ol>
+      <span style="font-size: 20px; font-weight: 800">ShareLinkCard · driver and parents</span>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px" dir="rtl">
+        <section data-component="ShareLinkCard" data-role="driver" style="background: #FFFFFF; border: 2px solid #1F4FD1; border-radius: 14px; overflow: hidden; line-height: 1.9">
+          <div style="background: #1F4FD1; color: #FFFFFF; padding: 6px 12px; font-size: 16px; font-weight: 700">ڈرائیور کے لیے</div>
+          <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 14px; font-weight: 600">پہلے سے لکھا پیغام · اردو اور انگریزی</span>
+            <span style="height: 48px; border-radius: 12px; background: #127A3F; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700">واٹس ایپ پر بھیجیں</span>
+          </div>
+        </section>
+        <section data-component="ShareLinkCard" data-role="parent" style="background: #FFFFFF; border: 2px solid #121212; border-radius: 14px; overflow: hidden; line-height: 1.9">
+          <div style="background: #121212; color: #FFFFFF; padding: 6px 12px; font-size: 16px; font-weight: 700">والدین کے لیے</div>
+          <div style="padding: 10px 12px; display: flex; flex-direction: column; gap: 8px">
+            <span style="font-size: 14px; font-weight: 600">پہلے سے لکھا پیغام · اردو اور انگریزی</span>
+            <span style="height: 48px; border-radius: 12px; background: #127A3F; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700">واٹس ایپ پر بھیجیں</span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":1700}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      tokens: [
+        { name: 'ink', hex: '#121212', use: 'text, primary buttons' },
+        { name: 'ground', hex: '#FAF8F3', use: 'screen background' },
+        { name: 'surface', hex: '#FFFFFF', use: 'cards, rows' },
+        { name: 'line', hex: '#D6D2C8', use: 'borders only, never text' },
+        { name: 'ink-2', hex: '#3A3A3A', use: 'secondary text (10.7:1)' },
+        { name: 'step-left', hex: '#1F4FD1', use: 'Nikal gaye' },
+        { name: 'step-picked', hex: '#0E7A3E', use: 'Bitha liya' },
+        { name: 'step-school', hex: '#141414', use: 'School pohnch gaye (+ #FFC21A)' },
+        { name: 'step-left-school', hex: '#6B2FB3', use: 'School se nikle' },
+        { name: 'step-dropped', hex: '#00707A', use: 'Ghar utaar diya' },
+        { name: 'absent', hex: '#4D4D4D', use: 'Aaj chutti (on #EEEBE4)' },
+        { name: 'offline', hex: '#8A5A00', use: 'OfflineBanner (on #FFF3D6)' }
+      ],
+      steps: [
+        { id: 'left', ur: 'نکل گئے', en: 'Left', bg: '#1F4FD1', fg: '#FFFFFF', chip: '#FFFFFF', icon: '#1F4FD1', tint: '#E8EEFD', d: 'M2 16V7a1 1 0 0 1 1-1h11l4 4h2a2 2 0 0 1 2 2v4 M9 17h6 M5 17a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M15 17a2 2 0 1 0 4 0a2 2 0 1 0-4 0' },
+        { id: 'picked', ur: 'بٹھا لیا', en: 'Picked up', bg: '#0E7A3E', fg: '#FFFFFF', chip: '#FFFFFF', icon: '#0E7A3E', tint: '#E3F2E9', d: 'M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5' },
+        { id: 'reached_school', ur: 'اسکول پہنچ گئے', en: 'Reached school', bg: '#141414', fg: '#FFC21A', chip: '#FFC21A', icon: '#141414', tint: '#FFF6D6', d: 'M3 21h18 M5 21V10l7-4 7 4v11 M10 21v-5h4v5 M12 6V2l4 1.5L12 5' },
+        { id: 'left_school', ur: 'اسکول سے نکلے', en: 'Left school', bg: '#6B2FB3', fg: '#FFFFFF', chip: '#FFFFFF', icon: '#6B2FB3', tint: '#EFE6FA', d: 'M10 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h5 M15 7l5 5-5 5 M20 12H9' },
+        { id: 'dropped', ur: 'گھر اتار دیا', en: 'Dropped home', bg: '#00707A', fg: '#FFFFFF', chip: '#FFFFFF', icon: '#00707A', tint: '#DDF0F1', d: 'M3 11 12 4l9 7 M5 10v10h14V10 M10 20v-6h4v6' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

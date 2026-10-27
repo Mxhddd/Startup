@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Pohnch admin</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F4FD1}a:hover{color:#163A9C}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; overflow: hidden; background: #F4F2EC; color: #121212; font-family: Inter, sans-serif; font-size: 14px; line-height: 1.4; display: flex; flex-direction: column">
+  <header style="height: 56px; background: #121212; color: #FFFFFF; display: flex; align-items: center; gap: 24px; padding: 0 24px">
+    <span style="font-size: 18px; font-weight: 800">Pohnch admin</span>
+    <span style="font-weight: 600">Tue 27 Oct 2026 · Asia/Karachi</span>
+    <span style="margin-left: auto; display: flex; gap: 20px; font-weight: 600">
+      <span>6 vans</span><span>41 families</span><span style="color: #FFB4AB">2 vans under 80%</span><span>Oct paid 28 / 41</span>
+    </span>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 16px; padding: 16px 24px; min-height: 0">
+    <section role="table" aria-label="Vans" style="background: #FFFFFF; border: 1px solid #C9C4B8; border-radius: 8px; overflow: hidden">
+      <div role="row" style="display: grid; grid-template-columns: 130px 140px 80px minmax(0, 1fr) 110px 180px 120px 130px 56px; align-items: center; gap: 12px; height: 40px; padding: 0 14px; background: #ECE9E1; font-weight: 700; border-bottom: 1px solid #C9C4B8">
+        <span role="columnheader">Van</span><span role="columnheader">School</span><span role="columnheader">Driver</span><span role="columnheader">Tap rate · last 10 school days</span><span role="columnheader">Parents joined</span><span role="columnheader">Push delivered / failed · 7d</span><span role="columnheader">Chutti taps · 30d</span><span role="columnheader">Last tap</span><span role="columnheader"></span>
+      </div>
+      <sc-for list="{{vans}}" as="v" hint-placeholder-count="6">
+        <div role="row" style="display: grid; grid-template-columns: 130px 140px 80px minmax(0, 1fr) 110px 180px 120px 130px 56px; align-items: center; gap: 12px; height: 44px; padding: 0 14px; border-bottom: 1px solid #E2DED4; background: {{v.rowBg}}">
+          <span role="cell" style="font-weight: 700">{{v.name}}</span>
+          <span role="cell">{{v.school}}</span>
+          <span role="cell">{{v.driver}}</span>
+          <span role="cell" style="display: flex; align-items: center; gap: 10px">
+            <span style="width: 140px; height: 10px; background: #E2DED4; border-radius: 5px; overflow: hidden; display: inline-flex"><span style="width: {{v.rate}}%; background: {{v.barColor}}"></span></span>
+            <span style="font-weight: 800; width: 40px">{{v.rate}}%</span>
+            <span style="color: #3A3A3A">{{v.days}}/10 days</span>
+            <sc-if value="{{v.flag}}" hint-placeholder-val="{{ false }}"><span style="background: #B3261E; color: #FFFFFF; font-weight: 700; padding: 2px 8px; border-radius: 4px">Under 80%</span></sc-if>
+          </span>
+          <span role="cell">{{v.parents}}</span>
+          <span role="cell"><span style="font-weight: 700">{{v.delivered}}</span> / <span style="font-weight: 700; color: {{v.failColor}}">{{v.failed}}</span></span>
+          <span role="cell">{{v.chutti}}</span>
+          <span role="cell">{{v.last}}</span>
+          <span role="cell"><a href="#links" style="font-weight: 700">Open</a></span>
+        </div>
+      </sc-for>
+    </section>
+
+    <div style="flex: 1; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; min-height: 0">
+      <section style="background: #FFFFFF; border: 1px solid #C9C4B8; border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; align-items: baseline; gap: 12px">
+          <span style="font-size: 16px; font-weight: 800">Paid · Gulshan van</span>
+          <span style="color: #3A3A3A">one row per family, tick when paid</span>
+        </div>
+        <div role="table" aria-label="Payments" style="display: flex; flex-direction: column">
+          <div role="row" style="display: grid; grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr)); align-items: center; height: 32px; font-weight: 700; border-bottom: 1px solid #C9C4B8">
+            <span role="columnheader">Family (child)</span><span role="columnheader">Aug</span><span role="columnheader">Sep</span><span role="columnheader">Oct</span><span role="columnheader">Nov</span>
+          </div>
+          <sc-for list="{{families}}" as="f" hint-placeholder-count="6">
+            <div role="row" style="display: grid; grid-template-columns: minmax(0, 2fr) repeat(4, minmax(0, 1fr)); align-items: center; height: 34px; border-bottom: 1px solid #E2DED4">
+              <span role="cell" style="font-weight: 600">{{f.child}}</span>
+              <span role="cell"><input type="checkbox" aria-label="Paid August" checked="{{f.aug}}" style="width: 20px; height: 20px; margin: 0"></span>
+              <span role="cell"><input type="checkbox" aria-label="Paid September" checked="{{f.sep}}" style="width: 20px; height: 20px; margin: 0"></span>
+              <span role="cell"><input type="checkbox" aria-label="Paid October" checked="{{f.oct}}" style="width: 20px; height: 20px; margin: 0"></span>
+              <span role="cell"><input type="checkbox" aria-label="Paid November" checked="{{f.nov}}" style="width: 20px; height: 20px; margin: 0"></span>
+            </div>
+          </sc-for>
+        </div>
+      </section>
+
+      <section id="links" style="background: #FFFFFF; border: 1px solid #C9C4B8; border-radius: 8px; padding: 12px 16px; display: flex; flex-direction: column; gap: 6px">
+        <div style="display: flex; align-items: baseline; gap: 12px">
+          <span style="font-size: 16px; font-weight: 800">Invite links · Gulshan van</span>
+          <span style="color: #3A3A3A">switching off a link signs out everyone who used it</span>
+        </div>
+        <div role="table" aria-label="Invite links" style="display: flex; flex-direction: column">
+          <div role="row" style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr) 110px; align-items: center; height: 32px; font-weight: 700; border-bottom: 1px solid #C9C4B8">
+            <span role="columnheader">Role</span><span role="columnheader">Created</span><span role="columnheader">Devices</span><span role="columnheader">Status</span><span role="columnheader"></span>
+          </div>
+          <div role="row" style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr) 110px; align-items: center; height: 42px; border-bottom: 1px solid #E2DED4">
+            <span role="cell" style="font-weight: 600">Captain</span><span role="cell">2 Sep</span><span role="cell">1</span><span role="cell">Active</span><span role="cell"><button style="height: 32px; padding: 0 12px; border: 2px solid #B3261E; border-radius: 6px; background: #FFFFFF; color: #B3261E; font-family: inherit; font-weight: 700; cursor: pointer">Switch off</button></span>
+          </div>
+          <div role="row" style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr) 110px; align-items: center; height: 42px; border-bottom: 1px solid #E2DED4">
+            <span role="cell" style="font-weight: 600">Driver</span><span role="cell">2 Sep</span><span role="cell">1</span><span role="cell">Active</span><span role="cell"><button style="height: 32px; padding: 0 12px; border: 2px solid #B3261E; border-radius: 6px; background: #FFFFFF; color: #B3261E; font-family: inherit; font-weight: 700; cursor: pointer">Switch off</button></span>
+          </div>
+          <div role="row" style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr) 110px; align-items: center; height: 42px; border-bottom: 1px solid #E2DED4">
+            <span role="cell" style="font-weight: 600">Parents</span><span role="cell">2 Sep</span><span role="cell">9</span><span role="cell">Active</span><span role="cell"><button style="height: 32px; padding: 0 12px; border: 2px solid #B3261E; border-radius: 6px; background: #FFFFFF; color: #B3261E; font-family: inherit; font-weight: 700; cursor: pointer">Switch off</button></span>
+          </div>
+          <div role="row" style="display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.4fr) 110px; align-items: center; height: 42px; color: #3A3A3A">
+            <span role="cell" style="font-weight: 600">Driver (old)</span><span role="cell">1 Sep</span><span role="cell">0</span><span role="cell">Off since 2 Sep</span><span role="cell"></span>
+          </div>
+        </div>
+        <span style="margin-top: auto; color: #3A3A3A">A school day counts as tapped when the morning “left”, “picked” for every child not on chutti, and “reached school” all arrived.</span>
+      </section>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const vans = [
+      { name: 'DEMO', school: 'Demo School', driver: 'Demo', rate: 100, days: 10, parents: '6 / 6', delivered: 214, failed: 0, chutti: 3, last: 'today 7:46' },
+      { name: 'Gulshan van', school: 'Noor School', driver: 'Rafiq', rate: 90, days: 9, parents: '6 / 6', delivered: 198, failed: 2, chutti: 5, last: 'today 7:46' },
+      { name: 'Johar van 1', school: 'Noor School', driver: 'Asif', rate: 70, days: 7, parents: '8 / 9', delivered: 240, failed: 11, chutti: 4, last: 'today 7:51' },
+      { name: 'Johar van 2', school: 'Crescent School', driver: 'Naveed', rate: 100, days: 10, parents: '7 / 7', delivered: 251, failed: 1, chutti: 6, last: 'today 7:39' },
+      { name: 'PECHS van', school: 'Crescent School', driver: 'Saleem', rate: 60, days: 6, parents: '5 / 8', delivered: 120, failed: 4, chutti: 2, last: 'yesterday 1:58' },
+      { name: 'Clifton van', school: 'Harbour School', driver: 'Imran', rate: 80, days: 8, parents: '6 / 6', delivered: 176, failed: 0, chutti: 1, last: 'today 7:22' }
+    ];
+    return {
+      vans: vans.map((v) => ({
+        ...v,
+        flag: v.rate < 80,
+        rowBg: v.rate < 80 ? '#FDECEA' : '#FFFFFF',
+        barColor: v.rate < 80 ? '#B3261E' : '#0E7A3E',
+        failColor: v.failed > 5 ? '#B3261E' : '#121212'
+      })),
+      families: [
+        { child: 'Ali', aug: true, sep: true, oct: true, nov: false },
+        { child: 'Fatima', aug: true, sep: true, oct: true, nov: false },
+        { child: 'Hamza', aug: true, sep: true, oct: false, nov: false },
+        { child: 'Ayesha', aug: true, sep: true, oct: true, nov: false },
+        { child: 'Zain', aug: false, sep: true, oct: false, nov: false },
+        { child: 'Maryam', aug: true, sep: true, oct: true, nov: false }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
