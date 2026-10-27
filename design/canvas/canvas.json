@@ -7,36 +7,12 @@
  "title": "Pohnch designs",
  "launch": {
   "view": "canvas",
-  "page": "brand"
+  "page": "v2"
  },
  "pages": [
   {
-   "id": "brand",
-   "name": "Brand"
-  },
-  {
-   "id": "whatsapp",
-   "name": "WhatsApp cards"
-  },
-  {
-   "id": "print",
-   "name": "Print"
-  },
-  {
-   "id": "v2driver",
-   "name": "v2 · Driver"
-  },
-  {
-   "id": "v2parent",
-   "name": "v2 · Parent"
-  },
-  {
-   "id": "v2captain",
-   "name": "v2 · Captain"
-  },
-  {
-   "id": "concept",
-   "name": "Pohnch Baji concept"
+   "id": "v2",
+   "name": "Pohnch v2 · everything new"
   },
   {
    "id": "a1",
@@ -393,7 +369,7 @@
    "y": 0,
    "w": 1440,
    "h": 2720,
-   "page": "brand",
+   "page": "v2",
    "title": "Brand board"
   },
   "BR-Logo.dc.html": {
@@ -401,7 +377,7 @@
    "y": 0,
    "w": 1440,
    "h": 1300,
-   "page": "brand",
+   "page": "v2",
    "title": "Logo, mark and app icon"
   },
   "BR-Baji.dc.html": {
@@ -409,328 +385,328 @@
    "y": 0,
    "w": 1440,
    "h": 1300,
-   "page": "brand",
+   "page": "v2",
    "title": "Sub-brand · Pohnch Baji"
   },
   "M-WA-Parents.dc.html": {
    "x": 0,
-   "y": 0,
+   "y": 3240,
    "w": 1080,
    "h": 1080,
-   "page": "whatsapp",
+   "page": "v2",
    "title": "WhatsApp · to parents"
   },
   "M-WA-Join.dc.html": {
    "x": 1160,
-   "y": 0,
+   "y": 3240,
    "w": 1080,
    "h": 1080,
-   "page": "whatsapp",
+   "page": "v2",
    "title": "WhatsApp · how to join"
   },
   "M-WA-Status.dc.html": {
    "x": 2320,
-   "y": 0,
+   "y": 3240,
    "w": 1080,
    "h": 1920,
-   "page": "whatsapp",
+   "page": "v2",
    "title": "WhatsApp status 9:16"
   },
   "M-WA-BajiRecruit.dc.html": {
    "x": 3480,
-   "y": 0,
+   "y": 3240,
    "w": 1080,
    "h": 1080,
-   "page": "whatsapp",
+   "page": "v2",
    "title": "WhatsApp · Baji driver recruitment"
   },
   "M-Poster-A3.dc.html": {
    "x": 0,
-   "y": 0,
+   "y": 5680,
    "w": 1123,
    "h": 1587,
-   "page": "print",
+   "page": "v2",
    "title": "Poster A3 · school gate"
   },
   "M-Flyer-A5.dc.html": {
    "x": 1203,
-   "y": 0,
+   "y": 5680,
    "w": 559,
    "h": 794,
-   "page": "print",
+   "page": "v2",
    "title": "Flyer A5 · parents"
   },
   "M-Sticker.dc.html": {
    "x": 1842,
-   "y": 0,
+   "y": 5680,
    "w": 559,
    "h": 794,
-   "page": "print",
+   "page": "v2",
    "title": "Van window sticker (A5 sheet)"
   },
   "M-DriverCard-Front.dc.html": {
    "x": 2481,
-   "y": 0,
+   "y": 5680,
    "w": 559,
    "h": 397,
-   "page": "print",
+   "page": "v2",
    "title": "Driver card A6 · front"
   },
   "M-DriverCard-Back.dc.html": {
    "x": 2481,
-   "y": 517,
+   "y": 6197,
    "w": 559,
    "h": 397,
-   "page": "print",
+   "page": "v2",
    "title": "Driver card A6 · back"
   },
   "M-Baji-Poster-A3.dc.html": {
    "x": 3120,
-   "y": 0,
+   "y": 5680,
    "w": 1123,
    "h": 1587,
-   "page": "print",
+   "page": "v2",
    "title": "Poster A3 · Baji recruitment"
   },
   "V-D-Welcome.dc.html": {
    "x": 0,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "1 · Welcome + practice offer",
    "is_interactive": true
   },
   "V-D-Tutorial.dc.html": {
    "x": 440,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "2 · Practice run",
    "is_interactive": true
   },
   "V-D-Before.dc.html": {
    "x": 880,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "3 · Before trip: hold to start",
    "is_interactive": true
   },
   "V-D-Hold.dc.html": {
    "x": 1320,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "4 · Holding \"Nikal gaye\"",
    "is_interactive": true
   },
   "V-D-Undo.dc.html": {
    "x": 1760,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "5 · 5-second undo",
    "is_interactive": true
   },
   "V-D-MidRoute.dc.html": {
    "x": 2200,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "6 · Mid-route",
    "is_interactive": true
   },
   "V-D-School.dc.html": {
    "x": 2640,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "7 · Reached school",
    "is_interactive": true
   },
   "V-D-Afternoon.dc.html": {
    "x": 3080,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "8 · Afternoon",
    "is_interactive": true
   },
   "V-D-Offline.dc.html": {
    "x": 3520,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "9 · No signal",
    "is_interactive": true
   },
   "V-D-Safety.dc.html": {
    "x": 3960,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "10 · Help: stuck / emergency",
    "is_interactive": true
   },
   "V-D-Holiday.dc.html": {
    "x": 4400,
-   "y": 0,
+   "y": 7787,
    "w": 360,
    "h": 780,
-   "page": "v2driver",
+   "page": "v2",
    "title": "11 · No school today",
    "is_interactive": true
   },
   "V-P-Join.dc.html": {
    "x": 0,
-   "y": 0,
+   "y": 9087,
    "w": 360,
    "h": 780,
-   "page": "v2parent",
+   "page": "v2",
    "title": "1 · Join: pick child + who you are",
    "is_interactive": true
   },
   "V-P-Pending.dc.html": {
    "x": 440,
-   "y": 0,
+   "y": 9087,
    "w": 360,
    "h": 780,
-   "page": "v2parent",
+   "page": "v2",
    "title": "2 · Waiting for captain approval",
    "is_interactive": true
   },
   "V-P-Today.dc.html": {
    "x": 880,
-   "y": 0,
+   "y": 9087,
    "w": 360,
    "h": 780,
-   "page": "v2parent",
+   "page": "v2",
    "title": "3 · Today (badges)",
    "is_interactive": true
   },
   "V-P-Siblings.dc.html": {
    "x": 1320,
-   "y": 0,
+   "y": 9087,
    "w": 360,
    "h": 780,
-   "page": "v2parent",
+   "page": "v2",
    "title": "4 · Two children, two vans",
    "is_interactive": true
   },
   "V-P-Chutti.dc.html": {
    "x": 1760,
-   "y": 0,
+   "y": 9087,
    "w": 360,
    "h": 780,
-   "page": "v2parent",
+   "page": "v2",
    "title": "5 · Aaj chutti",
    "is_interactive": true
   },
   "V-P-Holiday.dc.html": {
    "x": 2200,
-   "y": 0,
+   "y": 9087,
    "w": 360,
    "h": 780,
-   "page": "v2parent",
+   "page": "v2",
    "title": "6 · Van off today",
    "is_interactive": true
   },
   "V-P-Lock.dc.html": {
    "x": 2640,
-   "y": 0,
+   "y": 9087,
    "w": 360,
    "h": 1000,
-   "page": "v2parent",
+   "page": "v2",
    "title": "7 · Lock-screen alerts",
    "is_interactive": true
   },
   "V-C-Setup.dc.html": {
    "x": 0,
-   "y": 0,
+   "y": 10607,
    "w": 360,
    "h": 780,
-   "page": "v2captain",
+   "page": "v2",
    "title": "1 · Set up van + badges",
    "is_interactive": true
   },
   "V-C-Share.dc.html": {
    "x": 440,
-   "y": 0,
+   "y": 10607,
    "w": 360,
    "h": 780,
-   "page": "v2captain",
+   "page": "v2",
    "title": "2 · Share links",
    "is_interactive": true
   },
   "V-C-Approve.dc.html": {
    "x": 880,
-   "y": 0,
+   "y": 10607,
    "w": 360,
    "h": 780,
-   "page": "v2captain",
+   "page": "v2",
    "title": "3 · Approve parents",
    "is_interactive": true
   },
   "V-C-Manage.dc.html": {
    "x": 1320,
-   "y": 0,
+   "y": 10607,
    "w": 360,
    "h": 1200,
-   "page": "v2captain",
+   "page": "v2",
    "title": "4 · Manage van",
    "is_interactive": true
   },
   "V-C-Strikes.dc.html": {
    "x": 1760,
-   "y": 0,
+   "y": 10607,
    "w": 360,
    "h": 780,
-   "page": "v2captain",
+   "page": "v2",
    "title": "5 · Driver this week",
    "is_interactive": true
   },
   "V-C-Holiday.dc.html": {
    "x": 2200,
-   "y": 0,
+   "y": 10607,
    "w": 360,
    "h": 780,
-   "page": "v2captain",
+   "page": "v2",
    "title": "6 · Mark a day off",
    "is_interactive": true
   },
   "V-C-SafetyAlert.dc.html": {
    "x": 2640,
-   "y": 0,
+   "y": 10607,
    "w": 360,
    "h": 780,
-   "page": "v2captain",
+   "page": "v2",
    "title": "7 · Driver asked for help",
    "is_interactive": true
   },
   "CON-Baji-1.dc.html": {
    "x": 0,
-   "y": 0,
+   "y": 12327,
    "w": 794,
    "h": 1123,
-   "page": "concept",
+   "page": "v2",
    "title": "Concept p1 · Pohnch Baji"
   },
   "CON-Baji-2.dc.html": {
    "x": 874,
-   "y": 0,
+   "y": 12327,
    "w": 794,
    "h": 1123,
-   "page": "concept",
+   "page": "v2",
    "title": "Concept p2 · model and pilot"
   }
  },
@@ -895,58 +871,58 @@
   "t_brand": {
    "x": 0,
    "y": -300,
-   "text": "Pohnch brand · فکر کم، خبر پوری",
+   "text": "1 · Brand · فکر کم، خبر پوری",
    "kind": "title1",
    "maxW": 4480,
-   "page": "brand"
+   "page": "v2"
   },
-  "t_wa": {
+  "t_whatsapp": {
    "x": 0,
-   "y": -300,
-   "text": "WhatsApp cards",
+   "y": 2940,
+   "text": "2 · WhatsApp cards",
    "kind": "title1",
    "maxW": 4560,
-   "page": "whatsapp"
+   "page": "v2"
   },
   "t_print": {
    "x": 0,
-   "y": -300,
-   "text": "Print · poster, flyer, sticker, driver card",
+   "y": 5380,
+   "text": "3 · Print: poster, flyer, sticker, driver card",
    "kind": "title1",
-   "maxW": 4240,
-   "page": "print"
+   "maxW": 4243,
+   "page": "v2"
   },
-  "t_v2d": {
+  "t_v2driver": {
    "x": 0,
-   "y": -300,
-   "text": "v2 · Driver: hold, undo, practice, help",
+   "y": 7487,
+   "text": "4 · Driver: practice, hold, undo, help",
    "kind": "title1",
    "maxW": 4760,
-   "page": "v2driver"
+   "page": "v2"
   },
-  "t_v2p": {
+  "t_v2parent": {
    "x": 0,
-   "y": -300,
-   "text": "v2 · Parent: approval, siblings, holidays",
+   "y": 8787,
+   "text": "5 · Parent: approval, siblings, chutti, day off",
    "kind": "title1",
    "maxW": 3000,
-   "page": "v2parent"
+   "page": "v2"
   },
-  "t_v2c": {
+  "t_v2captain": {
    "x": 0,
-   "y": -300,
-   "text": "v2 · Captain: approve, manage, strikes, help alerts",
+   "y": 10307,
+   "text": "6 · Captain: approve, manage, strikes, help alert",
    "kind": "title1",
    "maxW": 3000,
-   "page": "v2captain"
+   "page": "v2"
   },
-  "t_con": {
+  "t_concept": {
    "x": 0,
-   "y": -300,
-   "text": "Pohnch Baji · competition concept (draft)",
+   "y": 12027,
+   "text": "7 · Pohnch Baji competition concept (draft)",
    "kind": "title1",
    "maxW": 1668,
-   "page": "concept"
+   "page": "v2"
   }
  },
  "designSystems": []
