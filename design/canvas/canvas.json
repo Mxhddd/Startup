@@ -7,12 +7,16 @@
  "title": "Pohnch designs",
  "launch": {
   "view": "canvas",
-  "page": "v2"
+  "page": "v3"
  },
  "pages": [
   {
+   "id": "v3",
+   "name": "v3 · Neel o Kesar (current)"
+  },
+  {
    "id": "v2",
-   "name": "Pohnch v2 · everything new"
+   "name": "v2 · previous"
   },
   {
    "id": "a1",
@@ -708,6 +712,414 @@
    "h": 1123,
    "page": "v2",
    "title": "Concept p2 · model and pilot"
+  },
+  "X-Brand.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 2400,
+   "page": "v3",
+   "title": "Brand board"
+  },
+  "X-Logo.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 1440,
+   "h": 1400,
+   "page": "v3",
+   "title": "Logo, pattern, app icon"
+  },
+  "X-Amaan.dc.html": {
+   "x": 3040,
+   "y": 0,
+   "w": 1440,
+   "h": 1400,
+   "page": "v3",
+   "title": "Sub-brand · Pohnch Amaan"
+  },
+  "X-Idea.dc.html": {
+   "x": 0,
+   "y": 2920,
+   "w": 1440,
+   "h": 1900,
+   "page": "v3",
+   "title": "Refined idea v3"
+  },
+  "X-Pricing.dc.html": {
+   "x": 1520,
+   "y": 2920,
+   "w": 1440,
+   "h": 1300,
+   "page": "v3",
+   "title": "Pricing: plans + live model",
+   "is_interactive": true
+  },
+  "X-WA-Parents.dc.html": {
+   "x": 0,
+   "y": 5340,
+   "w": 1080,
+   "h": 1080,
+   "page": "v3",
+   "title": "WhatsApp · to parents"
+  },
+  "X-WA-Join.dc.html": {
+   "x": 1160,
+   "y": 5340,
+   "w": 1080,
+   "h": 1080,
+   "page": "v3",
+   "title": "WhatsApp · how to join"
+  },
+  "X-WA-Status.dc.html": {
+   "x": 2320,
+   "y": 5340,
+   "w": 1080,
+   "h": 1920,
+   "page": "v3",
+   "title": "WhatsApp status 9:16"
+  },
+  "X-WA-Amaan.dc.html": {
+   "x": 3480,
+   "y": 5340,
+   "w": 1080,
+   "h": 1080,
+   "page": "v3",
+   "title": "WhatsApp · Amaan drivers wanted"
+  },
+  "X-Poster.dc.html": {
+   "x": 0,
+   "y": 7780,
+   "w": 1123,
+   "h": 1587,
+   "page": "v3",
+   "title": "Poster A3 · school gate"
+  },
+  "X-Flyer.dc.html": {
+   "x": 1203,
+   "y": 7780,
+   "w": 559,
+   "h": 794,
+   "page": "v3",
+   "title": "Flyer A5 · parents"
+  },
+  "X-Sticker.dc.html": {
+   "x": 1842,
+   "y": 7780,
+   "w": 559,
+   "h": 794,
+   "page": "v3",
+   "title": "Van sticker (A5 sheet)"
+  },
+  "X-Card-Front.dc.html": {
+   "x": 2481,
+   "y": 7780,
+   "w": 559,
+   "h": 397,
+   "page": "v3",
+   "title": "Driver card A6 · front"
+  },
+  "X-Card-Back.dc.html": {
+   "x": 2481,
+   "y": 8297,
+   "w": 559,
+   "h": 397,
+   "page": "v3",
+   "title": "Driver card A6 · back"
+  },
+  "X-Amaan-Poster.dc.html": {
+   "x": 3120,
+   "y": 7780,
+   "w": 1123,
+   "h": 1587,
+   "page": "v3",
+   "title": "Poster A3 · Amaan recruitment"
+  },
+  "XD-Welcome.dc.html": {
+   "x": 0,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "1 · Welcome",
+   "is_interactive": true
+  },
+  "XD-Practice.dc.html": {
+   "x": 440,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "2 · Practice run",
+   "is_interactive": true
+  },
+  "XD-Before.dc.html": {
+   "x": 880,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "3 · Before trip · hold",
+   "is_interactive": true
+  },
+  "XD-Undo.dc.html": {
+   "x": 1320,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "4 · 5-second undo",
+   "is_interactive": true
+  },
+  "XD-MidRoute.dc.html": {
+   "x": 1760,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "5 · Mid-route",
+   "is_interactive": true
+  },
+  "XD-School.dc.html": {
+   "x": 2200,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "6 · Reached school",
+   "is_interactive": true
+  },
+  "XD-Afternoon.dc.html": {
+   "x": 2640,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "7 · Afternoon",
+   "is_interactive": true
+  },
+  "XD-Offline.dc.html": {
+   "x": 3080,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "8 · No signal",
+   "is_interactive": true
+  },
+  "XD-Help.dc.html": {
+   "x": 3520,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "9 · Help",
+   "is_interactive": true
+  },
+  "XD-Earnings.dc.html": {
+   "x": 3960,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "10 · Earnings + public profile",
+   "is_interactive": true
+  },
+  "XD-SafeHome.dc.html": {
+   "x": 4400,
+   "y": 9887,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "11 · Amaan: I'm home safe",
+   "is_interactive": true
+  },
+  "XP-Join.dc.html": {
+   "x": 0,
+   "y": 11187,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "1 · Join + who you are",
+   "is_interactive": true
+  },
+  "XP-Pending.dc.html": {
+   "x": 440,
+   "y": 11187,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "2 · Waiting for approval",
+   "is_interactive": true
+  },
+  "XP-Today.dc.html": {
+   "x": 880,
+   "y": 11187,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "3 · Today",
+   "is_interactive": true
+  },
+  "XP-Siblings.dc.html": {
+   "x": 1320,
+   "y": 11187,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "4 · Two children",
+   "is_interactive": true
+  },
+  "XP-Chutti.dc.html": {
+   "x": 1760,
+   "y": 11187,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "5 · Aaj chutti",
+   "is_interactive": true
+  },
+  "XP-Plan.dc.html": {
+   "x": 2200,
+   "y": 11187,
+   "w": 360,
+   "h": 900,
+   "page": "v3",
+   "title": "6 · Plan + pay",
+   "is_interactive": true
+  },
+  "XP-Find.dc.html": {
+   "x": 2640,
+   "y": 11187,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "7 · Find a van",
+   "is_interactive": true
+  },
+  "XP-Driver.dc.html": {
+   "x": 3080,
+   "y": 11187,
+   "w": 360,
+   "h": 900,
+   "page": "v3",
+   "title": "8 · Driver profile",
+   "is_interactive": true
+  },
+  "XP-Lock.dc.html": {
+   "x": 3520,
+   "y": 11187,
+   "w": 360,
+   "h": 1000,
+   "page": "v3",
+   "title": "9 · Lock-screen alerts",
+   "is_interactive": true
+  },
+  "XC-Setup.dc.html": {
+   "x": 0,
+   "y": 12707,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "1 · Set up van",
+   "is_interactive": true
+  },
+  "XC-Share.dc.html": {
+   "x": 440,
+   "y": 12707,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "2 · Share links",
+   "is_interactive": true
+  },
+  "XC-Approve.dc.html": {
+   "x": 880,
+   "y": 12707,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "3 · Approve phones",
+   "is_interactive": true
+  },
+  "XC-Manage.dc.html": {
+   "x": 1320,
+   "y": 12707,
+   "w": 360,
+   "h": 1200,
+   "page": "v3",
+   "title": "4 · Manage van + billing",
+   "is_interactive": true
+  },
+  "XC-Week.dc.html": {
+   "x": 1760,
+   "y": 12707,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "5 · Driver's week",
+   "is_interactive": true
+  },
+  "XC-DayOff.dc.html": {
+   "x": 2200,
+   "y": 12707,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "6 · Day off",
+   "is_interactive": true
+  },
+  "XC-Alert.dc.html": {
+   "x": 2640,
+   "y": 12707,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "7 · Help alert",
+   "is_interactive": true
+  },
+  "XA-Apply.dc.html": {
+   "x": 0,
+   "y": 14427,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "1 · Apply to drive or attend",
+   "is_interactive": true
+  },
+  "XA-Verify.dc.html": {
+   "x": 440,
+   "y": 14427,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "2 · Verification steps",
+   "is_interactive": true
+  },
+  "XA-Listing.dc.html": {
+   "x": 880,
+   "y": 14427,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "3 · Amaan van listing",
+   "is_interactive": true
+  },
+  "XA-Captain.dc.html": {
+   "x": 1320,
+   "y": 14427,
+   "w": 360,
+   "h": 780,
+   "page": "v3",
+   "title": "4 · Captain: Amaan safety log",
+   "is_interactive": true
+  },
+  "XAD-Admin.dc.html": {
+   "x": 0,
+   "y": 15727,
+   "w": 1280,
+   "h": 800,
+   "page": "v3",
+   "title": "Admin · vans, revenue, payouts"
   }
  },
  "order": [
@@ -789,7 +1201,54 @@
   "V-C-Holiday.dc.html",
   "V-C-SafetyAlert.dc.html",
   "CON-Baji-1.dc.html",
-  "CON-Baji-2.dc.html"
+  "CON-Baji-2.dc.html",
+  "X-Brand.dc.html",
+  "X-Logo.dc.html",
+  "X-Amaan.dc.html",
+  "X-Idea.dc.html",
+  "X-Pricing.dc.html",
+  "X-WA-Parents.dc.html",
+  "X-WA-Join.dc.html",
+  "X-WA-Status.dc.html",
+  "X-WA-Amaan.dc.html",
+  "X-Poster.dc.html",
+  "X-Flyer.dc.html",
+  "X-Sticker.dc.html",
+  "X-Card-Front.dc.html",
+  "X-Card-Back.dc.html",
+  "X-Amaan-Poster.dc.html",
+  "XD-Welcome.dc.html",
+  "XD-Practice.dc.html",
+  "XD-Before.dc.html",
+  "XD-Undo.dc.html",
+  "XD-MidRoute.dc.html",
+  "XD-School.dc.html",
+  "XD-Afternoon.dc.html",
+  "XD-Offline.dc.html",
+  "XD-Help.dc.html",
+  "XD-Earnings.dc.html",
+  "XD-SafeHome.dc.html",
+  "XP-Join.dc.html",
+  "XP-Pending.dc.html",
+  "XP-Today.dc.html",
+  "XP-Siblings.dc.html",
+  "XP-Chutti.dc.html",
+  "XP-Plan.dc.html",
+  "XP-Find.dc.html",
+  "XP-Driver.dc.html",
+  "XP-Lock.dc.html",
+  "XC-Setup.dc.html",
+  "XC-Share.dc.html",
+  "XC-Approve.dc.html",
+  "XC-Manage.dc.html",
+  "XC-Week.dc.html",
+  "XC-DayOff.dc.html",
+  "XC-Alert.dc.html",
+  "XA-Apply.dc.html",
+  "XA-Verify.dc.html",
+  "XA-Listing.dc.html",
+  "XA-Captain.dc.html",
+  "XAD-Admin.dc.html"
  ],
  "notes": {
   "t_a1": {
@@ -923,6 +1382,78 @@
    "kind": "title1",
    "maxW": 1668,
    "page": "v2"
+  },
+  "t3_0": {
+   "x": 0,
+   "y": -300,
+   "text": "1 · Brand: Neel o Kesar",
+   "kind": "title1",
+   "maxW": 4480,
+   "page": "v3"
+  },
+  "t3_1": {
+   "x": 0,
+   "y": 2620,
+   "text": "2 · Refined idea and pricing",
+   "kind": "title1",
+   "maxW": 2960,
+   "page": "v3"
+  },
+  "t3_2": {
+   "x": 0,
+   "y": 5040,
+   "text": "3 · WhatsApp cards",
+   "kind": "title1",
+   "maxW": 4560,
+   "page": "v3"
+  },
+  "t3_3": {
+   "x": 0,
+   "y": 7480,
+   "text": "4 · Print",
+   "kind": "title1",
+   "maxW": 4243,
+   "page": "v3"
+  },
+  "t3_4": {
+   "x": 0,
+   "y": 9587,
+   "text": "5 · Driver (plain, built for sunlight)",
+   "kind": "title1",
+   "maxW": 4760,
+   "page": "v3"
+  },
+  "t3_5": {
+   "x": 0,
+   "y": 10887,
+   "text": "6 · Parent (premium craft)",
+   "kind": "title1",
+   "maxW": 3880,
+   "page": "v3"
+  },
+  "t3_6": {
+   "x": 0,
+   "y": 12407,
+   "text": "7 · Captain",
+   "kind": "title1",
+   "maxW": 3000,
+   "page": "v3"
+  },
+  "t3_7": {
+   "x": 0,
+   "y": 14127,
+   "text": "8 · Pohnch Amaan screens",
+   "kind": "title1",
+   "maxW": 1680,
+   "page": "v3"
+  },
+  "t3_8": {
+   "x": 0,
+   "y": 15427,
+   "text": "9 · Admin",
+   "kind": "title1",
+   "maxW": 1280,
+   "page": "v3"
   }
  },
  "designSystems": []

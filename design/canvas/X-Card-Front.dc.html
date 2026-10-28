@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver card front v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400}
+</style>
+</helmet>
+<div dir="rtl" style="width: 559px; height: 397px; box-sizing: border-box; overflow: hidden; position: relative; background: #1F2A5C; color: #FAF6EE; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6">
+  <svg width="559" height="397" aria-hidden="true" style="position: absolute; inset: 0"><defs><pattern id="cfp" width="48" height="48" patternUnits="userSpaceOnUse"><path transform="translate(7 7) scale(0.53)" d="{{S}}" fill="#2B3A80"></path><circle cx="24" cy="24" r="2.8" fill="#E8A33D"></circle></pattern></defs><rect width="559" height="397" fill="url(#cfp)"></rect><rect x="14" y="14" width="531" height="369" rx="8" fill="none" stroke="#C9A24A" stroke-width="2"></rect></svg>
+  <div style="position: absolute; inset: 36px 40px; display: flex; flex-direction: column; gap: 6px">
+    <span style="display: flex; align-items: center; gap: 12px"><svg width="56" height="56" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#E8A33D"></path><path d="M22 33 l7 7 l14 -14" fill="none" stroke="#1F2A5C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path></svg><span class="disp" style="font-size: 48px; line-height: 1.4">پہنچ</span></span>
+    <span class="disp" style="font-size: 40px; line-height: 1.55">آپ کا بٹن، والدین کا سکون</span>
+    <span style="font-size: 18px; font-weight: 700">رکی ہوئی وین میں ایک ٹیپ۔ والدین کے فون بجنا بند۔</span>
+    <div style="margin-top: auto; background: #FAF6EE; color: #141A33; border-radius: 12px; padding: 10px 16px; display: flex; align-items: center; gap: 12px">
+      <span style="font-size: 30px; font-weight: 800; color: #17705A">Rs 40</span>
+      <span style="font-size: 16px; font-weight: 700; line-height: 1.5">ہر ادا بچے پر، ہر مہینے، جب 90% ٹیپ وقت پر ہوں۔ پہنچ آپ کے لیے مفت۔</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":559,"height":397}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z' };
+  }
+}
+</script>
+</body>
+</html>

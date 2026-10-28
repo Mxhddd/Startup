@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver mid-route v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column">
+  <header data-component="TripHeader" style="background: #1F2A5C; color: #FAF6EE; padding: 14px 16px; border-bottom: 5px solid #E8A33D; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 10px">
+      <div style="flex: 1; display: flex; flex-direction: column; line-height: 1.5"><span style="font-size: 21px; font-weight: 800">صبح کا چکر</span><span style="font-size: 14px; font-weight: 600">نکل گئے 7:05 · گلشن وین</span></div>
+      <span style="font-size: 28px; font-weight: 800; line-height: 1">3/5</span>
+      <a href="XD-Help.dc.html" style="height: 52px; padding: 0 14px; border-radius: 14px; background: #FAF6EE; color: #1F2A5C; text-decoration: none; display: flex; align-items: center; font-size: 16px; font-weight: 800">مدد</a>
+    </div>
+    <div data-component="RouteDots" aria-hidden="true" style="display: flex; align-items: center; gap: 4px">
+      <sc-for list="{{dots}}" as="d" hint-placeholder-count="5"><span style="width: 16px; height: 16px; border-radius: 50%; background: {{d.fill}}; border: 3px solid {{d.ring}}; box-sizing: border-box; flex: none"></span><span style="flex: 1; border-top: 3px dotted #FAF6EE"></span></sc-for>
+      <svg width="28" height="28" viewBox="0 0 64 64" style="flex: none"><path d="{{S}}" fill="#E8A33D"></path></svg>
+    </div>
+  </header>
+
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 14px">
+    <span data-component="AbsentChip" style="align-self: flex-start; display: inline-flex; align-items: center; height: 40px; padding: 0 14px; border-radius: 999px; background: #EEE9DF; color: #5E5A52; font-size: 16px; font-weight: 800; box-shadow: inset 0 0 0 1.5px #5E5A52">مریم · آج چھٹی</span>
+    <sc-for list="{{done}}" as="k" hint-placeholder-count="3">
+      <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 48px; padding: 0 16px; background: #DCEFE7; border-radius: 14px">
+        <span style="width: 28px; height: 28px; border-radius: 50%; background: #17705A; display: flex; align-items: center; justify-content: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"></path></svg></span>
+        <span style="flex: 1; font-size: 18px; font-weight: 700">{{k.name}}</span><span style="font-size: 16px; font-weight: 800">{{k.t}}</span>
+      </div>
+    </sc-for>
+    <a href="XD-Undo.dc.html" data-component="TapButton" data-step="picked" data-size="next" style="display: flex; align-items: center; gap: 14px; height: 108px; padding: 0 18px; border-radius: 20px; background: #17705A; color: #FFFFFF; text-decoration: none; box-shadow: 0 5px 0 #0C4A3B">
+      <span style="width: 62px; height: 62px; border-radius: 16px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#17705A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5"></path></svg></span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.5"><span style="font-size: 28px; font-weight: 800">عائشہ</span><span style="font-size: 17px; font-weight: 700">بٹھا لیا · ایک ٹیپ</span></span>
+      <span style="width: 38px; height: 38px; border-radius: 50%; box-shadow: inset 0 0 0 3px #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800">4</span>
+    </a>
+    <button data-component="ChildRow" data-state="waiting" style="display: flex; align-items: center; gap: 12px; height: 64px; padding: 0 16px; background: #FFFFFF; border: 0; box-shadow: inset 0 0 0 2.5px #17705A; border-radius: 14px; color: #141A33; font-family: inherit; text-align: right; cursor: pointer">
+      <span style="width: 30px; height: 30px; border-radius: 50%; box-shadow: inset 0 0 0 2px #141A33; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">5</span>
+      <span style="flex: 1; font-size: 19px; font-weight: 700">زین</span><span style="font-size: 16px; font-weight: 800; color: #17705A">بٹھا لیا</span>
+    </button>
+    <a href="XD-School.dc.html" data-component="TapButton" data-step="reached_school" data-hold="true" style="margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 10px; height: 66px; border-radius: 16px; background: #FBEBCF; box-shadow: inset 0 0 0 2.5px #141A33; color: #141A33; text-decoration: none; font-size: 18px; font-weight: 800">
+      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#141A33" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18 M5 21V10l7-4 7 4v11 M10 21v-5h4v5 M12 6V2l4 1.5L12 5"></path></svg>
+      اسکول پہنچ گئے · دبا کر رکھیں
+    </a>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const dot = (d) => ({ fill: d ? '#E8A33D' : 'transparent', ring: d ? '#E8A33D' : '#FAF6EE' });
+    return {
+      S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z',
+      dots: [dot(true), dot(true), dot(true), dot(false), dot(false)],
+      done: [{ name: 'علی', t: '7:12' }, { name: 'فاطمہ', t: '7:18' }, { name: 'حمزہ', t: '7:24' }]
+    };
+  }
+}
+</script>
+</body>
+</html>

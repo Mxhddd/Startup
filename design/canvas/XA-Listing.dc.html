@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Amaan van listing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F5E4E}a:hover{color:#17705A}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.stat{background:#FFFFFF;border-radius:14px;box-shadow:inset 0 0 0 1px #E2DCCD;padding:8px 0;display:flex;flex-direction:column;align-items:center;line-height:1.3}
+.p{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;min-height:30px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column">
+  <div style="position: relative; height: 130px; background: #0F5E4E; flex: none">
+    <svg width="360" height="130" aria-hidden="true" style="position: absolute; inset: 0"><defs><pattern id="xal" width="40" height="40" patternUnits="userSpaceOnUse"><path transform="translate(6 6) scale(0.44)" d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#17705A"></path><circle cx="20" cy="20" r="2.2" fill="#C9A24A"></circle></pattern></defs><rect width="360" height="130" fill="url(#xal)"></rect></svg>
+    <span style="position: absolute; top: 14px; right: 16px; height: 32px; padding: 0 12px; border-radius: 999px; background: #FAF6EE; color: #0F5E4E; display: inline-flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 800"><svg width="14" height="14" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#0F5E4E"></path></svg>امان مہر · 5/5</span>
+    <div style="position: absolute; right: 50%; transform: translateX(50%); bottom: -40px; display: flex; gap: -12px">
+      <span style="width: 84px; height: 84px; border-radius: 50%; background: #E8A33D; box-shadow: 0 0 0 5px #FAF6EE, 0 0 0 6.5px #C9A24A; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 800; color: #141A33">ش</span>
+      <span style="width: 64px; height: 64px; border-radius: 50%; background: #DCEFE7; box-shadow: 0 0 0 4px #FAF6EE; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: #0F5E4E; margin-right: -14px; align-self: flex-end">ر</span>
+    </div>
+  </div>
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 48px 16px 16px">
+    <div style="display: flex; flex-direction: column; align-items: center; text-align: center; line-height: 1.4">
+      <span style="font-size: 22px; font-weight: 800">جوہر امان وین</span>
+      <span style="font-size: 15px; font-weight: 600; color: #4A4F66">ڈرائیور: شازیہ صاحبہ · ساتھی: رخسانہ صاحبہ</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <span class="stat"><span style="font-size: 21px; font-weight: 800; color: #17705A">99%</span><span style="font-size: 14px; font-weight: 700">بھروسہ</span></span>
+      <span class="stat"><span style="font-size: 21px; font-weight: 800">5</span><span style="font-size: 14px; font-weight: 700">مہینے</span></span>
+      <span class="stat"><span style="font-size: 21px; font-weight: 800; color: #A8321F">1</span><span style="font-size: 14px; font-weight: 700">خالی سیٹ</span></span>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 5px #FFFFFF, inset 0 0 0 6px #E2DCCD; padding: 10px 18px; display: flex; flex-direction: column">
+      <span style="font-size: 15px; font-weight: 800; color: #0F5E4E; margin-bottom: 2px">امان کا وعدہ</span>
+      <sc-for list="{{promise}}" as="p" hint-placeholder-count="4">
+        <span class="p"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0F5E4E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>{{p}}</span>
+      </sc-for>
+    </div>
+    <div style="display: flex; justify-content: space-between; font-size: 15px; font-weight: 700; background: #F3EEE3; border-radius: 12px; padding: 8px 12px"><span>جوہر بلاک 14، 15 · سٹی اسکول</span><span>Rs 5,000</span></div>
+    <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+      <span style="background: #DCEFE7; color: #0B4A3D; border-radius: 12px; padding: 8px 12px; font-size: 15px; font-weight: 800">درخواست کیپٹن کو گئی۔ منظور ہوتے ہی آپ کو اطلاع ملے گی۔</span>
+    </sc-if>
+    <button onClick="{{ask}}" style="margin-top: auto; height: 62px; border-radius: 16px; border: 0; background: {{btnBg}}; color: {{btnFg}}; font-family: inherit; font-size: 18px; font-weight: 800; cursor: pointer">{{btn}}</button>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sent: false }; }
+  renderVals() {
+    const s = this.state.sent;
+    return {
+      promise: ['صرف دن کے چکر', 'ہر وین میں خاتون ساتھی', 'کیپٹن کو ہر ٹیپ کی خبر', 'مدد کا بٹن اور "گھر پہنچ گئی"'],
+      sent: s,
+      btn: s ? 'درخواست واپس لیں' : 'سیٹ کی درخواست بھیجیں',
+      btnBg: s ? '#FFFFFF' : '#0F5E4E', btnFg: s ? '#0F5E4E' : '#FAF6EE',
+      ask: () => this.setState({ sent: !s })
+    };
+  }
+}
+</script>
+</body>
+</html>

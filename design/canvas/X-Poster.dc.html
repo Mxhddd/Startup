@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Poster A3 school gate v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400}
+.c{position:absolute;width:30px;height:30px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 1123px; height: 1587px; box-sizing: border-box; overflow: hidden; position: relative; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6">
+  <!-- top band: neel with star lattice and the van illustration -->
+  <div style="position: absolute; top: 0; left: 0; right: 0; height: 680px; background: #1F2A5C; overflow: hidden">
+    <svg width="1123" height="680" aria-hidden="true" style="position: absolute; inset: 0"><defs><pattern id="pp" width="96" height="96" patternUnits="userSpaceOnUse"><path transform="translate(15 15) scale(1.03)" d="{{S}}" fill="#2B3A80"></path><circle cx="48" cy="48" r="5" fill="#E8A33D"></circle></pattern></defs><rect width="1123" height="680" fill="url(#pp)"></rect></svg>
+    <div style="position: absolute; top: 80px; right: 90px; display: flex; align-items: center; gap: 18px; color: #FAF6EE">
+      <svg width="96" height="96" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#E8A33D"></path><path d="M22 33 l7 7 l14 -14" fill="none" stroke="#1F2A5C" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span class="disp" style="font-size: 92px; line-height: 1.4">پہنچ</span>
+    </div>
+    <!-- flat van illustration -->
+    <svg width="760" height="380" viewBox="0 0 760 380" aria-hidden="true" style="position: absolute; left: 60px; bottom: 0">
+      <rect x="0" y="330" width="760" height="50" fill="#141A33"></rect>
+      <rect x="40" y="350" width="80" height="8" rx="4" fill="#E8A33D"></rect><rect x="200" y="350" width="80" height="8" rx="4" fill="#E8A33D"></rect><rect x="360" y="350" width="80" height="8" rx="4" fill="#E8A33D"></rect><rect x="520" y="350" width="80" height="8" rx="4" fill="#E8A33D"></rect>
+      <path d="M90 300 V120 a30 30 0 0 1 30 -30 H500 l110 100 h40 a30 30 0 0 1 30 30 V300 Z" fill="#FAF6EE"></path>
+      <path d="M90 230 H680 V260 H90 Z" fill="#E8A33D"></path>
+      <rect x="130" y="120" width="96" height="76" rx="12" fill="#E6E9F5"></rect><rect x="246" y="120" width="96" height="76" rx="12" fill="#E6E9F5"></rect><rect x="362" y="120" width="96" height="76" rx="12" fill="#E6E9F5"></rect>
+      <path d="M484 120 h20 l84 76 h-104 Z" fill="#E6E9F5"></path>
+      <circle cx="160" cy="158" r="20" fill="#A8321F"></circle><circle cx="276" cy="158" r="20" fill="#17705A"></circle><circle cx="392" cy="158" r="20" fill="#E8A33D"></circle>
+      <path transform="translate(300 236) scale(0.4)" d="{{S}}" fill="#1F2A5C"></path>
+      <circle cx="200" cy="300" r="44" fill="#141A33"></circle><circle cx="200" cy="300" r="18" fill="#C9C2B4"></circle>
+      <circle cx="580" cy="300" r="44" fill="#141A33"></circle><circle cx="580" cy="300" r="18" fill="#C9C2B4"></circle>
+    </svg>
+    <!-- phone with alert -->
+    <div style="position: absolute; right: 100px; bottom: 60px; width: 260px; height: 400px; border-radius: 40px; background: #141A33; padding: 14px; box-sizing: border-box">
+      <div style="width: 100%; height: 100%; border-radius: 28px; background: #FAF6EE; padding: 24px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+        <sc-for list="{{phone}}" as="n" hint-placeholder-count="3">
+          <div style="background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1px #E2DCCD; padding: 10px 12px; display: flex; align-items: center; gap: 10px">
+            <span style="width: 34px; height: 34px; border-radius: 10px; background: {{n.c}}; flex: none"></span>
+            <span style="display: flex; flex-direction: column; line-height: 1.35"><span style="font-size: 14px; font-weight: 700; color: #4A4F66">{{n.t}}</span><span style="font-size: 18px; font-weight: 800">{{n.ur}}</span></span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div style="position: absolute; top: 720px; right: 90px; left: 90px; display: flex; flex-direction: column; gap: 22px">
+    <span class="disp" style="font-size: 110px; line-height: 1.45">فکر کم، خبر پوری</span>
+    <span style="font-size: 34px; font-weight: 700; line-height: 1.6">اسکول وین کی ہر خبر آپ کے فون پر۔ ڈرائیور بٹن دباتے ہیں، آپ کو اطلاع آتی ہے۔ نقشہ نہیں، ٹریکر نہیں، کوئی ڈبہ نہیں۔</span>
+    <div style="display: flex; gap: 14px; flex-wrap: wrap">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+        <span style="height: 62px; padding: 0 24px; border-radius: 999px; background: {{s.bg}}; color: {{s.fg}}; display: inline-flex; align-items: center; font-size: 28px; font-weight: 800">{{s.t}}</span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="position: absolute; bottom: 80px; right: 90px; left: 90px; background: #FFFFFF; border-radius: 10px; box-shadow: inset 0 0 0 3px #C9A24A, inset 0 0 0 13px #FFFFFF, inset 0 0 0 15px #E2DCCD; padding: 36px 48px; display: flex; align-items: center; gap: 36px; box-sizing: border-box">
+    <svg class="c" style="top: 18px; right: 18px" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>
+    <svg class="c" style="bottom: 18px; left: 18px" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>
+    <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.45">
+      <span style="font-size: 46px; font-weight: 800">پہلا مہینہ مفت</span>
+      <span style="font-size: 30px; font-weight: 700">پھر Rs 199 ماہانہ یا Rs 1,990 سالانہ · کیپٹن کا بچہ مفت</span>
+      <span style="font-size: 26px; font-weight: 700; color: #4A4F66">اپنی وین کو جوڑنے کے لیے اسکین کریں</span>
+    </span>
+    <span style="width: 170px; height: 170px; border-radius: 14px; background: #FAF6EE; box-shadow: inset 0 0 0 3px #141A33; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; flex: none">[QR]</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1123,"height":1587}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z',
+      phone: [
+        { t: '7:05', c: '#1F2A5C', ur: 'وین نکل گئی' },
+        { t: '7:12', c: '#17705A', ur: 'علی وین میں ہے' },
+        { t: '7:48', c: '#E8A33D', ur: 'اسکول پہنچ گئے' }
+      ],
+      steps: [
+        { t: 'وین نکلی', bg: '#1F2A5C', fg: '#FAF6EE' },
+        { t: 'بچہ وین میں', bg: '#17705A', fg: '#FFFFFF' },
+        { t: 'اسکول پہنچے', bg: '#E8A33D', fg: '#141A33' },
+        { t: 'اسکول سے نکلے', bg: '#A8321F', fg: '#FFFFFF' },
+        { t: 'گھر پہنچ گئے', bg: '#A7D47E', fg: '#141A33' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

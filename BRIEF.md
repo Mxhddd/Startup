@@ -8,7 +8,7 @@ In Karachi, parents hand their children to a private school van and see nothing 
 
 ## What Pohnch is
 
-A free, Urdu-first web app (installable on the home screen) for one school van at a time:
+An Urdu-first web app (installable on the home screen) for one school van at a time. Families pay a small fee per child; drivers use it free and earn a reward for tapping:
 
 - A parent **van captain** sets up the van with three fields and gets two invite links to share on WhatsApp: one for the driver, one for the other parents.
 - The **driver** taps big buttons only when the van is stopped: "نکل گئے" (left), one tap per child picked up, "اسکول پہنچ گئے" (reached school); in the afternoon "اسکول سے نکلے" (left school) and one tap per child dropped home.
@@ -42,18 +42,29 @@ A free, Urdu-first web app (installable on the home screen) for one school van a
 13. Parents with two or more children, in one or several vans.
 14. Driver practice run before the first real trip.
 15. Driver help: "I'm stuck" (late alert to captain and parents) and "Emergency" (captain gets location), plus 15 and 1122.
-16. Van badges for the Pohnch Baji line: woman driver, mother-driver, woman attendant, girls only.
-17. Paid from day one: [PRICE] per family per month, collected by the captain outside the app.
+16. Van badges for the Pohnch Amaan line: ڈرائیور صاحبہ (woman driver), امان ساتھی (woman companion), صرف بچیاں (girls only).
+17. Paid from day one: Rs 199 per child per month after a free first month, collected by the captain outside the app; the admin ticks Paid.
 
-Items 9–17 make version 1 noticeably bigger. Suggested split: 9, 10, 12 and 17 in version 1; 11, 13–16 in version 1.1 after the first pilot week. Decide before B2, because they change the database.
+### Added in round 3 (pricing and refinements)
+
+18. Plans: Rs 199 per child per month (school months only), yearly Rs 1,990 (12 months for 10), siblings Rs 99, no charge in June and July, first month free.
+19. Captain's child free while the van has 5 or more paying families.
+20. Driver reward: Rs 40 per paying child per month when the month's tap rate is 90% or more, paid by JazzCash, Easypaisa or Raast.
+21. Public driver profile and "find a van": areas, schools, free seats, reliability score (on-time taps over 30 days). Never a child's name, phone number or token.
+22. Pohnch Amaan screens: apply (driver, companion, mother-driver), five-check verification, Amaan van listing, captain safety log with "میں گھر پہنچ گئی" check-ins.
+23. School plan: Rs 149 per child billed yearly to the school (later stage, after about 30 vans).
+
+Payment methods for 18: Raast QR, JazzCash, Easypaisa, or cash to the captain. Reasons, the cost model and sources are in `design/DECISIONS.md` (round 3).
+
+Items 9–23 make version 1 noticeably bigger. Suggested split: 9, 10, 12, 17 and 19 in version 1; 11, 13–16, 18 and 20 in version 1.1 after the first pilot weeks; 21–23 later. Decide before B2, because they change the database.
 
 ## Out of scope for version 1
 
-Live GPS tracking or maps (location is sent only in an emergency), in-app chat, payments inside the app, accounts or passwords, school-side dashboards, native app-store apps, SMS fallback, the Pohnch Baji marketplace and operator stages.
+Live GPS tracking or maps (location is sent only in an emergency), in-app chat, payments inside the app (version 1.1), accounts or passwords, school-side dashboards, native app-store apps, SMS fallback, the Pohnch Amaan marketplace and operator stages.
 
 ## Brand
 
-`design/BRAND.md`: name, slogan "فکر کم، خبر پوری", logo, colours, type, voice and the Pohnch Baji sub-brand.
+`design/BRAND.md` (v3 "Neel o Kesar"): name, slogan "فکر کم، خبر پوری", eight-point star mark, colours, type, craft kit, voice and the Pohnch Amaan sub-brand.
 
 ## Stack
 

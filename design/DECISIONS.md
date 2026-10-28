@@ -1,8 +1,82 @@
 # Design decisions
 
-## Round 2 (current): brand, v2 screens, Pohnch Baji
+## Round 3 (current): Neel o Kesar, Pohnch Amaan, pricing
 
-The v2 pages of the canvas (**Brand, WhatsApp cards, Print, v2 · Driver, v2 · Parent, v2 · Captain, Pohnch Baji concept**) replace the v1 look below. The brand is in `design/BRAND.md`. Where round 2 and round 1 disagree, round 2 wins; the round 1 reasoning still holds for anything not mentioned here.
+The canvas page **v3 · Neel o Kesar (current)** replaces the v2 pages, which stay on the canvas as "v2 · previous". The brand is in `design/BRAND.md`. Where round 3 and an earlier round disagree, round 3 wins; earlier reasoning still holds for anything not mentioned here.
+
+Builder's answers that drove round 3:
+
+1. **What was wrong with v2:** generic and template-like, weak typography, muddy colours.
+2. **Feeling: premium but local craft.** One direction, taken all the way, colours left to the designer. Result: neel (indigo) and kesar (saffron) on ghee, an eight-point star mark, star-lattice pattern, gold hairline frames, flat illustration.
+3. **Urdu type: a mix.** Gulzar Nastaliq for brand moments (logo, titles, posters); Noto Sans Arabic for all UI text, because it stays readable in sunlight and at 14 px; Manrope for Latin and digits.
+4. **Craft split by role.** Driver screens stay plain (flat colour, big buttons, no pattern). Parent, captain, Amaan and print get the pattern, frames and illustration.
+5. **The women-run line is renamed پہنچ امان · Pohnch Amaan** ("safety, trust"). "Baji" framed women as helpers; Amaan frames them as professionals and names what parents are buying. Roles: ڈرائیور صاحبہ، امان ساتھی، والدہ ڈرائیور.
+6. **Who pays: families pay per child; drivers are on the platform for free** and are visible to families looking for a van (public profile with reliability score and free seats).
+7. **Price: decided after modelling** (below).
+8. **All four refinements:** drivers are paid for tapping, the captain's child is free, first month free plus a yearly plan, and a school plan for later.
+
+### Pricing (decided)
+
+| Plan | Price | Notes |
+| --- | --- | --- |
+| Family, monthly | **Rs 199 per child per month** | first month free; billed only in school months |
+| Family, yearly | **Rs 1,990 per child** | 12 months for the price of 10 |
+| Sibling | **Rs 99** per extra child | same family, any van |
+| Summer | **Rs 0 in June and July** | billing pauses automatically |
+| Captain's child | **free** | while the van has 5 or more paying families |
+| Driver | **free, plus Rs 40 per paying child per month** | paid when the month's tap rate is 90% or more |
+| School plan (later) | **Rs 149 per child**, billed yearly | after about 30 vans; school pays for every van serving it |
+
+Payment: Raast QR (no fee to the payer; up to 0.25% merchant fee), JazzCash, Easypaisa, or cash to the captain, who ticks "نقد ملا" in the app.
+
+Model for a 10-child van (captain's child free, 9 paying): Rs 1,791 billed, Rs 360 to the driver, about Rs 150 in payment and push costs, **about Rs 1,281 kept per van per month**. With fixed costs of about Rs 75,000 a month (one part-time support person, hosting, printing), **break-even is about 59 vans**. The pricing board on the canvas lets you change children, price (149 / 199 / 249 / 299), reward, van fee and the captain rule.
+
+Why Rs 199: it is about 5% of a typical van fee (Rs 2,000–7,500) and it leaves room for a driver reward that is real money. At Rs 149 the reward eats most of the margin and break-even needs about 120 vans. Rs 249 and above sits on top of recent van fee rises of Rs 1,000–2,000, so we start low and test willingness to pay in the pilot. These are estimates, not survey results: the pilot should check them.
+
+### Refined idea (eight changes)
+
+1. Drivers are on the platform: public profile with areas, schools, seats free and a reliability score from real taps.
+2. Drivers earn for tapping (Rs 40 per paying child at ≥90%).
+3. Rs 199 per child, first month free, yearly Rs 1,990.
+4. Siblings Rs 99.
+5. Captain's child free while 5 or more families pay.
+6. No charge in June and July.
+7. School plan Rs 149 (later stage).
+8. Pohnch Amaan: five-check seal, Amaan companion, "میں گھر پہنچ گئی" check-in after the last trip (reminder at 45 minutes, captain then the team calls at 60).
+
+Growth loop: families pay → driver earns → driver taps every stop → reliability score rises → more families find the van → seats fill and the captain's child stays free.
+
+### Research (October 2026)
+
+1. School van fees in Karachi: Rs 2,000–7,500 per child per month; Bahria Town about Rs 7,000–7,500 (bestschool.pk, *School Transport in Karachi 2025*; housingassociates.pk, *Schools in Bahria Town Karachi 2026*).
+2. GPS van trackers: Rs 300–800 or Rs 790 / 1,990 per van per month plus Rs 8,000–15,000 hardware, usually paid by the operator (iotee.pk; smartvan.pk pricing).
+3. CNG station closures raised van fees by Rs 1,000–2,000 (The Hawk).
+4. Petrol Rs 393.86 a litre on 15 October 2026 (Pakistan Observer, gari.pk).
+5. Sindh unskilled minimum wage Rs 40,000 for 2025-26, rising to Rs 43,000 from July 2026 (Profit; Sindh cabinet).
+6. Raast person-to-merchant payments: up to 0.25% merchant fee (State Bank of Pakistan).
+7. Women in transport: Paxi Pink Taxi, VSisters (2025), 1,500+ female Careem captains, Sindh Pink Bus training women drivers; Sindh female labour-force participation about 11%.
+
+### New screens in round 3
+
+- Driver: earnings and public profile (XD-Earnings), Amaan "I'm home safe" (XD-SafeHome).
+- Parent: plan and pay (XP-Plan), find a van with an Amaan filter (XP-Find), driver profile (XP-Driver), trial pill on Today.
+- Captain: billing and "cash received" ticks in Manage van (XC-Manage), captain's-child-free status, driver reward.
+- Amaan: apply (XA-Apply), verification steps (XA-Verify), Amaan van listing (XA-Listing), captain safety log (XA-Captain).
+- Admin: revenue, driver rewards, kept vs. cost (XAD-Admin).
+
+New component names to add in code: **PlanCard**, **PriceRow**, **ReliabilityScore**, **DriverProfile**, **AmaanSeal**, **SafeHomeCheck**, alongside the round 2 names.
+
+Open items:
+- [QR], help and WhatsApp numbers, and the pohnch.pk domain are placeholders.
+- In-app payments are still out of scope for version 1: the Plan screen is a design for version 1.1. Version 1 keeps "captain collects, admin ticks Paid", now at Rs 199.
+- Driver rewards need a payout method (JazzCash, Easypaisa or Raast) and a monthly job; not in version 1.
+- The public driver profile and "find a van" are new public pages; they must never show a child's name, a phone number or a token.
+
+---
+
+## Round 2: brand, v2 screens, Pohnch Baji (superseded)
+
+The v2 pages of the canvas (now one page, **v2 · previous**) replaced the v1 look below; round 3 replaces v2's look, name for the women's line and [PRICE] placeholders. The behaviour decisions (undo, hold, approval, help) still stand. The brand is in `design/BRAND.md`. Where round 2 and round 1 disagree, round 2 wins; the round 1 reasoning still holds for anything not mentioned here.
 
 Builder's answers that drove round 2:
 

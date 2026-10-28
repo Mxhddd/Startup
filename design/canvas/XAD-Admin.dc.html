@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Admin v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.kpi{background:#FFFFFF;border-radius:14px;box-shadow:inset 0 0 0 1px #E2DCCD;padding:14px 16px;display:flex;flex-direction:column;gap:2px;line-height:1.3}
+.kpi b{font-size:23px;font-weight:800;letter-spacing:-0.01em;white-space:nowrap}
+.kpi span{font-size:14px;font-weight:700;color:#4A4F66}
+.f{height:44px;padding:0 16px;border:0;border-radius:999px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.g{display:grid;grid-template-columns:2.2fr 1.4fr 1fr 0.8fr 1.1fr 1.1fr 1fr;align-items:center;column-gap:12px;padding:0 16px}
+.th{font-size:14px;font-weight:800;color:#4A4F66;height:44px;border-bottom:1.5px solid #E2DCCD}
+.tr{min-height:52px;border-bottom:1px solid #F0EBE0;font-size:15px;font-weight:700}
+.pill{display:inline-flex;align-items:center;height:28px;padding:0 10px;border-radius:999px;font-size:14px;font-weight:800}
+</style>
+</helmet>
+<div style="width: 1280px; height: 800px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5; display: flex">
+  <aside style="width: 220px; background: #141A33; color: #FAF6EE; padding: 24px 18px; display: flex; flex-direction: column; gap: 6px; flex: none">
+    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 18px">
+      <svg width="34" height="34" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#E8A33D"></path><path d="M22 33 l7 7 l14 -14" fill="none" stroke="#141A33" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span style="display: flex; flex-direction: column; line-height: 1.2"><span style="font-family: Gulzar, serif; font-size: 26px" lang="ur">پہنچ</span><span style="font-size: 14px; font-weight: 700; color: #E2DCCD">Admin</span></span>
+    </div>
+    <span style="height: 44px; border-radius: 10px; background: #1F2A5C; display: flex; align-items: center; padding: 0 12px; font-size: 15px; font-weight: 800">Vans</span>
+    <span style="height: 44px; display: flex; align-items: center; padding: 0 12px; font-size: 15px; font-weight: 700">Payments</span>
+    <span style="height: 44px; display: flex; align-items: center; padding: 0 12px; font-size: 15px; font-weight: 700">Driver rewards</span>
+    <span style="height: 44px; display: flex; align-items: center; padding: 0 12px; font-size: 15px; font-weight: 700">Amaan checks</span>
+    <span style="height: 44px; display: flex; align-items: center; padding: 0 12px; font-size: 15px; font-weight: 700">Help alerts</span>
+    <span style="margin-top: auto; font-size: 14px; font-weight: 600; color: #E2DCCD">November 2026 · Asia/Karachi</span>
+  </aside>
+  <main style="flex: 1; padding: 24px 28px; display: flex; flex-direction: column; gap: 16px; min-width: 0">
+    <div style="display: flex; align-items: baseline; justify-content: space-between">
+      <span style="font-size: 28px; font-weight: 800; letter-spacing: -0.01em">Vans</span>
+      <span style="font-size: 15px; font-weight: 700; color: #4A4F66">Names are first names only. No phone numbers or tokens on this page.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px">
+      <div class="kpi"><b>62</b><span>Active vans · 9 Amaan</span></div>
+      <div class="kpi"><b>558</b><span>Paying children</span></div>
+      <div class="kpi"><b>Rs 111,042</b><span>Billed this month</span></div>
+      <div class="kpi"><b style="color: #A8321F">Rs 22,320</b><span>Driver rewards (≥90%)</span></div>
+      <div class="kpi" style="background: #DCEFE7; box-shadow: none"><b style="color: #0B4A3D">Rs 79,422</b><span style="color: #0B4A3D">Kept · cost Rs 75,000 · break-even 59 vans</span></div>
+    </div>
+    <div style="display: flex; gap: 8px; align-items: center">
+      <sc-for list="{{filters}}" as="f" hint-placeholder-count="4">
+        <button class="f" onClick="{{f.pick}}" aria-pressed="{{f.on}}" style="background: {{f.bg}}; color: {{f.fg}}; box-shadow: {{f.ring}}">{{f.label}}</button>
+      </sc-for>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1px #E2DCCD; overflow: hidden; flex: 1" role="table" aria-label="Vans">
+      <div class="g th" role="row"><span role="columnheader">Van · driver</span><span role="columnheader">Captain · school</span><span role="columnheader">Tap rate (30 d)</span><span role="columnheader">Strikes</span><span role="columnheader">Families paid</span><span role="columnheader">Reward</span><span role="columnheader">Badges</span></div>
+      <sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+        <div class="g tr" role="row">
+          <span role="cell" style="display: flex; flex-direction: column; line-height: 1.3"><span style="font-weight: 800">{{r.van}}</span><span style="font-size: 14px; color: #4A4F66">{{r.driver}}</span></span>
+          <span role="cell" style="display: flex; flex-direction: column; line-height: 1.3"><span>{{r.cap}}</span><span style="font-size: 14px; color: #4A4F66">{{r.school}}</span></span>
+          <span role="cell" style="display: flex; align-items: center; gap: 8px"><span style="width: 60px; height: 8px; border-radius: 4px; background: #EEE9DF; overflow: hidden"><span style="display: block; height: 8px; width: {{r.rate}}%; background: {{r.rc}}"></span></span><span style="color: {{r.rc}}; font-weight: 800">{{r.rate}}%</span></span>
+          <span role="cell" style="color: {{r.sc}}; font-weight: 800">{{r.strikes}}</span>
+          <span role="cell">{{r.paid}}</span>
+          <span role="cell"><span class="pill" style="background: {{r.wb}}; color: {{r.wf}}">{{r.reward}}</span></span>
+          <span role="cell"><sc-if value="{{r.amaan}}" hint-placeholder-val="{{ false }}"><span class="pill" style="background: #0F5E4E; color: #FAF6EE">Amaan</span></sc-if></span>
+        </div>
+      </sc-for>
+    </div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1280,"height":800}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { f: 'all' }; }
+  renderVals() {
+    const all = [
+      { van: 'Gulshan van', driver: 'Rafiq', cap: 'Sara', school: 'Noor School', rate: 96, strikes: 1, paid: '6/9 · 2 trial', amaan: false },
+      { van: 'Johar Amaan van', driver: 'Shazia', cap: 'Hina', school: 'City School', rate: 99, strikes: 0, paid: '9/9', amaan: true },
+      { van: 'University Rd van', driver: 'Aslam', cap: 'Bilal', school: 'Beaconhouse', rate: 91, strikes: 2, paid: '11/12', amaan: false },
+      { van: 'Block 10 Amaan van', driver: 'Nasreen', cap: 'Ayesha', school: 'Noor School', rate: 94, strikes: 0, paid: '0/7 · trial', amaan: true },
+      { van: 'Nazimabad van', driver: 'Kamran', cap: 'Faraz', school: 'Habib Public', rate: 82, strikes: 5, paid: '8/10', amaan: false },
+      { van: 'DHA Ph 6 van', driver: 'Javed', cap: 'Mehr', school: 'Karachi Grammar', rate: 97, strikes: 0, paid: '7/10 · 3 unpaid', amaan: false },
+      { van: 'Malir van', driver: 'Saleem', cap: 'Rida', school: 'TCF Malir', rate: 88, strikes: 3, paid: '5/8', amaan: false }
+    ];
+    const by = { all: () => true, low: (r) => r.rate < 90, amaan: (r) => r.amaan, unpaid: (r) => /unpaid|trial/.test(r.paid) };
+    const labels = [['all', 'All 62'], ['low', 'Below 90%'], ['amaan', 'Amaan'], ['unpaid', 'Unpaid or trial']];
+    return {
+      filters: labels.map(([id, label]) => {
+        const on = id === this.state.f;
+        return { label, on, bg: on ? '#1F2A5C' : '#FFFFFF', fg: on ? '#FAF6EE' : '#141A33', ring: on ? 'none' : 'inset 0 0 0 1.5px #E2DCCD', pick: () => this.setState({ f: id }) };
+      }),
+      rows: all.filter(by[this.state.f]).map((r) => {
+        const ok = r.rate >= 90;
+        const kids = parseInt(r.paid, 10);
+        return {
+          ...r,
+          rc: r.rate >= 95 ? '#17705A' : ok ? '#8A5A12' : '#9E2A1F',
+          sc: r.strikes >= 3 ? '#9E2A1F' : '#141A33',
+          reward: ok ? (kids ? 'Rs ' + kids * 40 : 'Rs 0 · trial') : 'Not this month',
+          wb: ok && kids ? '#DCEFE7' : '#EEE9DF', wf: ok && kids ? '#0B4A3D' : '#5E5A52'
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

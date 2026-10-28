@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain manage and billing v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.box{background:#FFFFFF;border-radius:18px;box-shadow:inset 0 0 0 1px #E2DCCD;padding:6px 14px}
+.row{display:flex;align-items:center;gap:10px;min-height:56px;border-bottom:1px solid #F0EBE0}
+.row:last-child{border-bottom:0}
+.h{font-size:16px;font-weight:800;margin-top:4px}
+.act{height:48px;border-radius:12px;border:0;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer;padding:0 14px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 1200px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 20px 16px 16px; gap: 10px">
+  <span class="disp" style="font-size: 36px">گلشن وین</span>
+  <span style="font-size: 15px; font-weight: 600; margin-top: -8px">رفیق بھائی · نور اسکول · 10 بچے · کیپٹن: سارہ (آپ)</span>
+
+  <div style="background: #1F2A5C; color: #FAF6EE; border-radius: 18px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; position: relative; overflow: hidden">
+    <svg width="120" height="120" viewBox="0 0 64 64" aria-hidden="true" style="position: absolute; left: -24px; bottom: -30px; opacity: .35"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#2B3A80"></path></svg>
+    <span style="font-size: 15px; font-weight: 800; color: #E8A33D">نومبر کا حساب</span>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; text-align: center; line-height: 1.3">
+      <span style="display: flex; flex-direction: column"><span style="font-size: 24px; font-weight: 800">{{paid}}/9</span><span style="font-size: 14px; font-weight: 700">خاندان ادا</span></span>
+      <span style="display: flex; flex-direction: column"><span style="font-size: 24px; font-weight: 800">2</span><span style="font-size: 14px; font-weight: 700">مفت مہینے میں</span></span>
+      <span style="display: flex; flex-direction: column"><span style="font-size: 24px; font-weight: 800">Rs {{reward}}</span><span style="font-size: 14px; font-weight: 700">ڈرائیور انعام</span></span>
+    </div>
+    <span style="font-size: 15px; font-weight: 700; background: {{capBg}}; color: {{capFg}}; border-radius: 10px; padding: 6px 10px">{{capText}}</span>
+  </div>
+
+  <span class="h">بچے اور ادائیگی</span>
+  <div class="box">
+    <sc-for list="{{kids}}" as="k" hint-placeholder-count="6">
+      <div class="row">
+        <span style="width: 36px; height: 36px; border-radius: 50%; background: {{k.c}}; color: #FAF6EE; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 800; flex: none">{{k.i}}</span>
+        <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.35"><span style="font-size: 16px; font-weight: 800">{{k.name}}</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66">{{k.plan}}</span></span>
+        <button class="act" onClick="{{k.tap}}" aria-pressed="{{k.on}}" style="background: {{k.bg}}; color: {{k.fg}}; box-shadow: {{k.ring}}">{{k.state}}</button>
+      </div>
+    </sc-for>
+  </div>
+  <span style="font-size: 14px; font-weight: 600; color: #4A4F66">"نقد ملا" صرف تب لگائیں جب پیسے ہاتھ میں ہوں۔ راست اور JazzCash خود لگ جاتے ہیں۔</span>
+
+  <span class="h">لنک</span>
+  <div class="box">
+    <div class="row"><span style="flex: 1; font-size: 16px; font-weight: 700">ڈرائیور کا لنک</span><button class="act" style="background: #F3EEE3; color: #141A33">نیا لنک</button></div>
+    <div class="row"><span style="flex: 1; font-size: 16px; font-weight: 700">والدین کا لنک</span><button class="act" style="background: #F3EEE3; color: #141A33">نیا لنک</button></div>
+  </div>
+
+  <span class="h">وین</span>
+  <div class="box">
+    <a class="row" href="XC-Week.dc.html" style="text-decoration: none; color: #141A33"><span style="flex: 1; font-size: 16px; font-weight: 700">ڈرائیور کا ہفتہ · بھروسہ 96%</span><span style="font-size: 18px; font-weight: 800">‹</span></a>
+    <a class="row" href="XC-DayOff.dc.html" style="text-decoration: none; color: #141A33"><span style="flex: 1; font-size: 16px; font-weight: 700">پوری وین کی چھٹی</span><span style="font-size: 18px; font-weight: 800">‹</span></a>
+    <a class="row" href="XA-Captain.dc.html" style="text-decoration: none; color: #0F5E4E"><span style="flex: 1; font-size: 16px; font-weight: 800">امان بیج لگائیں</span><span style="font-size: 18px; font-weight: 800">‹</span></a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":1200}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { cash: { 5: false } }; }
+  renderVals() {
+    const base = [
+      { id: 0, name: 'مریم', i: 'م', plan: 'کیپٹن کا بچہ · مفت', kind: 'free', c: '#E8A33D' },
+      { id: 1, name: 'علی', i: 'ع', plan: 'سالانہ Rs 1,990 · راست', kind: 'paid', c: '#1F2A5C' },
+      { id: 2, name: 'حمزہ', i: 'ح', plan: 'ماہانہ Rs 199 · JazzCash', kind: 'paid', c: '#A8321F' },
+      { id: 3, name: 'عائشہ', i: 'ع', plan: 'ماہانہ + بہن بھائی Rs 298', kind: 'paid', c: '#0F5E4E' },
+      { id: 4, name: 'سارا', i: 'س', plan: 'مفت مہینہ · 21 دن باقی', kind: 'trial', c: '#17705A' },
+      { id: 5, name: 'زین', i: 'ز', plan: 'ماہانہ Rs 199 · نقد کیپٹن کو', kind: 'cash', c: '#2B3A80' }
+    ];
+    const cashOn = !!this.state.cash[5];
+    const paid = 5 + (cashOn ? 1 : 0);
+    const capOk = paid >= 5;
+    return {
+      paid,
+      reward: (paid + 1) * 40,
+      capText: capOk ? 'مریم کا پہنچ مفت: 5 یا زیادہ خاندان ادا کر رہے ہیں' : 'مریم مفت رہے گی جب 5 خاندان ادا کریں',
+      capBg: capOk ? '#DCEFE7' : '#FBEBCF', capFg: capOk ? '#0B4A3D' : '#141A33',
+      kids: base.map((k) => {
+        let state = 'ادا', bg = '#DCEFE7', fg = '#0B4A3D', ring = 'none', on = true, tap = () => {};
+        if (k.kind === 'free') { state = 'مفت'; bg = '#FBEBCF'; fg = '#141A33'; }
+        if (k.kind === 'trial') { state = 'مفت مہینہ'; bg = '#E6E9F5'; fg = '#1F2A5C'; }
+        if (k.kind === 'cash') {
+          on = cashOn;
+          state = cashOn ? 'نقد ملا' : 'نقد ملا؟';
+          bg = cashOn ? '#DCEFE7' : '#FFFFFF'; fg = cashOn ? '#0B4A3D' : '#1F2A5C'; ring = cashOn ? 'none' : 'inset 0 0 0 2px #1F2A5C';
+          tap = () => this.setState({ cash: { 5: !cashOn } });
+        }
+        return { ...k, state, bg, fg, ring, on, tap };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent today v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column">
+  <div style="position: relative; background: #1F2A5C; color: #FAF6EE; padding: 18px 16px 74px; flex: none">
+    <svg width="360" height="140" aria-hidden="true" style="position: absolute; left: 0; bottom: 0"><defs><pattern id="xpt" width="40" height="40" patternUnits="userSpaceOnUse"><path transform="translate(6 6) scale(0.44)" d="{{S}}" fill="#2B3A80"></path><circle cx="20" cy="20" r="2.4" fill="#E8A33D"></circle></pattern></defs><rect y="70" width="360" height="70" fill="url(#xpt)"></rect></svg>
+    <header data-component="TripHeader" data-role="parent" style="position: relative; display: flex; align-items: center; gap: 10px">
+      <span style="width: 46px; height: 46px; border-radius: 50%; background: #E8A33D; color: #141A33; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800">ع</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 20px; font-weight: 800">علی · صبح</span><span style="font-size: 14px; font-weight: 600">گلشن وین · رفیق بھائی</span></span>
+      <a href="XP-Plan.dc.html" style="height: 40px; padding: 0 12px; border-radius: 999px; background: #FAF6EE; color: #1F2A5C; text-decoration: none; display: flex; align-items: center; font-size: 14px; font-weight: 800">مفت · 21 دن</a>
+    </header>
+  </div>
+  <section style="position: relative; margin: -60px 16px 0; background: #FFFFFF; border-radius: 18px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 5px #FFFFFF, inset 0 0 0 6px #E2DCCD, 0 12px 28px -16px rgba(20,26,51,.5); padding: 18px 20px; display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 58px; height: 58px; border-radius: 16px; background: #17705A; display: flex; align-items: center; justify-content: center; flex: none"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5"></path></svg></span>
+      <span style="display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 26px; font-weight: 800">علی وین میں ہے</span><span style="font-size: 15px; font-weight: 700; color: #4A4F66">7:12 · رفیق بھائی نے مارک کیا</span></span>
+    </div>
+    <div data-component="RouteDots" aria-hidden="true" style="display: flex; align-items: center; gap: 4px">
+      <span style="width: 14px; height: 14px; border-radius: 50%; background: #1F2A5C"></span><span style="flex: 1; border-top: 3px dotted #141A33"></span>
+      <span style="width: 22px; height: 22px; border-radius: 50%; background: #17705A; box-shadow: 0 0 0 4px #DCEFE7"></span><span style="flex: 1; border-top: 3px dotted #141A33"></span>
+      <span style="width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 3px #141A33"></span><span style="flex: 1; border-top: 3px dotted #141A33"></span>
+      <svg width="26" height="26" viewBox="0 0 64 64"><path d="{{S}}" fill="none" stroke="#E8A33D" stroke-width="5"></path></svg>
+    </div>
+  </section>
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 16px">
+    <ol style="list-style: none; margin: 0; padding: 4px 16px; background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1px #E2DCCD; display: flex; flex-direction: column">
+      <sc-for list="{{events}}" as="e" hint-placeholder-count="3">
+        <li data-component="TimelineEvent" style="display: flex; align-items: center; gap: 12px; height: 50px; border-bottom: 1px solid #F0EBE0">
+          <span style="width: 14px; height: 14px; border-radius: 50%; background: {{e.c}}; box-shadow: {{e.ring}}"></span>
+          <span style="flex: 1; font-size: 17px; font-weight: {{e.w}}; color: {{e.fg}}">{{e.t}}</span><span style="font-size: 15px; font-weight: 800">{{e.time}}</span>
+        </li>
+      </sc-for>
+    </ol>
+    <div style="display: flex; align-items: center; gap: 10px; background: #DCEFE7; border-radius: 14px; padding: 10px 14px">
+      <svg width="24" height="24" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#0F5E4E"></path></svg>
+      <span style="flex: 1; font-size: 15px; font-weight: 700; color: #0B4A3D">رفیق بھائی اس مہینے 96% ٹیپ وقت پر کر رہے ہیں</span>
+    </div>
+    <a href="XP-Chutti.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; height: 58px; border-radius: 16px; box-shadow: inset 0 0 0 2px #1F2A5C; color: #1F2A5C; text-decoration: none; font-size: 18px; font-weight: 800">چھٹی لگائیں</a>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z',
+      events: [
+        { t: 'وین نکل گئی', time: '7:05', c: '#1F2A5C', ring: 'none', w: 700, fg: '#141A33' },
+        { t: 'علی وین میں ہے', time: '7:12', c: '#17705A', ring: '0 0 0 4px #DCEFE7', w: 800, fg: '#141A33' },
+        { t: 'اسکول پہنچنا', time: '', c: 'transparent', ring: 'inset 0 0 0 2px #4A4F66', w: 600, fg: '#4A4F66' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

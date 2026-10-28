@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Amaan apply</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F5E4E}a:hover{color:#17705A}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.role{border:0;border-radius:16px;font-family:inherit;text-align:right;padding:12px 14px;display:flex;align-items:center;gap:12px;cursor:pointer;min-height:72px}
+.in{height:52px;border-radius:14px;border:0;box-shadow:inset 0 0 0 2px #141A33;background:#FFFFFF;padding:0 14px;font-family:inherit;font-size:17px;font-weight:700;color:#141A33;box-sizing:border-box;width:100%}
+.in:focus{outline:3px solid #E8A33D;outline-offset:2px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column">
+  <div style="position: relative; background: #0F5E4E; color: #FAF6EE; padding: 20px 16px 16px; overflow: hidden; flex: none">
+    <svg width="360" height="150" aria-hidden="true" style="position: absolute; inset: 0"><defs><pattern id="xaa" width="40" height="40" patternUnits="userSpaceOnUse"><path transform="translate(6 6) scale(0.44)" d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#17705A"></path><circle cx="20" cy="20" r="2.2" fill="#C9A24A"></circle></pattern></defs><rect width="360" height="150" fill="url(#xaa)"></rect></svg>
+    <div style="position: relative; display: flex; flex-direction: column">
+      <span style="font-size: 15px; font-weight: 800; color: #FBEBCF">پہنچ امان</span>
+      <span class="disp" style="font-size: 34px">ہمارے ساتھ کام کریں</span>
+      <span style="font-size: 15px; font-weight: 700">خواتین کے لیے · اپنے علاقے میں · اپنے وقت پر</span>
+    </div>
+  </div>
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 14px 16px 16px">
+    <span style="font-size: 16px; font-weight: 800">آپ کیا کرنا چاہیں گی؟</span>
+    <sc-for list="{{roles}}" as="r" hint-placeholder-count="3">
+      <button class="role" onClick="{{r.pick}}" aria-pressed="{{r.on}}" style="background: {{r.bg}}; box-shadow: {{r.ring}}; color: #141A33">
+        <span style="width: 24px; height: 24px; border-radius: 50%; box-shadow: inset 0 0 0 {{r.dot}} #0F5E4E; flex: none"></span>
+        <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 17px; font-weight: 800">{{r.t}}</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66">{{r.n}}</span></span>
+      </button>
+    </sc-for>
+    <label for="xa-area" style="font-size: 16px; font-weight: 800">علاقہ</label>
+    <input id="xa-area" class="in" value="گلشن اقبال، بلاک 13">
+    <span style="font-size: 14px; font-weight: 700; background: #DCEFE7; color: #0B4A3D; border-radius: 12px; padding: 8px 12px">{{need}}</span>
+    <button style="margin-top: auto; height: 62px; border-radius: 16px; border: 0; background: #0F5E4E; color: #FAF6EE; font-family: inherit; font-size: 18px; font-weight: 800; cursor: pointer">درخواست بھیجیں</button>
+    <span style="font-size: 14px; font-weight: 600; text-align: center; color: #4A4F66">ہماری ٹیم کی ایک خاتون 2 دن میں فون کریں گی۔</span>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { r: 0 }; }
+  renderVals() {
+    const roles = [
+      { t: 'ڈرائیور صاحبہ', n: 'اپنی یا کرائے کی وین، اپنا روٹ', need: 'چاہیے: لائسنس، شناختی کارڈ، وین کے کاغذ۔ ٹریننگ مفت۔' },
+      { t: 'امان ساتھی', n: 'وین میں بچوں کے ساتھ، روزانہ 2 چکر', need: 'چاہیے: شناختی کارڈ اور ایک حوالہ۔ لائسنس ضروری نہیں۔' },
+      { t: 'والدہ جو خود چلاتی ہیں', n: 'اپنے بچوں کے ساتھ 2 سے 4 اور بچے', need: 'چاہیے: لائسنس اور اپنی گاڑی۔ 7 سیٹ والی کار بھی چلے گی۔' }
+    ];
+    return {
+      need: roles[this.state.r].need,
+      roles: roles.map((r, i) => {
+        const on = i === this.state.r;
+        return { ...r, on, bg: on ? '#FFFFFF' : '#FAF6EE', ring: on ? 'inset 0 0 0 2.5px #0F5E4E' : 'inset 0 0 0 1.5px #E2DCCD', dot: on ? '7px' : '2px', pick: () => this.setState({ r: i }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Amaan safety log</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#0F5E4E}a:hover{color:#17705A}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.tab{flex:1;height:48px;border:0;border-radius:12px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+.ev{display:flex;align-items:center;gap:10px;min-height:50px;border-bottom:1px solid #F0EBE0}
+.ev:last-child{border-bottom:0}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 18px 16px 14px; gap: 10px">
+  <span style="font-size: 15px; font-weight: 800; color: #0F5E4E; display: inline-flex; align-items: center; gap: 6px"><svg width="16" height="16" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#0F5E4E"></path></svg>جوہر امان وین · کیپٹن</span>
+  <span class="disp" style="font-size: 34px; margin-top: -8px">حفاظت کی ڈائری</span>
+
+  <div style="display: flex; gap: 6px; background: #F3EEE3; border-radius: 14px; padding: 4px">
+    <sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+      <button class="tab" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="background: {{t.bg}}; color: {{t.fg}}">{{t.label}}</button>
+    </sc-for>
+  </div>
+
+  <div style="background: #FFFFFF; border-radius: 18px; box-shadow: inset 0 0 0 1px #E2DCCD; padding: 4px 14px">
+    <sc-for list="{{events}}" as="e" hint-placeholder-count="5">
+      <div class="ev">
+        <span dir="ltr" style="font-family: Manrope, sans-serif; font-size: 15px; font-weight: 800; width: 48px; flex: none; text-align: right">{{e.t}}</span>
+        <span style="width: 12px; height: 12px; border-radius: 50%; background: {{e.c}}; flex: none"></span>
+        <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 16px; font-weight: 800">{{e.what}}</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66">{{e.who}}</span></span>
+      </div>
+    </sc-for>
+  </div>
+
+  <sc-if value="{{late}}" hint-placeholder-val="{{ false }}">
+    <div style="background: #F9E3DF; border-radius: 16px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+      <span style="font-size: 16px; font-weight: 800; color: #9E2A1F">رخسانہ صاحبہ نے 45 منٹ میں "گھر پہنچ گئی" نہیں لگایا</span>
+      <span style="font-size: 14px; font-weight: 600">ایپ نے ایک بار یاد دلایا۔ اب آپ فون کریں۔ 15 منٹ اور گزرے تو پہنچ کی ٹیم بھی فون کرے گی۔</span>
+      <button style="height: 52px; border: 0; border-radius: 14px; background: #9E2A1F; color: #FFFFFF; font-family: inherit; font-size: 16px; font-weight: 800; cursor: pointer">رخسانہ صاحبہ کو فون کریں</button>
+    </div>
+  </sc-if>
+  <sc-if value="{{allOk}}" hint-placeholder-val="{{ true }}">
+    <div style="background: #DCEFE7; border-radius: 16px; padding: 12px 14px; font-size: 15px; font-weight: 800; color: #0B4A3D">دونوں گھر پہنچ گئیں · اس ہفتے 10 میں سے 10 بار وقت پر</div>
+  </sc-if>
+  <span style="margin-top: auto; font-size: 14px; font-weight: 600; color: #4A4F66">یہ ڈائری صرف کیپٹن اور پہنچ کی ٹیم دیکھتی ہے۔ گھر کا پتہ کہیں نہیں جاتا، صرف وقت۔</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { tab: 0 }; }
+  renderVals() {
+    const ok = '#17705A', amber = '#E8A33D', red = '#9E2A1F', neel = '#1F2A5C';
+    const today = [
+      { t: '6:48', c: neel, what: 'وین نکل گئی', who: 'شازیہ صاحبہ نے مارک کیا' },
+      { t: '7:40', c: amber, what: 'اسکول پہنچ گئے', who: 'شازیہ صاحبہ نے مارک کیا' },
+      { t: '2:25', c: ok, what: 'سب بچے گھر', who: 'شازیہ صاحبہ نے مارک کیا' },
+      { t: '2:51', c: ok, what: 'میں گھر پہنچ گئی', who: 'شازیہ صاحبہ' },
+      { t: '3:12', c: red, what: 'گھر پہنچنا باقی', who: 'رخسانہ صاحبہ · 45 منٹ گزر گئے' }
+    ];
+    const yesterday = [
+      { t: '6:50', c: neel, what: 'وین نکل گئی', who: 'شازیہ صاحبہ نے مارک کیا' },
+      { t: '7:38', c: amber, what: 'اسکول پہنچ گئے', who: 'شازیہ صاحبہ نے مارک کیا' },
+      { t: '2:20', c: ok, what: 'سب بچے گھر', who: 'شازیہ صاحبہ نے مارک کیا' },
+      { t: '2:44', c: ok, what: 'میں گھر پہنچ گئی', who: 'شازیہ صاحبہ' },
+      { t: '2:58', c: ok, what: 'میں گھر پہنچ گئی', who: 'رخسانہ صاحبہ' }
+    ];
+    const isToday = this.state.tab === 0;
+    return {
+      tabs: ['آج', 'کل'].map((label, i) => {
+        const on = i === this.state.tab;
+        return { label, on, bg: on ? '#0F5E4E' : 'transparent', fg: on ? '#FAF6EE' : '#141A33', pick: () => this.setState({ tab: i }) };
+      }),
+      events: isToday ? today : yesterday,
+      late: isToday, allOk: !isToday
+    };
+  }
+}
+</script>
+</body>
+</html>

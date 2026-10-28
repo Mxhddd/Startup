@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent two children v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.kid{background:#FFFFFF;border-radius:18px;box-shadow:inset 0 0 0 1.5px #C9A24A,inset 0 0 0 5px #FFFFFF,inset 0 0 0 6px #E2DCCD;padding:16px 18px;display:flex;flex-direction:column;gap:10px;color:#141A33;text-decoration:none}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 22px 16px 16px; gap: 14px">
+  <div style="display: flex; align-items: baseline; justify-content: space-between">
+    <span class="disp" style="font-size: 38px">آج صبح</span>
+    <span style="font-size: 15px; font-weight: 700">بدھ 28 اکتوبر</span>
+  </div>
+  <a href="XP-Today.dc.html" class="kid">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 46px; height: 46px; border-radius: 50%; background: #1F2A5C; color: #FAF6EE; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800">ع</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 20px; font-weight: 800">علی</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66">گلشن وین · رفیق بھائی</span></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #17705A; color: #FFFFFF; border-radius: 12px; padding: 8px 14px"><span style="flex: 1; font-size: 17px; font-weight: 800">وین میں ہے</span><span style="font-size: 16px; font-weight: 800">7:12</span></div>
+  </a>
+  <a href="XA-Listing.dc.html" class="kid">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 46px; height: 46px; border-radius: 50%; background: #0F5E4E; color: #FAF6EE; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800">س</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 20px; font-weight: 800">سارا</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66">جوہر امان وین · شازیہ صاحبہ</span></span>
+      <span style="display: inline-flex; align-items: center; gap: 4px; height: 30px; padding: 0 10px; border-radius: 999px; background: #DCEFE7; color: #0F5E4E; font-size: 14px; font-weight: 800"><svg width="14" height="14" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#0F5E4E"></path></svg>امان</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #EEE9DF; border-radius: 12px; padding: 8px 14px"><span style="flex: 1; font-size: 17px; font-weight: 800">وین کا انتظار</span><span style="font-size: 15px; font-weight: 700">عموماً 7:20</span></div>
+  </a>
+  <div style="background: #FBEBCF; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 10px">
+    <span style="font-size: 22px; font-weight: 800">Rs 298</span>
+    <span style="flex: 1; font-size: 15px; font-weight: 700">ماہانہ کل: علی Rs 199 + سارا Rs 99 (بہن بھائی)</span>
+  </div>
+  <button style="margin-top: auto; height: 56px; border-radius: 16px; border: 2px dashed #1F2A5C; background: transparent; color: #1F2A5C; font-family: inherit; font-size: 17px; font-weight: 800; cursor: pointer">+ ایک اور بچہ یا وین</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

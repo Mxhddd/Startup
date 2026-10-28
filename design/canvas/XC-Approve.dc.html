@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain approvals v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.b{height:52px;border-radius:14px;border:0;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer;flex:1}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 20px 16px 16px; gap: 12px">
+  <span class="disp" style="font-size: 36px">منظوریاں</span>
+  <span style="font-size: 15px; font-weight: 600; margin-top: -8px">صرف اُنہیں منظور کریں جنہیں آپ جانتے ہیں۔ نمبر پہچانیں، پھر ہاں کریں۔</span>
+
+  <sc-for list="{{items}}" as="a" hint-placeholder-count="3">
+    <article style="background: #FFFFFF; border-radius: 18px; box-shadow: inset 0 0 0 1px #E2DCCD; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="width: 44px; height: 44px; border-radius: 50%; background: {{a.c}}; color: #FAF6EE; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 800; flex: none">{{a.i}}</span>
+        <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.4">
+          <span style="font-size: 17px; font-weight: 800">{{a.who}}</span>
+          <span dir="ltr" style="font-family: Manrope, sans-serif; font-size: 15px; font-weight: 700; color: #4A4F66; text-align: right">{{a.phone}}</span>
+        </span>
+        <span style="font-size: 14px; font-weight: 700; color: #4A4F66">{{a.t}}</span>
+      </div>
+      <sc-if value="{{a.open}}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; gap: 8px">
+          <button class="b" onClick="{{a.no}}" style="background: #FFFFFF; color: #9E2A1F; box-shadow: inset 0 0 0 2px #9E2A1F">نہیں</button>
+          <button class="b" onClick="{{a.yes}}" style="background: #17705A; color: #FFFFFF">ہاں، منظور</button>
+        </div>
+      </sc-if>
+      <sc-if value="{{a.done}}" hint-placeholder-val="{{ false }}">
+        <span style="height: 44px; border-radius: 12px; background: {{a.doneBg}}; color: {{a.doneFg}}; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">{{a.doneText}}</span>
+      </sc-if>
+    </article>
+  </sc-for>
+
+  <div style="margin-top: auto; background: #E6E9F5; border-radius: 14px; padding: 10px 14px; font-size: 15px; font-weight: 700; color: #1F2A5C">منظور ہوتے ہی اُن کا مفت مہینہ شروع۔ بل کیپٹن کو نہیں، ہر خاندان کو الگ آتا ہے۔</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { d: {} }; }
+  renderVals() {
+    const list = [
+      { id: 1, who: 'ثنا · بچی: سارا', i: 'ث', phone: '0300 ••• 4417', t: '5 منٹ پہلے', c: '#1F2A5C' },
+      { id: 2, who: 'عمران · بچہ: حمزہ', i: 'ع', phone: '0321 ••• 9082', t: '1 گھنٹہ پہلے', c: '#A8321F' },
+      { id: 3, who: 'نادیہ · بچی: عائشہ', i: 'ن', phone: '0333 ••• 1265', t: 'کل', c: '#0F5E4E' }
+    ];
+    return {
+      items: list.map((a) => {
+        const st = this.state.d[a.id];
+        return {
+          ...a, open: !st, done: !!st,
+          doneText: st === 'y' ? 'منظور · اطلاع بھیج دی' : 'منع کر دیا · اُنہیں بتا دیا',
+          doneBg: st === 'y' ? '#DCEFE7' : '#EEE9DF', doneFg: st === 'y' ? '#0B4A3D' : '#5E5A52',
+          yes: () => this.setState({ d: { ...this.state.d, [a.id]: 'y' } }),
+          no: () => this.setState({ d: { ...this.state.d, [a.id]: 'n' } })
+        };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

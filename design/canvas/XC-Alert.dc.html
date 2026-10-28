@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain help alert v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#FAF6EE}a:hover{color:#FBEBCF}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.call{height:64px;border-radius:16px;border:0;font-family:inherit;font-size:18px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;text-decoration:none}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column">
+  <div style="background: #9E2A1F; color: #FFFFFF; padding: 22px 16px 18px; display: flex; flex-direction: column; gap: 6px">
+    <span style="display: inline-flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3L2 20h20z M12 10v4 M12 17v.5"></path></svg>مدد چاہیے · 1:52</span>
+    <span class="disp" style="font-size: 34px">رفیق بھائی نے مدد مانگی</span>
+    <span style="font-size: 17px; font-weight: 700">وجہ: وین خراب ہو گئی · 6 بچے وین میں</span>
+  </div>
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 12px; padding: 14px 16px 16px">
+    <div style="border-radius: 18px; overflow: hidden; box-shadow: inset 0 0 0 1px #E2DCCD; background: #FFFFFF">
+      <div style="height: 120px; position: relative; background: #E6E9F5">
+        <svg width="328" height="120" aria-hidden="true" style="position: absolute; inset: 0"><path d="M0 70 H328 M120 0 V120 M240 0 L200 120" stroke="#FFFFFF" stroke-width="10"></path><circle cx="164" cy="64" r="14" fill="#9E2A1F"></circle><circle cx="164" cy="64" r="26" fill="none" stroke="#9E2A1F" stroke-width="2.5" opacity=".5"></circle></svg>
+      </div>
+      <div style="padding: 10px 14px; display: flex; flex-direction: column; line-height: 1.5">
+        <span style="font-size: 16px; font-weight: 800">یونیورسٹی روڈ، NIPA چورنگی کے پاس</span>
+        <span style="font-size: 14px; font-weight: 600; color: #4A4F66">جگہ صرف اس مدد کے لیے بھیجی گئی · 30 دن بعد مٹ جائے گی</span>
+      </div>
+    </div>
+    <a class="call" href="#" style="background: #1F2A5C; color: #FAF6EE"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg>رفیق بھائی کو فون کریں</a>
+    <div style="display: flex; gap: 8px">
+      <a class="call" href="#" style="flex: 1; background: #FFFFFF; color: #9E2A1F; box-shadow: inset 0 0 0 2px #9E2A1F">1122</a>
+      <a class="call" href="#" style="flex: 1; background: #FFFFFF; color: #9E2A1F; box-shadow: inset 0 0 0 2px #9E2A1F">پولیس 15</a>
+    </div>
+    <span style="font-size: 16px; font-weight: 800">والدین کو کیا بتائیں؟</span>
+    <sc-for list="{{msgs}}" as="m" hint-placeholder-count="2">
+      <button onClick="{{m.pick}}" aria-pressed="{{m.on}}" style="min-height: 56px; border: 0; border-radius: 14px; background: {{m.bg}}; color: #141A33; box-shadow: {{m.ring}}; font-family: inherit; font-size: 16px; font-weight: 700; text-align: right; padding: 8px 14px; cursor: pointer">{{m.t}}</button>
+    </sc-for>
+    <button onClick="{{send}}" style="margin-top: auto; height: 62px; border-radius: 16px; border: 0; background: {{btnBg}}; color: {{btnFg}}; font-family: inherit; font-size: 18px; font-weight: 800; cursor: pointer">{{btn}}</button>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { m: 0, sent: false }; }
+  renderVals() {
+    const list = ['وین خراب ہوئی، بچے محفوظ ہیں۔ دوسری گاڑی آ رہی ہے، 20 منٹ دیر۔', 'بچوں کو لینے کا انتظام ہو رہا ہے۔ فون پاس رکھیں، کیپٹن رابطہ کریں گے۔'];
+    return {
+      msgs: list.map((t, i) => {
+        const on = i === this.state.m;
+        return { t, on, bg: on ? '#FBEBCF' : '#FFFFFF', ring: on ? 'inset 0 0 0 2.5px #E8A33D' : 'inset 0 0 0 1.5px #E2DCCD', pick: () => this.setState({ m: i, sent: false }) };
+      }),
+      btn: this.state.sent ? '6 خاندانوں کو بھیج دیا' : 'متعلقہ والدین کو بھیجیں',
+      btnBg: this.state.sent ? '#DCEFE7' : '#1F2A5C', btnFg: this.state.sent ? '#0B4A3D' : '#FAF6EE',
+      send: () => this.setState({ sent: true })
+    };
+  }
+}
+</script>
+</body>
+</html>

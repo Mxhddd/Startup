@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver undo v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; position: relative">
+  <header data-component="TripHeader" style="background: #1F2A5C; color: #FAF6EE; padding: 14px 16px; border-bottom: 5px solid #E8A33D; display: flex; align-items: center; gap: 10px">
+    <div style="flex: 1; display: flex; flex-direction: column; line-height: 1.5"><span style="font-size: 21px; font-weight: 800">صبح کا چکر</span><span style="font-size: 14px; font-weight: 600">نکل گئے 7:05 · گلشن وین</span></div>
+    <span style="font-size: 28px; font-weight: 800; line-height: 1">4/5</span>
+  </header>
+  <main style="flex: 1; display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 130px">
+    <sc-for list="{{done}}" as="k" hint-placeholder-count="3">
+      <div data-component="ChildRow" data-state="done" style="display: flex; align-items: center; gap: 12px; height: 46px; padding: 0 16px; background: #DCEFE7; border-radius: 14px">
+        <span style="width: 26px; height: 26px; border-radius: 50%; background: #17705A"></span>
+        <span style="flex: 1; font-size: 17px; font-weight: 700">{{k.name}}</span><span style="font-size: 15px; font-weight: 800">{{k.t}}</span>
+      </div>
+    </sc-for>
+    <div data-component="ChildRow" data-state="sending" style="display: flex; align-items: center; gap: 12px; height: 56px; padding: 0 16px; background: #FFFFFF; border-radius: 14px; box-shadow: inset 0 0 0 2.5px #141A33">
+      <span style="width: 28px; height: 28px; border-radius: 50%; background: #17705A"></span>
+      <span style="flex: 1; font-size: 18px; font-weight: 800">عائشہ</span><span style="font-size: 15px; font-weight: 800">بھیج رہے ہیں…</span>
+    </div>
+    <button data-component="TapButton" data-step="picked" data-size="next" style="display: flex; align-items: center; gap: 14px; height: 108px; padding: 0 18px; border: 0; border-radius: 20px; background: #17705A; color: #FFFFFF; font-family: inherit; text-align: right; box-shadow: 0 5px 0 #0C4A3B; cursor: pointer">
+      <span style="width: 62px; height: 62px; border-radius: 16px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#17705A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5"></path></svg></span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.5"><span style="font-size: 28px; font-weight: 800">زین</span><span style="font-size: 17px; font-weight: 700">بٹھا لیا · ایک ٹیپ</span></span>
+    </button>
+  </main>
+  <div data-component="UndoBar" role="status" style="position: absolute; left: 12px; right: 12px; bottom: 16px; background: #141A33; color: #FAF6EE; border-radius: 20px; padding: 12px 12px 12px 16px; display: flex; align-items: center; gap: 12px">
+    <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true" style="flex: none"><circle cx="28" cy="28" r="24" fill="none" stroke="#2E3555" stroke-width="5"></circle><circle cx="28" cy="28" r="24" fill="none" stroke="#E8A33D" stroke-width="5" stroke-dasharray="90 151" transform="rotate(-90 28 28)" stroke-linecap="round"></circle><text x="28" y="36" text-anchor="middle" font-family="Manrope" font-weight="800" font-size="22" fill="#E8A33D">3</text></svg>
+    <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.5"><span style="font-size: 17px; font-weight: 800">عائشہ · بٹھا لیا</span><span style="font-size: 14px; font-weight: 600">3 سیکنڈ میں والدین کو خبر</span></span>
+    <a href="XD-MidRoute.dc.html" style="height: 64px; padding: 0 22px; border-radius: 14px; background: #E8A33D; color: #141A33; text-decoration: none; display: flex; align-items: center; font-size: 20px; font-weight: 800">واپس</a>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { done: [{ name: 'علی', t: '7:12' }, { name: 'فاطمہ', t: '7:18' }, { name: 'حمزہ', t: '7:24' }] };
+  }
+}
+</script>
+</body>
+</html>

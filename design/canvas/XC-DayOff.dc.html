@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain van day off v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.d{height:72px;border:0;border-radius:14px;font-family:inherit;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.3}
+.r{height:48px;padding:0 16px;border:0;border-radius:999px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 20px 16px 16px; gap: 12px">
+  <span class="disp" style="font-size: 36px">پوری وین کی چھٹی</span>
+  <span style="font-size: 15px; font-weight: 600; margin-top: -8px">سب والدین اور رفیق بھائی کو ایک ساتھ اطلاع جائے گی۔</span>
+
+  <span style="font-size: 16px; font-weight: 800">کون سا دن؟</span>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px">
+    <sc-for list="{{days}}" as="d" hint-placeholder-count="4">
+      <button class="d" onClick="{{d.pick}}" aria-pressed="{{d.on}}" style="background: {{d.bg}}; color: {{d.fg}}; box-shadow: {{d.ring}}">
+        <span style="font-size: 14px; font-weight: 700">{{d.name}}</span><span style="font-size: 22px; font-weight: 800">{{d.n}}</span>
+      </button>
+    </sc-for>
+  </div>
+
+  <span style="font-size: 16px; font-weight: 800">وجہ</span>
+  <div style="display: flex; flex-wrap: wrap; gap: 8px">
+    <sc-for list="{{reasons}}" as="r" hint-placeholder-count="4">
+      <button class="r" onClick="{{r.pick}}" aria-pressed="{{r.on}}" style="background: {{r.bg}}; color: {{r.fg}}; box-shadow: {{r.ring}}">{{r.t}}</button>
+    </sc-for>
+  </div>
+
+  <span style="font-size: 16px; font-weight: 800">والدین کو یہ جائے گا</span>
+  <div style="background: #FFFFFF; border-radius: 18px; box-shadow: inset 0 0 0 1px #E2DCCD; padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start">
+    <span style="width: 40px; height: 40px; border-radius: 12px; background: #A8321F; display: flex; align-items: center; justify-content: center; flex: none; margin-top: 4px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v16H3z M3 10h18 M8 3v4 M16 3v4"></path></svg></span>
+    <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.5"><span style="font-size: 14px; font-weight: 700; color: #4A4F66">پہنچ · گلشن وین</span><span style="font-size: 17px; font-weight: 800">{{preview}}</span><span style="font-size: 14px; font-weight: 600">{{why}} · سارہ (کیپٹن) نے بتایا</span></span>
+  </div>
+
+  <sc-if value="{{sent}}" hint-placeholder-val="{{ false }}">
+    <div style="background: #DCEFE7; border-radius: 14px; padding: 10px 14px; display: flex; align-items: center; gap: 10px">
+      <span style="flex: 1; font-size: 15px; font-weight: 800; color: #0B4A3D">10 خاندانوں اور ڈرائیور کو بھیج دیا</span>
+      <button onClick="{{undo}}" style="height: 44px; padding: 0 14px; border: 0; border-radius: 12px; background: #FFFFFF; color: #0B4A3D; font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer">واپس</button>
+    </div>
+  </sc-if>
+  <button onClick="{{send}}" style="margin-top: auto; height: 62px; border-radius: 16px; border: 0; background: {{btnBg}}; color: #FAF6EE; font-family: inherit; font-size: 18px; font-weight: 800; cursor: pointer">{{btn}}</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { day: 2, why: 0, sent: false }; }
+  renderVals() {
+    const days = [{ name: 'کل', n: 29, full: 'کل جمعرات' }, { name: 'جمعہ', n: 30, full: 'جمعہ' }, { name: 'ہفتہ', n: 31, full: 'ہفتہ 31 اکتوبر' }, { name: 'پیر', n: 2, full: 'پیر 2 نومبر' }];
+    const reasons = ['اسکول کی چھٹی', 'وین کی مرمت', 'ڈرائیور بیمار', 'شہر بند'];
+    const s = this.state;
+    return {
+      days: days.map((d, i) => {
+        const on = i === s.day;
+        return { ...d, on, bg: on ? '#1F2A5C' : '#FFFFFF', fg: on ? '#FAF6EE' : '#141A33', ring: on ? 'none' : 'inset 0 0 0 1.5px #E2DCCD', pick: () => this.setState({ day: i, sent: false }) };
+      }),
+      reasons: reasons.map((t, i) => {
+        const on = i === s.why;
+        return { t, on, bg: on ? '#A8321F' : '#FFFFFF', fg: on ? '#FFFFFF' : '#141A33', ring: on ? 'none' : 'inset 0 0 0 1.5px #E2DCCD', pick: () => this.setState({ why: i, sent: false }) };
+      }),
+      preview: days[s.day].full + ' کو وین نہیں آئے گی',
+      why: reasons[s.why],
+      sent: s.sent,
+      btn: s.sent ? 'بھیج دیا' : 'سب کو بتائیں',
+      btnBg: s.sent ? '#4A4F66' : '#1F2A5C',
+      send: () => this.setState({ sent: true }),
+      undo: () => this.setState({ sent: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

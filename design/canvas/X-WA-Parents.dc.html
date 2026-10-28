@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>WhatsApp card to parents v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400}
+.c{position:absolute;width:26px;height:26px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 1080px; height: 1080px; box-sizing: border-box; overflow: hidden; position: relative; background: #1F2A5C; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6">
+  <svg width="1080" height="1080" aria-hidden="true" style="position: absolute; inset: 0"><defs><pattern id="wap" width="90" height="90" patternUnits="userSpaceOnUse"><path transform="translate(14 14) scale(0.97)" d="{{S}}" fill="#2B3A80"></path><circle cx="45" cy="45" r="5" fill="#E8A33D"></circle></pattern></defs><rect width="1080" height="1080" fill="url(#wap)"></rect></svg>
+
+  <div style="position: absolute; inset: 70px; background: #FAF6EE; border-radius: 10px; box-shadow: inset 0 0 0 3px #C9A24A, inset 0 0 0 14px #FAF6EE, inset 0 0 0 16px #E2DCCD; padding: 64px 72px; display: flex; flex-direction: column; gap: 22px; box-sizing: border-box">
+    <svg class="c" style="top: 22px; right: 22px" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>
+    <svg class="c" style="top: 22px; left: 22px" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>
+    <svg class="c" style="bottom: 22px; right: 22px" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>
+    <svg class="c" style="bottom: 22px; left: 22px" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>
+
+    <div style="display: flex; align-items: center; gap: 18px">
+      <svg width="84" height="84" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#1F2A5C"></path><path d="M22 33 l7 7 l14 -14" fill="none" stroke="#E8A33D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span class="disp" style="font-size: 72px; line-height: 1.4; color: #1F2A5C">پہنچ</span>
+    </div>
+    <span class="disp" style="font-size: 96px; line-height: 1.55">فکر کم، خبر پوری</span>
+    <span style="font-size: 34px; font-weight: 700; line-height: 1.7">وین چلتی ہے، آپ کے فون پر خبر آتی ہے۔ ڈرائیور ایک بٹن دباتے ہیں، بس۔</span>
+
+    <div style="display: flex; gap: 14px; flex-wrap: wrap">
+      <sc-for list="{{steps}}" as="s" hint-placeholder-count="5">
+        <span style="height: 64px; padding: 0 24px; border-radius: 999px; background: {{s.bg}}; color: {{s.fg}}; display: inline-flex; align-items: center; font-size: 28px; font-weight: 800">{{s.t}}</span>
+      </sc-for>
+    </div>
+
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 24px; background: #FBEBCF; border-radius: 18px; padding: 22px 30px">
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.45"><span style="font-size: 38px; font-weight: 800">پہلا مہینہ مفت</span><span style="font-size: 28px; font-weight: 700">پھر Rs 199 ماہانہ · جون جولائی کوئی پیسہ نہیں</span></span>
+      <span style="width: 150px; height: 150px; border-radius: 14px; background: #FFFFFF; box-shadow: inset 0 0 0 2px #141A33; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; text-align: center; flex: none">[QR]</span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1080,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z',
+      steps: [
+        { t: 'وین نکلی', bg: '#1F2A5C', fg: '#FAF6EE' },
+        { t: 'بچہ وین میں', bg: '#17705A', fg: '#FFFFFF' },
+        { t: 'اسکول پہنچے', bg: '#E8A33D', fg: '#141A33' },
+        { t: 'اسکول سے نکلے', bg: '#A8321F', fg: '#FFFFFF' },
+        { t: 'گھر پہنچ گئے', bg: '#A7D47E', fg: '#141A33' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

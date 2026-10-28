@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>WhatsApp status v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400}
+</style>
+</helmet>
+<div dir="rtl" style="width: 1080px; height: 1920px; box-sizing: border-box; overflow: hidden; position: relative; background: #141A33; color: #FAF6EE; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6">
+  <svg width="1080" height="1920" aria-hidden="true" style="position: absolute; inset: 0"><defs><pattern id="wsp" width="120" height="120" patternUnits="userSpaceOnUse"><path transform="translate(20 20) scale(1.25)" d="{{S}}" fill="#1F2A5C"></path><circle cx="60" cy="60" r="6" fill="#E8A33D" opacity=".8"></circle></pattern></defs><rect width="1080" height="1920" fill="url(#wsp)"></rect></svg>
+
+  <div style="position: absolute; top: 150px; right: 90px; left: 90px; display: flex; flex-direction: column; gap: 20px">
+    <div style="display: flex; align-items: center; gap: 18px">
+      <svg width="96" height="96" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#E8A33D"></path><path d="M22 33 l7 7 l14 -14" fill="none" stroke="#141A33" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span class="disp" style="font-size: 88px; line-height: 1.4">پہنچ</span>
+    </div>
+    <span class="disp" style="font-size: 132px; line-height: 1.5">فکر کم،<br>خبر پوری</span>
+  </div>
+
+  <div style="position: absolute; top: 800px; right: 70px; left: 70px; display: flex; flex-direction: column; gap: 26px">
+    <sc-for list="{{notes}}" as="n" hint-placeholder-count="3">
+      <div style="background: #FAF6EE; color: #141A33; border-radius: 40px; padding: 30px 34px; display: flex; gap: 26px; align-items: center">
+        <span style="width: 108px; height: 108px; border-radius: 30px; background: {{n.bg}}; display: flex; align-items: center; justify-content: center; flex: none">
+          <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="{{n.fg}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{n.d}}"></path></svg>
+        </span>
+        <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.45">
+          <span style="font-size: 32px; font-weight: 700; color: #4A4F66">پہنچ · {{n.t}}</span>
+          <span style="font-size: 50px; font-weight: 800">{{n.ur}}</span>
+        </span>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="position: absolute; bottom: 130px; right: 90px; left: 90px; background: #E8A33D; color: #141A33; border-radius: 30px; padding: 40px 44px; display: flex; flex-direction: column; line-height: 1.45">
+    <span style="font-size: 56px; font-weight: 800">اپنی وین کے کیپٹن سے پوچھیں</span>
+    <span style="font-size: 38px; font-weight: 700">پہلا مہینہ مفت · پھر Rs 199 ماہانہ</span>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1080,"height":1920}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const van = 'M2 16V7a1 1 0 0 1 1-1h11l4 4h2a2 2 0 0 1 2 2v4 M9 17h6 M5 17a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M15 17a2 2 0 1 0 4 0a2 2 0 1 0-4 0';
+    return {
+      S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z',
+      notes: [
+        { t: '7:05', bg: '#1F2A5C', fg: '#FAF6EE', d: van, ur: 'وین نکل گئی' },
+        { t: '7:12', bg: '#17705A', fg: '#FFFFFF', d: 'M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5', ur: 'علی وین میں ہے' },
+        { t: '7:48', bg: '#E8A33D', fg: '#141A33', d: 'M3 21h18 M5 21V10l7-5 7 5v11 M10 21v-5h4v5', ur: 'اسکول پہنچ گئے' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

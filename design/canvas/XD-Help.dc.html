@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver help v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.opt{height:64px;border-radius:14px;border:0;background:#FFFFFF;box-shadow:inset 0 0 0 2.5px #1F2A5C;color:#141A33;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 12px">
+  <div style="display: flex; align-items: center; justify-content: space-between">
+    <span style="font-size: 28px; font-weight: 800">مدد</span>
+    <a href="XD-MidRoute.dc.html" aria-label="بند کریں" style="width: 52px; height: 52px; border-radius: 14px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E2DCCD; display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#141A33" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></a>
+  </div>
+  <section data-component="HelpSheet" style="background: #E6E9F5; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+    <span style="font-size: 20px; font-weight: 800; color: #1F2A5C">میں پھنس گیا ہوں</span>
+    <span style="font-size: 15px; font-weight: 600">کیپٹن اور والدین کو "وین کو دیر ہو رہی ہے" کی خبر</span>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+      <button class="opt">گاڑی خراب</button><button class="opt">ٹریفک جام</button><button class="opt">راستہ بند</button>
+    </div>
+  </section>
+  <section style="background: #F9E3DF; border-radius: 16px; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px">
+    <span style="font-size: 20px; font-weight: 800; color: #7A1E14">ایمرجنسی</span>
+    <span style="font-size: 15px; font-weight: 600; color: #5C150E">2 سیکنڈ دبائیں۔ کیپٹن کو آپ کی جگہ کے ساتھ فوراً خبر۔</span>
+    <a href="XC-Alert.dc.html" style="height: 80px; border-radius: 18px; background: #9E2A1F; color: #FFFFFF; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 22px; font-weight: 800">ایمرجنسی · دبا کر رکھیں</a>
+  </section>
+  <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+    <a href="tel:15" style="height: 64px; border-radius: 14px; background: #141A33; color: #FAF6EE; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 17px; font-weight: 800">پولیس 15</a>
+    <a href="tel:1122" style="height: 64px; border-radius: 14px; background: #141A33; color: #FAF6EE; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 17px; font-weight: 800">ریسکیو 1122</a>
+  </div>
+  <a href="tel:" style="margin-top: auto; height: 64px; border-radius: 14px; box-shadow: inset 0 0 0 2.5px #1F2A5C; color: #1F2A5C; text-decoration: none; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800">کیپٹن سارہ کو فون</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

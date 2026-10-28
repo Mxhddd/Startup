@@ -1,77 +1,98 @@
-# Pohnch brand guide
+# Pohnch brand guide (v3 · Neel o Kesar)
 
-Canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy, page **Brand** (board, logo sheet, Pohnch Baji). This file is the text version for building the app and website.
+Canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy, page **v3 · Neel o Kesar (current)**. This file is the text version for building the app and website. v2 ("Ghar/Saaf", neem and haldi, "Pohnch Baji") is kept on the canvas as history only.
+
+## Direction
+
+Premium, but local craft. Think a well-made Karachi thing: indigo and saffron, an eight-point star, a gold hairline frame, Nastaliq for the big moments. Two moods by role:
+
+- **Driver screens: plain.** Built for sunlight and one thumb. Flat colour, big buttons, no pattern, no frames.
+- **Parent, captain and print: rich.** Star-lattice pattern as texture, ornamental frames, flat illustration.
 
 ## Name and line
 
 - **پہنچ · Pohnch** ("reached").
 - Slogan: **فکر کم، خبر پوری** — English line: *Less worry, the whole story.*
-- Hero: the parent's peace of mind. The driver is the trusted helper and is credited in every alert ("ڈرائیور نے مارک کیا").
-- Promise: what the driver marked reaches you. No more, no less, no later.
-
-## Idea: the route dots
-
-پ and چ each carry three dots, like stops on a route. One dot per stop, ending at home. The dots are the app's progress bar (one per child, filled haldi when picked), poster borders and loaders.
+- Driver line (driver card): **آپ کا بٹن، والدین کا سکون**.
+- Promise: **جو مارک ہوا، وہی پہنچا** — what the driver marked reaches you. No more, no less, no later.
+- Hero: the parent's peace of mind. The driver is credited in every alert ("رفیق بھائی نے مارک کیا · 7:12").
 
 ## Logo
 
-- **Mark**: a location pin whose top is a house roof, with a check inside. Neem pin, haldi check. Works alone as app icon and sticker.
-- **Lockup**: mark on the right, پہنچ in Gulzar on the left (RTL order). English lockup: mark + "Pohnch" in Nunito Black.
-- **App icon**: neem rounded square, doodh pin, neem check, small haldi dot top corner.
-- Approved colourways: neem on doodh, doodh on neem, haldi on siyahi, siyahi on haldi.
-- Don't: stretch, recolour, rotate, or set Gulzar small. Minimum mark size 24 px; clear space half the mark's width.
-- SVG path of the mark (viewBox 0 0 64 64):
-  - pin: `M32 5 L58 25 C59.5 26.2 58.7 28 56.8 28 H54 V33 C54 45 42 53 33.4 60.2 a2.2 2.2 0 0 1 -2.8 0 C22 53 10 45 10 33 V28 H7.2 C5.3 28 4.5 26.2 6 25 Z`
-  - check: `M22 35 l7 7 l14 -14`, stroke width 5.5, round caps.
+- **Mark**: an eight-point star (khatim) in neel with a kesar check inside. Works alone as app icon, sticker and seal.
+- **Lockup**: mark on the right, پہنچ in Gulzar on the left (RTL order). English lockup: mark + "Pohnch" in Manrope ExtraBold.
+- **App icon**: neel rounded square, kesar star, neel check.
+- Colourways: neel star + kesar check on ghee; kesar star + neel/siyahi check on neel or siyahi; sona star + emerald check for Amaan.
+- Don't: stretch, rotate, outline, or set Gulzar small. Minimum mark size 24 px; clear space half the mark's width.
+- SVG (viewBox 0 0 64 64):
+  - star: `M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z`
+  - check: `M22 33 l7 7 l14 -14`, stroke width 6, round caps and joins.
 
-## Colour ("home colours")
+## Craft kit
+
+- **Star lattice**: the star at 44% scale on a 40 px tile (bigger tiles on print), in the next shade of the ground (#2B3A80 on neel, #17705A on emerald), with a kesar dot (sona on emerald) at each tile centre.
+- **Ornamental frame**: three inset rings — 1.5 px sona, 5 px of the card colour, 1 px line colour — with small sona stars in the corners. Cards on parent screens, posters, the price table.
+- **Illustration**: flat shapes only, no gradients, no photos, no emoji. Ghee van with a kesar stripe and a star on the door, neel road with kesar dashes, round child "heads" in step colours.
+
+## Colour
 
 | Name | Hex | Use |
 | --- | --- | --- |
-| دودھ Doodh | #F6EFE2 | ground, every screen background |
-| ملائی Malai | #FFFBF3 | cards and rows |
-| سیاہی Siyahi | #1B2525 | text, strong buttons |
-| نیم Neem | #1E5C5A | brand colour, primary buttons, "dropped home" |
-| ہلدی Haldi | #F2B544 | joy moments, school steps, progress dots |
-| مٹی Matti | #C4643A | illustration only, never text |
-| آسمان Aasman | #2747B8 | step "left" |
-| پتہ Patta | #0E7A3E | step "picked" |
-| دھواں Dhuan | #4A4339 | secondary text (8.5:1) |
-| چھٹی Chutti | #5C5348 on #EDE3D0 | absent |
-| دھیان Dhiyan | #7A4E00 on #FFF1D2 | offline / "stuck" |
-| خطرہ Khatra | #B3261E on #FDECEA | errors, emergency |
-| line | #DCCFB8 | borders only |
-| WhatsApp green | #127A3F | "Send on WhatsApp" |
+| گھی Ghee | #FAF6EE | ground, every screen background |
+| White | #FFFFFF | cards and rows |
+| سیاہی Siyahi | #141A33 | text, lock screen, dark panels |
+| ink 2 | #4A4F66 | secondary text (8.0:1 on ghee) |
+| line | #E2DCCD | borders only |
+| نیل Neel | #1F2A5C (hover #2B3A80, tint #E6E9F5) | brand colour, primary buttons, step "left" |
+| کیسر Kesar | #E8A33D (tint #FBEBCF) | joy, highlights, step "reached school"; text on it is siyahi |
+| شنگرف Shingarf | #A8321F (tint #F6DDD6) | step "left school", strikes |
+| زمرد Zamurrad | #17705A (tint #DCEFE7, text on tint #0B4A3D) | step "picked", success, "paid" |
+| پستہ Pista | #A7D47E | step "dropped"; text on it is siyahi |
+| سونا Sona | #C9A24A | **decoration only** (frames, corner stars). Never text, never a button. Gold on emerald is 3.2:1. |
+| امان Amaan | #0F5E4E | Pohnch Amaan sub-brand |
+| absent | #5E5A52 on #EEE9DF | "Aaj chutti" |
+| danger | #9E2A1F on #F9E3DF | errors, help alert |
 
-Driver steps: left = aasman · picked = patta · reached school = siyahi with haldi · left school = haldi with siyahi · dropped = neem. Morning and afternoon steps never share a screen; within a trip each step differs in lightness, not only hue.
+Driver steps (each its own colour and icon):
+
+| Step | Fill | Text |
+| --- | --- | --- |
+| left (نکل گئے) | neel #1F2A5C | ghee |
+| picked (بٹھا لیا) | zamurrad #17705A | white |
+| reached school (اسکول پہنچ گئے) | kesar #E8A33D | siyahi |
+| left school (اسکول سے نکلے) | shingarf #A8321F | white |
+| dropped (گھر اتار دیا) | pista #A7D47E | siyahi |
 
 ## Type
 
-- **Gulzar** (display Nastaliq): logo, slogans, headlines, poster titles. Never under 26 px.
-- **Noto Nastaliq Urdu**: all Urdu UI text, line-height about 1.9, minimum 14 px.
-- **Nunito** (700–900): all Latin text and every digit. Western digits for times and counts.
+- **Gulzar** (display Nastaliq): logo, slogans, screen titles, poster headlines. Never under 26 px. Brand moments only.
+- **Noto Sans Arabic** (500–800): all Urdu UI text. Modern and readable in sunlight; minimum 14 px, line-height about 1.6.
+- **Manrope** (500–800): all Latin text and every digit. Western digits for times, prices and counts ("Rs 199", "7:12").
 
-## Shape and illustration
+## Shape
 
-Rounded everything: cards 20–32 px radius, buttons 18–26 px, pills full. Flat "paper" shadow (`0 5px 0` in a darker shade of the fill). Illustration: simple flat shapes in brand colours — haldi van with neem windows and matti stripe, matti-roof houses, haldi sun, dotted route. No gradients, no emoji, no photos needed.
+Cards 14–18 px radius, buttons 14–16 px, pills full. Print frames 6–10 px. No drop shadows on the driver screens; on parent screens the frame does the work, not a shadow.
 
 ## Voice
 
 - Respectful **آپ**, never تم.
-- Say who did it: "ڈرائیور نے مارک کیا · 7:12", never "system updated".
+- Say who did it: "رفیق بھائی نے مارک کیا · 7:12", never "system updated".
 - Calm, never alarm: "وین کو دیر ہو رہی ہے", never "خطرہ! وین غائب!".
 - Fewest words: "علی وین میں ہے".
-- Gender-neutral about children (we never store a child's gender).
+- Gender-neutral about children (we never store a child's gender). Adults are named as they ask to be named (بھائی، صاحبہ).
 
-## Sub-brand: پہنچ باجی (Pohnch Baji)
+## Sub-brand: پہنچ امان (Pohnch Amaan)
 
-School vans driven by women, or with a woman attendant on board. Line: **باجی چلائے، گھر بے فکر** (*School vans run by women*).
+School vans driven by women, or with a woman companion on board. Women framed as professionals, not as "baji". Line: **اپنی وین، اپنی کمائی** (recruitment) and **امان مہر** (the seal parents see).
 
-- Colour **فالسہ Falsa #6E2C5A** with tint #F3E3EC and haldi. Deliberately not pink, to stand apart from "pink bus/taxi".
-- Same mark in falsa; lockup adds a haldi "باجی" pill.
-- Van badges (attached to the van, never the child): خاتون ڈرائیور (woman driver), امی ڈرائیور (mother-driver), خاتون اٹینڈنٹ (woman attendant), صرف بچیاں (girls only).
-- Promise: every driver verified and trained, a help button in every van, and the captain sees every tap.
+- Colour **Amaan emerald #0F5E4E** with sona frames and the same star in sona.
+- Roles: **ڈرائیور صاحبہ** (woman driver), **امان ساتھی** (woman companion on board), **والدہ ڈرائیور** (a mother who drives her own children plus 2–4 more).
+- Van badges (attached to the van, never the child): ڈرائیور صاحبہ، امان ساتھی، صرف بچیاں.
+- The Amaan seal needs five checks: CNIC, licence, two references, half-day training, home visit by two women from the team.
+- Promise: day trips only, a woman companion in every van, the captain sees every tap, a help button, and "میں گھر پہنچ گئی" after the last trip (reminder at 45 minutes, captain then the team calls at 60).
 
 ## Materials on the canvas
 
-WhatsApp: card to parents, how-to-join card, 9:16 status, Baji recruitment card. Print: A3 school-gate poster, A5 parent flyer, van window sticker (A5 sheet, Pohnch + Baji strip), A6 laminated driver card (front: the five buttons; back: help, 15, 1122, captain's number), A3 Baji recruitment poster with tear-off tabs. Placeholders to fill before printing: [قیمت]/[PRICE], [pohnch link], [QR], [number], [آمدنی].
+WhatsApp: card to parents, how-to-join card, 9:16 status, Amaan recruitment card. Print: A3 school-gate poster, A5 parent flyer with the price table, van sticker sheet (window seal, door strip, Amaan badge, "seat free" QR), A6 driver card (front: reward; back: the five taps), A3 Amaan recruitment poster.
+
+Prices are real (see `DECISIONS.md` round 3). Placeholders still to fill before printing: [QR], [نمبر] (help and WhatsApp number), the pohnch.pk domain.

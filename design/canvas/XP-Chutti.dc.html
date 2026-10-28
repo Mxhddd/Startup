@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent chutti v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.on{border-radius:14px;border:0;background:#1F2A5C;color:#FAF6EE;font-family:inherit;font-weight:800;cursor:pointer}
+.off{border-radius:14px;border:0;background:#FFFFFF;box-shadow:inset 0 0 0 1.5px #E2DCCD;color:#141A33;font-family:inherit;font-weight:700;cursor:pointer}
+.btn{display:flex;align-items:center;justify-content:center;height:62px;border-radius:16px;border:0;font-family:inherit;font-size:18px;font-weight:800;text-decoration:none;cursor:pointer}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 14px">
+  <div style="display: flex; align-items: center; gap: 8px">
+    <a href="XP-Today.dc.html" aria-label="واپس" style="width: 48px; height: 48px; border-radius: 14px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E2DCCD; display: flex; align-items: center; justify-content: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#141A33" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="m13 6 6 6-6 6"></path></svg></a>
+    <span class="disp" style="font-size: 34px">علی کی چھٹی</span>
+  </div>
+  <sc-if value="{{choosing}}" hint-placeholder-val="{{ true }}">
+    <span style="font-size: 17px; font-weight: 800">کون سا دن؟</span>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{days}}" as="d" hint-placeholder-count="2">
+        <sc-if value="{{d.on}}" hint-placeholder-val="{{ false }}"><button class="on" aria-pressed="true" onClick="{{d.pick}}" style="height: 74px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.4"><span style="font-size: 21px">{{d.label}}</span><span style="font-size: 14px">{{d.sub}}</span></button></sc-if>
+        <sc-if value="{{d.off}}" hint-placeholder-val="{{ true }}"><button class="off" aria-pressed="false" onClick="{{d.pick}}" style="height: 74px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1.4"><span style="font-size: 21px">{{d.label}}</span><span style="font-size: 14px">{{d.sub}}</span></button></sc-if>
+      </sc-for>
+    </div>
+    <span style="font-size: 17px; font-weight: 800">کون سا چکر؟</span>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+      <sc-for list="{{trips}}" as="t" hint-placeholder-count="3">
+        <sc-if value="{{t.on}}" hint-placeholder-val="{{ false }}"><button class="on" aria-pressed="true" onClick="{{t.pick}}" style="height: 60px; font-size: 18px">{{t.label}}</button></sc-if>
+        <sc-if value="{{t.off}}" hint-placeholder-val="{{ true }}"><button class="off" aria-pressed="false" onClick="{{t.pick}}" style="height: 60px; font-size: 18px">{{t.label}}</button></sc-if>
+      </sc-for>
+    </div>
+    <div style="background: #EEE9DF; border-radius: 14px; padding: 12px 16px; font-size: 17px; font-weight: 800">{{summary}}</div>
+    <button class="btn" onClick="{{mark}}" style="margin-top: auto; background: #1F2A5C; color: #FAF6EE">چھٹی لگائیں</button>
+  </sc-if>
+  <sc-if value="{{marked}}" hint-placeholder-val="{{ false }}">
+    <div role="status" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 8px">
+      <svg width="100" height="100" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#5E5A52"></path><path d="M22 33 l7 7 l14 -14" fill="none" stroke="#FAF6EE" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <span class="disp" style="font-size: 40px">چھٹی لگ گئی</span>
+      <span style="font-size: 18px; font-weight: 800">{{summary}}</span>
+      <span style="font-size: 16px; font-weight: 600; color: #4A4F66">رفیق بھائی کی فہرست میں علی کا نام چھٹی میں دکھے گا۔ وین نکلنے تک واپس لے سکتے ہیں۔</span>
+    </div>
+    <button class="btn" onClick="{{undo}}" style="background: #FFFFFF; box-shadow: inset 0 0 0 2px #1F2A5C; color: #1F2A5C">واپس لیں</button>
+    <a class="btn" href="XP-Today.dc.html" style="background: #1F2A5C; color: #FAF6EE">ٹھیک ہے</a>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { day: 'tomorrow', trip: 'both', marked: false }; }
+  renderVals() {
+    const days = [{ id: 'today', label: 'آج', sub: 'بدھ 28' }, { id: 'tomorrow', label: 'کل', sub: 'جمعرات 29' }];
+    const trips = [{ id: 'morning', label: 'صبح' }, { id: 'afternoon', label: 'دوپہر' }, { id: 'both', label: 'دونوں' }];
+    const tripText = { morning: 'صرف صبح', afternoon: 'صرف دوپہر', both: 'صبح اور دوپہر' }[this.state.trip];
+    const day = days.find((d) => d.id === this.state.day);
+    return {
+      choosing: !this.state.marked, marked: this.state.marked,
+      days: days.map((d) => ({ ...d, on: d.id === this.state.day, off: d.id !== this.state.day, pick: () => this.setState({ day: d.id }) })),
+      trips: trips.map((t) => ({ ...t, on: t.id === this.state.trip, off: t.id !== this.state.trip, pick: () => this.setState({ trip: t.id }) })),
+      summary: day.label + ' ' + day.sub + ' اکتوبر · ' + tripText,
+      mark: () => this.setState({ marked: true }),
+      undo: () => this.setState({ marked: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

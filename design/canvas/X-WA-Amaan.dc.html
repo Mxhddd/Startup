@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>WhatsApp Amaan drivers wanted</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400}
+.c{position:absolute;width:24px;height:24px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 1080px; height: 1080px; box-sizing: border-box; overflow: hidden; position: relative; background: #0F5E4E; color: #FAF6EE; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6">
+  <svg width="1080" height="1080" aria-hidden="true" style="position: absolute; inset: 0"><defs><pattern id="wam" width="90" height="90" patternUnits="userSpaceOnUse"><path transform="translate(14 14) scale(0.97)" d="{{S}}" fill="#17705A"></path><circle cx="45" cy="45" r="5" fill="#C9A24A"></circle></pattern></defs><rect width="1080" height="1080" fill="url(#wam)"></rect></svg>
+
+  <div style="position: absolute; top: 80px; right: 84px; left: 84px; display: flex; flex-direction: column; gap: 6px">
+    <span style="display: inline-flex; align-items: center; gap: 12px; font-size: 32px; font-weight: 800; color: #FBEBCF"><svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>پہنچ امان</span>
+    <span class="disp" style="font-size: 100px; line-height: 1.5">اپنی وین، اپنی کمائی</span>
+  </div>
+
+  <div style="position: absolute; top: 420px; right: 84px; left: 84px; bottom: 84px; background: #FAF6EE; color: #141A33; border-radius: 10px; box-shadow: inset 0 0 0 3px #C9A24A, inset 0 0 0 13px #FAF6EE, inset 0 0 0 15px #E2DCCD; padding: 50px 56px; display: flex; flex-direction: column; gap: 18px; box-sizing: border-box">
+    <svg class="c" style="top: 20px; right: 20px" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>
+    <svg class="c" style="top: 20px; left: 20px" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#C9A24A"></path></svg>
+    <span style="font-size: 38px; font-weight: 800">خواتین ڈرائیور اور امان ساتھی چاہییں</span>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 28px">
+      <sc-for list="{{points}}" as="p" hint-placeholder-count="4">
+        <span style="display: flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 700"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0F5E4E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"></path></svg>{{p}}</span>
+      </sc-for>
+    </div>
+    <div style="margin-top: auto; display: flex; align-items: center; gap: 24px; background: #DCEFE7; border-radius: 16px; padding: 20px 26px">
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.45"><span style="font-size: 32px; font-weight: 800; color: #0B4A3D">درخواست: pohnch.pk/amaan</span><span style="font-size: 26px; font-weight: 700">یا اس نمبر پر "امان" لکھیں: [نمبر]</span></span>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1080,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z',
+      points: ['صرف دن کے چکر', 'وین فیس پوری آپ کی', 'مفت تربیت', 'وقت پر ٹیپ پر انعام', 'اپنے علاقے میں', 'ماں بھی اپنی گاڑی سے']
+    };
+  }
+}
+</script>
+</body>
+</html>

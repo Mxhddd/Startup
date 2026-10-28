@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Captain share links v3</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.card{border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 0 0 0 1.5px #C9A24A,inset 0 0 0 5px #FFFFFF,inset 0 0 0 6px #E2DCCD;background:#FFFFFF}
+.wa{height:56px;border-radius:14px;border:0;font-family:inherit;font-size:17px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 20px 16px 16px; gap: 12px">
+  <span class="disp" style="font-size: 36px">وین تیار ہے</span>
+  <span style="font-size: 15px; font-weight: 600; margin-top: -8px">گلشن وین · نور اسکول · 7:00. اب دو لنک واٹس ایپ پر بھیجیں۔</span>
+
+  <sc-for list="{{cards}}" as="c" hint-placeholder-count="2">
+    <section class="card">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="width: 44px; height: 44px; border-radius: 12px; background: {{c.bg}}; display: flex; align-items: center; justify-content: center; flex: none">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="{{c.fg}}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{c.d}}"></path></svg>
+        </span>
+        <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 18px; font-weight: 800">{{c.title}}</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66">{{c.note}}</span></span>
+      </div>
+      <span dir="ltr" style="font-family: Manrope, sans-serif; font-size: 15px; font-weight: 700; background: #F3EEE3; border-radius: 10px; padding: 8px 10px; text-align: left">pohnch.pk/j/••••••••</span>
+      <button class="wa" onClick="{{c.send}}" style="background: {{c.btn}}; color: {{c.btnFg}}">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="{{c.icon}}"></path></svg>{{c.label}}
+      </button>
+    </section>
+  </sc-for>
+
+  <div style="background: #FBEBCF; border-radius: 14px; padding: 10px 14px; font-size: 15px; font-weight: 700">ہر نیا والدین آپ کی منظوری کے بعد ہی جڑے گا۔ لنک کسی اور کے ہاتھ لگ جائے تو "نیا لنک" دبائیں، پرانا بند ہو جائے گا۔</div>
+  <a href="XC-Approve.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; height: 62px; border-radius: 16px; background: #1F2A5C; color: #FAF6EE; text-decoration: none; font-size: 18px; font-weight: 800">منظوریاں دیکھیں (2)</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sent: {} }; }
+  renderVals() {
+    const share = 'M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7 M12 3v12 M7 8l5-5 5 5';
+    const tick = 'M5 12l5 5 9-10';
+    const base = [
+      { id: 'd', title: 'ڈرائیور کا لنک', note: 'صرف رفیق بھائی کو بھیجیں', bg: '#1F2A5C', fg: '#FAF6EE', d: 'M2 16V7a1 1 0 0 1 1-1h11l4 4h2a2 2 0 0 1 2 2v4 M5 17a2 2 0 1 0 4 0a2 2 0 1 0-4 0 M15 17a2 2 0 1 0 4 0a2 2 0 1 0-4 0' },
+      { id: 'p', title: 'والدین کا لنک', note: 'وین کے واٹس ایپ گروپ میں بھیجیں', bg: '#17705A', fg: '#FFFFFF', d: 'M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1 M17 4a4 4 0 0 1 0 7' }
+    ];
+    return {
+      cards: base.map((c) => {
+        const sent = !!this.state.sent[c.id];
+        return { ...c, label: sent ? 'واٹس ایپ پر بھیج دیا' : 'واٹس ایپ پر بھیجیں', icon: sent ? tick : share, btn: sent ? '#DCEFE7' : '#E8A33D', btnFg: sent ? '#0B4A3D' : '#141A33', send: () => this.setState({ sent: { ...this.state.sent, [c.id]: true } }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

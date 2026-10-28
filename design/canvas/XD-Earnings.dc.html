@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver earnings and profile</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.step{width:52px;height:52px;border-radius:14px;border:0;background:#1F2A5C;color:#FAF6EE;font-family:inherit;font-size:26px;font-weight:800;cursor:pointer}
+</style>
+</helmet>
+<div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 18px 16px 16px; gap: 12px">
+  <span style="font-size: 26px; font-weight: 800">میری کمائی · اکتوبر</span>
+  <section style="background: #17705A; color: #FFFFFF; border-radius: 18px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+    <div style="display: flex; align-items: baseline; justify-content: space-between">
+      <span style="font-size: 16px; font-weight: 700">ٹیپ وقت پر</span>
+      <span style="font-size: 40px; font-weight: 800; line-height: 1">96%</span>
+    </div>
+    <div aria-hidden="true" style="height: 10px; border-radius: 5px; background: #0C4A3B; position: relative"><span style="position: absolute; top: 0; bottom: 0; right: 0; width: 96%; border-radius: 5px; background: #A7D47E"></span><span style="position: absolute; top: -4px; bottom: -4px; right: 90%; width: 3px; background: #FFFFFF"></span></div>
+    <span style="font-size: 15px; font-weight: 700">90% کی لکیر پار · 5 بچے × Rs 40 = <span style="font-size: 20px; font-weight: 800">Rs 200</span></span>
+    <span style="font-size: 14px; font-weight: 600">یکم نومبر کو JazzCash ••• 4521 پر</span>
+  </section>
+
+  <section style="background: #FFFFFF; border-radius: 18px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 5px #FFFFFF, inset 0 0 0 6px #E2DCCD; padding: 16px 18px; display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 52px; height: 52px; border-radius: 50%; background: #1F2A5C; color: #FAF6EE; display: flex; align-items: center; justify-content: center; font-size: 22px; font-weight: 800">ر</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 19px; font-weight: 800">رفیق بھائی · گلشن وین</span><span style="font-size: 14px; font-weight: 600">گلشن اقبال بلاک 13 · نور اسکول</span></span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; text-align: center">
+      <span style="background: #FAF6EE; border-radius: 10px; padding: 6px 0; display: flex; flex-direction: column; line-height: 1.3"><span style="font-size: 20px; font-weight: 800">96%</span><span style="font-size: 14px; font-weight: 700">بھروسہ</span></span>
+      <span style="background: #FAF6EE; border-radius: 10px; padding: 6px 0; display: flex; flex-direction: column; line-height: 1.3"><span style="font-size: 20px; font-weight: 800">3</span><span style="font-size: 14px; font-weight: 700">مہینے</span></span>
+      <span style="background: #FAF6EE; border-radius: 10px; padding: 6px 0; display: flex; flex-direction: column; line-height: 1.3"><span style="font-size: 20px; font-weight: 800">{{seats}}</span><span style="font-size: 14px; font-weight: 700">خالی سیٹیں</span></span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px">
+      <span style="flex: 1; font-size: 16px; font-weight: 800">خالی سیٹیں دکھائیں</span>
+      <button class="step" onClick="{{down}}" aria-label="کم">−</button>
+      <span style="width: 32px; text-align: center; font-size: 24px; font-weight: 800">{{seats}}</span>
+      <button class="step" onClick="{{up}}" aria-label="زیادہ">+</button>
+    </div>
+    <span style="font-size: 14px; font-weight: 600; color: #4A4F66">والدین آپ کو "وین ڈھونڈیں" میں دیکھیں گے۔ آپ کا فون نمبر کبھی نہیں دکھایا جاتا۔</span>
+  </section>
+
+  <a href="XP-Driver.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; height: 64px; border-radius: 16px; background: #127A3F; color: #FFFFFF; text-decoration: none; font-size: 18px; font-weight: 800">اپنا پروفائل واٹس ایپ پر بھیجیں</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":780}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { seats: 2 }; }
+  renderVals() {
+    return {
+      seats: this.state.seats,
+      down: () => this.setState({ seats: Math.max(0, this.state.seats - 1) }),
+      up: () => this.setState({ seats: Math.min(9, this.state.seats + 1) })
+    };
+  }
+}
+</script>
+</body>
+</html>

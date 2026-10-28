@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Pohnch pricing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400}
+.lbl{font-size:14px;font-weight:800;letter-spacing:.06em;color:#4A4F66;text-transform:uppercase}
+.step{width:48px;height:48px;border-radius:12px;border:0;background:#1F2A5C;color:#FAF6EE;font-family:inherit;font-size:24px;font-weight:800;cursor:pointer}
+.row{display:flex;align-items:center;gap:12px;border-top:1px solid #E2DCCD;padding:10px 0}
+.num{font-variant-numeric:tabular-nums}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1300px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; font-size: 18px; line-height: 1.5; padding: 72px 88px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 48px">
+  <section style="display: flex; flex-direction: column; gap: 18px">
+    <div style="display: flex; flex-direction: column; gap: 4px">
+      <span class="lbl">Pohnch pricing · pilot proposal</span>
+      <span style="font-size: 44px; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em">Families pay a little. Drivers earn. Captains ride free.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px">
+      <sc-for list="{{plans}}" as="p" hint-placeholder-count="6">
+        <div style="background: {{p.bg}}; color: {{p.fg}}; border-radius: 6px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; box-shadow: inset 0 0 0 1px {{p.line}}">
+          <span style="font-size: 14px; font-weight: 800; letter-spacing: .06em">{{p.who}}</span>
+          <span class="num" style="font-size: 36px; font-weight: 800; line-height: 1.15">{{p.price}}</span>
+          <span style="font-size: 15px; font-weight: 700">{{p.unit}}</span>
+          <span style="font-size: 15px; font-weight: 600">{{p.note}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <span style="font-size: 15px; font-weight: 600; color: #3A3F55">Payment: Raast QR, JazzCash or Easypaisa in the app, or the captain collects with the van fee and marks it paid. Amaan vans use the same Pohnch prices; the van fee itself is set by the driver.</span>
+  </section>
+
+  <section style="background: #FFFFFF; border-radius: 6px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 6px #FFFFFF, inset 0 0 0 7px #E2DCCD; padding: 32px 34px; display: flex; flex-direction: column; gap: 6px">
+    <span class="lbl">Live model · one van</span>
+    <div class="row"><span style="flex: 1; font-weight: 700">Children in the van</span><button class="step" onClick="{{kidsDown}}" aria-label="fewer children">−</button><span class="num" style="width: 56px; text-align: center; font-size: 26px; font-weight: 800">{{kids}}</span><button class="step" onClick="{{kidsUp}}" aria-label="more children">+</button></div>
+    <div class="row"><span style="flex: 1; font-weight: 700">Price per child / month</span><button class="step" onClick="{{priceDown}}" aria-label="lower price">−</button><span class="num" style="width: 96px; text-align: center; font-size: 26px; font-weight: 800">Rs {{price}}</span><button class="step" onClick="{{priceUp}}" aria-label="higher price">+</button></div>
+    <div class="row"><span style="flex: 1; font-weight: 700">Driver reward per child</span><button class="step" onClick="{{rewDown}}" aria-label="lower reward">−</button><span class="num" style="width: 96px; text-align: center; font-size: 26px; font-weight: 800">Rs {{reward}}</span><button class="step" onClick="{{rewUp}}" aria-label="higher reward">+</button></div>
+    <div class="row"><span style="flex: 1; font-weight: 700">Typical van fee per child</span><button class="step" onClick="{{feeDown}}" aria-label="lower van fee">−</button><span class="num" style="width: 110px; text-align: center; font-size: 26px; font-weight: 800">Rs {{fee}}</span><button class="step" onClick="{{feeUp}}" aria-label="higher van fee">+</button></div>
+    <div class="row"><span style="flex: 1; font-weight: 700">Captain's child free</span><button onClick="{{toggleCap}}" aria-pressed="{{capFree}}" style="height: 48px; padding: 0 18px; border-radius: 12px; border: 0; background: {{capBg}}; color: {{capFg}}; font-family: inherit; font-size: 17px; font-weight: 800; cursor: pointer">{{capLabel}}</button></div>
+
+    <div style="margin-top: 12px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px">
+      <div style="background: #1F2A5C; color: #FAF6EE; border-radius: 6px; padding: 14px 16px"><span class="lbl" style="color: #E6E9F5">Families pay</span><div class="num" style="font-size: 32px; font-weight: 800">Rs {{revenue}}</div><span style="font-size: 14px; font-weight: 700">{{paying}} paying children</span></div>
+      <div style="background: #17705A; color: #FFFFFF; border-radius: 6px; padding: 14px 16px"><span class="lbl" style="color: #DCEFE7">Driver earns</span><div class="num" style="font-size: 32px; font-weight: 800">Rs {{driver}}</div><span style="font-size: 14px; font-weight: 700">if taps ≥ 90%</span></div>
+      <div style="background: #E8A33D; color: #141A33; border-radius: 6px; padding: 14px 16px"><span class="lbl" style="color: #141A33">Pohnch keeps</span><div class="num" style="font-size: 32px; font-weight: 800">Rs {{keep}}</div><span style="font-size: 14px; font-weight: 700">after Rs 15/child running cost</span></div>
+      <div style="background: #FAF6EE; border-radius: 6px; padding: 14px 16px; box-shadow: inset 0 0 0 1px #E2DCCD"><span class="lbl">Share of van fee</span><div class="num" style="font-size: 32px; font-weight: 800">{{share}}%</div><span style="font-size: 14px; font-weight: 700">what a parent adds on top</span></div>
+    </div>
+    <div style="margin-top: 8px; background: #141A33; color: #FAF6EE; border-radius: 6px; padding: 14px 18px; display: flex; align-items: center; gap: 14px">
+      <span class="num" style="font-size: 40px; font-weight: 800; color: #E8A33D">{{breakeven}}</span>
+      <span style="font-size: 16px; font-weight: 700">vans to cover Rs 75,000 a month of fixed cost (part-time support at minimum wage, hosting, SIM, marketing).</span>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1300}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { kids: 10, pi: 1, reward: 40, fee: 4000, cap: true };
+  }
+  renderVals() {
+    const prices = [149, 199, 249, 299];
+    const s = this.state;
+    const price = prices[s.pi];
+    const paying = s.cap ? Math.max(0, s.kids - 1) : s.kids;
+    const revenue = paying * price;
+    const driver = paying * s.reward;
+    const keep = revenue - driver - s.kids * 15;
+    const set = (o) => () => this.setState(o);
+    const navy = { bg: '#1F2A5C', fg: '#FAF6EE', line: '#1F2A5C' }, white = { bg: '#FFFFFF', fg: '#141A33', line: '#E2DCCD' }, jade = { bg: '#17705A', fg: '#FFFFFF', line: '#17705A' }, emer = { bg: '#0F5E4E', fg: '#FAF6EE', line: '#0F5E4E' };
+    return {
+      plans: [
+        { ...navy, who: 'FAMILY · MONTHLY', price: 'Rs 199', unit: 'per child per month', note: 'First month free. Cancel any time.' },
+        { ...white, who: 'FAMILY · YEARLY', price: 'Rs 1,990', unit: 'per child per year', note: '12 months for the price of 10. Summer is free.' },
+        { ...white, who: 'SIBLING', price: 'Rs 99', unit: 'each extra child, same family', note: 'One phone, two children.' },
+        { ...jade, who: 'DRIVER', price: 'Free', unit: '+ earns Rs 40 per child / month', note: 'When the month’s tap rate is 90% or more. Public profile included.' },
+        { ...white, who: 'VAN CAPTAIN', price: 'Rs 0', unit: 'for the captain’s own child', note: 'While 5 or more families in the van pay.' },
+        { ...emer, who: 'SCHOOL PLAN · LATER', price: 'Rs 149', unit: 'per child per month, billed yearly', note: 'The school pays for every van; Pohnch on the prospectus.' }
+      ],
+      kids: s.kids, price, reward: s.reward, fee: s.fee.toLocaleString('en-US'),
+      capFree: s.cap, capLabel: s.cap ? 'Yes' : 'No', capBg: s.cap ? '#17705A' : '#E2DCCD', capFg: s.cap ? '#FFFFFF' : '#141A33',
+      paying, revenue: revenue.toLocaleString('en-US'), driver: driver.toLocaleString('en-US'), keep: keep.toLocaleString('en-US'),
+      share: (price / s.fee * 100).toFixed(1),
+      breakeven: keep > 0 ? Math.ceil(75000 / keep) : '∞',
+      kidsDown: set({ kids: Math.max(4, s.kids - 1) }), kidsUp: set({ kids: Math.min(18, s.kids + 1) }),
+      priceDown: set({ pi: Math.max(0, s.pi - 1) }), priceUp: set({ pi: Math.min(3, s.pi + 1) }),
+      rewDown: set({ reward: Math.max(0, s.reward - 10) }), rewUp: set({ reward: Math.min(80, s.reward + 10) }),
+      feeDown: set({ fee: Math.max(2000, s.fee - 500) }), feeUp: set({ fee: Math.min(8000, s.fee + 500) }),
+      toggleCap: set({ cap: !s.cap })
+    };
+  }
+}
+</script>
+</body>
+</html>
