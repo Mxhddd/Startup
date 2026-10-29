@@ -1,85 +1,56 @@
-# Pohnch (پہنچ) — brief
+# Pohnch (پہنچ) — brief (v5, map-first)
 
-> Drafted from `docs/BUILD_PROMPTS.md` and the phase A designs, because there was no separate "Final brief" export. Edit it if anything here is wrong; `CLAUDE.md` follows it.
+> v5 replaces the v1–v4 brief (an installable web app joined through WhatsApp links, Rs 199 a month, a parent "van captain"). The reasons are in `design/DECISIONS.md` round 5. `CLAUDE.md` follows this brief.
 
 ## The problem
 
-In Karachi, parents hand their children to a private school van and see nothing until the child is home. Drivers don't have time to message every family, and parents worry.
+In Karachi, parents hand their children to a private school van and see nothing until the child is home. They call the driver again and again; drivers can't answer while driving. Drivers, for their part, chase fees every month and fill empty seats by word of mouth. Schools that run their own buses pay for guards and staff to track them by phone.
 
 ## What Pohnch is
 
-An Urdu-first web app (installable on the home screen) for one school van at a time. Families pay a small fee per child; drivers use it free and earn a reward for tapping:
+Careem for school vans: one live van, seen from three sides.
 
-- A parent **van captain** sets up the van with three fields and gets two invite links to share on WhatsApp: one for the driver, one for the other parents.
-- The **driver** taps big buttons only when the van is stopped: "نکل گئے" (left), one tap per child picked up, "اسکول پہنچ گئے" (reached school); in the afternoon "اسکول سے نکلے" (left school) and one tap per child dropped home.
-- Every **parent** gets a push notification for each tap that concerns them, and can mark "آج چھٹی" (absent) for today or tomorrow, morning, afternoon or both, so the driver skips that stop.
-- An **admin page** (only for the builder) shows whether each van is actually used.
+- **Pohnch** (parent app, iOS and Android): the van moving on a map, minutes to your door, a Live Activity on the iPhone lock screen and Dynamic Island, an ongoing notification on Android, a push when your child is picked up, reaches school and is dropped home, and "آج چھٹی" so the driver skips your stop.
+- **Pohnch Driver** (driver app, free): today's stops in order, start trip, location shared only while the trip runs, one big tap per child when the van is stopped. Later: seat requests from families nearby and fees collected in the app, paid out on the 5th.
+- **pohnch.pk** (website): what Pohnch is, store links, "invite my driver", privacy policy, our admin page; later the Pohnch for Schools desk.
 
-## Users
+Two honest limits: the map runs on the driver's phone, so there is no GPS box and the map is only as good as the phone's signal; and the map shows where the van is, while the driver's tap (or a geofence near a stop) says whether your child is in it.
 
-- **Drivers**: cheap Android phones, bright sunlight, some read slowly. One main action per screen, buttons at least 64 px tall, each step with its own colour and icon.
-- **Parents**: busy and worried. They need a calm, trustworthy family utility, not a flashy startup.
-- **Van captain**: one parent per van who sets it up and shares links.
-- **Admin**: the builder, on a laptop.
+## Who is who
 
-## Version 1 scope
+| Person | What they do | What they see |
+| --- | --- | --- |
+| Parent | has the account, adds children, books and pays (later), marks chutti, invites up to 3 family members | only their own children and their own van |
+| Child | a profile under a parent: first name, school, stop; no phone, no login | nothing; is seen |
+| Driver | drives the van, sets the route and fee, approves families, taps when each child boards | their stops and today's first names |
+| Helper (later) | a second adult on board, often a woman; marks boarding, hands over at the gate | the same as the driver, for that trip |
+| School (later) | runs its buses on Pohnch or lists partner vans | its buses, riders and gate |
+| Pohnch team | verifies drivers, answers help, handles payments and disputes | what a case needs, logged |
 
-1. Captain setup at `/start` (driver's first name, school name, morning pickup time) and a share screen with two WhatsApp links.
-2. Login-free access through invite links `/j/[token]`; tokens are 32 random bytes, only their SHA-256 hash is stored; links can be switched off.
-3. Parents pick their child's first name or add a new one.
-4. Driver Today screen with offline tap queue (IndexedDB), optional location at tap time, absent children greyed out.
-5. Web push to parents (VAPID, `web-push` library), Urdu first, each message ending "ڈرائیور نے مارک کیا" (marked by the driver).
-6. "Aaj chutti" with Undo until that trip's "left" tap.
-7. Admin page at `/admin` protected by `ADMIN_TOKEN`: tap rate over the last 10 school days, parents joined, notifications delivered and failed, chutti taps, Paid ticks per family per month, vans under 80% flagged, switch off any link.
-8. Urdu (default, right-to-left) and English.
+The old "captain" is gone: setting up the van is the driver's job (or any parent's "invite my driver"), and approving families is the driver's, after Pohnch verifies the driver.
 
-### Added after the design review (round 2)
+## Stages
 
-9. Captain approves every new parent phone; parents say who they are (amma, abbu, grandparent, other).
-10. Mistaken taps: a 1-second hold on van-wide buttons, a 5-second undo on every tap, and undone taps counted as strikes for the captain and admin (no automatic action).
-11. Captain van management: rename, morning and afternoon times, stop order, switch off links, fee status, optional captain phone, van badges.
-12. Whole-van day off (holidays), shown to driver and parents.
-13. Parents with two or more children, in one or several vans.
-14. Driver practice run before the first real trip.
-15. Driver help: in the pilot, late reasons only (late alert to captain and parents) plus 15 and 1122. After the pilot gate, "Emergency" sends the captain and the Pohnch team the location.
-16. Van badges for the Pohnch Amaan line: ڈرائیور صاحبہ (woman driver), امان ساتھی (woman companion), صرف بچیاں (girls only).
-17. Paid after a free first month: Rs 199 per child per month, paid by each family straight to Pohnch (captains never collect money); in the pilot the admin ticks Paid by hand.
+1. **Stage 1, now to March 2027: showcase and pilot, 3–5 real vans.** Both apps and the website; live map, taps, Live Activity, aaj chutti, practice run, help with late reasons. Free during the pilot. **Gate 1:** 80% of trips tracked end to end over 20 school days, and 40% of families keep Pohnch Live after the free month.
+2. **Stage 2, 2027: marketplace, 20 to 60 vans.** Find a van on your route (choose a child, home and school, see vans whose route passes nearby), book a seat with a one-week trial, fees paid in the app, request a van (opens at 4 children, Pohnch brings a verified van at 8), ratings, driver profiles, help alert with location. **Gate 2:** 40 paying vans.
+3. **Stage 3, 2028: schools and Pohnch Amaan.** Pohnch for Schools (fleet map, boarding register, gate handover, reports). Pohnch Amaan: women drivers and women helpers, its own tab and filter, five checks and training, once a training partner and women staff are in place.
 
-### Added in round 3 (pricing and refinements)
+## Pricing (estimates the pilot tests)
 
-18. Plans: Rs 199 per child per month (school months only), yearly Rs 1,990 (12 months for 10), siblings Rs 99, no charge in June and July, first month free.
-19. Captain's child free while the van has 5 or more paying families.
-20. Driver reward: Rs 40 per paying child per month when the month's tap rate is 90% or more, paid by JazzCash, Easypaisa or Raast.
-21. Public driver profile and "find a van": areas, schools, free seats, reliability score (on-time taps over 30 days). Never a child's name, phone number or token.
-22. Pohnch Amaan screens: apply (driver, companion, mother-driver), five-check verification, Amaan van listing, captain safety log with "میں گھر پہنچ گئی" check-ins.
-23. School plan: Rs 149 per child billed yearly to the school (later stage, after about 30 vans).
+| Line | Price | Who pays |
+| --- | --- | --- |
+| Pohnch Live | Rs 599 per child a month (sibling Rs 299, yearly Rs 5,990, first month free); basic alerts stay free | parent |
+| Van fees in the app | 7% of fees paid through Pohnch | driver's side; the fare is not raised |
+| Pohnch Routes (request a van) | 12% of fees on routes Pohnch forms | driver's side |
+| Pohnch for Schools | Rs 300 per rider a month, billed yearly | school |
 
-Payment methods for 18: Raast QR, JazzCash, Easypaisa, or cash to the captain. Reasons, the cost model and sources are in `design/DECISIONS.md` (round 3).
-
-### Version split (decided in the round 4 design review)
-
-- **Pilot, build now (19 screens):** items 1–10, 12, 14, 15 (late reasons only) and 17. Siblings at one stop take one tap. The admin page shows 4 numbers.
-- **After the pilot gate** (3 of the first 10 families pay): 11 (van accounts, no cash), 13 (two children), 15 (emergency alert to captain and team), 18, 19, 20, and the driver's week.
-- **Later, its own launch** (100 vans, a training partner, separate funding): 16, 21, 22, 23. Pohnch Amaan needs training, verification and women staff, so nothing in the pilot promises it.
-
-The database for B2 should still leave room for payments, rewards and badges, so they can be added without a rewrite.
-
-## Out of scope for version 1
-
-Live GPS tracking or maps (location is sent only in an emergency), in-app chat, payments inside the app (version 1.1), accounts or passwords, school-side dashboards, native app-store apps, SMS fallback, the Pohnch Amaan marketplace and operator stages.
-
-## Brand
-
-`design/BRAND.md` (v3 "Neel o Kesar"): name, slogan "فکر کم، خبر پوری", eight-point star mark, colours, type, craft kit, voice and the Pohnch Amaan sub-brand.
+One 12-child van at Rs 5,500 a child, with half the families on Live, leaves Pohnch about Rs 7,300 a month; about 37 vans cover Rs 270,000 a month of fixed cost. The pilot offers Live at Rs 499, 599 or 799 and keeps the highest price 40% of families take.
 
 ## Stack
 
-Next.js (App Router, TypeScript), Supabase (Postgres, row-level security on, only server code with the service key reads or writes), web push with `web-push`, hand-written service worker, hosted on Vercel. Vitest for unit tests, Playwright for end-to-end tests.
+Expo (React Native) for both apps, Next.js for the website, Supabase (Postgres with PostGIS, Realtime, phone login, Edge Functions), Expo push, react-native-maps, expo-location, expo-widgets. Details and costs: `docs/PLAN.md`.
 
-## Success measure for the pilot
+## Designs and documents
 
-Driver tap rate of at least 80% over 10 school days (a school day counts when the morning "left", a "picked" for every child not on chutti, and "reached school" all arrived), and every alert reaching parents within seconds.
-
-## Designs
-
-The phase A canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy (sources in `design/canvas/`, decisions in `design/DECISIONS.md`).
+- Canvas, page "v5 · Map-first app (current)": https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy (sources in `design/canvas/`).
+- Build plan, pitch, deck, proposal and launch plan: `docs/LAUNCH.md`.

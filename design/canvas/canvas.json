@@ -7,12 +7,16 @@
   "title": "Pohnch designs",
   "launch": {
     "view": "canvas",
-    "page": "v3"
+    "page": "v5"
   },
   "pages": [
     {
+      "id": "v5",
+      "name": "v5 · Map-first app (current)"
+    },
+    {
       "id": "v3",
-      "name": "v4 · Pilot plan (current)"
+      "name": "v4 · Pilot plan (previous)"
     },
     {
       "id": "v2",
@@ -1128,9 +1132,158 @@
       "h": 2000,
       "page": "v3",
       "title": "Review applied: what we build first"
+    },
+    "Z-Scheme.dc.html": {
+      "x": 0,
+      "y": 0,
+      "w": 1440,
+      "h": 1900,
+      "page": "v5",
+      "title": "Grand scheme, roles, stages"
+    },
+    "Z-Pricing.dc.html": {
+      "x": 1520,
+      "y": 0,
+      "w": 1440,
+      "h": 1250,
+      "page": "v5",
+      "title": "Pricing v5 + live model",
+      "is_interactive": true
+    },
+    "ZP-Home.dc.html": {
+      "x": 0,
+      "y": 2500,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "1 · Home: live map",
+      "is_interactive": true
+    },
+    "ZP-Find.dc.html": {
+      "x": 470,
+      "y": 2500,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "2 · Find a van on your route",
+      "is_interactive": true
+    },
+    "ZP-Van.dc.html": {
+      "x": 940,
+      "y": 2500,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "3 · Van and book a seat",
+      "is_interactive": true
+    },
+    "ZP-Live.dc.html": {
+      "x": 1410,
+      "y": 2500,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "4 · Live trip",
+      "is_interactive": true
+    },
+    "ZP-Lock.dc.html": {
+      "x": 1880,
+      "y": 2500,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "5 · Live Activity, notification, widget",
+      "is_interactive": true
+    },
+    "ZP-Request.dc.html": {
+      "x": 2350,
+      "y": 2500,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "6 · Request a van",
+      "is_interactive": true
+    },
+    "ZP-Plans.dc.html": {
+      "x": 2820,
+      "y": 2500,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "7 · Plans: Free and Live",
+      "is_interactive": true
+    },
+    "ZP-Amaan.dc.html": {
+      "x": 3290,
+      "y": 2500,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "8 · Pohnch Amaan side",
+      "is_interactive": true
+    },
+    "ZD-Today.dc.html": {
+      "x": 0,
+      "y": 3950,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "1 · Today and start trip",
+      "is_interactive": true
+    },
+    "ZD-Trip.dc.html": {
+      "x": 470,
+      "y": 3950,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "2 · Next stop, siblings in one tap",
+      "is_interactive": true
+    },
+    "ZD-Earnings.dc.html": {
+      "x": 940,
+      "y": 3950,
+      "w": 390,
+      "h": 844,
+      "page": "v5",
+      "title": "3 · Fees, payout, seat requests",
+      "is_interactive": true
+    },
+    "ZS-School.dc.html": {
+      "x": 0,
+      "y": 5400,
+      "w": 1440,
+      "h": 900,
+      "page": "v5",
+      "title": "Pohnch for Schools dashboard",
+      "is_interactive": true
+    },
+    "ZW-Web.dc.html": {
+      "x": 1520,
+      "y": 5400,
+      "w": 1440,
+      "h": 1300,
+      "page": "v5",
+      "title": "Website pohnch.pk",
+      "is_interactive": true
     }
   },
   "order": [
+    "Z-Scheme.dc.html",
+    "Z-Pricing.dc.html",
+    "ZP-Home.dc.html",
+    "ZP-Find.dc.html",
+    "ZP-Van.dc.html",
+    "ZP-Live.dc.html",
+    "ZP-Lock.dc.html",
+    "ZP-Request.dc.html",
+    "ZP-Plans.dc.html",
+    "ZP-Amaan.dc.html",
+    "ZD-Today.dc.html",
+    "ZD-Trip.dc.html",
+    "ZD-Earnings.dc.html",
+    "ZS-School.dc.html",
+    "ZW-Web.dc.html",
     "Main.dc.html",
     "A1-Saaf-Driver.dc.html",
     "A1-Saaf-Parent.dc.html",
@@ -1455,6 +1608,38 @@
       "kind": "title1",
       "maxW": 1440,
       "page": "v3"
+    },
+    "t5_0": {
+      "x": 0,
+      "y": -300,
+      "text": "1 · The grand scheme and pricing",
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "v5"
+    },
+    "t5_1": {
+      "x": 0,
+      "y": 2200,
+      "text": "2 · Parent app (iOS and Android)",
+      "kind": "title1",
+      "maxW": 3680,
+      "page": "v5"
+    },
+    "t5_2": {
+      "x": 0,
+      "y": 3650,
+      "text": "3 · Driver app",
+      "kind": "title1",
+      "maxW": 1330,
+      "page": "v5"
+    },
+    "t5_3": {
+      "x": 0,
+      "y": 5100,
+      "text": "4 · Schools and website",
+      "kind": "title1",
+      "maxW": 2960,
+      "page": "v5"
     }
   },
   "designSystems": []

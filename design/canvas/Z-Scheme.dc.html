@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Pohnch v5 grand scheme</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.lbl{font-size:14px;font-weight:800;letter-spacing:.06em;color:#4A4F66;text-transform:uppercase}
+.h2{font-size:30px;font-weight:800;letter-spacing:-0.01em;margin:0}
+.node{position:absolute;background:#FFFFFF;border-radius:18px;box-shadow:inset 0 0 0 1.5px #E2DCCD;padding:14px 16px;display:flex;flex-direction:column;gap:4px;width:250px;box-sizing:border-box}
+.node b{font-size:18px;font-weight:800}
+.node span{font-size:15px;font-weight:600;color:#4A4F66;line-height:1.45}
+.rr{display:grid;grid-template-columns:150px 1fr 1fr;column-gap:18px;padding:12px 0;border-top:1px solid #E2DCCD;font-size:16px;line-height:1.45}
+.line{background:#FFFFFF;border-radius:18px;padding:18px;display:flex;flex-direction:column;gap:6px;box-shadow:inset 0 0 0 1px #E2DCCD}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1900px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5; padding: 64px 80px; display: flex; flex-direction: column; gap: 40px">
+  <header style="display: flex; justify-content: space-between; align-items: flex-end; gap: 40px">
+    <div style="display: flex; flex-direction: column; gap: 8px; max-width: 920px">
+      <span class="lbl">Pohnch v5 · the grand scheme</span>
+      <span style="font-size: 54px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1">Careem for school vans: a live map for parents, a marketplace for drivers, a desk for schools.</span>
+    </div>
+    <span dir="rtl" style="font-family: Gulzar, serif; font-size: 60px; color: #1F2A5C; line-height: 1.6">فکر کم، خبر پوری</span>
+  </header>
+
+  <section style="background: #1F2A5C; color: #FAF6EE; border-radius: 22px; padding: 24px 30px; display: grid; grid-template-columns: 1.1fr 1fr 1fr; gap: 30px">
+    <div style="display: flex; flex-direction: column; gap: 6px"><span class="lbl" style="color: #E8A33D">Is the new idea in line?</span><span style="font-size: 26px; font-weight: 800; line-height: 1.3">Yes. It makes Pohnch bigger, with two honest changes.</span></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><b style="font-size: 18px; color: #E8A33D">1 · The map runs on the driver's phone</b><span style="font-size: 16px; font-weight: 600">No GPS box to buy. The van pointer moves every 5 seconds during a trip only. The map shows where the van is; the driver's tap (or a geofence) still says whether your child is in it.</span></div>
+    <div style="display: flex; flex-direction: column; gap: 6px"><b style="font-size: 18px; color: #E8A33D">2 · You book a seat, not a ride</b><span style="font-size: 16px; font-weight: 600">School vans are monthly. "Choose a van on your route" books a seat with a one-week trial; the fee is paid monthly in the app.</span></div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 14px">
+    <h2 class="h2">One live van, five ways in</h2>
+    <div style="position: relative; height: 540px">
+      <svg width="1280" height="540" viewBox="0 0 1280 540" aria-hidden="true" style="position: absolute; inset: 0">
+        <g fill="none" stroke="#B9B2A2" stroke-width="2" stroke-dasharray="4 8"><path d="M640 270 L250 90"></path><path d="M640 270 L1030 90"></path><path d="M640 270 L250 450"></path><path d="M640 270 L1030 450"></path><path d="M640 270 L640 500"></path></g>
+        <circle cx="640" cy="270" r="150" fill="#E6E9F5"></circle>
+        <circle cx="640" cy="270" r="96" fill="#1F2A5C"></circle>
+        <path d="M600 285 V250 h48 l18 18 v17 Z" fill="#E8A33D"></path>
+        <circle cx="612" cy="292" r="9" fill="#FAF6EE"></circle><circle cx="652" cy="292" r="9" fill="#FAF6EE"></circle>
+      </svg>
+      <span style="position: absolute; left: 540px; top: 380px; width: 200px; text-align: center; font-size: 17px; font-weight: 800; color: #1F2A5C">The live van</span>
+      <div class="node" style="left: 20px; top: 20px; box-shadow: inset 0 0 0 2px #1F2A5C"><b>Parent app · iOS, Android</b><span>Live map, ETA, Live Activity, alerts, aaj chutti, find and book a van, request a van, pay</span></div>
+      <div class="node" style="right: 20px; top: 20px; box-shadow: inset 0 0 0 2px #17705A"><b>Driver app</b><span>Start trip, turn-by-turn stop order, one tap per child, seat requests, fees paid on the 5th</span></div>
+      <div class="node" style="left: 20px; bottom: 20px; box-shadow: inset 0 0 0 2px #8A5A12"><b>Pohnch for Schools · web</b><span>Fleet map, boarding register, gate handover, reports; Live for every parent</span></div>
+      <div class="node" style="right: 20px; bottom: 20px; box-shadow: inset 0 0 0 2px #0F5E4E"><b>Pohnch Amaan</b><span>Women drivers and women helpers, its own tab and filter, five checks and training</span></div>
+      <div class="node" style="left: 515px; bottom: -6px; width: 250px; box-shadow: inset 0 0 0 2px #141A33"><b>pohnch.pk website</b><span>Find a van, driver sign-up, school demo, help</span></div>
+    </div>
+  </section>
+
+  <section style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 40px">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <h2 class="h2">Who is who (no more "captain")</h2>
+      <div class="rr" style="font-weight: 800; color: #4A4F66; font-size: 14px; letter-spacing: .06em">PERSON<span>WHAT THEY DO</span><span>WHAT THEY SEE</span></div>
+      <sc-for list="{{roles}}" as="r" hint-placeholder-count="6"><div class="rr"><b style="color: {{r.c}}">{{r.who}}</b><span>{{r.does}}</span><span style="color: #4A4F66">{{r.sees}}</span></div></sc-for>
+      <span style="font-size: 15px; font-weight: 700; color: #4A4F66; margin-top: 6px">The captain's old jobs moved: setting up the van is now the driver's (or any parent's "invite my driver"); approving families is the driver's, after Pohnch verifies the driver.</span>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 12px">
+      <h2 class="h2">Three stages</h2>
+      <sc-for list="{{stages}}" as="s" hint-placeholder-count="3">
+        <div class="line" style="box-shadow: inset 0 0 0 1px #E2DCCD, inset 6px 0 0 {{s.c}}">
+          <span class="lbl" style="color: {{s.c}}">{{s.when}}</span>
+          <b style="font-size: 20px">{{s.t}}</b>
+          <span style="font-size: 15px; font-weight: 600; color: #4A4F66">{{s.b}}</span>
+          <span style="font-size: 15px; font-weight: 800">Gate: {{s.gate}}</span>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      roles: [
+        { who: 'Parent', does: 'Has the account, adds children, books and pays, marks chutti. Can invite up to 3 family members.', sees: 'Only their own children and their own van', c: '#1F2A5C' },
+        { who: 'Child', does: 'A profile under a parent: first name, school, home pin. No phone, no login.', sees: 'Nothing; is seen', c: '#17705A' },
+        { who: 'Driver', does: 'Owns or drives the van, sets the route and fee, approves seat requests, taps when each child boards.', sees: 'Their stops and first names for today', c: '#17705A' },
+        { who: 'Helper', does: 'Optional second adult on board (often a woman); marks boarding, hands children over at the gate.', sees: 'Same as the driver, for that trip', c: '#0F5E4E' },
+        { who: 'School', does: 'Runs its own buses on Pohnch, or lists partner vans; watches the fleet and the register.', sees: 'Its buses, its riders, its gate', c: '#8A5A12' },
+        { who: 'Pohnch team', does: 'Verifies drivers, answers help alerts, handles payments and disputes.', sees: 'What a case needs, logged', c: '#141A33' }
+      ],
+      stages: [
+        { when: 'Stage 1 · now to Mar 2027', t: 'Showcase and pilot: 3–5 real vans', b: 'Parent and driver apps on iOS and Android, website. Bring your own van, live map, taps, Live Activity, aaj chutti. Free during the pilot.', gate: '80% of trips tracked end to end; 40% of families keep Live after the free month', c: '#1F2A5C' },
+        { when: 'Stage 2 · 2027', t: 'Marketplace: 20 to 60 vans', b: 'Find a van and book a seat, fees paid in the app, request a van, ratings, Pohnch Live paid.', gate: '40 paying vans, break-even month in sight', c: '#E8A33D' },
+        { when: 'Stage 3 · 2028', t: 'Schools and Pohnch Amaan', b: 'Pohnch for Schools dashboard and contracts; Amaan with a training partner and women staff.', gate: 'First 2 schools signed; training partner in place', c: '#0F5E4E' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

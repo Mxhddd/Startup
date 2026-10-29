@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver fees, payout and seat requests</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ln{display:flex;justify-content:space-between;align-items:center;min-height:38px;font-size:16px;font-weight:700}
+.b{height:52px;flex:1;border:0;border-radius:14px;font-family:inherit;font-size:16px;font-weight:800;cursor:pointer}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5; padding: 18px 16px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+  <span style="font-size: 26px; font-weight: 800">نومبر کی فیس</span>
+  <section style="background: #1F2A5C; color: #FAF6EE; border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 4px">
+    <span style="font-size: 15px; font-weight: 700">5 نومبر کو آپ کے JazzCash میں</span>
+    <span dir="ltr" style="font-size: 40px; font-weight: 800; text-align: right; line-height: 1.15">Rs 51,150</span>
+    <div style="height: 1px; background: rgba(250,246,238,.2); margin: 6px 0"></div>
+    <div class="ln"><span>ایپ میں ادا</span><span dir="ltr">10 / 10 · Rs 55,000</span></div>
+    <div class="ln"><span>پہنچ کا حصہ 7%</span><span dir="ltr">− Rs 3,850</span></div>
+    <span style="font-size: 14px; font-weight: 700; color: #E6E9F5">کسی سے پیسے مانگنے نہیں پڑے۔ دیر سے دینے والوں کو یاد دہانی پہنچ بھیجتا ہے۔</span>
+  </section>
+  <span style="font-size: 18px; font-weight: 800; margin-top: 4px">سیٹ کی درخواستیں</span>
+  <sc-for list="{{reqs}}" as="r" hint-placeholder-count="2">
+    <div style="background: #FFFFFF; border-radius: 18px; box-shadow: inset 0 0 0 1px #E2DCCD; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px">
+      <div style="display: flex; align-items: center; gap: 10px">
+        <span style="width: 46px; height: 46px; border-radius: 50%; background: {{r.c}}; color: #FAF6EE; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 800">{{r.i}}</span>
+        <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.35"><span style="font-size: 17px; font-weight: 800">{{r.who}}</span><span style="font-size: 14px; font-weight: 700; color: #4A4F66">{{r.where}}</span></span>
+      </div>
+      <sc-if value="{{r.open}}" hint-placeholder-val="{{ true }}"><div style="display: flex; gap: 8px"><button class="b" onClick="{{r.no}}" style="background: #F3EEE3; color: #141A33">نہیں</button><button class="b" onClick="{{r.yes}}" style="background: #17705A; color: #FFFFFF">ہاں · ایک ہفتہ آزمائش</button></div></sc-if>
+      <sc-if value="{{r.closed}}" hint-placeholder-val="{{ false }}"><span style="height: 44px; border-radius: 12px; background: {{r.dbg}}; color: {{r.dfg}}; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 800">{{r.dtext}}</span></sc-if>
+    </div>
+  </sc-for>
+  <span style="margin-top: auto; font-size: 14px; font-weight: 700; color: #4A4F66">نئے بچے کا اسٹاپ آپ کے راستے میں خود جڑ جاتا ہے۔ آپ کو بس ہاں کہنا ہے۔</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { d: {} }; }
+  renderVals() {
+    const list = [
+      { id: 1, i: 'ع', who: 'علی · والدہ ثنا', where: 'گلشن بلاک 13 · راستے سے 120 میٹر · 7:12', c: '#1F2A5C' },
+      { id: 2, i: 'ز', who: 'زارا · والد عمران', where: 'گلشن بلاک 10 · راستے سے 400 میٹر · 7:20', c: '#17705A' }
+    ];
+    return {
+      reqs: list.map((r) => {
+        const st = this.state.d[r.id];
+        return { ...r, open: !st, closed: !!st, dtext: st === 'y' ? 'منظور · گھر والوں کو خبر گئی' : 'منع کیا · پہنچ اور وین دکھائے گا', dbg: st === 'y' ? '#DCEFE7' : '#EEE9DF', dfg: st === 'y' ? '#0B4A3D' : '#5E5A52', yes: () => this.setState({ d: { ...this.state.d, [r.id]: 'y' } }), no: () => this.setState({ d: { ...this.state.d, [r.id]: 'n' } }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

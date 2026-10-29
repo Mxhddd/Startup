@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Driver trip with next stop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #EFE9DC; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5">
+  <svg width="390" height="844" viewBox="0 0 390 844" aria-label="نقشہ: اگلا اسٹاپ حمزہ اور عائشہ کا گھر" style="position: absolute; inset: 0">
+    <rect width="390" height="844" fill="#EFE9DC"></rect>
+    <g fill="none" stroke="#FFFFFF" stroke-width="10" stroke-linecap="round"><path d="M0 200 H390"></path><path d="M70 120 V460"></path><path d="M300 120 V460"></path></g>
+    <path d="M195 470 C195 400 195 330 210 280 C225 230 260 210 300 200" fill="none" stroke="#DDD4C2" stroke-width="30" stroke-linecap="round"></path>
+    <path d="M195 470 C195 400 195 330 210 280 C225 230 260 210 300 200" fill="none" stroke="#FFFFFF" stroke-width="22" stroke-linecap="round"></path>
+    <path d="M195 470 C195 400 195 330 210 280 C225 230 260 210 300 200" fill="none" stroke="#1F2A5C" stroke-width="9" stroke-linecap="round"></path>
+    <g transform="translate(300 200)"><circle r="26" fill="#17705A" fill-opacity=".2"></circle><circle r="15" fill="#17705A" stroke="#FFFFFF" stroke-width="4"></circle></g>
+    <g transform="translate(195 440)"><path d="M0 -26 L18 16 L0 6 L-18 16 Z" fill="#1F2A5C" stroke="#FFFFFF" stroke-width="4" stroke-linejoin="round"></path></g>
+  </svg>
+  <header data-component="TripHeader" style="position: absolute; top: 0; left: 0; right: 0; background: #1F2A5C; color: #FAF6EE; padding: 14px 16px 16px; display: flex; flex-direction: column; gap: 4px">
+    <div style="display: flex; align-items: center; gap: 10px"><span style="flex: 1; font-size: 15px; font-weight: 700">صبح کا چکر · 3/6 · لائیو</span><span style="height: 44px; padding: 0 14px; border-radius: 12px; background: #A8321F; color: #FFFFFF; font-size: 16px; font-weight: 800; display: flex; align-items: center">مدد</span></div>
+    <div style="display: flex; align-items: baseline; gap: 10px"><span dir="ltr" style="font-size: 40px; font-weight: 800; line-height: 1">350 m</span><span style="font-size: 20px; font-weight: 800">بائیں · گلی 4</span></div>
+  </header>
+  <section style="position: absolute; left: 0; right: 0; bottom: 0; background: #FAF6EE; border-radius: 24px 24px 0 0; box-shadow: 0 -10px 30px rgba(20,26,51,.18); padding: 14px 14px 18px; display: flex; flex-direction: column; gap: 10px">
+    <span style="font-size: 15px; font-weight: 800; color: #4A4F66">اگلا اسٹاپ · ایک ہی گھر</span>
+    <sc-if value="{{open}}" hint-placeholder-val="{{ true }}">
+      <button data-component="TapButton" data-step="picked" data-size="next" onClick="{{both}}" style="height: 108px; border: 0; border-radius: 22px; background: #17705A; color: #FFFFFF; font-family: inherit; display: flex; align-items: center; gap: 14px; padding: 0 18px; box-shadow: 0 5px 0 #0B4A3D; cursor: pointer">
+        <span style="width: 64px; height: 64px; border-radius: 18px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; flex: none"><svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#17705A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7a4 4 0 1 0 8 0a4 4 0 1 0-8 0 M2 21v-1a6 6 0 0 1 6-6h3 M14.5 18l2.5 2.5 5-5"></path></svg></span>
+        <span style="flex: 1; display: flex; flex-direction: column; text-align: right; line-height: 1.4"><span style="font-size: 26px; font-weight: 800">حمزہ اور عائشہ</span><span style="font-size: 16px; font-weight: 700">دونوں بٹھا لیے · ایک ٹیپ</span></span>
+      </button>
+    </sc-if>
+    <sc-if value="{{done}}" hint-placeholder-val="{{ false }}">
+      <div style="height: 108px; border-radius: 22px; background: #DCEFE7; color: #0B4A3D; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 20px; font-weight: 800">حمزہ اور عائشہ وین میں · گھر والوں کو خبر گئی <button onClick="{{undo}}" style="height: 48px; padding: 0 14px; border: 0; border-radius: 12px; background: #FFFFFF; color: #0B4A3D; font-family: inherit; font-size: 16px; font-weight: 800; cursor: pointer">واپس</button></div>
+    </sc-if>
+    <div style="display: flex; gap: 8px">
+      <span style="flex: 1; height: 64px; border-radius: 16px; background: #FFFFFF; box-shadow: inset 0 0 0 2px #1F2A5C; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; color: #1F2A5C">صرف حمزہ</span>
+      <span style="flex: 1; height: 64px; border-radius: 16px; background: #FFFFFF; box-shadow: inset 0 0 0 2px #1F2A5C; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 800; color: #1F2A5C">صرف عائشہ</span>
+    </div>
+    <span style="font-size: 14px; font-weight: 700; color: #4A4F66">گھر کے پاس پہنچ کر والدین کو "وین پہنچ گئی" خود جاتا ہے۔ آپ صرف بچے کے بیٹھنے پر ٹیپ کریں۔</span>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { done: false }; }
+  renderVals() {
+    const d = this.state.done;
+    return { open: !d, done: d, both: () => this.setState({ done: true }), undo: () => this.setState({ done: false }) };
+  }
+}
+</script>
+</body>
+</html>

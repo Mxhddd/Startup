@@ -1,14 +1,18 @@
 # Designs
 
 - Canvas (all screens, clickable prototype): https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy
-- `BRAND.md`: the brand (v4) (tokens, type, mark, Amaan).
-- `DECISIONS.md`: round 3 pricing, refinements and research; earlier rounds, the A5 review, component names.
+- `BRAND.md`: the brand (tokens, type, mark, map style, Amaan).
+- `DECISIONS.md`: round 5 (map-first native apps, roles, pricing, stages); earlier rounds, the A5 review, component names.
 - `canvas/`: the source of every artboard (`.dc.html`) and the canvas layout (`canvas.json`). They render inside the canvas, not on their own.
 
 | Prefix | Page | Screens |
 | --- | --- | --- |
-| `Y-Review` | v4 · Pilot plan (current) | review applied: new mark, colour rule, the 32 screens in 3 stages |
-| `X-` | v4 · Pilot plan (current) | brand board, logo and pattern, Pohnch Amaan, refined idea, pricing + live model |
+| `Z-Scheme`, `Z-Pricing` | v5 · Map-first app (current) | the grand scheme (roles, stages, ecosystem); pricing with a live model |
+| `ZP-` | v5 · Map-first app (current) | parent: live map home, find a van, book a seat, trip timeline, lock screen and widget, request a van, plans, Amaan |
+| `ZD-` | v5 · Map-first app (current) | driver: today, trip with taps, earnings and seat requests |
+| `ZS-`, `ZW-` | v5 · Map-first app (current) | Pohnch for Schools desk; pohnch.pk website |
+| `Y-Review` | v4 · Pilot plan | review applied: new mark, colour rule, the 32 screens in 3 stages |
+| `X-` | v4 · Pilot plan | brand board, logo and pattern, Pohnch Amaan, refined idea, pricing + live model |
 | `X-WA-` | v4 · WhatsApp | to parents, how to join, 9:16 status, Amaan recruitment |
 | `X-Poster`, `X-Flyer`, `X-Sticker`, `X-Card-`, `X-Amaan-Poster` | v4 · Print | A3 poster, A5 flyer, sticker sheet, A6 driver card, A3 Amaan poster |
 | `XD-` | v4 · Driver | welcome, practice, before trip, undo, mid-route, school, afternoon, offline, help, earnings, home safe |

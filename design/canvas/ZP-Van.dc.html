@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent van detail and booking</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.stat{flex:1;display:flex;flex-direction:column;align-items:center;line-height:1.25;padding:8px 0}
+.row{display:flex;align-items:center;justify-content:space-between;min-height:40px;font-size:15px;font-weight:700;border-bottom:1px solid #F0EBE0}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5; display: flex; flex-direction: column">
+  <div style="height: 236px; position: relative; flex: none; overflow: hidden">
+    <svg width="390" height="236" viewBox="0 0 390 236" aria-label="وین کا راستہ اور آپ کا اسٹاپ" style="position: absolute; inset: 0">
+      <rect width="390" height="236" fill="#EFE9DC"></rect>
+      <g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"><path d="M0 70 H390"></path><path d="M0 170 H390"></path><path d="M90 0 V236"></path><path d="M250 0 V236"></path></g>
+      <path d="M-10 120 C100 110 220 140 400 120" fill="none" stroke="#FFFFFF" stroke-width="13" stroke-linecap="round"></path>
+      <path d="M40 210 C90 170 140 150 190 128 C240 106 290 80 360 30" fill="none" stroke="#1F2A5C" stroke-width="7" stroke-linecap="round"></path>
+      <g fill="#FFFFFF" stroke="#1F2A5C" stroke-width="4"><circle cx="40" cy="210" r="7"></circle><circle cx="120" cy="158" r="7"></circle></g>
+      <g transform="translate(190 128)"><circle r="20" fill="#17705A" fill-opacity=".2"></circle><circle r="11" fill="#17705A" stroke="#FFFFFF" stroke-width="3"></circle></g>
+      <g transform="translate(360 30)"><circle r="15" fill="#E8A33D" stroke="#FFFFFF" stroke-width="3"></circle></g>
+    </svg>
+    <a href="ZP-Find.dc.html" aria-label="واپس" style="position: absolute; top: 14px; right: 14px; width: 44px; height: 44px; border-radius: 50%; background: #FFFFFF; box-shadow: 0 4px 14px rgba(20,26,51,.16); display: flex; align-items: center; justify-content: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141A33" stroke-width="2.4" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+    <span style="position: absolute; bottom: 12px; right: 14px; height: 32px; padding: 0 12px; border-radius: 999px; background: #FFFFFF; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 6px; box-shadow: 0 4px 14px rgba(20,26,51,.12)"><span style="width: 10px; height: 10px; border-radius: 50%; background: #17705A"></span>آپ کا اسٹاپ: دروازے سے 120 میٹر</span>
+  </div>
+
+  <main style="flex: 1; margin-top: -18px; background: #FAF6EE; border-radius: 22px 22px 0 0; position: relative; padding: 16px 16px 14px; display: flex; flex-direction: column; gap: 12px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <span style="width: 62px; height: 62px; border-radius: 50%; background: #E8A33D; color: #141A33; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; box-shadow: 0 0 0 4px #FAF6EE, 0 0 0 5.5px #C9A24A; flex: none">ر</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.35"><span style="font-size: 21px; font-weight: 800">رفیق بھائی</span><span style="font-size: 14px; font-weight: 700; color: #4A4F66">گلشن وین · سوزوکی بولان · 10 سیٹیں</span></span>
+      <span style="height: 30px; padding: 0 10px; border-radius: 999px; background: #E6E9F5; color: #1F2A5C; font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 4px"><svg width="14" height="14" viewBox="0 0 64 64"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#1F2A5C"></path></svg>تصدیق شدہ</span>
+    </div>
+    <div style="display: flex; background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1px #E2DCCD">
+      <span class="stat"><span dir="ltr" style="font-size: 20px; font-weight: 800; color: #17705A">96%</span><span style="font-size: 14px; font-weight: 700">وقت پر</span></span>
+      <span class="stat" style="border-right: 1px solid #F0EBE0; border-left: 1px solid #F0EBE0"><span dir="ltr" style="font-size: 20px; font-weight: 800">412</span><span style="font-size: 14px; font-weight: 700">چکر</span></span>
+      <span class="stat"><span dir="ltr" style="font-size: 20px; font-weight: 800">4.9</span><span style="font-size: 14px; font-weight: 700">والدین کی رائے</span></span>
+    </div>
+    <div style="background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 5px #FFFFFF, inset 0 0 0 6px #E2DCCD; padding: 4px 16px">
+      <div class="row"><span>صبح آپ کے دروازے پر</span><span dir="ltr">7:12</span></div>
+      <div class="row"><span>اسکول پہنچنا</span><span dir="ltr">7:45</span></div>
+      <div class="row"><span>دوپہر گھر واپسی</span><span dir="ltr">2:05</span></div>
+      <div class="row" style="border-bottom: 0"><span>تصدیق</span><span style="color: #17705A">شناختی کارڈ · لائسنس · گاڑی کے کاغذ</span></div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 10px; background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1px #E2DCCD; padding: 10px 14px">
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.35"><span style="font-size: 14px; font-weight: 700; color: #4A4F66">وین فیس (ڈرائیور طے کرتے ہیں)</span><span dir="ltr" style="font-size: 24px; font-weight: 800; text-align: right">Rs 5,500 <span style="font-size: 15px; color: #4A4F66">/ month</span></span></span>
+      <span style="font-size: 14px; font-weight: 800; color: #17705A; text-align: left">ایپ میں ادائیگی<br>ہر مہینے کی 1 تاریخ</span>
+    </div>
+    <span style="font-size: 14px; font-weight: 700; color: #4A4F66">پہلا ہفتہ آزمائشی۔ پسند نہ آئے تو کوئی فیس نہیں۔</span>
+    <button onClick="{{book}}" style="margin-top: auto; height: 58px; border-radius: 16px; border: 0; background: {{bg}}; color: {{fg}}; font-family: inherit; font-size: 18px; font-weight: 800; cursor: pointer">{{cta}}</button>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { sent: false }; }
+  renderVals() {
+    const s = this.state.sent;
+    return {
+      cta: s ? 'درخواست بھیج دی · رفیق بھائی جواب دیں گے' : 'علی کے لیے سیٹ مانگیں · ایک ہفتہ آزمائیں',
+      bg: s ? '#DCEFE7' : '#1F2A5C', fg: s ? '#0B4A3D' : '#FAF6EE',
+      book: () => this.setState({ sent: !s })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Pohnch v5 pricing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.lbl{font-size:14px;font-weight:800;letter-spacing:.06em;color:#4A4F66;text-transform:uppercase}
+.card{border-radius:20px;padding:20px 22px;display:flex;flex-direction:column;gap:4px}
+.card b{font-size:38px;font-weight:800;line-height:1.1}
+.st{width:44px;height:44px;border-radius:12px;border:0;background:#1F2A5C;color:#FAF6EE;font-family:inherit;font-size:22px;font-weight:800;cursor:pointer}
+.row{display:flex;align-items:center;gap:10px;border-top:1px solid #E2DCCD;padding:8px 0;font-size:16px;font-weight:700}
+</style>
+</helmet>
+<div style="width: 1440px; height: 1250px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5; padding: 64px 80px; display: flex; flex-direction: column; gap: 32px">
+  <div style="display: flex; flex-direction: column; gap: 6px">
+    <span class="lbl">Pricing v5 · replaces Rs 199</span>
+    <span style="font-size: 48px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.12">Three ways to earn per van instead of one: about Rs 7,300 a van, break-even near 37 vans.</span>
+  </div>
+  <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+    <div class="card" style="background: #1F2A5C; color: #FAF6EE"><span class="lbl" style="color: #E8A33D">Parents · Pohnch Live</span><b>Rs 599</b><span style="font-size: 16px; font-weight: 700">per child a month</span><span style="font-size: 15px; font-weight: 600; color: #E6E9F5">Live map, ETA, Live Activity, speed and route alerts, 4 family members. Sibling Rs 299, yearly Rs 5,990, first month free. Basic alerts stay free.</span></div>
+    <div class="card" style="background: #17705A; color: #FFFFFF"><span class="lbl" style="color: #DCEFE7">Drivers · van fees in the app</span><b>7%</b><span style="font-size: 16px; font-weight: 700">of fees paid through Pohnch</span><span style="font-size: 15px; font-weight: 600; color: #DCEFE7">Paid on the 5th, no chasing families, seats filled from the map. The app is free; a driver can still take cash and use Pohnch.</span></div>
+    <div class="card" style="background: #E8A33D; color: #141A33"><span class="lbl" style="color: #141A33">Request a van · Pohnch Routes</span><b>12%</b><span style="font-size: 16px; font-weight: 700">of fees on routes Pohnch forms</span><span style="font-size: 15px; font-weight: 600; color: #3A2A0A">A request opens at 4 children; Pohnch brings a verified van at 8. Families pay only once the van runs.</span></div>
+    <div class="card" style="background: #FFFFFF; box-shadow: inset 0 0 0 1px #E2DCCD"><span class="lbl" style="color: #8A5A12">Schools · Pohnch for Schools</span><b>Rs 300</b><span style="font-size: 16px; font-weight: 700">per rider a month, billed yearly</span><span style="font-size: 15px; font-weight: 600; color: #4A4F66">Fleet map, boarding register, gate handover, and Live for every parent. A 500-rider school is Rs 150,000 a month.</span></div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 32px">
+    <section style="background: #FFFFFF; border-radius: 20px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 6px #FFFFFF, inset 0 0 0 7px #E2DCCD; padding: 24px 28px; display: flex; flex-direction: column; gap: 4px">
+      <span class="lbl">Live model · one marketplace van a month</span>
+      <div class="row"><span style="flex: 1">Children in the van</span><button class="st" onClick="{{kd}}" aria-label="fewer">−</button><span style="width: 70px; text-align: center; font-size: 22px; font-weight: 800">{{kids}}</span><button class="st" onClick="{{ku}}" aria-label="more">+</button></div>
+      <div class="row"><span style="flex: 1">Van fee per child</span><button class="st" onClick="{{fd}}" aria-label="lower">−</button><span style="width: 110px; text-align: center; font-size: 22px; font-weight: 800">Rs {{fee}}</span><button class="st" onClick="{{fu}}" aria-label="higher">+</button></div>
+      <div class="row"><span style="flex: 1">Families on Live</span><button class="st" onClick="{{ad}}" aria-label="fewer">−</button><span style="width: 70px; text-align: center; font-size: 22px; font-weight: 800">{{adopt}}%</span><button class="st" onClick="{{au}}" aria-label="more">+</button></div>
+      <div class="row"><span style="flex: 1">Live price</span><button class="st" onClick="{{pd}}" aria-label="lower">−</button><span style="width: 110px; text-align: center; font-size: 22px; font-weight: 800">Rs {{price}}</span><button class="st" onClick="{{pu}}" aria-label="higher">+</button></div>
+      <div style="margin-top: 10px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px">
+        <div style="background: #E6E9F5; border-radius: 14px; padding: 12px"><span class="lbl">Fees 7%</span><div style="font-size: 26px; font-weight: 800">Rs {{com}}</div></div>
+        <div style="background: #FBEBCF; border-radius: 14px; padding: 12px"><span class="lbl">Live</span><div style="font-size: 26px; font-weight: 800">Rs {{live}}</div></div>
+        <div style="background: #DCEFE7; border-radius: 14px; padding: 12px"><span class="lbl" style="color: #0B4A3D">Kept after Rs 900 cost</span><div style="font-size: 26px; font-weight: 800; color: #0B4A3D">Rs {{keep}}</div></div>
+      </div>
+      <div style="margin-top: 10px; background: #141A33; color: #FAF6EE; border-radius: 14px; padding: 14px 18px; display: flex; align-items: center; gap: 14px"><span style="font-size: 40px; font-weight: 800; color: #E8A33D">{{be}}</span><span style="font-size: 16px; font-weight: 700">vans cover Rs 270,000 a month of fixed cost (a team of 3, hosting, maps, marketing). One 500-rider school alone covers more than half.</span></div>
+    </section>
+    <section style="display: flex; flex-direction: column; gap: 16px">
+      <div style="display: flex; flex-direction: column; gap: 6px"><span class="lbl">Why higher than Rs 199</span><span style="font-size: 17px; font-weight: 600; line-height: 1.55">Live tracking is a new, visible service; Rs 599 is about 10% of a Rs 5,500 van fee and below a US parent-alert app's USD 3.50. Rs 199 needed about 59 vans and gave drivers no reason to join.</span></div>
+      <div style="display: flex; flex-direction: column; gap: 6px"><span class="lbl">We test it, not guess it</span><span style="font-size: 17px; font-weight: 600; line-height: 1.55">After the free pilot month, vans are offered Live at Rs 499, Rs 599 or Rs 799. We keep the highest price that 40% of families take.</span></div>
+      <div style="display: flex; flex-direction: column; gap: 6px"><span class="lbl">The van fee itself is not raised</span><span style="font-size: 17px; font-weight: 600; line-height: 1.55">Sindh froze school van fares in April 2026. Live is a separate, optional service, and the 7% comes from the driver's side, so families pay the same fare.</span></div>
+      <div style="display: flex; flex-direction: column; gap: 6px"><span class="lbl">Sources</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66; line-height: 1.55">Here Comes the Bus parent tier (studybase.in guide); Careem 5% and 15% captain models (Profit, May 2024); Sindh van fare freeze (Daily Pakistan, 6 Apr 2026). Estimates until the pilot proves them.</span></div>
+    </section>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1250}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { kids: 12, fee: 5500, adopt: 50, pi: 1 }; }
+  renderVals() {
+    const prices = [499, 599, 799];
+    const s = this.state, price = prices[s.pi];
+    const com = Math.round(s.kids * s.fee * 0.07), live = Math.round(s.kids * s.adopt / 100 * price), keep = com + live - 900;
+    const f = (n) => n.toLocaleString('en-US'), set = (o) => () => this.setState(o);
+    return {
+      kids: s.kids, fee: f(s.fee), adopt: s.adopt, price, com: f(com), live: f(live), keep: f(keep), be: keep > 0 ? Math.ceil(270000 / keep) : '∞',
+      kd: set({ kids: Math.max(6, s.kids - 1) }), ku: set({ kids: Math.min(16, s.kids + 1) }),
+      fd: set({ fee: Math.max(3000, s.fee - 500) }), fu: set({ fee: Math.min(9000, s.fee + 500) }),
+      ad: set({ adopt: Math.max(10, s.adopt - 10) }), au: set({ adopt: Math.min(100, s.adopt + 10) }),
+      pd: set({ pi: Math.max(0, s.pi - 1) }), pu: set({ pi: Math.min(2, s.pi + 1) })
+    };
+  }
+}
+</script>
+</body>
+</html>

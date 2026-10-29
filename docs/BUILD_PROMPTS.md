@@ -1,226 +1,143 @@
-# Build prompts
+# Build prompts (v5: native apps)
 
-Paste these in order. Phase A makes the mockups in Claude Design; phase B builds version 1 in Claude Code from those mockups.
+Ten steps take Pohnch from an empty repo to 3–5 real vans in a pilot, in about 12–16 weeks of part-time work. Paste one prompt at a time into Claude Code. Each step starts with a plan you approve, ends with passing tests and a build, and is saved to GitHub.
+
+The earlier web-app prompts (WhatsApp links, a captain, Rs 199) are kept in `archive/BUILD_PROMPTS_v1_web.md` for history; the security rules and tests carry over.
 
 ## How to use these prompts
 
-Run phase A in Claude, then phase B in Claude Code, one prompt at a time, checking each step before the next.
+1. Open Claude Code in this repo (on your laptop or at claude.ai/code).
+2. Paste one prompt. Claude Code shows a plan: read it, ask about anything you don't understand, then say go.
+3. When the step is done, try the "After it, you can" line yourself on your phone. Only then move on.
+4. Replace anything in \[square brackets\] before pasting.
 
-1. **Phase A (designs) runs here in Claude.** Start each prompt with "Make this in Claude Design". Standalone Claude Design at claude.ai/design closes on 14 December 2026, because Claude Design now lives inside Claude, so don't start a project there.
-2. **Before phase B,** export the Final brief tab as Markdown and save it as `BRIEF.md` in an empty project folder.
-3. **Phase B (code) runs in Claude Code** on your computer or Claude Code on the web, opened in that folder.
-4. **One prompt at a time.** Claude Code will show a plan first: read it, ask about anything you don't understand, then say go.
-5. **After each step,** run the check in the last section and save your work with a git commit before the next prompt.
-6. **Replace anything in \[square brackets\]** before pasting.
+| Step | What gets built | After it, you can |
+| --- | --- | --- |
+| B0 | accounts and keys | sign in everywhere the build needs |
+| B1 | the repo: two Expo apps, the website, shared packages, test tools | open both apps on your phone |
+| B2 | the design system in code | flip through every component in a gallery screen |
+| B3 | database, security rules, phone login | log in as a parent and a driver on two phones |
+| B4 | driver app: trip, location, taps, offline | drive a test route and watch the data arrive |
+| B5 | parent app: live map, ETA, timeline, chutti | watch the van move on a second phone |
+| B6 | alerts: push, geofences, Live Activity, widget | see the van's minutes on your lock screen |
+| B7 | website and admin | send a link to a real driver and approve them |
+| B8 | hardening | trust it with real children |
+| B9 | release and pilot | real families use it every school day |
 
-Why this order: the designs settle what each screen looks like and what every component is called, and those names carry straight into the code.
-
-## Phase A: Claude Design prompts
-
-Five prompts, about one evening in total: pick a look, design the driver, parent and captain screens, then review the whole day as a clickable prototype.
-
-**A1. Choose a look**
+## B0. Accounts and keys
 
 ```text
-Make this in Claude Design.
+Read CLAUDE.md, BRIEF.md, design/DECISIONS.md (round 5), design/BRAND.md and docs/PLAN.md. Don't write code yet.
 
-I'm designing Pohnch (پہنچ, "reached"), a free Urdu-first phone app for school vans in Karachi, Pakistan. Today parents hand their children to a private van and can't see anything until the child is home. In Pohnch:
-- A parent "van captain" sets up the van and shares two invite links on WhatsApp: one for the driver, one for the other parents.
-- The driver taps big buttons when the van is stopped: "Nikal gaya" (left), one tap per child picked up, "School pohnch gaye" (reached school), and the same in the afternoon.
-- Every parent gets a push notification for each tap, and can tap "Aaj chutti" to mark their child absent so the driver skips that stop.
+Make docs/ACCOUNTS.md current for the v5 stack: for each account (Expo, Supabase, Google Maps Platform, Apple Developer, Google Play Console, Vercel, an SMS provider for login codes) give what it is for, its cost today, which step first needs it, and the exact sign-up steps. Then list every environment variable by name only in .env.example, and say which ones may reach an app bundle (only public keys) and which must stay in Supabase Edge Function secrets.
 
-Users: drivers with cheap Android phones, often in bright sunlight, some of whom read slowly; parents who are busy and worried. The feeling should be a calm, trustworthy family utility, not a flashy startup.
-
-Rules: Urdu first and right-to-left, with an English switch. Design at 360 x 780 px. Driver buttons at least 64 px tall, one main action per screen, each step with its own icon and colour so it can be recognised without reading. High contrast that works outdoors. No thin grey text.
-
-Show me 3 different visual directions side by side. For each, draw two screens: the driver's Today screen in the middle of the morning route (3 children picked up, 2 still to go, 1 marked absent), and a parent's Today timeline after "Ali van mein baith gaya". Name each direction and give one line on why it fits.
+Check the current free limits and prices on each vendor's own page and write the date you checked.
 ```
 
-**A2. Driver screens** (after you pick a direction)
+## B1. The repo
 
 ```text
-Use direction [name]. Design every driver screen at 360 x 780, Urdu first, with an English version of the Today screen:
-1. Opening the driver link for the first time: welcome, van name, "Add to home screen" steps.
-2. Today, before the morning trip: the list of children in stop order, absent children greyed out at the top with "Aaj chutti".
-3. Today, mid-route: "Nikal gaya" done, 3 children ticked, 2 waiting, the next child highlighted.
-4. Reached school: a clear done state.
-5. Afternoon trip: "School se nikle" (left school), a tap per child dropped home.
-6. No signal: a banner saying taps are saved and will send when signal returns, with a count of waiting taps.
-7. Link switched off: what the driver sees and who to call.
-Also draw the Today screen with 1 child and with 18 children, so I can see both ends.
-Name components consistently and reuse them across screens: TapButton, ChildRow, AbsentChip, OfflineBanner, TripHeader.
+Set up the monorepo described in docs/PLAN.md:
+- pnpm workspaces; apps/parent and apps/driver (Expo, Expo Router, TypeScript strict), apps/web (Next.js App Router), packages/ui, packages/core, packages/messages, supabase/.
+- Fonts (Noto Sans Arabic, Manrope, Gulzar) loaded in both apps; right-to-left layout by default with an English switch; all text from packages/messages/ur.json and en.json.
+- The theme file in packages/ui with every token from design/BRAND.md, including the map style.
+- App icons and splash: the star and dot on neel (design/BRAND.md, Logo).
+- Vitest in packages/core with one passing test; Maestro with one flow that opens each app; Playwright with one test for the website.
+- A development build profile for EAS so both apps run on a real phone.
+
+After it I should be able to open both apps on my phone and see the Pohnch splash, then an empty brand-styled map (parent) and an empty Today screen (driver), in Urdu and English.
 ```
 
-**A3. Parent screens**
+## B2. The design system
 
 ```text
-Same direction. Design every parent screen at 360 x 780:
-1. Opening the parents link: van name and driver name, "Pick your child" (first names only) or "Add my child".
-2. Allow notifications on Android; on iPhone, a 3-step guide to adding Pohnch to the home screen first, because iPhone only shows web notifications after that.
-3. Today timeline in four states: waiting for the van, van left, child in the van, reached school.
-4. "Aaj chutti": choose today or tomorrow and morning, afternoon or both; a confirmation; an Undo that works until the van leaves.
-5. Lock-screen previews of every notification, Urdu first with English underneath, each ending "driver ne mark kiya" (marked by the driver).
-6. Settings: language, leave this van.
-7. Empty state: the van hasn't started using Pohnch today.
-Reuse TimelineEvent, AbsentChip and TripHeader from the driver screens.
+Build the components named in CLAUDE.md in packages/ui, matching the canvas page "v5 · Map-first app (current)" (sources in design/canvas/Z*.dc.html): MapSheet, VanMarker (smooth movement between positions, a heading arrow, a grey "last seen" state), StopPin, EtaPill, TripHeader, TapButton (hold to confirm, sizes next 104 px and later 64 px), ChildRow, AbsentChip, OfflineBanner, RouteDots, TimelineEvent, UndoBar, HelpSheet, VanBadge, ApprovalCard, InviteCard, PlanCard, PriceRow, VanCard.
+
+Add a hidden gallery screen to each app that shows every component in every state, in Urdu and English. Unit-test the TapButton hold and the UndoBar timer.
 ```
 
-**A4. Van captain and admin**
+## B3. Database and login
 
 ```text
-Same direction.
-1. Van captain on a phone, 360 x 780: "Set up your van" with three fields only (driver's first name, school name, morning pickup time), then a Share screen with two ShareLinkCard components, one for the driver and one for parents. Each has a "Send on WhatsApp" button and a pre-written message in Urdu and English.
-2. My admin page on a laptop, 1280 x 800: a table of vans with driver tap rate for the last 10 school days, parents joined, notifications delivered or failed, "Aaj chutti" taps, and a Paid tick per family per month. Flag any van under 80% tap rate.
-Keep the admin page plain and dense; it's a working tool.
+Write Supabase migrations for: families, family_members, children (first name, school, stop; no gender), drivers (with a verified flag), vans, stops (PostGIS points, order), van_members (family, child, status pending/approved), trips (morning/afternoon, Asia/Karachi date), events (step, child, client_id unique), positions (van, trip, point, speed, heading, time), absences, day_offs, invites (token hash only), push_tokens.
+
+Row-level security on every table, following CLAUDE.md: no anonymous access; a parent reads only their own children and their approved van's trips and positions; a driver reads only their own van. Writes for taps, approvals and trips go through Edge Functions that check the role. Add a database test that proves a parent of van A can't read van B.
+
+Phone login with a one-time code (Supabase Auth). After login a person chooses "I'm a parent" (parent app) or registers as a driver (driver app, then waits for verification). Add a DEMO seed: one van, one driver, 6 children in 4 families, two of them siblings.
 ```
 
-**A5. Review the whole day**
+## B4. Driver app
 
 ```text
-Turn the screens into one clickable prototype that walks through a full school day: captain sets up the van, driver joins, one parent joins, morning trip, the parent marks tomorrow as chutti, afternoon trip.
-Then review it as a sceptical designer:
-- Is any driver button hard to tell apart without reading?
-- Is any text under 14 px or low-contrast?
-- Does every screen have its empty, loading, offline and error state?
-- Do the 1-child and 18-child versions still work?
-Fix what you find. Finish with a short list of design decisions and the reason for each, and a list of every component name used.
+Build the driver app screens from ZD-Today and ZD-Trip:
+- Set up the van: name, school, morning and afternoon times, stops placed on the map in order; accept a parent's "invite my driver"; approve or decline families (ApprovalCard).
+- Today: the trip list, absent children pinned at the top, whole-van day off, a practice run before the first real trip.
+- Start trip: expo-location background task (Android foreground service with a visible notification), a position every 5 s while moving and 30 s when stopped, sent in small batches; stops completely when the trip ends.
+- Taps: left, picked (siblings at one stop in one tap), reached school, left school, dropped; hold to confirm on van-wide taps; 5-second undo on every tap; each tap has a client_id and the server ignores duplicates.
+- Offline: taps and positions queue on the phone and send when signal returns; the OfflineBanner shows the count.
+- Help: late reasons (traffic, breakdown, road closed) that tell the van's families, plus 15 and 1122 dial buttons.
+
+Test the queue and the duplicate rule with Vitest and the whole morning trip with a Maestro flow.
 ```
 
-## Handoff to Claude Code
-
-Get the designs into the project folder in whichever form Claude offers, so Claude Code builds from them instead of guessing.
-
-- **If you see Export → "Hand off to Claude Code":** use it. It bundles the design files, the chat and a README explaining the designs, and gives you a prompt with the bundle link to paste into Claude Code. Paste that before prompt B0 ([Anthropic tutorial](https://claude.com/resources/tutorials/using-claude-design-for-prototypes-and-ux)).
-- **If you don't:** export each screen set as standalone HTML ([Anthropic](https://www.anthropic.com/news/claude-design-anthropic-labs) lists HTML among the export formats) and save the files in a `design/` folder inside the project. Also save A5's list of design decisions and component names as `design/DECISIONS.md`.
-
-Either way, the component names from A2 to A4 (TapButton, ChildRow, AbsentChip, OfflineBanner, TripHeader, TimelineEvent, ShareLinkCard) must appear in the code too. That's what keeps design and code in step when you change something later.
-
-## Phase B: Claude Code prompts
-
-Ten prompts build version 1 from an empty folder to a deployed pilot. Expect one or two evenings per prompt.
-
-**B0. Read the brief and plan**
+## B5. Parent app
 
 ```text
-Read BRIEF.md and everything in design/ (or the Claude Design handoff bundle I pasted above). Don't write app code yet.
-1. Write CLAUDE.md for this project: what Pohnch is, the version 1 scope (and what is out of scope), the design and tech rules, the component names from the designs, and these working rules: Urdu first and right-to-left; never commit secrets; every feature gets a test; explain your changes in plain language because I am a student learning as I build.
-2. Propose the folder structure and the order you'll build in, using the stack in the brief: Next.js with TypeScript, Supabase, web push with the web-push library, hosted on Vercel.
-3. List every account, key or setting I need to create, with exact steps, and mark which are free.
-Wait for my go-ahead before writing code.
+Build the parent app screens from ZP-Home and ZP-Live:
+- Add a child (first name, school, stop placed by hand on the map; never the phone's location), join a van from the driver's invite, or send "invite my driver" (a share sheet with a pohnch.pk/i/[token] link).
+- Home: the brand-styled map, the route, your stop and the school, the VanMarker following positions from Supabase Realtime, the EtaPill with minutes to your stop, and the bottom sheet with today's TimelineEvents.
+- When the signal drops, the marker turns grey with "last seen 40 s ago".
+- Aaj chutti: today or tomorrow, morning, afternoon or both; Undo until that trip's "left" tap.
+- Family members: invite up to 3 more phones to see the same child.
+
+Unit-test the ETA calculation and the chutti cut-off; a Maestro flow for adding a child and marking chutti.
 ```
 
-**B1. Skeleton app**
+## B6. Alerts and the lock screen
 
 ```text
-Create the Next.js (App Router, TypeScript) app.
-- Turn the design's colours, type sizes and spacing into one theme file; load the fonts the design uses with Latin fallbacks.
-- Set up two languages, Urdu (default, right-to-left) and English, with all text in ur.json and en.json; no text hard-coded in components.
-- Make it an installable web app: manifest, icons and a hand-written service worker in public/sw.js (no PWA plugin).
-- Set up Vitest for unit tests and Playwright for end-to-end tests, with one passing test each.
-- Add .env.example and make sure .env* files are git-ignored.
-Run the tests and the build, fix any errors, then show me how to run it on my laptop.
+Build alerts:
+- Expo push for each step that concerns a family, Urdu first, saying who did it ("رفیق بھائی نے مارک کیا · 7:12"); delete dead push tokens.
+- Geofences: an automatic "arriving" when the van is about 300 m from your stop and "at school" near the school, shown as automatic, not as a driver tap.
+- iPhone: a Live Activity with Dynamic Island (expo-widgets), started when the trip starts and updated by push with the minutes and the step; ended after the drop-off.
+- Android: an ongoing progress notification with the same minutes.
+- A home-screen widget on both: the next step and the minutes.
+
+Follow ZP-Lock on the canvas. Test who gets which message with Vitest.
 ```
 
-**B2. Database**
+## B7. Website and admin
 
 ```text
-Create the Supabase schema as migration files:
-- vans (name, school, morning and afternoon times, active)
-- invites (van, role: captain, driver or parent, SHA-256 hash of the token, revoked_at)
-- children (van, first_name, stop_order)
-- parent_devices (child, push subscription JSON, language)
-- trips (van, date in Asia/Karachi, direction: morning or afternoon)
-- events (trip, type: left, picked, reached_school, left_school, dropped; child when relevant; tapped_at from the phone; received_at; lat and lng, nullable; a unique client_id so a retried tap is never counted twice)
-- absences (child, date, direction: morning, afternoon or both)
-- payments (child, month, amount, paid_at)
-Turn on row-level security on every table with no public policies, so only server code using the service key can read or write. Add a daily job that clears lat and lng on events older than 30 days. Add a seed script that creates one van clearly named DEMO with 6 children.
-Explain each table to me in one or two sentences.
+Build apps/web from ZW-Web: the pohnch.pk landing page (Urdu and English), store links, the /i/[token] invite page that opens the right app or the store, and the privacy policy page (what we collect, why, for how long; plain words).
+
+Add /admin for the Pohnch team only: the driver check queue (CNIC, licence, van papers, approve or reject), switch off a van, and the 4 pilot numbers: trips tracked end to end (a trip counts when "left", a "picked" for every child not on chutti and "reached school" all arrived, with positions throughout), families active, alerts delivered, families on Live. Unit-test the trips-tracked calculation.
 ```
 
-**B3. Invite links**
+## B8. Hardening
 
 ```text
-Build login-free access through invite links, following the captain screens in the designs.
-- The captain opens /start, fills in the three fields, and gets a driver link and a parents link, shown with ShareLinkCard and "Send on WhatsApp" buttons that open wa.me with the pre-written message.
-- Tokens are 32 random bytes, base64url; store only their SHA-256 hash.
-- Opening /j/[token] sets a long-lived httpOnly cookie for that role and van, then sends the person to their Today screen. A revoked token shows the "link switched off" screen.
-- Parents pick their child's first name or add a new child.
-Write tests: a revoked link can't be used, a parent link can't open the driver screen, and tokens never appear in logs.
+Harden everything before real children use it:
+- Location only during trips; positions deleted after 30 days by a scheduled job; a test that proves it.
+- No token, phone number, secret or child's name in logs or bundles (add a check script).
+- Rate limits on login codes and Edge Functions.
+- Battery and data: measure an hour of trip on a cheap Android phone and write the numbers in docs/PLAN.md.
+- Every screen's empty, loading, offline and error state.
+- An automated full school day: morning trip, one chutti, one undo, afternoon trip, across both apps.
 ```
 
-**B4. Driver Today screen**
+## B9. Release and pilot
 
 ```text
-Build the driver's Today screen exactly as designed, with TapButton, ChildRow, AbsentChip, TripHeader and OfflineBanner.
-- Each tap creates an event with the phone's time and a client_id. If location permission was granted, include the position at that moment; never ask for it again if refused.
-- If offline, save the tap in IndexedDB, show it as waiting in OfflineBanner, and send queued taps when the browser comes back online or the app opens. Don't rely on Background Sync; iPhone doesn't support it.
-- Children marked absent for this trip appear greyed at the top and can't be tapped.
-- Buttons follow the order of the trip, so the next expected tap is the biggest one.
-Test: going offline, tapping three times, and coming back online sends exactly three events with their original times.
-```
-
-**B5. Push notifications**
-
-```text
-Add web push.
-- Generate VAPID keys with the web-push library and store them as environment variables; tell me exactly where to put them in Vercel.
-- The parent screen asks for notification permission only after a button press. On iPhone, show the add-to-home-screen guide first, as designed.
-- When an event is saved, notify the right parents: "left", "reached_school" and "left_school" go to every parent on the van; "picked" and "dropped" go only to that child's parents. Use each parent's language; Urdu text first; every message ends with "driver ne mark kiya".
-- If the push service answers 404 or 410, delete that subscription.
-- Record each send and whether it was delivered, for the admin page.
-Test with two browser profiles: one driver, one parent.
-```
-
-**B6. "Aaj chutti"**
-
-```text
-Build "Aaj chutti" as designed: the parent picks today or tomorrow and morning, afternoon or both, sees a confirmation, and can Undo until the van's "left" tap for that trip. The driver's screen updates on its next refresh or when the app reopens; no live connection needed. Add tests for the Undo cut-off.
-```
-
-**B7. Admin page**
-
-```text
-Build my admin page at /admin, protected by a long secret in an ADMIN_TOKEN environment variable (opened once as /admin?key=..., then kept in a cookie). Show, per van: driver tap rate over the last 10 school days (a school day counts if all three morning taps happened), parents joined, notifications delivered and failed, "Aaj chutti" taps, and a Paid checkbox per family per month. Flag vans under 80% tap rate. Add a button to switch off any invite link. These are the numbers that decide whether Pohnch continues, so double-check the tap-rate calculation with a unit test.
-```
-
-**B8. Harden it**
-
-```text
-Review the whole app as a sceptical security and reliability engineer:
-- Rate-limit the tap and join endpoints.
-- Confirm no secret, token or child's name appears in logs, URLs other than /j/[token], or client bundles.
-- Confirm every Supabase table is unreachable from the browser.
-- Check every screen against its empty, loading, offline and error design.
-- Write a Playwright test of the full school day from the A5 prototype: captain sets up, driver and one parent join, morning trip, chutti for tomorrow, afternoon trip.
-Fix what you find and list anything you couldn't test.
-```
-
-**B9. Deploy and pilot kit**
-
-```text
-Deploy to Vercel. Walk me through setting every environment variable, run the end-to-end test against the deployed site, and confirm a real notification reaches my phone. Then write README.md: how to run it locally, how to deploy, which files matter most and what each does, and every service it uses with its current free limit and what it costs after. Note that Vercel's Hobby plan is for non-commercial use, so list what to switch before charging anyone.
-```
-
-**Anytime: learn the code**
-
-```text
-Explain [file or feature] to me like a patient teacher: what it does, how data moves through it, and one small change I could make myself to prove I understand it. Don't make the change for me.
+Prepare the release:
+- EAS production builds for both apps; TestFlight for the iPhone and Play internal testing for Android.
+- Store listings in Urdu and English, screenshots from the canvas, the background-location reason for the driver app, and a short demo video for the App Store reviewer.
+- A pilot kit in docs/PILOT.md: how to install, the practice run with each driver, what to check every evening on /admin, and how to switch a van off.
+- Re-check every vendor price and limit, and the cost of the first month for 5 vans.
 ```
 
 ## Checks after each step
 
-Don't paste the next prompt until the current step passes its check yourself, on your own phone where it says so.
-
-| Step | What you do | Passes if |
-| --- | --- | --- |
-| A1–A5 | Open the prototype on your phone in sunlight | You can tell every driver button apart without reading it |
-| B0 | Read CLAUDE.md | It matches the brief and you understand every line |
-| B1 | Open the app on your phone and switch language | Urdu reads right-to-left; tests and build pass |
-| B2 | Open Supabase's table editor | The DEMO van and its 6 children are there |
-| B3 | Open the driver link in one browser, the parent link in another | Each lands on its own screen; a switched-off link is refused |
-| B4 | Turn on airplane mode, tap three times, turn it off | Three events arrive with the original times, no duplicates |
-| B5 | Tap "Nikal gaya" on one phone | A notification reaches the parent phone within seconds |
-| B6 | Mark tomorrow as chutti, then try Undo after "Nikal gaya" | The child is greyed out for the driver; the late Undo is refused |
-| B7 | Open /admin without the key | It's refused; with the key, tap rates match what you tapped |
-| B8 | Run the full-day test | It passes end to end |
-| B9 | Use it for one real school day with your own family's van, if the survey gate has passed | All alerts arrive and the admin page shows 100% tap rate |
+- Tests, the type check and the build pass (Claude Code shows the output).
+- You tried the "After it, you can" line on a real phone.
+- `git status` is clean after the commit, and no `.env` file was committed.

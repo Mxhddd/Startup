@@ -1,6 +1,55 @@
 # Design decisions
 
-## Round 4 (current): design review applied, pilot first
+## Round 5 (current): map-first native apps, no captain, new pricing
+
+The builder asked for real iOS and Android apps instead of a web app joined through WhatsApp links, a Careem-like flow (choose a child, home and school, see the vans on that route, pick one), a women-only side (Pohnch Amaan), a "request a van" button, a school partnership, a live map with the van as a moving pointer, higher prices, and clear roles. All of it is on the canvas page **v5 · Map-first app (current)**; its first board, "The grand scheme", is the summary. Where round 5 and an earlier round disagree, round 5 wins.
+
+**Is the map idea in line with Pohnch? Yes, with two honest changes.**
+
+1. **The map runs on the driver's phone.** No GPS box to buy. The van pointer moves every 5 seconds, during a trip only. The map shows where the van is; the driver's tap, or a geofence near a stop, still says whether your child is in it ("what was marked is what arrived" stays the promise).
+2. **You book a seat, not a ride.** School vans are monthly. "Choose a van on your route" books a seat with a one-week trial; the fee is monthly.
+
+**Roles: the captain is retired.** The captain did three jobs: set up the van (now the driver's, or any parent's "invite my driver"), approve families (now the driver's, after Pohnch verifies the driver) and collect money (never ours; fees go through the app in stage 2). Roles now: parent, child (a profile, not a user), driver, helper (later), school (later), Pohnch team. The table is in `BRIEF.md`.
+
+**Native apps.** Two apps (Pohnch, Pohnch Driver) because only the driver app asks for background location, which keeps App Store review simple for the parent app. Expo lets one person build both from one TypeScript codebase, with cloud builds and no Mac. The website stays for the landing page, invites, privacy policy, admin and later the school desk.
+
+**Pricing (replaces Rs 199).** Three ways to earn per van instead of one:
+
+| Line | Price | Notes |
+| --- | --- | --- |
+| Pohnch Live (parent) | Rs 599 per child a month | live map, ETA, Live Activity, route alerts, 4 family members; sibling Rs 299, yearly Rs 5,990, first month free; basic step alerts stay free |
+| Van fees in the app (driver side) | 7% of fees | paid on the 5th; the driver can still take cash and use Pohnch free |
+| Pohnch Routes (request a van) | 12% of fees | a request opens at 4 children; Pohnch brings a verified van at 8; families pay only once the van runs |
+| Pohnch for Schools | Rs 300 per rider a month, yearly | fleet map, boarding register, gate handover, Live for every parent; a 500-rider school is Rs 150,000 a month |
+
+Model (Z-Pricing board): 12 children × Rs 5,500 × 7% = Rs 4,620, plus half the families on Live at Rs 599 = Rs 3,594, minus about Rs 900 for payments, maps and SMS = **Rs 7,314 kept per van a month**. Rs 270,000 a month of fixed cost (a team of 3, hosting, maps, marketing) ÷ Rs 7,314 = **37 vans to break even**, or one 500-rider school plus 17 vans. Rs 199 needed about 59 vans and gave drivers no reason to join.
+
+Why it holds up:
+
+- Live tracking is a new, visible service; Rs 599 is about 10% of a Rs 5,500 van fee and below a US parent-alert app's parent tier of about USD 3.50 a month ([studybase.in guide](https://studybase.in/blogs/gps-bus-tracking-guide)).
+- A 7% fee from the driver side is well below ride-hailing commissions in Pakistan ([Profit, May 2024](https://profit.pakistantoday.com.pk/2024/05/13/changes-are-afoot-at-careem-what-do-they-mean-for-the-fast-changing-ride-hailing-sector)), and is paid for by fees arriving on time and seats filled from the map.
+- Sindh froze school-van fares in April 2026 ([Daily Pakistan, 6 April 2026](https://en.dailypakistan.com.pk/06-Apr-2026/sindh-govt-bans-increase-in-school-van-fares)). Pohnch never raises the fare: Live is separate and optional, and the 7% comes from the driver's side.
+- **We test it, not guess it:** after the free pilot month, vans are offered Live at Rs 499, 599 or 799, and we keep the highest price that 40% of families take.
+
+**Request a van: opens at 4, launches at 8.** Four families in one area is enough to show demand; about 8 children is what makes a route worth a driver's morning at Karachi fees.
+
+**Pohnch Amaan** becomes its own tab and filter (women drivers, women helpers, girls-only vans) in stage 3, still only with a training partner and women staff.
+
+**Schools** get Pohnch for Schools in stage 3: their own buses on one map, a boarding register and a gate handover, which replaces staff phoning drivers and guards logging buses by hand.
+
+**Stages and gates**
+
+| Stage | When | What | Gate to the next |
+| --- | --- | --- | --- |
+| 1 · Showcase and pilot | now to Mar 2027 | both apps, website, live map, taps, Live Activity, aaj chutti; 3–5 vans, free | 80% of trips tracked end to end; 40% of families keep Live |
+| 2 · Marketplace | 2027 | find and book a van, fees in the app, request a van, ratings, Live paid; 20 to 60 vans | 40 paying vans |
+| 3 · Schools and Amaan | 2028 | school desk and contracts; Amaan with a training partner | first 2 schools signed; training partner in place |
+
+**The ask** is Rs 3,000,000 for the first year, of which Rs 400,000 reaches gate 1 (team 1,355,000; stores, hosting, maps, SMS 400,000; launch 350,000; driver first-month guarantee 200,000; test phones 150,000; legal 150,000; reserve 395,000).
+
+**New boards (prefix Z)**: Z-Scheme, Z-Pricing; parent ZP-Home (live map), ZP-Find (vans on your route + Amaan tab), ZP-Van (book a seat), ZP-Live (timeline), ZP-Lock (Dynamic Island, Live Activity, Android notification, widget), ZP-Request, ZP-Plans, ZP-Amaan; driver ZD-Today, ZD-Trip, ZD-Earnings; ZS-School; ZW-Web. Build steps are in `docs/BUILD_PROMPTS.md`; the web-app plan of rounds 1–4 is in `docs/archive/`.
+
+## Round 4: design review applied, pilot first
 
 The review of 29 October 2026 split the 32 app screens into three stages, and every change it asked for is applied on the canvas page **v4 · Pilot plan (current)** (the old v3 page, regrouped). Its first board, "Review applied", is the summary.
 

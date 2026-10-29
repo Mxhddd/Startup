@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent home live map</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.chip{height:40px;padding:0 14px;border-radius:999px;border:0;font-family:inherit;font-size:15px;font-weight:800;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 4px 14px rgba(20,26,51,.14)}
+.act{flex:1;height:56px;border-radius:16px;border:0;font-family:inherit;font-size:15px;font-weight:800;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;background:#F3EEE3;color:#141A33}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #EFE9DC; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5">
+  <svg width="390" height="844" viewBox="0 0 390 844" aria-label="نقشہ: وین علی کے گھر کی طرف آ رہی ہے" style="position: absolute; inset: 0">
+    <rect width="390" height="844" fill="#EFE9DC"></rect>
+    <path d="M0 700 C80 660 160 690 230 760 L300 844 L0 844 Z" fill="#D3E3EA"></path>
+    <rect x="236" y="176" width="120" height="84" rx="16" fill="#DDEBCB"></rect>
+    <rect x="22" y="430" width="92" height="72" rx="16" fill="#DDEBCB"></rect>
+    <g fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linecap="round"><path d="M0 120 H390"></path><path d="M0 380 H390"></path><path d="M60 0 V680"></path><path d="M210 0 V844"></path><path d="M0 640 H390"></path><path d="M0 560 H390"></path><path d="M340 0 V844"></path></g>
+    <g fill="none" stroke-linecap="round"><path d="M-10 260 C120 250 220 300 400 280" stroke="#DDD4C2" stroke-width="20"></path><path d="M-10 260 C120 250 220 300 400 280" stroke="#FFFFFF" stroke-width="14"></path><path d="M120 -10 C130 200 110 420 160 620 C180 700 220 760 230 860" stroke="#DDD4C2" stroke-width="20"></path><path d="M120 -10 C130 200 110 420 160 620 C180 700 220 760 230 860" stroke="#FFFFFF" stroke-width="14"></path><path d="M300 -10 C280 160 300 360 270 860" stroke="#DDD4C2" stroke-width="18"></path><path d="M300 -10 C280 160 300 360 270 860" stroke="#FFFFFF" stroke-width="12"></path></g>
+    <g transform="translate(40 -40) scale(0.62)">
+    <path id="zph-route" d="M146 168 C128 220 120 280 134 320 C150 360 200 366 238 404 C262 430 276 470 286 520" fill="none" stroke="#1F2A5C" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M286 520 C292 560 300 600 312 640 C326 690 340 720 350 760" fill="none" stroke="#1F2A5C" stroke-width="11" stroke-linecap="round" stroke-dasharray="1 12" opacity=".55"></path>
+    <g transform="translate(146 168)"><circle r="8" fill="#1F2A5C" stroke="#FFFFFF" stroke-width="3"></circle></g><g transform="translate(350 760)"><circle r="28" fill="#E8A33D" stroke="#FFFFFF" stroke-width="6"></circle><path transform="scale(1.6)" d="M-7 6 V-2 l7 -5 7 5 V6 Z" fill="#141A33"></path></g>
+    <g transform="translate(238 404)"><circle r="13" fill="#FFFFFF" stroke="#1F2A5C" stroke-width="6"></circle></g>
+    <g transform="translate(312 640)"><circle r="34" fill="#17705A" fill-opacity=".18"></circle><circle r="18" fill="#17705A" stroke="#FFFFFF" stroke-width="5"></circle></g>
+    <g>
+      <animateMotion dur="18s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1" path="M146 168 C128 220 120 280 134 320 C150 360 200 366 238 404 C262 430 276 470 286 520" rotate="0"></animateMotion>
+      <circle r="40" fill="#1F2A5C" fill-opacity=".16"><animate attributeName="r" values="30;50;30" dur="2s" repeatCount="indefinite"></animate></circle>
+      <circle r="28" fill="#1F2A5C" stroke="#FFFFFF" stroke-width="6"></circle>
+      <path transform="scale(1.7)" d="M-8 4 V-4 h10 l4 4 v4 Z" fill="#E8A33D"></path>
+    </g>
+    </g>
+  </svg>
+
+  <div style="position: absolute; top: 18px; right: 16px; left: 16px; display: flex; align-items: center; gap: 8px">
+    <sc-for list="{{kids}}" as="k" hint-placeholder-count="2">
+      <button class="chip" onClick="{{k.pick}}" aria-pressed="{{k.on}}" style="background: {{k.bg}}; color: {{k.fg}}"><span style="width: 24px; height: 24px; border-radius: 50%; background: {{k.dot}}; color: #FFFFFF; display: inline-flex; align-items: center; justify-content: center; font-size: 13px">{{k.i}}</span>{{k.name}}</button>
+    </sc-for>
+    <span style="flex: 1"></span>
+    <button class="chip" aria-label="مینو" style="width: 40px; padding: 0; justify-content: center; background: #FFFFFF; color: #141A33"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#141A33" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button>
+  </div>
+  <div style="position: absolute; top: 74px; right: 16px; height: 34px; padding: 0 12px; border-radius: 999px; background: #17705A; color: #FFFFFF; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 800; box-shadow: 0 4px 14px rgba(20,26,51,.18)"><span style="width: 8px; height: 8px; border-radius: 50%; background: #A7D47E"></span>لائیو · 7:09</div>
+
+  <section style="position: absolute; left: 0; right: 0; bottom: 0; background: #FFFFFF; border-radius: 26px 26px 0 0; box-shadow: 0 -10px 30px rgba(20,26,51,.16); padding: 10px 18px 22px; display: flex; flex-direction: column; gap: 12px">
+    <span style="align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #E2DCCD"></span>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between">
+      <div style="display: flex; flex-direction: column; line-height: 1.35">
+        <span style="font-size: 15px; font-weight: 700; color: #4A4F66">{{name}} کی وین آ رہی ہے</span>
+        <span style="font-size: 30px; font-weight: 800">6 منٹ میں گھر</span>
+      </div>
+      <span dir="ltr" style="font-family: Manrope, sans-serif; font-size: 15px; font-weight: 800; color: #4A4F66">ETA 7:15</span>
+    </div>
+    <div aria-label="راستہ: دو اسٹاپ آپ سے پہلے" style="display: flex; align-items: center; gap: 6px">
+      <span style="width: 14px; height: 14px; border-radius: 50%; background: #1F2A5C"></span><span style="flex: 1; height: 4px; border-radius: 2px; background: #1F2A5C"></span>
+      <span style="width: 14px; height: 14px; border-radius: 50%; background: #1F2A5C"></span><span style="flex: 1; height: 4px; border-radius: 2px; background: #1F2A5C"></span>
+      <span style="width: 22px; height: 22px; border-radius: 50%; background: #1F2A5C; box-shadow: 0 0 0 5px #E6E9F5"></span><span style="flex: 1; height: 4px; border-radius: 2px; background: repeating-linear-gradient(90deg,#1F2A5C 0 6px,transparent 6px 12px)"></span>
+      <span style="width: 14px; height: 14px; border-radius: 50%; border: 3px solid #1F2A5C; box-sizing: border-box"></span><span style="flex: 1; height: 4px; border-radius: 2px; background: repeating-linear-gradient(90deg,#1F2A5C 0 6px,transparent 6px 12px)"></span>
+      <span style="width: 18px; height: 18px; border-radius: 50%; background: #17705A; box-shadow: 0 0 0 4px #DCEFE7"></span>
+    </div>
+    <span style="font-size: 14px; font-weight: 700; color: #4A4F66; margin-top: -4px">آپ سے پہلے 2 اسٹاپ · 1.8 کلومیٹر</span>
+    <div style="display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: #FAF6EE; border-radius: 16px">
+      <span style="width: 48px; height: 48px; border-radius: 50%; background: #E8A33D; color: #141A33; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 800; box-shadow: 0 0 0 3px #FFFFFF, 0 0 0 4.5px #C9A24A">ر</span>
+      <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.35"><span style="font-size: 16px; font-weight: 800">رفیق بھائی · سوزوکی بولان</span><span dir="ltr" style="font-family: Manrope, sans-serif; font-size: 14px; font-weight: 700; color: #4A4F66; text-align: right">KHI · LEB-4417 · 96% on time</span></span>
+      <button aria-label="ڈرائیور کو فون" style="width: 46px; height: 46px; border-radius: 50%; border: 0; background: #17705A; display: flex; align-items: center; justify-content: center; cursor: pointer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"></path></svg></button>
+    </div>
+    <div style="display: flex; gap: 8px">
+      <a class="act" href="ZP-Live.dc.html" style="text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F2A5C" stroke-width="2.2" stroke-linecap="round"><path d="M3 12h4l3-8 4 16 3-8h4"></path></svg>سفر</a>
+      <button class="act"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5E5A52" stroke-width="2.2" stroke-linecap="round"><path d="M3 5h18v16H3z M3 10h18 M8 3v4 M16 3v4"></path></svg>آج چھٹی</button>
+      <button class="act"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F2A5C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7 M12 3v12 M7 8l5-5 5 5"></path></svg>شیئر</button>
+      <a class="act" href="ZP-Find.dc.html" style="text-decoration: none"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1F2A5C" stroke-width="2.2" stroke-linecap="round"><path d="M10 4a6 6 0 1 0 0 12a6 6 0 1 0 0-12 M15 15l5 5"></path></svg>وینیں</a>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { k: 0 }; }
+  renderVals() {
+    const kids = [{ name: 'علی', i: 'ع', dot: '#1F2A5C' }, { name: 'سارا', i: 'س', dot: '#17705A' }];
+    return {
+      name: kids[this.state.k].name,
+      kids: kids.map((k, i) => {
+        const on = i === this.state.k;
+        return { ...k, on, bg: on ? '#141A33' : '#FFFFFF', fg: on ? '#FAF6EE' : '#141A33', pick: () => this.setState({ k: i }) };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>

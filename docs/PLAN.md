@@ -1,59 +1,57 @@
-# Build plan (B0)
+# Build plan (v5)
+
+The full plan with the architecture diagram, costs and risks is the doc **Pohnch build plan**: https://claude.ai/artifact/QSiSNBiLTUZdoBrZ2vzvv1. This file is the short version for the repo. The step-by-step prompts are in `BUILD_PROMPTS.md`.
+
+## Three front ends, one backend
+
+```text
+ Pohnch (parent app)      Pohnch Driver (driver app)      pohnch.pk (website, admin, later schools)
+  iOS + Android             iOS + Android                   Next.js on Vercel
+        \                          |                              /
+         \______ Supabase: Postgres + PostGIS, Realtime, phone login, Edge Functions ______/
+                                   |
+                       Expo push (APNs, FCM) · Google Maps
+```
+
+How data moves on a trip: the driver taps "start trip" → the driver app sends a position every 5 seconds to an Edge Function → it is saved in `positions` and broadcast on Supabase Realtime → the parent app moves the VanMarker and recalculates the minutes → when the driver taps "picked" (or the van reaches a geofence), an Edge Function saves the event and sends push and Live Activity updates to that child's family only.
 
 ## Folder structure
 
 ```text
 Startup/
-├── BRIEF.md, CLAUDE.md, README.md
-├── design/                     phase A: canvas sources and DECISIONS.md
-├── docs/                       build prompts, this plan, accounts list
-├── public/
-│   ├── manifest.webmanifest    installable app (name, icons, colours)
-│   ├── sw.js                   hand-written service worker: push + offline shell
-│   └── icons/
+├── BRIEF.md, CLAUDE.md
+├── design/                     canvas sources, BRAND.md, DECISIONS.md
+├── docs/                       this plan, build prompts, accounts, launch links
+├── apps/
+│   ├── parent/                 Expo app "Pohnch": map, timeline, chutti, family
+│   ├── driver/                 Expo app "Pohnch Driver": van setup, trip, taps, offline queue
+│   └── web/                    Next.js: pohnch.pk, /i/[token], privacy, /admin
+├── packages/
+│   ├── ui/                     theme file + the components named in CLAUDE.md
+│   ├── core/                   shared types and logic: ETA, trip rules, tap queue, Karachi dates
+│   └── messages/               ur.json, en.json
 ├── supabase/
-│   ├── migrations/             SQL files, one per change (tables, RLS, cleanup job)
-│   └── seed.ts                 DEMO van with 6 children
-├── src/
-│   ├── app/
-│   │   ├── layout.tsx          sets <html lang dir> from the language cookie
-│   │   ├── start/              captain: setup (C1) and share (C2)
-│   │   ├── j/[token]/route.ts  opens an invite link: sets cookie, redirects
-│   │   ├── driver/             driver Today screen (D1–D9)
-│   │   ├── parent/             join, Today timeline, chutti, settings (P1–P7)
-│   │   ├── off/                "link switched off"
-│   │   ├── admin/              admin page
-│   │   └── api/                events, absences, children, push subscribe, admin actions
-│   ├── components/             TapButton, ChildRow, AbsentChip, OfflineBanner,
-│   │                           TripHeader, TimelineEvent, ShareLinkCard
-│   ├── lib/
-│   │   ├── db.ts               server-only Supabase client (secret key)
-│   │   ├── tokens.ts           make tokens, hash them
-│   │   ├── session.ts          read/write the role cookie
-│   │   ├── push.ts             send web push, delete dead subscriptions
-│   │   ├── karachiTime.ts      "today" and trip dates in Asia/Karachi
-│   │   ├── tapQueue.ts         IndexedDB queue for offline taps (browser)
-│   │   ├── tapRate.ts          the admin tap-rate calculation
-│   │   └── i18n.ts             loads ur.json / en.json
-│   ├── messages/ur.json, en.json
-│   └── theme.ts                colours, type sizes, spacing from design/DECISIONS.md
-└── tests/
-    ├── unit/                   Vitest
-    └── e2e/                    Playwright
+│   ├── migrations/             SQL: tables, PostGIS, row-level security, 30-day cleanup
+│   ├── functions/              Edge Functions: taps, positions, approvals, push, invites
+│   └── seed.sql                DEMO van with 6 children
+└── tests/                      Maestro flows (apps), Playwright (web); Vitest lives next to code
 ```
 
-Language is kept in a cookie, not in the URL, so invite links stay short (`/j/[token]`).
+## The stack and its costs
 
-## Build order
+| Piece | Choice | Cost (October 2026, check before paying) |
+| --- | --- | --- |
+| Phone apps | Expo (React Native), Expo Router, EAS builds | free tier |
+| Maps | react-native-maps on the native SDK, brand-styled | native mobile map loads reported free; routing has a monthly free cap |
+| Driver location | expo-location background task | free |
+| Live Activity, widget | expo-widgets (iOS), ongoing notification (Android) | free |
+| Backend | Supabase | free to start, about USD 25 a month on Pro |
+| Login | phone number and one-time code | an SMS provider charges per code |
+| Push | Expo push | free |
+| Website | Next.js on Vercel | free Hobby for the pilot (non-commercial); Pro about USD 20 a month before charging anyone |
+| Stores | Apple Developer, Google Play | USD 99 a year, USD 25 once |
+| Tests | Vitest, Maestro, Playwright | free |
 
-Same as the build prompts, one at a time, each ending with tests, a build and a commit:
+## Battery and data notes
 
-1. **B1 Skeleton**: Next.js app, theme file, fonts, Urdu/English text files, manifest and `sw.js`, Vitest and Playwright with one passing test each, `.env.example`.
-2. **B2 Database**: migrations for vans, invites, children, parent_devices, trips, events, absences, payments; RLS on with no public policies; 30-day location cleanup; DEMO seed.
-3. **B3 Invite links**: `/start`, token hashing, `/j/[token]` cookie, parent picks or adds a child, "link switched off".
-4. **B4 Driver Today**: TapButton, ChildRow, AbsentChip, TripHeader, OfflineBanner; offline queue in IndexedDB; optional location.
-5. **B5 Push**: VAPID keys, permission after a button press, iPhone guide first, who gets which message, delete 404/410 subscriptions, record delivery.
-6. **B6 Aaj chutti**: choose, confirm, Undo until the trip's "left" tap.
-7. **B7 Admin**: `ADMIN_TOKEN`, tap rate with a unit test, joins, push counts, chutti, Paid ticks, switch off links.
-8. **B8 Harden**: rate limits, log and bundle checks, RLS check, all states, full-day Playwright test.
-9. **B9 Deploy**: Vercel, environment variables, real phone test, README.
+Filled in at B8 after measuring an hour-long trip on a cheap Android phone.

@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent live trip</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.ev{display:flex;gap:12px;min-height:54px}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #EFE9DC; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5">
+  <svg width="390" height="844" viewBox="0 0 390 844" aria-label="نقشہ: وین اسکول کی طرف، علی وین میں" style="position: absolute; inset: 0">
+    <rect width="390" height="844" fill="#EFE9DC"></rect>
+    <rect x="30" y="120" width="120" height="80" rx="16" fill="#DDEBCB"></rect>
+    <g fill="none" stroke="#FFFFFF" stroke-width="8" stroke-linecap="round"><path d="M0 110 H390"></path><path d="M0 250 H390"></path><path d="M0 390 H390"></path><path d="M100 0 V420"></path><path d="M230 0 V420"></path><path d="M350 0 V420"></path></g>
+    <path d="M-10 320 C120 300 260 340 400 310" fill="none" stroke="#DDD4C2" stroke-width="22" stroke-linecap="round"></path>
+    <path d="M-10 320 C120 300 260 340 400 310" fill="none" stroke="#FFFFFF" stroke-width="15" stroke-linecap="round"></path>
+    <path d="M340 400 C320 360 300 330 260 320 C210 308 180 300 160 260 C150 230 150 190 170 150 C186 120 214 96 240 70" fill="none" stroke="#1F2A5C" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"></path>
+    <path d="M340 400 C320 360 300 330 260 320 C210 308 180 300 160 260" fill="none" stroke="#17705A" stroke-width="8" stroke-linecap="round"></path>
+    <g transform="translate(340 400)"><circle r="11" fill="#17705A" stroke="#FFFFFF" stroke-width="4"></circle></g>
+    <g transform="translate(240 70)"><circle r="20" fill="#E8A33D" stroke="#FFFFFF" stroke-width="4"></circle><path d="M-7 6 V-2 l7 -5 7 5 V6 Z" fill="#141A33"></path></g>
+    <g>
+      <animateMotion dur="14s" repeatCount="indefinite" path="M160 260 C150 230 150 190 170 150 C186 120 214 96 240 70"></animateMotion>
+      <circle r="28" fill="#1F2A5C" fill-opacity=".15"><animate attributeName="r" values="20;32;20" dur="2s" repeatCount="indefinite"></animate></circle>
+      <circle r="18" fill="#1F2A5C" stroke="#FFFFFF" stroke-width="4"></circle>
+      <path d="M-8 4 V-4 h10 l4 4 v4 Z" fill="#E8A33D"></path>
+    </g>
+  </svg>
+  <div style="position: absolute; top: 16px; right: 16px; left: 16px; display: flex; gap: 8px">
+    <span style="height: 40px; padding: 0 14px; border-radius: 999px; background: #141A33; color: #FAF6EE; display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 800"><span style="width: 8px; height: 8px; border-radius: 50%; background: #A7D47E"></span>صبح کا سفر · لائیو</span>
+    <span style="height: 40px; padding: 0 14px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 800; box-shadow: 0 4px 14px rgba(20,26,51,.14)"><span dir="ltr">38 km/h</span> · رفتار ٹھیک</span>
+  </div>
+
+  <section style="position: absolute; left: 0; right: 0; bottom: 0; height: 404px; background: #FFFFFF; border-radius: 26px 26px 0 0; box-shadow: 0 -10px 30px rgba(20,26,51,.16); padding: 10px 18px 16px; display: flex; flex-direction: column; gap: 8px">
+    <span style="align-self: center; width: 44px; height: 5px; border-radius: 3px; background: #E2DCCD"></span>
+    <div style="display: flex; align-items: flex-end; justify-content: space-between"><span style="display: flex; flex-direction: column; line-height: 1.3"><span style="font-size: 15px; font-weight: 700; color: #4A4F66">علی وین میں ہے</span><span style="font-size: 28px; font-weight: 800">اسکول 9 منٹ میں</span></span><span dir="ltr" style="font-size: 15px; font-weight: 800; color: #4A4F66">ETA 7:46</span></div>
+    <div role="list" style="display: flex; flex-direction: column; margin-top: 4px">
+      <sc-for list="{{events}}" as="e" hint-placeholder-count="4">
+        <div class="ev" role="listitem">
+          <span style="display: flex; flex-direction: column; align-items: center; width: 22px; flex: none"><span style="width: 18px; height: 18px; border-radius: 50%; background: {{e.dot}}; box-shadow: {{e.ring}}; margin-top: 4px"></span><span style="flex: 1; width: 3px; background: {{e.line}}; margin-top: 4px"></span></span>
+          <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.35"><span style="font-size: 16px; font-weight: 800; color: {{e.tc}}">{{e.t}}</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66">{{e.by}}</span></span>
+          <span dir="ltr" style="font-size: 15px; font-weight: 800; color: {{e.tc}}">{{e.time}}</span>
+        </div>
+      </sc-for>
+    </div>
+    <div style="margin-top: auto; display: flex; gap: 8px">
+      <button style="flex: 1; height: 52px; border-radius: 14px; border: 0; background: #F3EEE3; font-family: inherit; font-size: 15px; font-weight: 800; color: #141A33; cursor: pointer">سفر شیئر کریں</button>
+      <button style="flex: 1; height: 52px; border-radius: 14px; border: 0; background: #F6DDD6; font-family: inherit; font-size: 15px; font-weight: 800; color: #7A1E14; cursor: pointer">مدد</button>
+    </div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const done = (t, by, time, dot) => ({ t, by, time, dot, ring: 'none', line: dot, tc: '#141A33' });
+    return {
+      events: [
+        done('وین نکل گئی', 'رفیق بھائی نے مارک کیا', '7:05', '#1F2A5C'),
+        done('علی وین میں ہے', 'گھر کے پاس پہنچتے ہی · رفیق بھائی نے تصدیق کی', '7:12', '#17705A'),
+        { t: 'اسکول کی طرف · 3.1 کلومیٹر باقی', by: 'لائیو جگہ ہر 5 سیکنڈ', time: '7:37', dot: '#FFFFFF', ring: 'inset 0 0 0 4px #1F2A5C', line: '#E2DCCD', tc: '#141A33' },
+        { t: 'اسکول پہنچ گئے', by: 'اسکول کے گیٹ پر خود بخود', time: '7:46', dot: '#FFFFFF', ring: 'inset 0 0 0 3px #E8A33D', line: 'transparent', tc: '#4A4F66' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,13 +1,14 @@
 # Pohnch brand guide (v3 · Neel o Kesar)
 
-Canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy, page **v4 · Pilot plan (current)**. This file is the text version for building the app and website. v2 ("Ghar/Saaf", neem and haldi, "Pohnch Baji") is kept on the canvas as history only.
+Canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy, page **v5 · Map-first app (current)** (v4 · Pilot plan holds the full colour and print work). This file is the text version for building the apps and website. v2 ("Ghar/Saaf", neem and haldi, "Pohnch Baji") is kept on the canvas as history only.
 
 ## Direction
 
 Premium, but local craft. Think a well-made Karachi thing: indigo and saffron, an eight-point star, a gold hairline frame, Nastaliq for the big moments. Two moods by role:
 
 - **Driver screens: plain.** Built for sunlight and one thumb. Flat colour, big buttons, no pattern, no frames.
-- **Parent, captain and print: rich.** Star-lattice pattern as texture, ornamental frames, flat illustration.
+- **Parent app: map-first.** The brand-styled map fills the screen; a ghee bottom sheet holds the trip. Pattern and frames only on brand moments (plans, Amaan, empty states, the website).
+- **Print and pitch: rich.** Star-lattice pattern as texture, ornamental frames, flat illustration.
 
 ## Name and line
 
@@ -63,6 +64,28 @@ Driver steps: one colour per meaning, one icon per step. Neel = the van leaves s
 | left school (اسکول سے نکلے) | neel #1F2A5C | ghee |
 | dropped (گھر اتار دیا) | zamurrad #17705A | white |
 
+## Map (v5)
+
+The map is the parent app's main screen, so it is styled to the brand instead of the default Google look.
+
+| Layer | Colour | Notes |
+| --- | --- | --- |
+| land | #EFE9DC | warm, close to ghee |
+| parks | #DDEBCB | |
+| water | #CFDCE8 | |
+| roads | #FFFFFF with #DDD4C2 casing | main roads slightly wider; no road colour coding |
+| labels | #4A4F66 | few labels: hide shops, businesses and transit |
+| route line | neel #1F2A5C, 6 px, round caps | the trip still to drive; driven part neel at 35% |
+| stops | white dot with a neel ring; your stop a zamurrad home pin | other families' stops never shown to parents |
+| school | kesar pin with the star | |
+| van marker | neel circle, ghee 4 px ring, kesar van glyph, heading arrow | moves smoothly between positions; turns grey with "last seen 40 s ago" when the signal drops |
+
+- **Bottom sheet**: ghee, 24 px top radius, a grab bar, EtaPill ("6 منٹ میں گھر") on top in Manrope digits, then the TimelineEvent list.
+- **Live Activity and Dynamic Island**: siyahi ground, the star at the leading edge, the van's minutes in Manrope 800, a route-dots progress bar from van to home, the step colour as the only accent.
+- **Android ongoing notification**: the same progress bar and minutes; the small icon is the star and dot.
+- **Widget**: ghee ground, the next step and the minutes; tap opens the map.
+- **Pitch and deck marker font**: Shantell Sans for hand-written notes on the whiteboard pitch and deck only, never in the apps.
+
 ## Type
 
 - **Gulzar** (display Nastaliq): logo, slogans, screen titles, poster headlines. Never under 26 px. Brand moments only.
@@ -89,10 +112,10 @@ School vans driven by women, or with a woman companion on board. Women framed as
 - Roles: **ڈرائیور صاحبہ** (woman driver), **امان ساتھی** (woman companion on board), **والدہ ڈرائیور** (a mother who drives her own children plus 2–4 more).
 - Van badges (attached to the van, never the child): ڈرائیور صاحبہ، امان ساتھی، صرف بچیاں.
 - The Amaan seal needs five checks: CNIC, licence, two references, half-day training, home visit by two women from the team.
-- Promise: day trips only, a woman companion in every van, the captain sees every tap, a help button, and "میں گھر پہنچ گئی" after the last trip (reminder at 45 minutes, captain then the team calls at 60).
+- Promise: day trips only, a woman companion in every van, the parents see every tap, a help button, and "میں گھر پہنچ گئی" after the last trip (reminder at 45 minutes, the team calls at 60).
 
 ## Materials on the canvas
 
 WhatsApp: card to parents, how-to-join card, 9:16 status, Amaan recruitment card. Print: A3 school-gate poster, A5 parent flyer with the price table, van sticker sheet (window seal, door strip, Amaan badge, "seat free" QR), A6 driver card (front: reward; back: the five taps), A3 Amaan recruitment poster.
 
-Prices are real (see `DECISIONS.md` round 3). Placeholders still to fill before printing: [QR], [نمبر] (help and WhatsApp number), the pohnch.pk domain.
+Print prices still show round 3 (Rs 199) and must be updated to round 5 pricing before printing. Placeholders still to fill before printing: [QR], [نمبر] (help and WhatsApp number), the pohnch.pk domain.

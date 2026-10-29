@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="ur" dir="rtl">
+<head>
+<meta charset="utf-8">
+<title>Parent plans Free and Live</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400;line-height:1.55}
+.li{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:700;min-height:28px}
+.seg{flex:1;height:40px;border:0;border-radius:10px;font-family:inherit;font-size:15px;font-weight:800;cursor:pointer}
+</style>
+</helmet>
+<div dir="rtl" style="width: 390px; height: 844px; position: relative; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5; padding: 18px 16px 16px; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px">
+  <span class="disp" style="font-size: 32px">آپ کا پلان</span>
+  <div style="display: flex; gap: 4px; background: #F3EEE3; border-radius: 12px; padding: 4px; margin-top: -6px">
+    <sc-for list="{{segs}}" as="g" hint-placeholder-count="2"><button class="seg" onClick="{{g.pick}}" aria-pressed="{{g.on}}" style="background: {{g.bg}}; color: {{g.fg}}">{{g.label}}</button></sc-for>
+  </div>
+
+  <section style="position: relative; overflow: hidden; background: #1F2A5C; color: #FAF6EE; border-radius: 22px; padding: 16px 18px; display: flex; flex-direction: column; gap: 6px">
+    <svg width="160" height="160" viewBox="0 0 64 64" aria-hidden="true" style="position: absolute; left: -40px; top: -40px; opacity: .35"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#2B3A80"></path></svg>
+    <div style="display: flex; align-items: center; justify-content: space-between; position: relative"><span style="font-size: 20px; font-weight: 800">پہنچ لائیو</span><span style="height: 28px; padding: 0 10px; border-radius: 999px; background: #E8A33D; color: #141A33; font-size: 14px; font-weight: 800; display: flex; align-items: center">پہلا مہینہ مفت</span></div>
+    <span dir="ltr" style="font-size: 36px; font-weight: 800; text-align: right; position: relative">{{price}} <span style="font-size: 16px; color: #E6E9F5">{{unit}}</span></span>
+    <span style="font-size: 14px; font-weight: 700; color: #E6E9F5; position: relative">{{note}}</span>
+    <div style="display: flex; flex-direction: column; margin-top: 4px; position: relative">
+      <sc-for list="{{live}}" as="l" hint-placeholder-count="5"><span class="li"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#E8A33D" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg>{{l}}</span></sc-for>
+    </div>
+  </section>
+
+  <section style="background: #FFFFFF; border-radius: 22px; box-shadow: inset 0 0 0 1px #E2DCCD; padding: 14px 18px; display: flex; flex-direction: column; gap: 4px">
+    <div style="display: flex; align-items: center; justify-content: space-between"><span style="font-size: 18px; font-weight: 800">پہنچ مفت</span><span dir="ltr" style="font-size: 20px; font-weight: 800">Rs 0</span></div>
+    <sc-for list="{{free}}" as="f" hint-placeholder-count="3"><span class="li" style="color: #4A4F66"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#17705A" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-10"></path></svg>{{f}}</span></sc-for>
+  </section>
+
+  <div style="display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 700; color: #4A4F66"><span style="height: 32px; padding: 0 10px; border-radius: 8px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E2DCCD; display: flex; align-items: center; color: #141A33">JazzCash</span><span style="height: 32px; padding: 0 10px; border-radius: 8px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E2DCCD; display: flex; align-items: center; color: #141A33">Easypaisa</span><span style="height: 32px; padding: 0 10px; border-radius: 8px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E2DCCD; display: flex; align-items: center; color: #141A33">راست</span><span style="height: 32px; padding: 0 10px; border-radius: 8px; background: #FFFFFF; box-shadow: inset 0 0 0 1px #E2DCCD; display: flex; align-items: center; color: #141A33">کارڈ</span></div>
+  <button style="margin-top: auto; height: 58px; border-radius: 16px; border: 0; background: #E8A33D; color: #141A33; font-family: inherit; font-size: 18px; font-weight: 800; cursor: pointer">علی کے لیے لائیو شروع کریں · مفت</button>
+  <span style="font-size: 14px; font-weight: 600; text-align: center; color: #4A4F66">جون جولائی میں خود بخود رُک جاتا ہے۔ وین فیس الگ ہے اور اس پر کوئی اضافہ نہیں۔</span>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { y: false }; }
+  renderVals() {
+    const y = this.state.y;
+    return {
+      segs: ['ماہانہ', 'سالانہ · 2 مہینے مفت'].map((label, i) => { const on = (i === 1) === y; return { label, on, bg: on ? '#141A33' : 'transparent', fg: on ? '#FAF6EE' : '#141A33', pick: () => this.setState({ y: i === 1 }) }; }),
+      price: y ? 'Rs 5,990' : 'Rs 599', unit: y ? '/ year' : '/ month',
+      note: y ? 'ہر بچہ، 12 مہینے، 10 کی قیمت · دوسرا بچہ Rs 2,990' : 'ہر بچہ · دوسرا بچہ Rs 299',
+      live: ['نقشے پر وین لائیو، ہر 5 سیکنڈ', 'لاک اسکرین پر لائیو ایکٹیویٹی اور وجٹ', 'پہنچنے کا وقت اور "5 منٹ دور" الرٹ', 'تیز رفتار اور راستہ بدلنے کی خبر', 'گھر کے 4 افراد ایک ساتھ دیکھیں'],
+      free: ['وین نکلی، بچہ وین میں، اسکول پہنچا', 'آج چھٹی', 'وین ڈھونڈیں اور سیٹ بک کریں']
+    };
+  }
+}
+</script>
+</body>
+</html>
