@@ -20,22 +20,14 @@ label{font-size:16px;font-weight:800}
 </helmet>
 <div dir="rtl" style="width: 360px; height: 780px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.6; display: flex; flex-direction: column; padding: 20px 16px 16px; gap: 10px">
   <div style="display: flex; align-items: center; gap: 8px">
-    <svg width="32" height="32" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#1F2A5C"></path><path d="M22 33 l7 7 l14 -14" fill="none" stroke="#E8A33D" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    <svg width="62" height="32" viewBox="0 0 124 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#1F2A5C"></path><circle cx="32" cy="32" r="9" fill="#E8A33D"></circle><circle cx="74" cy="32" r="5" fill="#E8A33D"></circle><circle cx="88" cy="32" r="3" fill="#E8A33D"></circle><circle cx="98" cy="32" r="3" fill="#E8A33D"></circle><circle cx="114" cy="32" r="6" fill="#17705A"></circle></svg>
     <span class="disp" style="font-size: 26px; color: #1F2A5C">پہنچ</span>
   </div>
   <span class="disp" style="font-size: 38px">اپنی وین بنائیں</span>
-  <span style="font-size: 15px; font-weight: 700; color: #17705A; margin-top: -6px">آپ کیپٹن ہیں: آپ کے بچے کا پہنچ مفت</span>
+  <span style="font-size: 15px; font-weight: 700; color: #17705A; margin-top: -6px">تین سوال، دو منٹ۔ آپ اس وین کے کیپٹن ہوں گے۔</span>
   <div style="display: flex; flex-direction: column; gap: 2px"><label for="x-d">ڈرائیور کا پہلا نام</label><input id="x-d" class="in" value="رفیق"></div>
   <div style="display: flex; flex-direction: column; gap: 2px"><label for="x-s">اسکول کا نام</label><input id="x-s" class="in" value="نور اسکول"></div>
   <div style="display: flex; flex-direction: column; gap: 2px"><label for="x-t">صبح وین کب نکلتی ہے؟</label><input id="x-t" class="in" type="time" value="07:00" dir="ltr" style="font-family: Manrope, sans-serif; text-align: right"></div>
-  <div style="background: #DCEFE7; border-radius: 14px; padding: 10px 14px; display: flex; flex-direction: column; gap: 6px">
-    <span style="font-size: 15px; font-weight: 800; color: #0B4A3D">اختیاری · پہنچ امان</span>
-    <div style="display: flex; flex-wrap: wrap; gap: 6px">
-      <sc-for list="{{badges}}" as="b" hint-placeholder-count="3">
-        <button aria-pressed="{{b.on}}" onClick="{{b.toggle}}" style="height: 44px; padding: 0 14px; border-radius: 999px; border: 0; background: {{b.bg}}; color: {{b.fg}}; box-shadow: inset 0 0 0 1.5px #0F5E4E; font-family: inherit; font-size: 15px; font-weight: 800; cursor: pointer">{{b.label}}</button>
-      </sc-for>
-    </div>
-  </div>
   <a href="XC-Share.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; height: 62px; border-radius: 16px; background: #1F2A5C; color: #FAF6EE; text-decoration: none; font-size: 19px; font-weight: 800">لنک بنائیں</a>
 </div>
 </x-dc>

@@ -6,9 +6,9 @@ Pohnch (پہنچ, "reached") is an Urdu-first installable web app for school van
 
 ## Version 1 scope
 
-In: captain setup (`/start`) and share screen; invite links `/j/[token]` with httpOnly cookie sessions; parent picks or adds a child and the captain approves the phone; driver Today screen with offline queue, hold-to-confirm on van-wide taps and a 5-second undo on every tap; web push; "Aaj chutti" with Undo until the trip's "left" tap; whole-van day off; admin page `/admin` with tap rate, strikes and Paid ticks (the captain collects Rs 199 outside the app; captain's child free while 5+ families pay); Urdu and English. BRIEF.md items 11 and 13–16 (van management, siblings, practice run, driver help, van badges) and the round 3 items 18–23 (plans and payment, driver reward, driver profile and "find a van", Pohnch Amaan screens, school plan) wait for the builder's go-ahead on the version split.
+In: captain setup (`/start`) and share screen; invite links `/j/[token]` with httpOnly cookie sessions; parent types their own child's first name (other children's names are never shown) and the captain approves the phone; driver Today screen with offline queue, hold-to-confirm on van-wide taps and a 5-second undo on every tap; web push; "Aaj chutti" with Undo until the trip's "left" tap; whole-van day off; driver practice run; siblings at one stop in one tap; driver help with late reasons only (plus 15 and 1122 dial buttons); admin page `/admin` with 4 numbers (tap rate, parents joined, alerts delivered, families paying) and Paid ticks; Urdu and English. These are the 19 pilot screens on the canvas page "v4 · Pilot plan (current)". After the pilot gate (3 of the first 10 families pay): payments, captain van accounts, driver's week and earnings, two children, emergency help alert. Later: find a van, driver profiles, Pohnch Amaan, school plan.
 
-Out: live GPS or maps (location only in a driver emergency), chat, in-app payments, accounts or passwords, school dashboards, native apps, SMS, the Pohnch Amaan marketplace/operator stages. Ask before adding anything not listed under "In".
+Out: live GPS or maps, any location in the pilot (location comes only with the emergency alert after the gate), cash handled by captains, chat, in-app payments, accounts or passwords, school dashboards, native apps, SMS, the Pohnch Amaan marketplace/operator stages. Ask before adding anything not listed under "In".
 
 ## Stack
 
@@ -22,9 +22,10 @@ Out: live GPS or maps (location only in a driver emergency), chat, in-app paymen
 
 - Urdu first and right-to-left; English is a switch. All text lives in `src/messages/ur.json` and `src/messages/en.json`; never hard-code text in components.
 - Phone layout 360 × 780. Driver tap targets at least 64 px tall; the next expected tap is the only big (104 px) button.
-- Brand and tokens: `design/BRAND.md` (v3 "Neel o Kesar": ghee ground, neel primary, kesar accent, eight-point star mark, sona gold for decoration only). The canvas page "v3 · Neel o Kesar (current)" is the reference; v2 and v1 pages are history.
+- Brand and tokens: `design/BRAND.md` (v3 "Neel o Kesar": ghee ground, neel primary, kesar accent, eight-point star mark, sona gold for decoration only). The canvas page "v4 · Pilot plan (current)" is the reference; v2 and v1 pages are history.
 - Driver screens are plain (no pattern or frames); parent, captain and Amaan screens use the star pattern and ornamental frames.
-- Each step has its own colour and icon: left neel, picked zamurrad, reached school kesar with siyahi text, left school shingarf, dropped pista with siyahi text.
+- One colour per meaning, one icon per step: left and left school neel, picked and dropped zamurrad, reached school kesar with siyahi text. Shingarf red only for help, "van is late" and strikes.
+- Logo: "the path arrives" (route dots into the star with a centre dot); under 32 px the star and dot alone.
 - No text under 14 px, no thin grey text, contrast at least 4.5:1.
 - Gulzar for display only (≥26 px, brand moments), Noto Sans Arabic for Urdu UI text (line-height about 1.6), Manrope for Latin and all digits; Western digits for times and prices.
 - Voice: آپ, say who did it, calm, fewest words.
@@ -42,7 +43,7 @@ TapButton (with hold behaviour), ChildRow, AbsentChip, OfflineBanner, TripHeader
 - No secret, token or child's name in logs.
 - Dates for trips are in Asia/Karachi.
 - Every tap has a client-generated `client_id`; the server ignores duplicates.
-- Location is optional; ask once, never again if refused. `lat`/`lng` are cleared after 30 days.
+- No location in the pilot. After the gate, location is sent only with an emergency help alert; ask once, never again if refused. `lat`/`lng` are cleared after 30 days.
 
 ## Working rules
 

@@ -1,6 +1,6 @@
 # Pohnch brand guide (v3 · Neel o Kesar)
 
-Canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy, page **v3 · Neel o Kesar (current)**. This file is the text version for building the app and website. v2 ("Ghar/Saaf", neem and haldi, "Pohnch Baji") is kept on the canvas as history only.
+Canvas: https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy, page **v4 · Pilot plan (current)**. This file is the text version for building the app and website. v2 ("Ghar/Saaf", neem and haldi, "Pohnch Baji") is kept on the canvas as history only.
 
 ## Direction
 
@@ -19,14 +19,14 @@ Premium, but local craft. Think a well-made Karachi thing: indigo and saffron, a
 
 ## Logo
 
-- **Mark**: an eight-point star (khatim) in neel with a kesar check inside. Works alone as app icon, sticker and seal.
+- **Mark ("the path arrives")**: a green home dot and three kesar route dots run into an eight-point star (khatim) with a kesar dot at its centre. The dots run right to left, the way Urdu is read; in English lockups the path is mirrored. Chosen in the round 4 review over the old star-and-tick, which read as a "verified" badge.
 - **Lockup**: mark on the right, پہنچ in Gulzar on the left (RTL order). English lockup: mark + "Pohnch" in Manrope ExtraBold.
-- **App icon**: neel rounded square, kesar star, neel check.
-- Colourways: neel star + kesar check on ghee; kesar star + neel/siyahi check on neel or siyahi; sona star + emerald check for Amaan.
+- **App icon and anything under 32 px**: the star with its centre dot only, no path. App icon = neel rounded square, kesar star, neel centre dot.
+- Colourways: neel star + kesar dot + kesar path + zamurrad home dot on ghee; kesar star + neel dot + kesar path + pista home dot on neel or siyahi; sona star + sona path + ghee home dot for Amaan.
 - Don't: stretch, rotate, outline, or set Gulzar small. Minimum mark size 24 px; clear space half the mark's width.
 - SVG (viewBox 0 0 64 64):
   - star: `M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z`
-  - check: `M22 33 l7 7 l14 -14`, stroke width 6, round caps and joins.
+  - lockup viewBox 0 0 124 64: the star as above, centre dot `circle 32,32 r9`, path dots `74,32 r5`, `88,32 r3`, `98,32 r3`, home dot `114,32 r6`.
 
 ## Craft kit
 
@@ -45,23 +45,23 @@ Premium, but local craft. Think a well-made Karachi thing: indigo and saffron, a
 | line | #E2DCCD | borders only |
 | نیل Neel | #1F2A5C (hover #2B3A80, tint #E6E9F5) | brand colour, primary buttons, step "left" |
 | کیسر Kesar | #E8A33D (tint #FBEBCF) | joy, highlights, step "reached school"; text on it is siyahi |
-| شنگرف Shingarf | #A8321F (tint #F6DDD6) | step "left school", strikes |
+| شنگرف Shingarf | #A8321F (tint #F6DDD6) | attention only: help, "van is late", strikes |
 | زمرد Zamurrad | #17705A (tint #DCEFE7, text on tint #0B4A3D) | step "picked", success, "paid" |
-| پستہ Pista | #A7D47E | step "dropped"; text on it is siyahi |
+| پستہ Pista | #A7D47E | decoration only (home dot on dark grounds); no longer a step colour |
 | سونا Sona | #C9A24A | **decoration only** (frames, corner stars). Never text, never a button. Gold on emerald is 3.2:1. |
 | امان Amaan | #0F5E4E | Pohnch Amaan sub-brand |
 | absent | #5E5A52 on #EEE9DF | "Aaj chutti" |
 | danger | #9E2A1F on #F9E3DF | errors, help alert |
 
-Driver steps (each its own colour and icon):
+Driver steps: one colour per meaning, one icon per step. Neel = the van leaves somewhere; zamurrad = something happened to your child; kesar = arrived at school. Red is never a routine step.
 
 | Step | Fill | Text |
 | --- | --- | --- |
 | left (نکل گئے) | neel #1F2A5C | ghee |
 | picked (بٹھا لیا) | zamurrad #17705A | white |
 | reached school (اسکول پہنچ گئے) | kesar #E8A33D | siyahi |
-| left school (اسکول سے نکلے) | shingarf #A8321F | white |
-| dropped (گھر اتار دیا) | pista #A7D47E | siyahi |
+| left school (اسکول سے نکلے) | neel #1F2A5C | ghee |
+| dropped (گھر اتار دیا) | zamurrad #17705A | white |
 
 ## Type
 

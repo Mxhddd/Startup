@@ -45,7 +45,7 @@ a{color:#1F2A5C}a:hover{color:#2B3A80}
       </div>
     </sc-for>
   </div>
-  <span style="font-size: 14px; font-weight: 600; color: #4A4F66">"نقد ملا" صرف تب لگائیں جب پیسے ہاتھ میں ہوں۔ راست اور JazzCash خود لگ جاتے ہیں۔</span>
+  <span style="font-size: 14px; font-weight: 600; color: #4A4F66">ہر خاندان پہنچ کو خود ادا کرتا ہے (راست، JazzCash، Easypaisa)۔ آپ کو پیسے نہیں سنبھالنے پڑتے۔</span>
 
   <span class="h">لنک</span>
   <div class="box">
@@ -63,18 +63,18 @@ a{color:#1F2A5C}a:hover{color:#2B3A80}
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":360,"height":1200}}'>
 class Component extends DCLogic {
-  constructor(props) { super(props); this.state = { cash: { 5: false } }; }
+  constructor(props) { super(props); this.state = { nudged: false }; }
   renderVals() {
     const base = [
       { id: 0, name: 'مریم', i: 'م', plan: 'کیپٹن کا بچہ · مفت', kind: 'free', c: '#E8A33D' },
       { id: 1, name: 'علی', i: 'ع', plan: 'سالانہ Rs 1,990 · راست', kind: 'paid', c: '#1F2A5C' },
-      { id: 2, name: 'حمزہ', i: 'ح', plan: 'ماہانہ Rs 199 · JazzCash', kind: 'paid', c: '#A8321F' },
+      { id: 2, name: 'حمزہ', i: 'ح', plan: 'ماہانہ Rs 199 · JazzCash', kind: 'paid', c: '#2B3A80' },
       { id: 3, name: 'عائشہ', i: 'ع', plan: 'ماہانہ + بہن بھائی Rs 298', kind: 'paid', c: '#0F5E4E' },
       { id: 4, name: 'سارا', i: 'س', plan: 'مفت مہینہ · 21 دن باقی', kind: 'trial', c: '#17705A' },
-      { id: 5, name: 'زین', i: 'ز', plan: 'ماہانہ Rs 199 · نقد کیپٹن کو', kind: 'cash', c: '#2B3A80' }
+      { id: 5, name: 'زین', i: 'ز', plan: 'ماہانہ Rs 199 · 3 دن سے باقی', kind: 'due', c: '#2B3A80' }
     ];
-    const cashOn = !!this.state.cash[5];
-    const paid = 5 + (cashOn ? 1 : 0);
+    const nudged = this.state.nudged;
+    const paid = 5;
     const capOk = paid >= 5;
     return {
       paid,
@@ -85,11 +85,11 @@ class Component extends DCLogic {
         let state = 'ادا', bg = '#DCEFE7', fg = '#0B4A3D', ring = 'none', on = true, tap = () => {};
         if (k.kind === 'free') { state = 'مفت'; bg = '#FBEBCF'; fg = '#141A33'; }
         if (k.kind === 'trial') { state = 'مفت مہینہ'; bg = '#E6E9F5'; fg = '#1F2A5C'; }
-        if (k.kind === 'cash') {
-          on = cashOn;
-          state = cashOn ? 'نقد ملا' : 'نقد ملا؟';
-          bg = cashOn ? '#DCEFE7' : '#FFFFFF'; fg = cashOn ? '#0B4A3D' : '#1F2A5C'; ring = cashOn ? 'none' : 'inset 0 0 0 2px #1F2A5C';
-          tap = () => this.setState({ cash: { 5: !cashOn } });
+        if (k.kind === 'due') {
+          on = nudged;
+          state = nudged ? 'یاد دلا دیا' : 'یاد دلائیں';
+          bg = nudged ? '#EEE9DF' : '#FFFFFF'; fg = nudged ? '#5E5A52' : '#1F2A5C'; ring = nudged ? 'none' : 'inset 0 0 0 2px #1F2A5C';
+          tap = () => this.setState({ nudged: !nudged });
         }
         return { ...k, state, bg, fg, ring, on, tap };
       })

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<title>Review applied v4</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Gulzar&family=Noto+Sans+Arabic:wght@400;500;600;700;800&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F2A5C}a:hover{color:#2B3A80}
+.disp{font-family:Gulzar,'Noto Nastaliq Urdu',serif;font-weight:400}
+.lbl{font-size:14px;font-weight:800;letter-spacing:.06em;color:#4A4F66}
+.h2{font-size:30px;font-weight:800;letter-spacing:-0.01em;margin:0}
+.chip{display:inline-flex;flex-direction:column;gap:2px;min-width:150px;padding:10px 14px;border-radius:12px;background:#FFFFFF;box-shadow:inset 0 0 0 1px #E2DCCD;text-decoration:none;color:#141A33}
+.chip b{font-size:16px;font-weight:800}
+.chip span{font-size:14px;font-weight:700}
+.btn{height:68px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-family:'Noto Sans Arabic',sans-serif;font-size:21px;font-weight:800}
+</style>
+</helmet>
+<div style="width: 1440px; height: 2000px; box-sizing: border-box; overflow: hidden; background: #FAF6EE; color: #141A33; font-family: Manrope, 'Noto Sans Arabic', sans-serif; line-height: 1.5; padding: 64px 88px; display: flex; flex-direction: column; gap: 40px">
+  <div style="display: flex; justify-content: space-between; align-items: flex-start">
+    <div style="display: flex; flex-direction: column; gap: 8px">
+      <span class="lbl">DESIGN REVIEW · 29 OCT 2026 · APPLIED</span>
+      <span style="font-size: 52px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.15">Build 19 screens for the pilot.<br>The rest waits for paying families.</span>
+    </div>
+    <span class="disp" dir="rtl" style="font-size: 64px; line-height: 1.6; color: #1F2A5C">فکر کم، خبر پوری</span>
+  </div>
+
+  <section style="display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px">
+    <div style="background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 6px #FFFFFF, inset 0 0 0 7px #E2DCCD; padding: 30px 34px; display: flex; flex-direction: column; gap: 16px">
+      <h2 class="h2">New mark: the path arrives</h2>
+      <div dir="rtl" style="display: flex; align-items: center; gap: 22px">
+        <svg width="232" height="120" viewBox="0 0 124 64" role="img" aria-label="Pohnch mark"><path d="{{S}}" fill="#1F2A5C"></path><circle cx="32" cy="32" r="9" fill="#E8A33D"></circle><circle cx="74" cy="32" r="5" fill="#E8A33D"></circle><circle cx="88" cy="32" r="3" fill="#E8A33D"></circle><circle cx="98" cy="32" r="3" fill="#E8A33D"></circle><circle cx="114" cy="32" r="6" fill="#17705A"></circle></svg>
+        <span class="disp" style="font-size: 96px; line-height: 1.4; color: #1F2A5C">پہنچ</span>
+      </div>
+      <span style="font-size: 17px; font-weight: 600">The tick read as "verified". Now a green home dot and kesar route dots run into the star, the way Urdu is read (right to left), so the mark says "arrived". In English lockups the path is mirrored. Below 32 px, and as the app icon, use the star with its centre dot only.</span>
+      <div style="display: flex; align-items: flex-end; gap: 22px">
+        <svg width="96" height="96" viewBox="0 0 64 64" aria-label="App icon"><rect width="64" height="64" rx="15" fill="#1F2A5C"></rect><path transform="translate(9 9) scale(0.72)" d="{{S}}" fill="#E8A33D"></path><circle cx="32" cy="32" r="7" fill="#1F2A5C"></circle></svg>
+        <svg width="48" height="48" viewBox="0 0 64 64" aria-label="App icon small"><rect width="64" height="64" rx="15" fill="#1F2A5C"></rect><path transform="translate(9 9) scale(0.72)" d="{{S}}" fill="#E8A33D"></path><circle cx="32" cy="32" r="7" fill="#1F2A5C"></circle></svg>
+        <svg width="24" height="24" viewBox="0 0 64 64" aria-label="Favicon"><path d="{{S}}" fill="#1F2A5C"></path><circle cx="32" cy="32" r="10" fill="#E8A33D"></circle></svg>
+        <span style="font-size: 15px; font-weight: 700; color: #4A4F66">icon 96 · 48 · favicon 24</span>
+      </div>
+    </div>
+
+    <div style="background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 6px #FFFFFF, inset 0 0 0 7px #E2DCCD; padding: 30px 34px; display: flex; flex-direction: column; gap: 14px">
+      <h2 class="h2">One colour per meaning. Red only for attention.</h2>
+      <div dir="rtl" style="display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px">
+        <sc-for list="{{steps}}" as="s" hint-placeholder-count="5"><span class="btn" style="background: {{s.bg}}; color: {{s.fg}}">{{s.t}}</span></sc-for>
+      </div>
+      <span style="font-size: 16px; font-weight: 700"><b style="color: #1F2A5C">Neel</b> = the van leaves somewhere · <b style="color: #17705A">Zamurrad</b> = something happened to your child · <b style="color: #8A5A12">Kesar</b> = arrived at school</span>
+      <div dir="rtl" style="display: flex; gap: 10px; margin-top: 6px">
+        <span class="btn" style="background: #A8321F; color: #FFFFFF; padding: 0 24px; border-radius: 999px; height: 56px">مدد</span>
+        <span class="btn" style="background: #A8321F; color: #FFFFFF; padding: 0 24px; border-radius: 999px; height: 56px">وین کو دیر ہو رہی ہے</span>
+        <span class="btn" style="background: #A8321F; color: #FFFFFF; padding: 0 24px; border-radius: 999px; height: 56px">کمی</span>
+      </div>
+      <span style="font-size: 16px; font-weight: 600">Shingarf red is kept for help, late and strikes only. A routine "left school" in red read like an alarm on a parent's lock screen. Pista is no longer a step colour.</span>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; align-items: center; gap: 14px"><span style="height: 40px; padding: 0 16px; border-radius: 999px; background: #17705A; color: #FFFFFF; display: inline-flex; align-items: center; font-size: 16px; font-weight: 800">Pilot · build now</span><span style="font-size: 17px; font-weight: 700">One van, free month. 19 screens. Every change the review asked for is already applied.</span></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px">
+      <sc-for list="{{pilot}}" as="c" hint-placeholder-count="19"><a class="chip" href="{{c.href}}"><b>{{c.t}}</b><span style="color: {{c.tc}}">{{c.note}}</span></a></sc-for>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; align-items: center; gap: 14px"><span style="height: 40px; padding: 0 16px; border-radius: 999px; background: #E8A33D; color: #141A33; display: inline-flex; align-items: center; font-size: 16px; font-weight: 800">After the pilot gate</span><span style="font-size: 17px; font-weight: 700">Only once 3 of the first 10 families pay. 6 screens.</span></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px">
+      <sc-for list="{{gate}}" as="c" hint-placeholder-count="6"><a class="chip" href="{{c.href}}"><b>{{c.t}}</b><span style="color: {{c.tc}}">{{c.note}}</span></a></sc-for>
+    </div>
+  </section>
+
+  <section style="display: flex; flex-direction: column; gap: 14px">
+    <div style="display: flex; align-items: center; gap: 14px"><span style="height: 40px; padding: 0 16px; border-radius: 999px; background: #1F2A5C; color: #FAF6EE; display: inline-flex; align-items: center; font-size: 16px; font-weight: 800">Later · its own launch</span><span style="font-size: 17px; font-weight: 700">Marketplace and Pohnch Amaan need many vans, a training partner and real verification work first. 7 screens.</span></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px">
+      <sc-for list="{{later}}" as="c" hint-placeholder-count="7"><a class="chip" href="{{c.href}}"><b>{{c.t}}</b><span style="color: {{c.tc}}">{{c.note}}</span></a></sc-for>
+    </div>
+  </section>
+
+  <section style="background: #141A33; color: #FAF6EE; border-radius: 16px; padding: 24px 32px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px">
+    <div style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 18px; color: #E8A33D">Undo stays 5 seconds</b><span style="font-size: 15px; font-weight: 600">Parents don't notice a 5-second delay; a slow reader in noon sun needs it. One number to teach, one number on the driver card.</span></div>
+    <div style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 18px; color: #E8A33D">Captains never hold money</b><span style="font-size: 15px; font-weight: 600">Families pay Pohnch directly by Raast, JazzCash or Easypaisa. No cash ticks, no awkward chasing between neighbours.</span></div>
+    <div style="display: flex; flex-direction: column; gap: 4px"><b style="font-size: 18px; color: #E8A33D">Children's names stay private</b><span style="font-size: 15px; font-weight: 600">A joining parent types their own child's name; the list of other children is never shown. The captain matches name and number.</span></div>
+  </section>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":2000}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const done = '#17705A', plain = '#4A4F66';
+    const c = (t, href, note) => ({ t, href, note: note || 'as designed', tc: note ? done : plain });
+    return {
+      S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z',
+      steps: [
+        { t: 'نکل گئے', bg: '#1F2A5C', fg: '#FAF6EE' },
+        { t: 'بٹھا لیا', bg: '#17705A', fg: '#FFFFFF' },
+        { t: 'اسکول پہنچ گئے', bg: '#E8A33D', fg: '#141A33' },
+        { t: 'اسکول سے نکلے', bg: '#1F2A5C', fg: '#FAF6EE' },
+        { t: 'گھر اتار دیا', bg: '#17705A', fg: '#FFFFFF' }
+      ],
+      pilot: [
+        c('Driver welcome', 'XD-Welcome.dc.html'), c('Practice run', 'XD-Practice.dc.html'), c('Morning, before start', 'XD-Before.dc.html', 'Step colours, siblings ✓'),
+        c('Tap sent, undo', 'XD-Undo.dc.html', 'Undo kept at 5 s ✓'), c('Mid-route', 'XD-MidRoute.dc.html', 'Siblings: one tap ✓'), c('Reached school', 'XD-School.dc.html'),
+        c('Afternoon trip', 'XD-Afternoon.dc.html', 'Step colours ✓'), c('No signal', 'XD-Offline.dc.html'), c('Help', 'XD-Help.dc.html', 'Late reasons only ✓'),
+        c('Parent joins', 'XP-Join.dc.html', 'Other names hidden ✓'), c('Request sent', 'XP-Pending.dc.html'), c('Parent today', 'XP-Today.dc.html'),
+        c('Aaj chutti', 'XP-Chutti.dc.html'), c('Notifications', 'XP-Lock.dc.html', 'Step colours ✓'), c('Captain: create van', 'XC-Setup.dc.html', 'Amaan options dropped ✓'),
+        c('Captain: share links', 'XC-Share.dc.html'), c('Captain: approvals', 'XC-Approve.dc.html'), c('Whole-van holiday', 'XC-DayOff.dc.html', 'Neel, not red ✓'),
+        c('Admin', 'XAD-Admin.dc.html', 'Trimmed to 4 numbers ✓')
+      ],
+      gate: [
+        c('Plan and payment', 'XP-Plan.dc.html', 'No cash option ✓'), c('Captain: van accounts', 'XC-Manage.dc.html', 'No cash for captains ✓'), c('Driver week', 'XC-Week.dc.html'),
+        c('Driver earnings', 'XD-Earnings.dc.html'), c('Two children', 'XP-Siblings.dc.html'), c('Help alert to captain', 'XC-Alert.dc.html', 'Team alerted too ✓')
+      ],
+      later: [
+        c('Find a van', 'XP-Find.dc.html'), c('Driver profile', 'XP-Driver.dc.html'), c('Amaan: apply', 'XA-Apply.dc.html'), c('Amaan: verification', 'XA-Verify.dc.html'),
+        c('Amaan: van listing', 'XA-Listing.dc.html'), c('Amaan: safety log', 'XA-Captain.dc.html'), c("Amaan: I'm home safe", 'XD-SafeHome.dc.html')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -39,7 +39,7 @@ a{color:#1F2A5C}a:hover{color:#2B3A80}
 
   <span style="font-size: 16px; font-weight: 800">والدین کو یہ جائے گا</span>
   <div style="background: #FFFFFF; border-radius: 18px; box-shadow: inset 0 0 0 1px #E2DCCD; padding: 10px 12px; display: flex; gap: 10px; align-items: flex-start">
-    <span style="width: 40px; height: 40px; border-radius: 12px; background: #A8321F; display: flex; align-items: center; justify-content: center; flex: none; margin-top: 4px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v16H3z M3 10h18 M8 3v4 M16 3v4"></path></svg></span>
+    <span style="width: 40px; height: 40px; border-radius: 12px; background: #1F2A5C; display: flex; align-items: center; justify-content: center; flex: none; margin-top: 4px"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 5h18v16H3z M3 10h18 M8 3v4 M16 3v4"></path></svg></span>
     <span style="flex: 1; display: flex; flex-direction: column; line-height: 1.5"><span style="font-size: 14px; font-weight: 700; color: #4A4F66">پہنچ · گلشن وین</span><span style="font-size: 17px; font-weight: 800">{{preview}}</span><span style="font-size: 14px; font-weight: 600">{{why}} · سارہ (کیپٹن) نے بتایا</span></span>
   </div>
 
@@ -66,7 +66,7 @@ class Component extends DCLogic {
       }),
       reasons: reasons.map((t, i) => {
         const on = i === s.why;
-        return { t, on, bg: on ? '#A8321F' : '#FFFFFF', fg: on ? '#FFFFFF' : '#141A33', ring: on ? 'none' : 'inset 0 0 0 1.5px #E2DCCD', pick: () => this.setState({ why: i, sent: false }) };
+        return { t, on, bg: on ? '#1F2A5C' : '#FFFFFF', fg: on ? '#FFFFFF' : '#141A33', ring: on ? 'none' : 'inset 0 0 0 1.5px #E2DCCD', pick: () => this.setState({ why: i, sent: false }) };
       }),
       preview: days[s.day].full + ' کو وین نہیں آئے گی',
       why: reasons[s.why],

@@ -41,9 +41,9 @@ An Urdu-first web app (installable on the home screen) for one school van at a t
 12. Whole-van day off (holidays), shown to driver and parents.
 13. Parents with two or more children, in one or several vans.
 14. Driver practice run before the first real trip.
-15. Driver help: "I'm stuck" (late alert to captain and parents) and "Emergency" (captain gets location), plus 15 and 1122.
+15. Driver help: in the pilot, late reasons only (late alert to captain and parents) plus 15 and 1122. After the pilot gate, "Emergency" sends the captain and the Pohnch team the location.
 16. Van badges for the Pohnch Amaan line: ڈرائیور صاحبہ (woman driver), امان ساتھی (woman companion), صرف بچیاں (girls only).
-17. Paid from day one: Rs 199 per child per month after a free first month, collected by the captain outside the app; the admin ticks Paid.
+17. Paid after a free first month: Rs 199 per child per month, paid by each family straight to Pohnch (captains never collect money); in the pilot the admin ticks Paid by hand.
 
 ### Added in round 3 (pricing and refinements)
 
@@ -56,7 +56,13 @@ An Urdu-first web app (installable on the home screen) for one school van at a t
 
 Payment methods for 18: Raast QR, JazzCash, Easypaisa, or cash to the captain. Reasons, the cost model and sources are in `design/DECISIONS.md` (round 3).
 
-Items 9–23 make version 1 noticeably bigger. Suggested split: 9, 10, 12, 17 and 19 in version 1; 11, 13–16, 18 and 20 in version 1.1 after the first pilot weeks; 21–23 later. Decide before B2, because they change the database.
+### Version split (decided in the round 4 design review)
+
+- **Pilot, build now (19 screens):** items 1–10, 12, 14, 15 (late reasons only) and 17. Siblings at one stop take one tap. The admin page shows 4 numbers.
+- **After the pilot gate** (3 of the first 10 families pay): 11 (van accounts, no cash), 13 (two children), 15 (emergency alert to captain and team), 18, 19, 20, and the driver's week.
+- **Later, its own launch** (100 vans, a training partner, separate funding): 16, 21, 22, 23. Pohnch Amaan needs training, verification and women staff, so nothing in the pilot promises it.
+
+The database for B2 should still leave room for payments, rewards and badges, so they can be added without a rewrite.
 
 ## Out of scope for version 1
 

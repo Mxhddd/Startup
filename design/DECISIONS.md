@@ -1,8 +1,34 @@
 # Design decisions
 
-## Round 3 (current): Neel o Kesar, Pohnch Amaan, pricing
+## Round 4 (current): design review applied, pilot first
 
-The canvas page **v3 · Neel o Kesar (current)** replaces the v2 pages, which stay on the canvas as "v2 · previous". The brand is in `design/BRAND.md`. Where round 3 and an earlier round disagree, round 3 wins; earlier reasoning still holds for anything not mentioned here.
+The review of 29 October 2026 split the 32 app screens into three stages, and every change it asked for is applied on the canvas page **v4 · Pilot plan (current)** (the old v3 page, regrouped). Its first board, "Review applied", is the summary.
+
+**Stages**
+
+| Stage | Screens | Starts when |
+| --- | --- | --- |
+| Pilot · build now | 19: driver welcome, practice run, before start, tap sent and undo, mid-route, reached school, afternoon, no signal, help; parent joins, request sent, today, aaj chutti, notifications; captain create van, share links, approvals, whole-van holiday; admin | now (one van, free month) |
+| After the pilot gate | 6: plan and payment, captain's van accounts, driver's week, driver earnings, two children, help alert to captain | 3 of the first 10 families pay |
+| Later · its own launch | 7: find a van, driver profile, Amaan apply, verification, listing, safety log, "I'm home safe" | 100 vans, a training partner, separate funding |
+
+**Changes applied**
+
+1. **Logo: "the path arrives"** (the builder picked the third option): route dots run into the star, which now has a centre dot instead of a tick. The tick read as a social-media "verified" badge. Under 32 px, the star and dot alone.
+2. **One colour per meaning.** "Left school" is neel (like "left"), "dropped" is zamurrad (like "picked"). Shingarf red is kept only for help, "van is late" and strikes: a routine "left school" in red read like an alarm on a lock screen. Holiday notices are neel.
+3. **Siblings at one stop take one tap** ("دونوں بٹھا لیے · ایک ٹیپ"), with "صرف حمزہ / صرف عائشہ" for when only one comes.
+4. **Undo stays 5 seconds** (the review asked 3 or 5): parents don't notice the delay, slow readers need it, and it is one number on the driver card.
+5. **Help in the pilot is late reasons only** (traffic, breakdown, road closed) plus 15 and 1122. Emergency-with-location moves to the "help alert to captain" screen after the gate, which also alerts the Pohnch team.
+6. **Parent join hides other children's names.** The parent types their own child's first name; the captain matches name and number.
+7. **Captain setup drops the Amaan options** for the pilot.
+8. **Admin trimmed to 4 numbers:** tap rate (10 school days), parents joined, alerts delivered, families paying (gate is 3 of 10).
+9. **No cash for captains.** Families pay Pohnch directly; the captain's accounts screen shows who paid and sends reminders.
+
+Launch plan, funding proposal and pitch deck (round 4 extras) are linked from `docs/LAUNCH.md`.
+
+## Round 3: Neel o Kesar, Pohnch Amaan, pricing
+
+The canvas page **v4 · Pilot plan (current)** replaces the v2 pages, which stay on the canvas as "v2 · previous". The brand is in `design/BRAND.md`. Where round 3 and an earlier round disagree, round 3 wins; earlier reasoning still holds for anything not mentioned here.
 
 Builder's answers that drove round 3:
 
@@ -27,11 +53,11 @@ Builder's answers that drove round 3:
 | Driver | **free, plus Rs 40 per paying child per month** | paid when the month's tap rate is 90% or more |
 | School plan (later) | **Rs 149 per child**, billed yearly | after about 30 vans; school pays for every van serving it |
 
-Payment: Raast QR (no fee to the payer; up to 0.25% merchant fee), JazzCash, Easypaisa, or cash to the captain, who ticks "نقد ملا" in the app.
+Payment: Raast QR (no fee to the payer; up to 0.25% merchant fee), JazzCash or Easypaisa, straight to Pohnch. (Round 4: captains never collect cash.)
 
 Model for a 10-child van (captain's child free, 9 paying): Rs 1,791 billed, Rs 360 to the driver, about Rs 150 in payment and push costs, **about Rs 1,281 kept per van per month**. With fixed costs of about Rs 75,000 a month (one part-time support person, hosting, printing), **break-even is about 59 vans**. The pricing board on the canvas lets you change children, price (149 / 199 / 249 / 299), reward, van fee and the captain rule.
 
-Why Rs 199: it is about 5% of a typical van fee (Rs 2,000–7,500) and it leaves room for a driver reward that is real money. At Rs 149 the reward eats most of the margin and break-even needs about 120 vans. Rs 249 and above sits on top of recent van fee rises of Rs 1,000–2,000, so we start low and test willingness to pay in the pilot. These are estimates, not survey results: the pilot should check them.
+Why Rs 199: it is about 5% of a typical van fee (Rs 2,000–7,500) and it leaves room for a driver reward that is real money. At Rs 149 a van keeps about Rs 831 and break-even needs about 90 vans. Rs 249 and above sits on top of recent van fee rises of Rs 1,000–2,000, so we start low and test willingness to pay in the pilot. These are estimates, not survey results: the pilot should check them.
 
 ### Refined idea (eight changes)
 

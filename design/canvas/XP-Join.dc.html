@@ -21,18 +21,15 @@ a{color:#1F2A5C}a:hover{color:#2B3A80}
   <div style="position: relative; height: 150px; background: #1F2A5C; flex: none">
     <svg width="360" height="150" aria-hidden="true" style="position: absolute; inset: 0"><defs><pattern id="xpj" width="40" height="40" patternUnits="userSpaceOnUse"><path transform="translate(6 6) scale(0.44)" d="{{S}}" fill="#2B3A80"></path><circle cx="20" cy="20" r="2.4" fill="#E8A33D"></circle><circle cx="0" cy="0" r="2" fill="#A8321F"></circle><circle cx="40" cy="0" r="2" fill="#A8321F"></circle><circle cx="0" cy="40" r="2" fill="#A8321F"></circle><circle cx="40" cy="40" r="2" fill="#A8321F"></circle></pattern></defs><rect width="360" height="150" fill="url(#xpj)"></rect></svg>
     <div style="position: absolute; right: 16px; left: 16px; bottom: -44px; background: #FFFFFF; border-radius: 16px; box-shadow: inset 0 0 0 1.5px #C9A24A, inset 0 0 0 5px #FFFFFF, inset 0 0 0 6px #E2DCCD, 0 10px 24px -14px rgba(20,26,51,.45); padding: 14px 18px; display: flex; align-items: center; gap: 12px">
-      <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#1F2A5C"></path><path d="M22 33 l7 7 l14 -14" fill="none" stroke="#E8A33D" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      <svg width="44" height="44" viewBox="0 0 64 64" aria-hidden="true"><path d="{{S}}" fill="#1F2A5C"></path><circle cx="32" cy="32" r="9" fill="#E8A33D"></circle></svg>
       <span style="display: flex; flex-direction: column; line-height: 1.4"><span style="font-size: 20px; font-weight: 800">گلشن وین</span><span style="font-size: 14px; font-weight: 600; color: #4A4F66">رفیق بھائی · نور اسکول · بھروسہ 96%</span></span>
     </div>
   </div>
   <main style="flex: 1; display: flex; flex-direction: column; gap: 10px; padding: 60px 16px 16px">
-    <span class="disp" style="font-size: 30px">آپ کا بچہ کون سا ہے؟</span>
-    <div role="radiogroup" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
-      <sc-for list="{{kids}}" as="k" hint-placeholder-count="6">
-        <sc-if value="{{k.on}}" hint-placeholder-val="{{ false }}"><button role="radio" aria-checked="true" class="on" onClick="{{k.pick}}">{{k.name}}</button></sc-if>
-        <sc-if value="{{k.off}}" hint-placeholder-val="{{ true }}"><button role="radio" aria-checked="false" class="off" onClick="{{k.pick}}">{{k.name}}</button></sc-if>
-      </sc-for>
-    </div>
+    <span class="disp" style="font-size: 30px">آپ کے بچے کا نام؟</span>
+    <label for="xp-kid" class="vh" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">بچے کا پہلا نام</label>
+    <input id="xp-kid" value="علی" style="height: 60px; border-radius: 16px; border: 0; box-shadow: inset 0 0 0 2.5px #1F2A5C; background: #FFFFFF; padding: 0 16px; font-family: inherit; font-size: 22px; font-weight: 800; color: #141A33">
+    <span style="font-size: 14px; font-weight: 600; color: #4A4F66; margin-top: -4px">صرف پہلا نام۔ دوسرے بچوں کے نام یہاں نہیں دکھائے جاتے۔</span>
     <span class="disp" style="font-size: 30px">آپ کون ہیں؟</span>
     <div role="radiogroup" style="display: flex; flex-wrap: wrap; gap: 8px">
       <sc-for list="{{who}}" as="w" hint-placeholder-count="5">
@@ -40,7 +37,7 @@ a{color:#1F2A5C}a:hover{color:#2B3A80}
         <sc-if value="{{w.off}}" hint-placeholder-val="{{ true }}"><button role="radio" aria-checked="false" class="off" style="height: 46px; padding: 0 16px; border-radius: 999px" onClick="{{w.pick}}">{{w.label}}</button></sc-if>
       </sc-for>
     </div>
-    <span style="font-size: 15px; font-weight: 600; color: #4A4F66">کیپٹن سارہ منظوری دیں گی۔ پہلا مہینہ مفت، پھر Rs 199 ماہانہ۔</span>
+    <span style="font-size: 15px; font-weight: 600; color: #4A4F66">کیپٹن سارہ نام اور نمبر دیکھ کر منظور کریں گی۔ پہلا مہینہ مفت۔</span>
     <a href="XP-Pending.dc.html" style="margin-top: auto; display: flex; align-items: center; justify-content: center; height: 62px; border-radius: 16px; background: #1F2A5C; color: #FAF6EE; text-decoration: none; font-size: 18px; font-weight: 800">{{cta}}</a>
   </main>
 </div>
@@ -55,7 +52,7 @@ class Component extends DCLogic {
       S: 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z',
       kids: names.map((n) => ({ name: n, on: n === this.state.kid, off: n !== this.state.kid, pick: () => this.setState({ kid: n }) })),
       who: whos.map((w) => ({ label: w, on: w === this.state.who, off: w !== this.state.who, pick: () => this.setState({ who: w }) })),
-      cta: this.state.kid + ' · ' + this.state.who + ' · منظوری کے لیے بھیجیں'
+      cta: 'منظوری کے لیے بھیجیں'
     };
   }
 }

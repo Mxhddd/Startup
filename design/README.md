@@ -1,20 +1,21 @@
 # Designs
 
 - Canvas (all screens, clickable prototype): https://claude.ai/artifact/FPmqJf681tEWFhcskvNQxy
-- `BRAND.md`: the v3 brand (tokens, type, mark, Amaan).
+- `BRAND.md`: the brand (v4) (tokens, type, mark, Amaan).
 - `DECISIONS.md`: round 3 pricing, refinements and research; earlier rounds, the A5 review, component names.
 - `canvas/`: the source of every artboard (`.dc.html`) and the canvas layout (`canvas.json`). They render inside the canvas, not on their own.
 
 | Prefix | Page | Screens |
 | --- | --- | --- |
-| `X-` | v3 · Neel o Kesar (current) | brand board, logo and pattern, Pohnch Amaan, refined idea, pricing + live model |
-| `X-WA-` | v3 · WhatsApp | to parents, how to join, 9:16 status, Amaan recruitment |
-| `X-Poster`, `X-Flyer`, `X-Sticker`, `X-Card-`, `X-Amaan-Poster` | v3 · Print | A3 poster, A5 flyer, sticker sheet, A6 driver card, A3 Amaan poster |
-| `XD-` | v3 · Driver | welcome, practice, before trip, undo, mid-route, school, afternoon, offline, help, earnings, home safe |
-| `XP-` | v3 · Parent | join, pending, today, two children, chutti, plan + pay, find a van, driver profile, lock screen |
-| `XC-` | v3 · Captain | setup, share, approve, manage + billing, driver's week, day off, help alert |
-| `XA-` | v3 · Amaan | apply, verification, van listing, safety log |
-| `XAD-` | v3 · Admin | vans, revenue, driver rewards |
+| `Y-Review` | v4 · Pilot plan (current) | review applied: new mark, colour rule, the 32 screens in 3 stages |
+| `X-` | v4 · Pilot plan (current) | brand board, logo and pattern, Pohnch Amaan, refined idea, pricing + live model |
+| `X-WA-` | v4 · WhatsApp | to parents, how to join, 9:16 status, Amaan recruitment |
+| `X-Poster`, `X-Flyer`, `X-Sticker`, `X-Card-`, `X-Amaan-Poster` | v4 · Print | A3 poster, A5 flyer, sticker sheet, A6 driver card, A3 Amaan poster |
+| `XD-` | v4 · Driver | welcome, practice, before trip, undo, mid-route, school, afternoon, offline, help, earnings, home safe |
+| `XP-` | v4 · Parent | join, pending, today, two children, chutti, plan + pay, find a van, driver profile, lock screen |
+| `XC-` | v4 · Captain | setup, share, approve, manage + billing, driver's week, day off, help alert |
+| `XA-` | v4 · Amaan | apply, verification, van listing, safety log |
+| `XAD-` | v4 · Admin | vans, revenue, driver rewards |
 | below | v2 · previous | round 2 designs, kept for history |
 | `BR-` | Brand | brand board, logo sheet, Pohnch Baji sub-brand (see `BRAND.md`) |
 | `M-WA-` | WhatsApp cards | to parents, how to join, 9:16 status, Baji recruitment |
