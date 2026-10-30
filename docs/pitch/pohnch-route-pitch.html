@@ -51,9 +51,9 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--kesar); out
   background-image: radial-gradient(var(--grid) 1.8px, transparent 1.8px); background-size: 40px 40px; }
 #world { position: absolute; left: 0; top: 0; width: 7400px; height: 4200px; transform-origin: 0 0; will-change: transform; transition: filter .8s ease; }
 #ink { position: absolute; inset: 0; width: 7400px; height: 4200px; overflow: visible; pointer-events: none; }
-.light { position: absolute; inset: 0; pointer-events: none; transition: opacity 1.8s ease; mix-blend-mode: multiply; }
-#dawn { background: radial-gradient(110% 80% at 0% 0%, rgba(232, 163, 61, .26), rgba(232, 163, 61, 0) 62%), radial-gradient(80% 60% at 10% 0%, rgba(168, 50, 31, .08), rgba(168, 50, 31, 0) 60%); }
-#dusk { background: radial-gradient(110% 85% at 100% 0%, rgba(232, 163, 61, .24), rgba(232, 163, 61, 0) 64%), linear-gradient(0deg, rgba(201, 162, 74, .07), rgba(201, 162, 74, 0)); }
+.light { position: absolute; inset: 0; pointer-events: none; transition: opacity 1.8s ease; }
+#dawn { background: radial-gradient(110% 80% at 0% 0%, rgba(232, 163, 61, .17), rgba(232, 163, 61, 0) 62%), radial-gradient(80% 60% at 10% 0%, rgba(168, 50, 31, .05), rgba(168, 50, 31, 0) 60%); }
+#dusk { background: radial-gradient(110% 85% at 100% 0%, rgba(232, 163, 61, .16), rgba(232, 163, 61, 0) 64%), linear-gradient(0deg, rgba(201, 162, 74, .05), rgba(201, 162, 74, 0)); }
 #gloom { background: linear-gradient(180deg, rgba(74, 79, 102, .10), rgba(74, 79, 102, .04)); opacity: 0; }
 body.without #gloom { opacity: 1; }
 body.without #world { filter: grayscale(.9) contrast(.96); }
@@ -64,8 +64,8 @@ body.without #vanQ { display: inline; }
 #trail { transition: opacity .6s ease, stroke .8s ease; }
 #night { background: radial-gradient(90% 70% at 50% 40%, #141A3A, #070A18); mix-blend-mode: normal; opacity: 0; transition: opacity 2.8s ease; }
 body.night #night { opacity: .86; }
-#lights { position: absolute; left: 0; top: 0; width: 7400px; height: 4200px; transform-origin: 0 0; opacity: 0; transition: opacity 2.2s ease 1s; pointer-events: none; will-change: transform; }
-body.night #lights { opacity: 1; }
+body.night #far { visibility: hidden; transition: visibility 0s 3s; }
+#nightCv { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 body.night #dock { background: linear-gradient(90deg, rgba(7, 10, 24, 0), #0B0F22 18%); }
 body.night #cap b { color: var(--paper); }
 body.night #cap span { color: #C9CCE0; }
@@ -182,7 +182,7 @@ body.ur .fund-list b { margin-left: 0; margin-right: auto; }
 @keyframes puff { from { opacity: .45; transform: scale(.5); } to { opacity: 0; transform: scale(2.4); } }
 
 /* paper, ink and kinetic type */
-#grain { position: absolute; inset: 0; pointer-events: none; opacity: .55; mix-blend-mode: multiply;
+#grain { position: absolute; inset: 0; pointer-events: none; opacity: .5;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .08 0 0 0 0 .1 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 #vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 95% at 50% 45%, rgba(20, 26, 51, 0) 60%, rgba(20, 26, 51, .09) 100%); }
 mark { color: inherit; padding: 0 .06em; margin: 0 -.06em; background: linear-gradient(transparent 56%, rgba(232, 163, 61, .5) 56%, rgba(232, 163, 61, .5) 90%, transparent 90%) no-repeat 0 0 / 100% 100%; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
@@ -256,7 +256,7 @@ body.ur #notes p, body.ur #notes header { font-family: var(--f-urdu); direction:
 
 /* finale */
 #finale { position: fixed; z-index: 7; top: 0; bottom: 0; left: 0; right: var(--dock-w, 0px); display: flex; align-items: flex-end; justify-content: center; pointer-events: none; padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
-#finale .fcard { animation-delay: 3.6s !important; pointer-events: auto; background: rgba(11, 15, 34, .84); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--paper); border-radius: 28px; padding: 22px 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+#finale .fcard { animation-delay: 4.4s !important; pointer-events: auto; background: rgba(11, 15, 34, .94); color: var(--paper); border-radius: 28px; padding: 22px 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
   box-shadow: inset 0 0 0 1.5px var(--sona), inset 0 0 0 7px rgba(11, 15, 34, .84), inset 0 0 0 8px rgba(201, 162, 74, .35), 0 40px 80px rgba(0, 0, 0, .45); animation: rise .9s cubic-bezier(.2, 1, .3, 1) both .6s; max-width: min(600px, 86%); }
 @keyframes rise { from { opacity: 0; transform: translateY(30px) scale(.96); } to { opacity: 1; transform: none; } }
 #finale .fcard { flex-direction: row; align-items: center; gap: 34px; text-align: left; max-width: min(860px, 92%) !important; }
@@ -369,7 +369,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
 
 <div id="stage">
   <div id="cam">
-    <div id="far" aria-hidden="true"><div id="farInner"></div><svg id="farMap" width="13400" height="10000" viewBox="-3000 -2500 13400 10000" style="position:absolute; left:-3000px; top:-2500px; overflow:visible"></svg></div>
+    <div id="far" aria-hidden="true"><div id="farInner"></div><canvas id="farMap" style="position:absolute; left:-3000px; top:-2500px; width:13400px; height:10000px"></canvas></div>
     <div id="world">
       <svg id="ink" viewBox="0 0 7400 4200" aria-hidden="true">
         <g id="minor"></g>
@@ -714,9 +714,8 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     <div class="light" id="dusk" style="opacity:0"></div>
     <div class="light" id="gloom"></div>
     <div class="light" id="night"></div>
-    <div id="lights" aria-hidden="true"><svg id="lightsSvg" width="7400" height="4200" viewBox="0 0 7400 4200" style="overflow:visible"></svg></div>
   </div>
-  <div id="grain" aria-hidden="true"></div><div id="vignette" aria-hidden="true"></div>
+  <canvas id="nightCv" aria-hidden="true"></canvas><div id="grain" aria-hidden="true"></div><div id="vignette" aria-hidden="true"></div>
   <canvas id="draw" aria-hidden="true"></canvas>
 </div>
 
@@ -1027,7 +1026,6 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     const fs = cam.s * FAR;
     far.style.transform = 'translate(' + (W_ / 2 - cam.x * fs) + 'px,' + (H_ / 2 - cam.y * fs) + 'px) scale(' + fs + ')';
     camEl.style.transform = cam.tilt ? 'perspective(1500px) rotateX(' + cam.tilt.toFixed(2) + 'deg)' : '';
-    $('lights').style.transform = world.style.transform;
   }
   function frameTarget(k) {
     const f = frames[k], x = parseFloat(f.style.left), y = parseFloat(f.style.top);
@@ -1137,40 +1135,85 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     over = !over; render();
     fly(over ? overTarget() : frameTarget(i), { dip: 0, lift: 0, tilt: 3, dur: 1200 });
   }
-  let lightsBuilt = false;
-  function buildLights() {
-    if (lightsBuilt) return; lightsBuilt = true;
-    const ls = $('lightsSvg'), add = (t, a) => ls.appendChild(svgEl(t, a));
-    const glow = svgEl('g', {}); ls.appendChild(glow);
-    [[130, '#E8A33D', .10], [54, '#E8A33D', .32], [18, '#FBEBCF', 1]].forEach(([w, c, o]) => glow.appendChild(svgEl('path', { d: route.getAttribute('d'), fill: 'none', stroke: c, 'stroke-opacity': o, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', class: 'glowpath' })));
-    for (let l = 0; l < total; l += 170) { const p = route.getPointAtLength(l); add('circle', { cx: p.x, cy: p.y - 70, r: 48, fill: '#E8A33D', 'fill-opacity': .16 }); add('circle', { cx: p.x, cy: p.y - 70, r: 12, fill: '#FBEBCF' }); }
-    ['r1', 'r2', 'r3', 'v1', 'v2', 'v3', 'v4'].forEach((id) => { const pth = $(id), tl = pth.getTotalLength(); for (let l = 80; l < tl; l += 190) { const p = pth.getPointAtLength(l); add('circle', { cx: p.x + 30, cy: p.y - 30, r: 36, fill: '#E8A33D', 'fill-opacity': .13 }); add('circle', { cx: p.x + 30, cy: p.y - 30, r: 9, fill: '#FBEBCF' }); } });
+  /* night: one canvas, redrawn each frame, so nothing flickers */
+  const nc = $('nightCv'), nx = nc.getContext('2d');
+  let nPrep = null, nRaf = null, nT0 = 0, nLevel = 0, nWant = 0, nLast = 0, nPassed = [];
+  function sprite(rgb) { const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64); gr.addColorStop(0, 'rgba(' + rgb + ',1)'); gr.addColorStop(.35, 'rgba(' + rgb + ',.45)'); gr.addColorStop(1, 'rgba(' + rgb + ',0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128); return c; }
+  function prepNight() {
+    if (nPrep) return nPrep;
+    const pts = []; for (let l = 0; l <= total; l += 10) { const q = route.getPointAtLength(l); pts.push([q.x, q.y, l]); }
+    const roads = ['r1', 'r2', 'r3', 'v1', 'v2', 'v3', 'v4'].map((id) => { const pth = $(id), tl = pth.getTotalLength(), a = []; for (let l = 0; l <= tl; l += 20) { const q = pth.getPointAtLength(l); a.push([q.x, q.y]); } return a; });
+    const lamps = []; for (let l = 0; l < total; l += 170) { const q = route.getPointAtLength(l); lamps.push([q.x, q.y - 70, 48]); }
+    roads.forEach((a) => { for (let k = 4; k < a.length; k += 9) lamps.push([a[k][0] + 30, a[k][1] - 30, 36]); });
     const boxes = frames.map((f) => [parseFloat(f.style.left) - 20, parseFloat(f.style.top) - 40, FW + 40, FH + 60]).concat([[230, 1540, 1040, 480]]);
     let sd = 11; const rnd = () => { sd = (sd * 9301 + 49297) % 233280; return sd / 233280; };
-    for (let n = 0; n < 900 && ls.querySelectorAll('.win').length < 260; n++) {
+    const wins = [];
+    for (let n = 0; n < 1400 && wins.length < 300; n++) {
       const x = 80 + rnd() * 7240, y = 60 + rnd() * 3820;
       if (boxes.some(([bx, by, bw, bh]) => x > bx && x < bx + bw && y > by && y < by + bh)) continue;
-      const w = add('rect', { x, y, width: 26, height: 22, rx: 4, fill: rnd() < .8 ? '#FBEBCF' : '#E8A33D', 'fill-opacity': (.45 + rnd() * .5).toFixed(2), class: 'win' });
-      if (rnd() < .18) w.innerHTML = '<animate attributeName="fill-opacity" values=".9;.15;.9" dur="' + (3 + rnd() * 5).toFixed(1) + 's" begin="' + (rnd() * 4).toFixed(1) + 's" repeatCount="indefinite"/>';
+      wins.push({ x, y, a: .45 + rnd() * .5, c: rnd() < .8 ? '#FBEBCF' : '#E8A33D', tw: rnd() < .2, sp: .6 + rnd() * 1.4, ph: rnd() * 6.28, on: rnd() * 1.6 });
     }
-    [['r1', 30, 0], ['r1', 44, 1], ['r2', 36, 1], ['r2', 26, 0], ['r3', 40, 0], ['r3', 52, 1], ['v2', 24, 0], ['v3', 28, 1], ['v4', 22, 0], ['v1', 18, 1]].forEach(([id, dur, rev], n) => {
-      const g = svgEl('g', {}); g.innerHTML = '<circle r="46" fill="#FBEBCF" fill-opacity=".18"/><circle r="14" fill="#FFFFFF"/><animateMotion dur="' + dur + 's" begin="-' + (n * 3) + 's" repeatCount="indefinite"' + (rev ? ' keyPoints="1;0" keyTimes="0;1" calcMode="linear"' : '') + '><mpath href="#' + id + '"/></animateMotion>'; ls.appendChild(g);
-    });
-    anchors.forEach((l) => { const p = route.getPointAtLength(l); add('circle', { cx: p.x, cy: p.y, r: 110, fill: '#17705A', 'fill-opacity': .34 }); add('circle', { cx: p.x, cy: p.y, r: 32, fill: '#DCEFE7' }); });
     const pe = route.getPointAtLength(anchors[N - 1]);
-    const home = svgEl('g', {}); home.innerHTML = '<circle cx="' + (pe.x + 110) + '" cy="' + (pe.y - 20) + '" r="300" fill="#E8A33D" fill-opacity=".16"><animate attributeName="r" values="260;340;260" dur="3s" repeatCount="indefinite"/></circle><rect x="' + (pe.x + 84) + '" y="' + (pe.y - 26) + '" width="22" height="18" rx="3" fill="#FBEBCF"/><rect x="' + (pe.x + 114) + '" y="' + (pe.y - 26) + '" width="22" height="18" rx="3" fill="#FBEBCF"/>';
-    ls.appendChild(home);
-    if (reduce) ls.pauseAnimations();
+    nPrep = { pts, roads, lamps, wins, home: [pe.x + 110, pe.y - 20], spK: sprite('232,163,61'), spW: sprite('251,235,207'), spG: sprite('23,112,90') };
+    return nPrep;
+  }
+  function sizeNight() { const r = nc.getBoundingClientRect(), d = devicePixelRatio || 1; nc.width = Math.max(1, Math.round(r.width * d)); nc.height = Math.max(1, Math.round(r.height * d)); }
+  const notes5 = [392, 440, 523.25, 587.33, 659.25, 783.99, 880, 1046.5, 1174.66, 1318.5, 1568, 1760, 2093];
+  let nCache = null, nKey = '';
+  function drawNight(now) {
+    const P = prepNight(), t = Math.max(0, (now - nT0) / 1000), dt = Math.min(.05, (now - (nLast || now)) / 1000); nLast = now;
+    nLevel += (nWant - nLevel) * Math.min(1, dt * (nWant ? 1.3 : 3));
+    const d = devicePixelRatio || 1, W_ = nc.width / d, H_ = nc.height / d;
+    nx.setTransform(d, 0, 0, d, 0, 0); nx.clearRect(0, 0, W_, H_);
+    if (nLevel < .005 && !nWant) { nRaf = null; nCache = null; return; }
+    const S = cam.s, ox = W_ / 2 - cam.x * S, oy = H_ / 2 - cam.y * S, X = (x) => ox + x * S, Y = (y) => oy + y * S;
+    const fadeIn = Math.min(1, Math.max(0, (t - .5) / 1.8));
+    const rp = reduce ? 1 : ease(Math.min(1, Math.max(0, (t - 1.2) / 3.4))), upto = rp * total;
+    anchors.forEach((l, k) => { if (upto >= l && nPassed[k] == null) { nPassed[k] = t; if (nWant) play('note', k); } });
+    const settled = t > 6 && !flight && nWant && Math.abs(nLevel - 1) < .01;
+    // the still parts: windows, lamps, the lit route and stops
+    const drawStill = (c, L0, withTwinkle) => {
+      P.wins.forEach((w) => { if (w.tw && !withTwinkle) return; const on = Math.min(1, Math.max(0, (t - .6 - w.on) / .4)); if (!on) return; let a = w.a * on; if (w.tw && !reduce) a *= .6 + .4 * Math.sin(t * w.sp + w.ph); c.globalAlpha = a * L0; c.fillStyle = w.c; c.fillRect(X(w.x), Y(w.y), Math.max(1.5, 26 * S), Math.max(1.5, 22 * S)); });
+      c.globalCompositeOperation = 'lighter';
+      P.lamps.forEach(([x, y, r]) => { const R = Math.max(3, r * S); c.globalAlpha = .5 * fadeIn * L0; c.drawImage(P.spK, X(x) - R, Y(y) - R, R * 2, R * 2); });
+      if (upto > 0) {
+        c.lineCap = 'round'; c.lineJoin = 'round'; c.beginPath(); let first = true;
+        for (const q of P.pts) { if (q[2] > upto) break; if (first) { c.moveTo(X(q[0]), Y(q[1])); first = false; } else c.lineTo(X(q[0]), Y(q[1])); }
+        [[130, 'rgba(232,163,61,.10)'], [54, 'rgba(232,163,61,.30)'], [18, 'rgba(251,235,207,.95)']].forEach(([w, col]) => { c.globalAlpha = L0; c.strokeStyle = col; c.lineWidth = Math.max(1, w * S); c.stroke(); });
+      }
+      anchors.forEach((l, k) => {
+        if (nPassed[k] == null) return;
+        const a = Math.min(1, (t - nPassed[k]) / .5), pop = 1 + .6 * Math.sin(a * Math.PI), q = route.getPointAtLength(l), R = Math.max(5, 110 * S * pop);
+        c.globalAlpha = L0 * a; c.drawImage(P.spG, X(q.x) - R, Y(q.y) - R, R * 2, R * 2); c.drawImage(P.spW, X(q.x) - R * .35, Y(q.y) - R * .35, R * .7, R * .7);
+      });
+      c.globalCompositeOperation = 'source-over'; c.globalAlpha = 1;
+    };
+    if (settled) {
+      const key = [nc.width, nc.height, S.toFixed(5), cam.x.toFixed(1), cam.y.toFixed(1)].join();
+      if (!nCache || nKey !== key) { nCache = document.createElement('canvas'); nCache.width = nc.width; nCache.height = nc.height; const cc = nCache.getContext('2d'); cc.setTransform(d, 0, 0, d, 0, 0); drawStill(cc, 1, false); nKey = key; }
+      nx.drawImage(nCache, 0, 0, W_, H_);
+      if (!reduce) P.wins.forEach((w) => { if (!w.tw) return; nx.globalAlpha = w.a * (.6 + .4 * Math.sin(t * w.sp + w.ph)); nx.fillStyle = w.c; nx.fillRect(X(w.x), Y(w.y), Math.max(1.5, 26 * S), Math.max(1.5, 22 * S)); });
+    } else { nCache = null; drawStill(nx, nLevel, true); }
+    // the moving parts: headlights, the head of the light, the glow at home
+    const L0 = nLevel;
+    nx.globalCompositeOperation = 'lighter';
+    if (!reduce) P.roads.forEach((a, k) => { for (let j = 0; j < 2; j++) { let u = ((t / (18 + k * 3) + j * .5 + k * .13) % 1); if ((k + j) % 2) u = 1 - u; const q = a[Math.max(0, Math.min(a.length - 1, Math.floor(u * (a.length - 1))))], R = Math.max(3, 46 * S); nx.globalAlpha = .9 * fadeIn * L0; nx.drawImage(P.spW, X(q[0]) - R, Y(q[1]) - R, R * 2, R * 2); } });
+    if (upto > 0 && rp < 1) { let head = P.pts[0]; for (const q of P.pts) { if (q[2] > upto) break; head = q; } const R = Math.max(8, 190 * S); nx.globalAlpha = L0; nx.drawImage(P.spW, X(head[0]) - R, Y(head[1]) - R, R * 2, R * 2); nx.drawImage(P.spK, X(head[0]) - R * 1.6, Y(head[1]) - R * 1.6, R * 3.2, R * 3.2); }
+    if (nPassed[N - 1] != null) { const a = Math.min(1, (t - nPassed[N - 1]) / .8), R = Math.max(10, (300 + 40 * Math.sin(t * 2)) * S); nx.globalAlpha = L0 * a; nx.drawImage(P.spK, X(P.home[0]) - R, Y(P.home[1]) - R, R * 2, R * 2); }
+    nx.globalCompositeOperation = 'source-over'; nx.globalAlpha = 1;
+    nRaf = requestAnimationFrame(drawNight);
   }
   function nightOn(on) {
     document.body.classList.toggle('night', on);
     $('moonCut').setAttribute('opacity', on ? '1' : '0');
+    nWant = on ? 1 : 0;
     if (on) {
-      buildLights();
+      prepNight(); sizeNight(); nT0 = performance.now(); nLast = 0; nPassed = [];
       $('sun').setAttribute('cx', '30'); $('sun').setAttribute('cy', '9'); $('sun').setAttribute('fill', '#FAF6EE'); $('clockT').textContent = '9:30';
-      $('dawn').style.opacity = '0'; $('dusk').style.opacity = '1';
-      document.querySelectorAll('.glowpath').forEach((g) => { if (reduce) return; g.style.transition = 'none'; g.style.strokeDasharray = total + ' ' + total; g.style.strokeDashoffset = total; void g.getBoundingClientRect(); g.style.transition = 'stroke-dashoffset 3.6s cubic-bezier(.4, 0, .2, 1) 1.6s'; g.style.strokeDashoffset = '0'; });
-    } else { $('sun').setAttribute('fill', '#E8A33D'); setLight(i); }
+      $('dawn').style.opacity = '0'; $('dusk').style.opacity = '0';
+      setTimeout(() => { if (nWant && !reduce) $('ink').pauseAnimations(); }, 2900);
+    } else { $('sun').setAttribute('fill', '#E8A33D'); setLight(i); if (!reduce) $('ink').unpauseAnimations(); }
+    if (!nRaf) nRaf = requestAnimationFrame(drawNight);
   }
   function finale(on) {
     fin = on; $('finale').hidden = !on;
@@ -1182,9 +1225,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       $('finT').textContent = L('Rs 3,000,000 for the first year.\nRs 400,000 starts the pilot.', 'پہلا سال: Rs 3,000,000\nپائلٹ: Rs 400,000');
       $('finS').textContent = L('Mohammad Hassan · Habib University\n0300 1478729 · mh10949@st.habib.edu.pk', 'محمد حسن · حبیب یونیورسٹی\n\u20660300 1478729 · mh10949@st.habib.edu.pk\u2069');
       $('finBack').textContent = L('Back to the route', 'واپس راستے پر');
-      fly(finTarget(), { dip: 0, lift: 0, tilt: 3, dur: 1800 });
-      if (!reduce) { trail.style.transition = 'none'; trail.style.strokeDashoffset = String(total); void trail.getBoundingClientRect(); trail.style.transition = 'stroke-dashoffset 3s ease .3s, opacity .6s ease'; trail.style.strokeDashoffset = '0'; }
-      else trail.style.strokeDashoffset = '0';
+      fly(finTarget(), { dip: 0, lift: 0, tilt: 0, dur: 1800 });
     } else { trail.style.transition = ''; trail.style.strokeDashoffset = String(total - vanLen); drawPhone(true); }
     render();
     if (on) $('clockT').textContent = '9:30';
@@ -1346,27 +1387,32 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     Object.assign(cam, fin ? finTarget() : over ? overTarget() : frameTarget(i), { tilt: 0 }); applyCam();
     render(); drawPhone(false);
     if (drawing) sizeInk();
+    sizeNight();
     if (!sketched && fontsReady) sketch();
   }
   addEventListener('resize', layout);
 
   /* ================= the city ================= */
-  function buildCity() {
-    // far layer: a faint street map of Karachi blocks and district names
-    const fm = $('farMap');
+  function paintFar() {
+    // far layer: a faint street map of Karachi, painted once into a flat image
+    const fm = $('farMap'), K = .25; fm.width = 13400 * K; fm.height = 10000 * K;
+    const fx = fm.getContext('2d'); fx.scale(K, K); fx.translate(3000, 2500);
     let seed = 7; const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
-    let d = '';
+    fx.strokeStyle = '#ECE4D3'; fx.lineWidth = 4; fx.lineJoin = 'round';
     for (let x = -2800; x < 10200; x += 270) for (let y = -2300; y < 7300; y += 230) {
       if (rnd() < .18) continue;
       const w = 170 + rnd() * 70, h = 140 + rnd() * 60, ox = x + rnd() * 20, oy = y + rnd() * 20;
-      d += 'M' + ox.toFixed(0) + ' ' + oy.toFixed(0) + 'h' + w.toFixed(0) + 'v' + h.toFixed(0) + 'h-' + w.toFixed(0) + 'z';
-      if (rnd() < .05) fm.appendChild(svgEl('rect', { x: ox, y: oy, width: w, height: h, rx: 18, fill: '#EEF1E1' }));
+      if (rnd() < .05) { fx.fillStyle = '#EEF1E1'; fx.beginPath(); fx.roundRect ? fx.roundRect(ox, oy, w, h, 18) : fx.rect(ox, oy, w, h); fx.fill(); }
+      fx.strokeRect(ox, oy, w, h);
     }
-    fm.appendChild(svgEl('path', { d, fill: 'none', stroke: '#ECE4D3', 'stroke-width': 4, 'stroke-linejoin': 'round' }));
+    fx.fillStyle = '#F0E9DA';
     [['GULSHAN', 'گلشن', 900, 300], ['JOHAR', 'جوہر', 6600, 200], ['PECHS', 'پی ای سی ایچ ایس', 4200, 1450], ['SADDAR', 'صدر', 600, 2600], ['CLIFTON', 'کلفٹن', 5600, 4300], ['KORANGI', 'کورنگی', 8600, 2600], ['LYARI', 'لیاری', -1600, 3400]].forEach(([en, ur, x, y]) => {
-      fm.appendChild(svgEl('text', { x, y, 'font-family': 'Manrope, sans-serif', 'font-weight': 800, 'font-size': 300, fill: '#F0E9DA', 'letter-spacing': 30 }, en));
-      fm.appendChild(svgEl('text', { x: x + 40, y: y + 240, 'font-family': 'Gulzar, serif', 'font-size': 200, fill: '#F0E9DA' }, ur));
+      fx.font = '800 300px Manrope, sans-serif'; if ('letterSpacing' in fx) fx.letterSpacing = '30px'; fx.textAlign = 'left'; fx.fillText(en, x, y);
+      if ('letterSpacing' in fx) fx.letterSpacing = '0px'; fx.font = '200px Gulzar, serif'; fx.fillText(ur, x + 40, y + 240);
     });
+  }
+  function buildCity() {
+    paintFar();
     // minor roads under the main route
     const minor = $('minor');
     const roads = { r1: 'M 120 1340 H 6900', r2: 'M 1700 2640 H 7250', r3: 'M 300 3850 H 7250', v1: 'M 1450 120 V 2300', v2: 'M 2850 120 V 3860', v3: 'M 4250 120 V 3860', v4: 'M 5650 120 V 3860' };
@@ -1599,6 +1645,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     dull() { const t = ac.currentTime; tone(196, t, .5, 'sine', .08, 150); },
     engine(dur) { const t = ac.currentTime, f = ac.createBiquadFilter(), v = ac.createGain(); f.type = 'lowpass'; f.frequency.value = 260; v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(.07, t + .5); v.gain.setValueAtTime(.07, t + dur - .7); v.gain.linearRampToValueAtTime(0, t + dur); f.connect(v).connect(master);
       [68, 71.5].forEach((hz) => { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(hz * .8, t); o.frequency.linearRampToValueAtTime(hz * 1.25, t + dur * .45); o.frequency.linearRampToValueAtTime(hz * .85, t + dur); o.connect(f); o.start(t); o.stop(t + dur + .05); }); },
+    note(k) { const t = ac.currentTime; tone(notes5[k % notes5.length], t, 1.4, 'sine', .06); tone(notes5[k % notes5.length] * 2, t, .6, 'sine', .015); },
     night() { const t = ac.currentTime; [392, 493.88, 587.33, 783.99].forEach((f, n) => tone(f, t + n * .35, 2.6, 'sine', .05)); }
   };
   function play(name, arg) { if (!soundOn || !audio()) return; sfx[name](arg); }
@@ -1658,7 +1705,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   placeVan(anchors[0]);
   layout();
   coldInit();
-  const ready = () => { fontsReady = true; if (!document.body.classList.contains('read') && !sketched) { sketch(); drawIn(0); } };
+  const ready = () => { fontsReady = true; paintFar(); if (!document.body.classList.contains('read') && !sketched) { sketch(); drawIn(0); } };
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(ready); else ready();
 })();
 </script>
