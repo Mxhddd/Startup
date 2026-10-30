@@ -45,7 +45,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--kesar); out
 
 /* ---------- stage and depth layers ---------- */
 #stage { position: fixed; top: 0; bottom: 0; left: 0; right: var(--dock-w, 0px); overflow: hidden; background: var(--paper); touch-action: pan-y; }
-#cam { position: absolute; inset: 0; transform-origin: 50% 100%; }
+#cam { position: absolute; inset: 0; transform-origin: 50% 62%; }
 #far { position: absolute; left: 0; top: 0; width: 1px; height: 1px; transform-origin: 0 0; will-change: transform; }
 #farInner { position: absolute; left: -3000px; top: -2500px; width: 13400px; height: 10000px;
   background-image: radial-gradient(var(--grid) 1.8px, transparent 1.8px); background-size: 40px 40px; }
@@ -62,6 +62,14 @@ body.without #vanBody { display: none; }
 body.without #vanQ { display: inline; }
 #vanQ { display: none; }
 #trail { transition: opacity .6s ease, stroke .8s ease; }
+#night { background: radial-gradient(90% 70% at 50% 40%, #141A3A, #070A18); mix-blend-mode: normal; opacity: 0; transition: opacity 2.8s ease; }
+body.night #night { opacity: .86; }
+#lights { position: absolute; left: 0; top: 0; width: 7400px; height: 4200px; transform-origin: 0 0; opacity: 0; transition: opacity 2.2s ease 1s; pointer-events: none; will-change: transform; }
+body.night #lights { opacity: 1; }
+body.night #dock { background: linear-gradient(90deg, rgba(7, 10, 24, 0), #0B0F22 18%); }
+body.night #cap b { color: var(--paper); }
+body.night #cap span { color: #C9CCE0; }
+#finTop { font: 700 18px var(--f-marker) !important; color: var(--kesar) !important; }
 #draw { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 body.drawing #draw { pointer-events: auto; cursor: crosshair; }
 
@@ -247,14 +255,19 @@ body.ur #notes p, body.ur #notes header { font-family: var(--f-urdu); direction:
 #progress { position: fixed; z-index: 7; left: 0; top: 0; height: 4px; width: 0; background: var(--kesar); }
 
 /* finale */
-#finale { position: fixed; z-index: 7; top: 0; bottom: 0; left: 0; right: var(--dock-w, 0px); display: flex; align-items: center; justify-content: center; pointer-events: none; }
-#finale .fcard { pointer-events: auto; background: rgba(250, 246, 238, .96); border-radius: 28px; padding: 40px 56px 36px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
-  box-shadow: inset 0 0 0 1.5px var(--sona), inset 0 0 0 7px rgba(250, 246, 238, .96), inset 0 0 0 8px var(--line), 0 40px 80px rgba(20, 26, 51, .25); animation: rise .9s cubic-bezier(.2, 1, .3, 1) both .6s; max-width: min(640px, 80%); }
+#finale { position: fixed; z-index: 7; top: 0; bottom: 0; left: 0; right: var(--dock-w, 0px); display: flex; align-items: flex-end; justify-content: center; pointer-events: none; padding-bottom: calc(96px + env(safe-area-inset-bottom, 0px)); }
+#finale .fcard { animation-delay: 3.6s !important; pointer-events: auto; background: rgba(11, 15, 34, .84); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); color: var(--paper); border-radius: 28px; padding: 22px 40px 24px; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center;
+  box-shadow: inset 0 0 0 1.5px var(--sona), inset 0 0 0 7px rgba(11, 15, 34, .84), inset 0 0 0 8px rgba(201, 162, 74, .35), 0 40px 80px rgba(0, 0, 0, .45); animation: rise .9s cubic-bezier(.2, 1, .3, 1) both .6s; max-width: min(600px, 86%); }
 @keyframes rise { from { opacity: 0; transform: translateY(30px) scale(.96); } to { opacity: 1; transform: none; } }
-#finale .gz { font-size: 110px; color: var(--neel); line-height: 1.35; }
-#finale b { font-size: 26px; }
-#finale span { font-size: 18px; color: var(--ink-2); }
-#finale button { margin-top: 14px; height: 48px; padding: 0 22px; border: 0; border-radius: 14px; background: var(--neel); color: var(--paper); font-weight: 800; font-size: 17px; cursor: pointer; }
+#finale .fcard { flex-direction: row; align-items: center; gap: 34px; text-align: left; max-width: min(860px, 92%) !important; }
+#finale .fl { display: flex; flex-direction: column; align-items: center; flex: none; }
+#finale .fr { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; min-width: 0; }
+@media (max-width: 1100px) { #finale .fcard { flex-direction: column; text-align: center; } #finale .fr { align-items: center; } }
+#finale .gz { font-size: 76px; color: var(--paper); line-height: 1.3; }
+#finale b { font-size: 24px; line-height: 1.3; white-space: pre-line; }
+body.ur #finale .fr { align-items: flex-end; text-align: right; direction: rtl; }
+#finale span { font-size: 17px; color: #C9CCE0; white-space: pre-line; line-height: 1.5; }
+#finale button { margin-top: 12px; height: 44px; padding: 0 20px; border: 0; border-radius: 14px; background: var(--kesar); color: var(--ink); font-weight: 800; font-size: 17px; cursor: pointer; }
 body.ur #finale b, body.ur #finale span:not(.gz), body.ur #finale button { font-family: var(--f-urdu); }
 
 /* ---------- docked phone ---------- */
@@ -376,6 +389,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
             <path d="M-16 9 V-9 h22 l10 10 v8 Z" fill="#E8A33D"/>
             <path d="M36 0 l-9 -7 v14 Z" fill="#1F2A5C"/>
           </g>
+          <g id="vanTag" opacity="0" transform="translate(0 -76)"><rect x="-40" y="-17" width="80" height="34" rx="17" fill="#1F2A5C" stroke="#FAF6EE" stroke-width="4"/><text id="vanTagT" y="7" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="19" fill="#FAF6EE">7:05</text></g>
           <g id="vanQ"><circle r="32" fill="#B9B2A2" stroke="#FFFFFF" stroke-width="7"/><text y="13" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="38" fill="#FFFFFF">?</text></g>
         </g>
       </svg>
@@ -699,6 +713,8 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     <div class="light" id="dawn"></div>
     <div class="light" id="dusk" style="opacity:0"></div>
     <div class="light" id="gloom"></div>
+    <div class="light" id="night"></div>
+    <div id="lights" aria-hidden="true"><svg id="lightsSvg" width="7400" height="4200" viewBox="0 0 7400 4200" style="overflow:visible"></svg></div>
   </div>
   <div id="grain" aria-hidden="true"></div><div id="vignette" aria-hidden="true"></div>
   <canvas id="draw" aria-hidden="true"></canvas>
@@ -712,12 +728,12 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
 <div id="story" aria-label="The pitch, one stop at a time"></div>
 
 <div class="hud" id="brand"><svg width="44" height="23" viewBox="0 0 124 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#1F2A5C"/><circle cx="32" cy="32" r="9" fill="#E8A33D"/><circle cx="74" cy="32" r="5" fill="#E8A33D"/><circle cx="88" cy="32" r="3" fill="#E8A33D"/><circle cx="98" cy="32" r="3" fill="#E8A33D"/><circle cx="114" cy="32" r="6" fill="#17705A"/></svg><span id="brandT">Pohnch · one school morning</span></div>
-<div class="hud" id="clock" aria-live="polite"><svg width="60" height="30" viewBox="0 0 60 30" aria-hidden="true"><path d="M4 27 Q30 -9 56 27" fill="none" stroke="#FAF6EE" stroke-opacity=".35" stroke-width="2" stroke-dasharray="2 4"/><line x1="0" y1="27.5" x2="60" y2="27.5" stroke="#FAF6EE" stroke-opacity=".35" stroke-width="1.5"/><circle id="sun" cx="10" cy="20" r="5.5" fill="#E8A33D"/></svg><span id="clockT">6:55</span></div>
+<div class="hud" id="clock" aria-live="polite"><svg width="60" height="30" viewBox="0 0 60 30" aria-hidden="true"><path d="M4 27 Q30 -9 56 27" fill="none" stroke="#FAF6EE" stroke-opacity=".35" stroke-width="2" stroke-dasharray="2 4"/><line x1="0" y1="27.5" x2="60" y2="27.5" stroke="#FAF6EE" stroke-opacity=".35" stroke-width="1.5"/><circle id="sun" cx="10" cy="20" r="5.5" fill="#E8A33D"/><circle id="moonCut" cx="33" cy="7" r="4.6" fill="#1F2A5C" opacity="0"/></svg><span id="clockT">6:55</span></div>
 <div class="hud" id="banner" hidden></div>
 <div class="hud" id="hint">→ or space to drive on · ? for every key</div>
 <div class="hud" id="notes" hidden aria-live="polite"><header><span id="notesStop"></span><span id="notesTimer">0:00</span></header><p id="notesText"></p><p class="next" id="notesNext"></p></div>
 <div class="hud" id="keys" hidden role="dialog" aria-label="Keys"></div>
-<div id="finale" hidden><div class="fcard"><svg width="180" height="93" viewBox="0 0 124 64" aria-label="Pohnch mark"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#1F2A5C"/><circle cx="32" cy="32" r="9" fill="#E8A33D"/><circle cx="74" cy="32" r="5" fill="#E8A33D"/><circle cx="88" cy="32" r="3" fill="#E8A33D"/><circle cx="98" cy="32" r="3" fill="#E8A33D"/><circle cx="114" cy="32" r="6" fill="#17705A"/></svg><span class="gz">پہنچ</span><span class="gz" style="font-size:40px; color:var(--kesar)">فکر کم، خبر پوری</span><b id="finT"></b><span id="finS"></span><button id="finBack"></button></div></div>
+<div id="finale" hidden><div class="fcard"><div class="fl"><div style="display:flex; align-items:center; gap:16px"><svg width="120" height="62" viewBox="0 0 124 64" aria-label="Pohnch mark"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#E8A33D"/><circle cx="32" cy="32" r="9" fill="#1F2A5C"/><circle cx="74" cy="32" r="5" fill="#E8A33D"/><circle cx="88" cy="32" r="3" fill="#E8A33D"/><circle cx="98" cy="32" r="3" fill="#E8A33D"/><circle cx="114" cy="32" r="6" fill="#A7D47E"/></svg><span class="gz">پہنچ</span></div><span class="gz" style="font-size:32px; color:var(--kesar); line-height:1.4">فکر کم، خبر پوری</span></div><div class="fr"><span id="finTop"></span><b id="finT"></b><span id="finS"></span><button id="finBack"></button></div></div></div>
 <nav class="hud" id="nav" aria-label="Pitch stops">
   <button class="navbtn" id="prev" aria-label="Previous stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M15 6l-6 6 6 6"/></svg></button>
   <div id="dots"></div>
@@ -892,6 +908,9 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
           '<div style="position:absolute;left:22px;right:22px;top:262px;display:grid;grid-template-columns:repeat(4,1fr);gap:18px 16px">' + ['#E8A33D', '#FAF6EE', '#17705A', '#2B3A80', '#C9A24A', '#FAF6EE', '#E6E9F5', '#A8321F', '#DCEFE7', '#FBEBCF', '#2B3A80', '#E8A33D'].map((c) => '<span style="aspect-ratio:1;border-radius:14px;background:' + c + ';opacity:.85"></span>').join('') + '</div>' +
           '<div style="position:absolute;left:14px;right:14px;bottom:18px;height:74px;border-radius:26px;background:rgba(250,246,238,.22);display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding:12px 16px;box-sizing:border-box">' + ['#17705A', '#FAF6EE', '#E8A33D', '#FAF6EE'].map((c, j) => j === 1 ? '<span style="border-radius:14px;background:#1F2A5C;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 2px #E8A33D">' + star(30, '#E8A33D', '#1F2A5C') + '</span>' : '<span style="border-radius:14px;background:' + c + ';opacity:.8"></span>').join('') + '</div></div>';
         break;
+      case 13:
+        h = lock('9:30', '<div class="ntw" style="top:196px">' + nt('آج کا خلاصہ', 'علی · 2 سفر · 7 خبریں · 0 کالیں', '9:30 PM', 'in') + '</div><div style="position:absolute;left:14px;right:14px;top:316px;background:rgba(250,246,238,.95);border-radius:24px;padding:14px 16px;display:flex;flex-direction:column;gap:2px;text-align:right"><div style="display:flex;align-items:center;gap:6px;direction:ltr;font:800 12.5px var(--f-display);color:#4A4F66">' + star(16, '#1F2A5C', '#E8A33D') + 'POHNCH</div><b class="u" style="font-size:16px;line-height:1.5;color:#4A4F66">کل صبح</b><b style="font:800 40px/1.1 var(--f-display);text-align:left">7:05</b><span class="u" style="font-size:14px;color:#4A4F66;line-height:1.5">رفیق بھائی · 12 بچے</span></div>').replace('class="ps lattice"', 'class="ps lattice" style="filter:brightness(.72) saturate(1.1)"');
+        break;
       case 12:
         h = '<div class="ps" style="background:#17705A;color:#FAF6EE"><div class="di"></div>' + sb('2:05', true) +
           '<div style="position:absolute;left:0;right:0;top:96px;display:flex;flex-direction:column;align-items:center;gap:2px;text-align:center">' + star(96, '#FAF6EE', '#E8A33D') +
@@ -915,7 +934,8 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     null,
     [['An Android phone · 8:00', 'ایک اینڈرائیڈ فون · 8:00'], ['The same trip as an ongoing notification', 'یہی سفر، جاری نوٹیفکیشن میں']],
     [["Sana's home screen · 1:30", 'ثنا کی ہوم اسکرین · 1:30'], ['Widget: the afternoon run leaves school at 1:35', 'ویجٹ: دوپہر کی وین 1:35 پر اسکول سے']],
-    [["Sana's phone · 2:05", 'ثنا کا فون · 2:05'], ['Rafiq bhai dropped Ali home', 'رفیق بھائی نے علی کو گھر اتار دیا']]
+    [["Sana's phone · 2:05", 'ثنا کا فون · 2:05'], ['Rafiq bhai dropped Ali home', 'رفیق بھائی نے علی کو گھر اتار دیا']],
+    [["Sana's phone · 9:30 pm", 'ثنا کا فون · رات 9:30'], ['Today: 2 trips, 7 alerts, 0 calls', 'آج: 2 سفر، 7 خبریں، 0 کالیں']]
   ];
   function capFor(k, s, wo) {
     const pick = (p) => [L(p[0][0], p[0][1]), L(p[1][0], p[1][1])];
@@ -925,10 +945,11 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     if (k === 9) return [L("Sana's phone · 7:52", 'ثنا کا فون · 7:52'), L('Pohnch Live, Rs ' + fmt(s.price) + ' a month', 'پہنچ لائیو، Rs ' + fmt(s.price) + ' ماہانہ')];
     return pick(caps[k]);
   }
-  function drawPhone(flash, shake) {
+  function drawPhone(flash, shake, kk) {
     if (!dockW) return;
-    $('shaker').innerHTML = phone(i, st, without);
-    const c = capFor(i, st, without); $('capWho').textContent = c[0]; $('capSub').textContent = c[1];
+    const k = kk != null ? kk : (fin ? 13 : i);
+    $('shaker').innerHTML = phone(k, st, without && k < 13);
+    const c = capFor(k, st, without && k < 13); $('capWho').textContent = c[0]; $('capSub').textContent = c[1];
     if (!reduce) {
       if (flash) { const ps = $('shaker').querySelector('.ps'); if (ps) ps.classList.add('flash'); }
       const sh = $('shaker'); sh.classList.remove('ring', 'buzz'); void sh.offsetWidth;
@@ -1006,11 +1027,13 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     const fs = cam.s * FAR;
     far.style.transform = 'translate(' + (W_ / 2 - cam.x * fs) + 'px,' + (H_ / 2 - cam.y * fs) + 'px) scale(' + fs + ')';
     camEl.style.transform = cam.tilt ? 'perspective(1500px) rotateX(' + cam.tilt.toFixed(2) + 'deg)' : '';
+    $('lights').style.transform = world.style.transform;
   }
   function frameTarget(k) {
     const f = frames[k], x = parseFloat(f.style.left), y = parseFloat(f.style.top);
     return { x: x + FW / 2, y: y + 470, s: Math.min(vw() / 1230, (vh() - 96) / 1010) };
   }
+  const finTarget = () => { const o = overTarget(); return { x: W / 2, y: H / 2 + H * .2, s: o.s * .84 }; };
   const overTarget = () => ({ x: W / 2, y: H / 2 - 20, s: Math.min(vw() / (W + 100), (vh() - 60) / (H + 100)) });
   const ease = (t) => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   function fly(target, opts) {
@@ -1032,6 +1055,31 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       if (toL !== fromL) placeVan(fromL + (toL - fromL) * e, t < 1);
       applyCam();
       if (t < 1) flight = requestAnimationFrame(step); else { flight = null; cam.tilt = 0; applyCam(); if (opts.done) opts.done(); }
+    };
+    flight = requestAnimationFrame(step);
+  }
+
+  const clockFmt = (m) => { const h = Math.floor(m / 60) % 24, mm = Math.round(m % 60); return ((h + 11) % 12 + 1) + ':' + String(mm).padStart(2, '0'); };
+  function ride(target, fromK, toK, done) {
+    if (flight) cancelAnimationFrame(flight);
+    const from = { x: cam.x, y: cam.y, s: cam.s }, fromL = vanLen, toL = anchors[toK];
+    const dir = Math.sign(toL - fromL) || 1, sC = target.s * 2.25, T = 22, dur = 3100;
+    const m0 = mins(times[fromK]), m1 = mins(times[toK]);
+    const tag = $('vanTag'), tagT = $('vanTagT');
+    play('engine', dur / 1000);
+    const at = (l) => { const p = route.getPointAtLength(Math.max(0, Math.min(total, l))), q = route.getPointAtLength(Math.max(0, Math.min(total, l + dir * 160))); return { x: (p.x + q.x) / 2, y: (p.y + q.y) / 2 - 40 }; };
+    const t0 = performance.now();
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / dur);
+      const vp = Math.max(0, Math.min(1, (t - .16) / .66)), ve = ease(vp), l = fromL + (toL - fromL) * ve;
+      placeVan(l, vp > 0 && vp < 1);
+      const c = at(l), m = m0 + (m1 - m0) * ve;
+      tagT.textContent = clockFmt(m); $('clockT').textContent = clockFmt(m);
+      if (t < .22) { const a = ease(t / .22); cam.x = from.x + (c.x - from.x) * a; cam.y = from.y + (c.y - from.y) * a; cam.s = from.s + (sC - from.s) * a; cam.tilt = T * a; tag.setAttribute('opacity', a.toFixed(2)); }
+      else if (t < .8) { cam.x = c.x; cam.y = c.y; cam.s = sC; cam.tilt = T; tag.setAttribute('opacity', '1'); }
+      else { const a = ease((t - .8) / .2); cam.x = c.x + (target.x - c.x) * a; cam.y = c.y + (target.y - c.y) * a; cam.s = sC + (target.s - sC) * a; cam.tilt = T * (1 - a); tag.setAttribute('opacity', (1 - a).toFixed(2)); if (a > .3 && !step.wh) { step.wh = 1; play('whoosh', .8); } }
+      applyCam();
+      if (t < 1) flight = requestAnimationFrame(step); else { flight = null; cam.tilt = 0; applyCam(); tag.setAttribute('opacity', '0'); setLight(toK); if (done) done(); }
     };
     flight = requestAnimationFrame(step);
   }
@@ -1059,7 +1107,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     $('prev').disabled = i === 0 && !fin;
     $('next').disabled = fin;
     $('overview').setAttribute('aria-pressed', String(over));
-    setLight(i);
+    if (fin) { /* night keeps its own light */ } else if (!flight) setLight(i); else { const m = mins(times[i]); $('dawn').style.opacity = Math.max(0, Math.min(1, (455 - m) / 45)).toFixed(2); $('dusk').style.opacity = (m > 600 ? Math.max(0, Math.min(1, (m - 770) / 70)) : 0).toFixed(2); }
     const nm = L(frames[i].getAttribute('aria-label'), frames[i].dataset.urName);
     $('notesStop').textContent = L('Stop ', 'پڑاؤ ') + (i + 1) + L(' of ', ' از ') + N + ' · ' + nm;
     $('notesText').textContent = L(notes[i][0], notes[i][1]);
@@ -1074,9 +1122,14 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     const prev = i, wasOver = over;
     over = false; i = Math.max(0, Math.min(N - 1, k));
     clearInk();
-    fly(frameTarget(i), { vanTo: anchors[i], dip: wasOver ? 0 : undefined, lift: wasOver ? 0 : undefined, tilt: wasOver ? 3 : undefined, done: () => { drawIn(i); } });
+    const riding = !wasOver && !reduce && Math.abs(i - prev) === 1;
+    if (riding) ride(frameTarget(i), prev, i, () => { drawIn(i); });
+    else fly(frameTarget(i), { vanTo: anchors[i], dip: wasOver ? 0 : undefined, lift: wasOver ? 0 : undefined, tilt: wasOver ? 3 : undefined, done: () => { drawIn(i); } });
     render();
-    if (i !== prev || wasOver) { drawPhone(true, i === 1 ? 'ring' : null); play('whoosh', 1.3); if (i === 1) setTimeout(() => play('ring'), 900); }
+    if (riding) frames[i].classList.remove('active');
+    if (riding) setTimeout(() => { if (!over && !fin) { frames[i].classList.add('active'); } }, 2350);
+    const kNow = i;
+    if (i !== prev || wasOver) { if (riding) setTimeout(() => { if (i === kNow && !fin) drawPhone(true, kNow === 1 ? 'ring' : null); }, 2300); else drawPhone(true, i === 1 ? 'ring' : null); if (!riding) play('whoosh', 1.3); if (i === 1) setTimeout(() => play('ring'), riding ? 2300 : 900); }
     if (playing && !fromPlay) schedule();
   }
   function toggleOver() {
@@ -1084,19 +1137,57 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     over = !over; render();
     fly(over ? overTarget() : frameTarget(i), { dip: 0, lift: 0, tilt: 3, dur: 1200 });
   }
+  let lightsBuilt = false;
+  function buildLights() {
+    if (lightsBuilt) return; lightsBuilt = true;
+    const ls = $('lightsSvg'), add = (t, a) => ls.appendChild(svgEl(t, a));
+    const glow = svgEl('g', {}); ls.appendChild(glow);
+    [[130, '#E8A33D', .10], [54, '#E8A33D', .32], [18, '#FBEBCF', 1]].forEach(([w, c, o]) => glow.appendChild(svgEl('path', { d: route.getAttribute('d'), fill: 'none', stroke: c, 'stroke-opacity': o, 'stroke-width': w, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', class: 'glowpath' })));
+    for (let l = 0; l < total; l += 170) { const p = route.getPointAtLength(l); add('circle', { cx: p.x, cy: p.y - 70, r: 48, fill: '#E8A33D', 'fill-opacity': .16 }); add('circle', { cx: p.x, cy: p.y - 70, r: 12, fill: '#FBEBCF' }); }
+    ['r1', 'r2', 'r3', 'v1', 'v2', 'v3', 'v4'].forEach((id) => { const pth = $(id), tl = pth.getTotalLength(); for (let l = 80; l < tl; l += 190) { const p = pth.getPointAtLength(l); add('circle', { cx: p.x + 30, cy: p.y - 30, r: 36, fill: '#E8A33D', 'fill-opacity': .13 }); add('circle', { cx: p.x + 30, cy: p.y - 30, r: 9, fill: '#FBEBCF' }); } });
+    const boxes = frames.map((f) => [parseFloat(f.style.left) - 20, parseFloat(f.style.top) - 40, FW + 40, FH + 60]).concat([[230, 1540, 1040, 480]]);
+    let sd = 11; const rnd = () => { sd = (sd * 9301 + 49297) % 233280; return sd / 233280; };
+    for (let n = 0; n < 900 && ls.querySelectorAll('.win').length < 260; n++) {
+      const x = 80 + rnd() * 7240, y = 60 + rnd() * 3820;
+      if (boxes.some(([bx, by, bw, bh]) => x > bx && x < bx + bw && y > by && y < by + bh)) continue;
+      const w = add('rect', { x, y, width: 26, height: 22, rx: 4, fill: rnd() < .8 ? '#FBEBCF' : '#E8A33D', 'fill-opacity': (.45 + rnd() * .5).toFixed(2), class: 'win' });
+      if (rnd() < .18) w.innerHTML = '<animate attributeName="fill-opacity" values=".9;.15;.9" dur="' + (3 + rnd() * 5).toFixed(1) + 's" begin="' + (rnd() * 4).toFixed(1) + 's" repeatCount="indefinite"/>';
+    }
+    [['r1', 30, 0], ['r1', 44, 1], ['r2', 36, 1], ['r2', 26, 0], ['r3', 40, 0], ['r3', 52, 1], ['v2', 24, 0], ['v3', 28, 1], ['v4', 22, 0], ['v1', 18, 1]].forEach(([id, dur, rev], n) => {
+      const g = svgEl('g', {}); g.innerHTML = '<circle r="46" fill="#FBEBCF" fill-opacity=".18"/><circle r="14" fill="#FFFFFF"/><animateMotion dur="' + dur + 's" begin="-' + (n * 3) + 's" repeatCount="indefinite"' + (rev ? ' keyPoints="1;0" keyTimes="0;1" calcMode="linear"' : '') + '><mpath href="#' + id + '"/></animateMotion>'; ls.appendChild(g);
+    });
+    anchors.forEach((l) => { const p = route.getPointAtLength(l); add('circle', { cx: p.x, cy: p.y, r: 110, fill: '#17705A', 'fill-opacity': .34 }); add('circle', { cx: p.x, cy: p.y, r: 32, fill: '#DCEFE7' }); });
+    const pe = route.getPointAtLength(anchors[N - 1]);
+    const home = svgEl('g', {}); home.innerHTML = '<circle cx="' + (pe.x + 110) + '" cy="' + (pe.y - 20) + '" r="300" fill="#E8A33D" fill-opacity=".16"><animate attributeName="r" values="260;340;260" dur="3s" repeatCount="indefinite"/></circle><rect x="' + (pe.x + 84) + '" y="' + (pe.y - 26) + '" width="22" height="18" rx="3" fill="#FBEBCF"/><rect x="' + (pe.x + 114) + '" y="' + (pe.y - 26) + '" width="22" height="18" rx="3" fill="#FBEBCF"/>';
+    ls.appendChild(home);
+    if (reduce) ls.pauseAnimations();
+  }
+  function nightOn(on) {
+    document.body.classList.toggle('night', on);
+    $('moonCut').setAttribute('opacity', on ? '1' : '0');
+    if (on) {
+      buildLights();
+      $('sun').setAttribute('cx', '30'); $('sun').setAttribute('cy', '9'); $('sun').setAttribute('fill', '#FAF6EE'); $('clockT').textContent = '9:30';
+      $('dawn').style.opacity = '0'; $('dusk').style.opacity = '1';
+      document.querySelectorAll('.glowpath').forEach((g) => { if (reduce) return; g.style.transition = 'none'; g.style.strokeDasharray = total + ' ' + total; g.style.strokeDashoffset = total; void g.getBoundingClientRect(); g.style.transition = 'stroke-dashoffset 3.6s cubic-bezier(.4, 0, .2, 1) 1.6s'; g.style.strokeDashoffset = '0'; });
+    } else { $('sun').setAttribute('fill', '#E8A33D'); setLight(i); }
+  }
   function finale(on) {
     fin = on; $('finale').hidden = !on;
+    nightOn(on);
     if (on) {
+      $('finTop').textContent = L('9:30 pm · everyone is home', 'رات 9:30 · سب گھر پر');
+      setTimeout(() => { if (fin) { drawPhone(true, 'buzz', 13); play('night'); } }, 1800);
       over = false; if (playing) setPlay(false);
-      $('finT').textContent = L('Rs 3,000,000 for the first year · Rs 400,000 starts the pilot', 'پہلا سال Rs 3,000,000 · پائلٹ Rs 400,000 سے');
-      $('finS').textContent = L('Mohammad Hassan · Habib University · 0300 1478729 · mh10949@st.habib.edu.pk', 'محمد حسن · حبیب یونیورسٹی · 0300 1478729 · mh10949@st.habib.edu.pk');
+      $('finT').textContent = L('Rs 3,000,000 for the first year.\nRs 400,000 starts the pilot.', 'پہلا سال: Rs 3,000,000\nپائلٹ: Rs 400,000');
+      $('finS').textContent = L('Mohammad Hassan · Habib University\n0300 1478729 · mh10949@st.habib.edu.pk', 'محمد حسن · حبیب یونیورسٹی\n\u20660300 1478729 · mh10949@st.habib.edu.pk\u2069');
       $('finBack').textContent = L('Back to the route', 'واپس راستے پر');
-      fly(overTarget(), { dip: 0, lift: 0, tilt: 3, dur: 1600 });
-      setTimeout(() => play('chime'), 900);
+      fly(finTarget(), { dip: 0, lift: 0, tilt: 3, dur: 1800 });
       if (!reduce) { trail.style.transition = 'none'; trail.style.strokeDashoffset = String(total); void trail.getBoundingClientRect(); trail.style.transition = 'stroke-dashoffset 3s ease .3s, opacity .6s ease'; trail.style.strokeDashoffset = '0'; }
       else trail.style.strokeDashoffset = '0';
-    } else { trail.style.transition = ''; trail.style.strokeDashoffset = String(total - vanLen); }
+    } else { trail.style.transition = ''; trail.style.strokeDashoffset = String(total - vanLen); drawPhone(true); }
     render();
+    if (on) $('clockT').textContent = '9:30';
   }
   $('finBack').addEventListener('click', () => { finale(false); fly(frameTarget(i), { dip: 0, lift: 0, tilt: 3, dur: 1200 }); });
 
@@ -1151,7 +1242,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     renderVanList(); reqRender(); calc(); renderFunds(); renderUndo();
     if (!$('keys').hidden) renderKeys();
     if (without) $('banner').textContent = L('The same morning, without Pohnch · W to switch back', 'یہی صبح، پہنچ کے بغیر · واپسی کے لیے W');
-    if (fin) { $('finT').textContent = L('Rs 3,000,000 for the first year · Rs 400,000 starts the pilot', 'پہلا سال Rs 3,000,000 · پائلٹ Rs 400,000 سے'); $('finS').textContent = L('Mohammad Hassan · Habib University · 0300 1478729 · mh10949@st.habib.edu.pk', 'محمد حسن · حبیب یونیورسٹی · 0300 1478729 · mh10949@st.habib.edu.pk'); $('finBack').textContent = L('Back to the route', 'واپس راستے پر'); }
+    if (fin) { $('finTop').textContent = L('9:30 pm · everyone is home', 'رات 9:30 · سب گھر پر'); $('finT').textContent = L('Rs 3,000,000 for the first year.\nRs 400,000 starts the pilot.', 'پہلا سال: Rs 3,000,000\nپائلٹ: Rs 400,000'); $('finS').textContent = L('Mohammad Hassan · Habib University\n0300 1478729 · mh10949@st.habib.edu.pk', 'محمد حسن · حبیب یونیورسٹی\n\u20660300 1478729 · mh10949@st.habib.edu.pk\u2069'); $('finBack').textContent = L('Back to the route', 'واپس راستے پر'); }
     render(); drawPhone(false);
     if (sketched) sketchMarks();
     if (document.body.classList.contains('read')) buildStory();
@@ -1252,7 +1343,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     if (showDock) { const ps = Math.max(.6, Math.min(1.1, (innerHeight - 170) / 624)); document.documentElement.style.setProperty('--ps', ps.toFixed(3)); dockW = Math.round(300 * ps + 70); }
     else dockW = 0;
     document.documentElement.style.setProperty('--dock-w', dockW + 'px');
-    Object.assign(cam, fin || over ? overTarget() : frameTarget(i), { tilt: 0 }); applyCam();
+    Object.assign(cam, fin ? finTarget() : over ? overTarget() : frameTarget(i), { tilt: 0 }); applyCam();
     render(); drawPhone(false);
     if (drawing) sizeInk();
     if (!sketched && fontsReady) sketch();
@@ -1505,7 +1596,10 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     horn() { const t = ac.currentTime; [0, .26].forEach((d) => { tone(311, t + d, .2, 'triangle', .07); tone(392, t + d, .2, 'triangle', .05); }); },
     whoosh(dur) { const t = ac.currentTime, s = noise(dur), f = ac.createBiquadFilter(), v = ac.createGain(); f.type = 'bandpass'; f.Q.value = .8; f.frequency.setValueAtTime(260, t); f.frequency.linearRampToValueAtTime(900, t + dur * .5); f.frequency.linearRampToValueAtTime(240, t + dur); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(.16, t + dur * .45); v.gain.linearRampToValueAtTime(0, t + dur); s.connect(f).connect(v).connect(master); s.start(t); s.stop(t + dur); },
     chime() { const t = ac.currentTime; [523.25, 659.25, 783.99, 1046.5].forEach((f, n) => tone(f, t + n * .14, 1.6, 'sine', .07)); },
-    dull() { const t = ac.currentTime; tone(196, t, .5, 'sine', .08, 150); }
+    dull() { const t = ac.currentTime; tone(196, t, .5, 'sine', .08, 150); },
+    engine(dur) { const t = ac.currentTime, f = ac.createBiquadFilter(), v = ac.createGain(); f.type = 'lowpass'; f.frequency.value = 260; v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(.07, t + .5); v.gain.setValueAtTime(.07, t + dur - .7); v.gain.linearRampToValueAtTime(0, t + dur); f.connect(v).connect(master);
+      [68, 71.5].forEach((hz) => { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(hz * .8, t); o.frequency.linearRampToValueAtTime(hz * 1.25, t + dur * .45); o.frequency.linearRampToValueAtTime(hz * .85, t + dur); o.connect(f); o.start(t); o.stop(t + dur + .05); }); },
+    night() { const t = ac.currentTime; [392, 493.88, 587.33, 783.99].forEach((f, n) => tone(f, t + n * .35, 2.6, 'sine', .05)); }
   };
   function play(name, arg) { if (!soundOn || !audio()) return; sfx[name](arg); }
   function setAmbient(on) {
