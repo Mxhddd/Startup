@@ -49,8 +49,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--kesar); out
 #far { position: absolute; left: 0; top: 0; width: 1px; height: 1px; transform-origin: 0 0; will-change: transform; }
 #farInner { position: absolute; left: -3000px; top: -2500px; width: 13400px; height: 10000px;
   background-image: radial-gradient(var(--grid) 1.8px, transparent 1.8px); background-size: 40px 40px; }
-#world { position: absolute; left: 0; top: 0; width: 7400px; height: 4200px; transform-origin: 0 0; will-change: transform; transition: filter .8s ease; }
-#ink { position: absolute; inset: 0; width: 7400px; height: 4200px; overflow: visible; pointer-events: none; }
+#world { position: absolute; left: 0; top: 0; width: 8200px; height: 5200px; transform-origin: 0 0; will-change: transform; transition: filter .8s ease; }
+#ink { position: absolute; inset: 0; width: 8200px; height: 5200px; overflow: visible; pointer-events: none; }
 .light { position: absolute; inset: 0; pointer-events: none; transition: opacity 1.8s ease; }
 #dawn { background: radial-gradient(110% 80% at 0% 0%, rgba(232, 163, 61, .17), rgba(232, 163, 61, 0) 62%), radial-gradient(80% 60% at 10% 0%, rgba(168, 50, 31, .05), rgba(168, 50, 31, 0) 60%); }
 #dusk { background: radial-gradient(110% 85% at 100% 0%, rgba(232, 163, 61, .16), rgba(232, 163, 61, 0) 64%), linear-gradient(0deg, rgba(201, 162, 74, .05), rgba(201, 162, 74, 0)); }
@@ -73,7 +73,23 @@ body.night #cap span { color: #C9CCE0; }
 #draw { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 body.drawing #draw { pointer-events: auto; cursor: crosshair; }
 
-.frame { position: absolute; width: 1100px; height: 700px; }
+.frame { position: absolute; width: 1100px; height: 700px; z-index: 1; }
+/* each stop is a hoarding standing in the city */
+.frame::before { content: ""; position: absolute; left: -46px; right: -46px; top: -62px; bottom: -42px; z-index: -1; border-radius: 10px; background: #FFFEFA;
+  box-shadow: 0 0 0 3px #141A33, 0 0 0 11px #E2DCCD, 0 0 0 14px #141A33, 22px 30px 0 8px rgba(20, 26, 51, .12), 0 40px 70px rgba(20, 26, 51, .14); }
+.frame::after { content: ""; position: absolute; left: 150px; right: 150px; top: calc(100% + 56px); height: 118px; z-index: -2;
+  background: linear-gradient(90deg, #4A4F66 0 16px, transparent 16px calc(50% - 8px), #4A4F66 calc(50% - 8px) calc(50% + 8px), transparent calc(50% + 8px) calc(100% - 16px), #4A4F66 calc(100% - 16px)); }
+.lamp { position: absolute; top: -118px; width: 54px; height: 24px; border-radius: 6px 6px 14px 14px; background: #141A33; z-index: 2; transform: translateX(-50%); transition: background .2s; }
+.lamp i { position: absolute; left: 50%; top: 24px; width: 6px; height: 38px; margin-left: -3px; background: #141A33; }
+.lamp b { position: absolute; left: 50%; top: 18px; width: 560px; height: 420px; transform: translateX(-50%); background: radial-gradient(50% 60% at 50% 0%, rgba(251, 235, 207, .55), rgba(251, 235, 207, 0) 100%); opacity: 0; pointer-events: none; }
+.frame.active .lamp { background: #E8A33D; }
+.frame.active .lamp b { animation: lampOn 1.1s steps(1, end) .15s both; }
+@keyframes lampOn { 0% { opacity: 0; } 12% { opacity: .9; } 22% { opacity: .1; } 34% { opacity: 1; } 48% { opacity: .35; } 60%, 100% { opacity: .75; } }
+.cloud { position: absolute; width: 1500px; height: 820px; border-radius: 50%; background: radial-gradient(closest-side, rgba(20, 26, 51, .085), rgba(20, 26, 51, 0)); pointer-events: none; z-index: 3; animation: drift linear infinite; will-change: transform; }
+@keyframes drift { from { transform: translateX(-1800px); } to { transform: translateX(9400px); } }
+.flock { position: absolute; left: 0; width: 120px; height: 60px; pointer-events: none; z-index: 3; animation: fly linear infinite; }
+@keyframes fly { 0% { transform: translate(-400px, 0); } 50% { transform: translate(3700px, -160px); } 100% { transform: translate(8600px, 40px); } }
+body.night .cloud, body.night .flock { display: none; }
 body.over .frame { cursor: zoom-in; }
 body.over .frame * { pointer-events: none; }
 .u { font-family: var(--f-urdu); direction: rtl; unicode-bidi: isolate; }
@@ -81,7 +97,8 @@ body.over .frame * { pointer-events: none; }
 .mk { font-family: var(--f-marker); }
 .time { position: absolute; left: 0; top: -8px; font: 700 28px/1 var(--f-marker); color: var(--shingarf); }
 h1, h2, h3 { margin: 0; font-weight: 800; letter-spacing: -0.02em; text-wrap: balance; }
-h2 { font-size: 62px; line-height: 1.06; color: var(--ink); max-width: 1000px; }
+.frame h2.h-sm { font-size: 58px; }
+h2 { font-size: 68px; line-height: 1.05; color: var(--ink); max-width: 1000px; }
 p { margin: 0; }
 .lead { font-size: 28px; line-height: 1.45; color: var(--ink-2); max-width: 760px; }
 .note { position: absolute; background: var(--kesar-tint); padding: 20px 22px 18px; font: 600 25px/1.3 var(--f-marker); color: var(--ink);
@@ -184,7 +201,9 @@ body.ur .fund-list b { margin-left: 0; margin-right: auto; }
 /* paper, ink and kinetic type */
 #grain { position: absolute; inset: 0; pointer-events: none; opacity: .5;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .08 0 0 0 0 .1 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
-#vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 95% at 50% 45%, rgba(20, 26, 51, 0) 60%, rgba(20, 26, 51, .09) 100%); }
+#vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(85% 85% at 50% 46%, rgba(20, 26, 51, 0) 55%, rgba(20, 26, 51, .26) 100%); opacity: .35; transition: opacity 1s ease; }
+body.atstop #vignette { opacity: 1; }
+body.night #vignette, body.over #vignette { opacity: .3; }
 mark { color: inherit; padding: 0 .06em; margin: 0 -.06em; background: linear-gradient(transparent 56%, rgba(232, 163, 61, .5) 56%, rgba(232, 163, 61, .5) 90%, transparent 90%) no-repeat 0 0 / 100% 100%; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
 .amaanbox mark { background-image: linear-gradient(transparent 56%, rgba(232, 163, 61, .45) 56%, rgba(232, 163, 61, .45) 90%, transparent 90%); }
 body.ur mark { background-position: 100% 0; }
@@ -361,6 +380,8 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   .frame.active mark, .frame.active h1, .frame.active h2, .vanart .bob, .frame.active .mark-dot, #coldGo,
   .frame.active .note, .nt.in, .frame.active .fundvan, .ps.flash, .floater, .shaker.ring, .shaker.buzz, #finale .fcard, .puff.go { animation: none; }
   .tilt, #phoneBox { transition: none; }
+  .cloud, .flock { animation: none; display: none; }
+  .frame.active .lamp b { animation: none; opacity: .75; }
 }
 </style>
 
@@ -371,31 +392,44 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   <div id="cam">
     <div id="far" aria-hidden="true"><div id="farInner"></div><canvas id="farMap" style="position:absolute; left:-3000px; top:-2500px; width:13400px; height:10000px"></canvas></div>
     <div id="world">
-      <svg id="ink" viewBox="0 0 7400 4200" aria-hidden="true">
+      <svg id="ink" viewBox="0 0 8200 5200" aria-hidden="true">
+        <g id="city"></g>
         <g id="minor"></g>
-        <path d="M 750 1090 H 6350 C 7350 1090 7350 2390 6350 2390 H 2150 C 1150 2390 1150 3690 2150 3690 H 6350" fill="none" stroke="#E2DCCD" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M 750 1090 H 6350 C 7350 1090 7350 2390 6350 2390 H 2150 C 1150 2390 1150 3690 2150 3690 H 6350" fill="none" stroke="#FFFFFF" stroke-width="46" stroke-linecap="round"/>
-        <path id="route" d="M 750 1090 H 6350 C 7350 1090 7350 2390 6350 2390 H 2150 C 1150 2390 1150 3690 2150 3690 H 6350" fill="none" stroke="#1F2A5C" stroke-width="9" stroke-linecap="round" stroke-dasharray="2 22"/>
-        <path id="trail" d="M 750 1090 H 6350 C 7350 1090 7350 2390 6350 2390 H 2150 C 1150 2390 1150 3690 2150 3690 H 6350" fill="none" stroke="#1F2A5C" stroke-width="13" stroke-linecap="round"/>
+        <path d="M 750 1090 H 7150 C 8150 1090 8150 2790 7150 2790 H 2350 C 1350 2790 1350 4490 2350 4490 H 7150" fill="none" stroke="#E2DCCD" stroke-width="64" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M 750 1090 H 7150 C 8150 1090 8150 2790 7150 2790 H 2350 C 1350 2790 1350 4490 2350 4490 H 7150" fill="none" stroke="#FFFFFF" stroke-width="46" stroke-linecap="round"/>
+        <path id="route" d="M 750 1090 H 7150 C 8150 1090 8150 2790 7150 2790 H 2350 C 1350 2790 1350 4490 2350 4490 H 7150" fill="none" stroke="#1F2A5C" stroke-width="9" stroke-linecap="round" stroke-dasharray="2 22"/>
+        <path id="trail" d="M 750 1090 H 7150 C 8150 1090 8150 2790 7150 2790 H 2350 C 1350 2790 1350 4490 2350 4490 H 7150" fill="none" stroke="#1F2A5C" stroke-width="13" stroke-linecap="round"/>
         <g id="deco"></g>
         <g id="traffic"></g>
         <g id="stops"></g>
-        <g id="rough"></g>
         <g id="puffs"></g>
         <g id="van" transform="translate(750 1090)">
           <circle r="50" fill="#1F2A5C" fill-opacity=".13"><animate attributeName="r" values="36;58;36" dur="2.2s" repeatCount="indefinite"/></circle>
           <g id="vanBody">
-            <circle r="32" fill="#1F2A5C" stroke="#FFFFFF" stroke-width="7"/>
-            <path d="M-16 9 V-9 h22 l10 10 v8 Z" fill="#E8A33D"/>
-            <path d="M36 0 l-9 -7 v14 Z" fill="#1F2A5C"/>
+            <ellipse cx="6" cy="9" rx="50" ry="28" fill="#141A33" opacity=".18"/>
+            <rect x="-44" y="-24" width="88" height="48" rx="13" fill="#FFFFFF" stroke="#1F2A5C" stroke-width="4.5"/>
+            <path d="M24 -19 Q39 -18 41 0 Q39 18 24 19 Z" fill="#2B3A80"/>
+            <rect x="-38" y="-18" width="10" height="36" rx="4" fill="#2B3A80" opacity=".75"/>
+            <rect x="-24" y="-5" width="44" height="10" rx="5" fill="#E8A33D"/>
+            <g><circle cx="-16" cy="-13" r="4" fill="#17705A"/><circle cx="-3" cy="-13" r="4" fill="#E8A33D"/><circle cx="10" cy="-13" r="4" fill="#1F2A5C"/><circle cx="-16" cy="13" r="4" fill="#1F2A5C"/><circle cx="-3" cy="13" r="4" fill="#17705A"/><circle cx="10" cy="13" r="4" fill="#E8A33D"/></g>
+            <circle cx="42" cy="-14" r="4" fill="#FBEBCF"/><circle cx="42" cy="14" r="4" fill="#FBEBCF"/>
+            <rect x="18" y="-30" width="8" height="6" rx="2" fill="#1F2A5C"/><rect x="18" y="24" width="8" height="6" rx="2" fill="#1F2A5C"/>
           </g>
           <g id="vanTag" opacity="0" transform="translate(0 -76)"><rect x="-40" y="-17" width="80" height="34" rx="17" fill="#1F2A5C" stroke="#FAF6EE" stroke-width="4"/><text id="vanTagT" y="7" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="19" fill="#FAF6EE">7:05</text></g>
           <g id="vanQ"><circle r="32" fill="#B9B2A2" stroke="#FFFFFF" stroke-width="7"/><text y="13" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="38" fill="#FFFFFF">?</text></g>
         </g>
       </svg>
 
+      <div class="cloud" style="top:300px; animation-duration:150s; animation-delay:-20s"></div>
+      <div class="cloud" style="top:2400px; animation-duration:190s; animation-delay:-110s"></div>
+      <div class="cloud" style="top:4000px; animation-duration:170s; animation-delay:-60s"></div>
+      <div class="flock" style="top:1250px; animation-duration:80s; animation-delay:-12s"><svg width="120" height="60" viewBox="0 0 120 60" aria-hidden="true"><g fill="none" stroke="#141A33" stroke-width="3" stroke-linecap="round" opacity=".55"><path d="M10 30 q8 -9 16 0 q8 -9 16 0"><animate attributeName="d" values="M10 30 q8 -9 16 0 q8 -9 16 0;M10 30 q8 4 16 0 q8 4 16 0;M10 30 q8 -9 16 0 q8 -9 16 0" dur=".9s" repeatCount="indefinite"/></path><path d="M54 14 q6 -7 12 0 q6 -7 12 0"><animate attributeName="d" values="M54 14 q6 -7 12 0 q6 -7 12 0;M54 14 q6 3 12 0 q6 3 12 0;M54 14 q6 -7 12 0 q6 -7 12 0" dur=".8s" repeatCount="indefinite"/></path><path d="M66 44 q6 -7 12 0 q6 -7 12 0"><animate attributeName="d" values="M66 44 q6 -7 12 0 q6 -7 12 0;M66 44 q6 3 12 0 q6 3 12 0;M66 44 q6 -7 12 0 q6 -7 12 0" dur="1s" repeatCount="indefinite"/></path></g></svg></div>
+      <div class="flock" style="top:3250px; animation-duration:95s; animation-delay:-60s"><svg width="120" height="60" viewBox="0 0 120 60" aria-hidden="true"><g fill="none" stroke="#141A33" stroke-width="3" stroke-linecap="round" opacity=".5"><path d="M14 24 q8 -9 16 0 q8 -9 16 0"><animate attributeName="d" values="M14 24 q8 -9 16 0 q8 -9 16 0;M14 24 q8 4 16 0 q8 4 16 0;M14 24 q8 -9 16 0 q8 -9 16 0" dur=".85s" repeatCount="indefinite"/></path><path d="M60 40 q6 -7 12 0 q6 -7 12 0"><animate attributeName="d" values="M60 40 q6 -7 12 0 q6 -7 12 0;M60 40 q6 3 12 0 q6 3 12 0;M60 40 q6 -7 12 0 q6 -7 12 0" dur=".95s" repeatCount="indefinite"/></path></g></svg></div>
+
+      <svg id="inkTop" viewBox="0 0 8200 5200" aria-hidden="true" style="position:absolute; inset:0; width:8200px; height:5200px; overflow:visible; pointer-events:none; z-index:2"><g id="rough"></g></svg>
+
       <!-- map key, left column -->
-      <div style="position:absolute; left:250px; top:1560px; width:1000px; display:flex; flex-direction:column; gap:14px" aria-label="Map key">
+      <div style="position:absolute; left:250px; top:1960px; width:1000px; display:flex; flex-direction:column; gap:14px" aria-label="Map key">
         <div style="display:flex; align-items:baseline; gap:26px; flex-wrap:wrap"><span class="gz" style="font-size:120px; color:var(--neel)">کراچی</span><span class="mk" style="font-size:40px; font-weight:700" data-ur="ایک اسکول کی صبح">Karachi · one school morning</span></div>
         <div style="display:flex; flex-direction:column; gap:12px; font-size:25px">
           <div style="display:flex; align-items:center; gap:16px"><svg width="90" height="24" viewBox="0 0 90 24" aria-hidden="true"><path d="M4 12 H86" stroke="#1F2A5C" stroke-width="10" stroke-linecap="round"/></svg><span data-ur="راستہ: گلشن سے 6:55 پر، کلفٹن 8:00 تک، اور 2:05 پر واپس گھر">the route: Gulshan at 6:55 to Clifton at 8:00, and home at 2:05</span></div>
@@ -442,7 +476,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 1 · Problem -->
-      <section class="frame" data-sum="Families pay Rs 2,000 to 7,500 a child each month for a van and get no news from it. Ten of them call one driver, who answers at the wheel." data-sum-ur="گھرانے ہر بچے کی وین کے لیے ماہانہ Rs 2,000 سے 7,500 دیتے ہیں، اور کوئی خبر نہیں ملتی۔ دس گھرانے ایک ڈرائیور کو فون کرتے ہیں، جو گاڑی چلاتے ہوئے سنتے ہیں۔" data-ur-name="مسئلہ" style="left:1600px; top:200px" aria-label="The problem">
+      <section class="frame" data-sum="Families pay Rs 2,000 to 7,500 a child each month for a van and get no news from it. Ten of them call one driver, who answers at the wheel." data-sum-ur="گھرانے ہر بچے کی وین کے لیے ماہانہ Rs 2,000 سے 7,500 دیتے ہیں، اور کوئی خبر نہیں ملتی۔ دس گھرانے ایک ڈرائیور کو فون کرتے ہیں، جو گاڑی چلاتے ہوئے سنتے ہیں۔" data-ur-name="مسئلہ" style="left:1800px; top:200px" aria-label="The problem">
         <span class="time" data-ur="7:02 · وین کہاں ہے؟">7:02 · where is the van?</span>
         <h2 style="position:absolute; left:0; top:44px" data-ur="ہر اسکول کی صبح، دس گھرانے &lt;mark&gt;ایک ڈرائیور&lt;/mark&gt; کو فون کرتے ہیں۔">Every school morning, ten families call <mark>one driver</mark>.</h2>
         <div class="note tilt" style="left:10px; top:240px; rotate:-3deg"><span class="u">وین نکل گئی؟</span><span data-ur="">has the van left?</span></div>
@@ -457,7 +491,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 2 · Live map -->
-      <section class="frame" data-sum="Parents watch the van move on a map and see the minutes to their door, also on the lock screen. No GPS box: the driver's phone shares its location, only during the trip." data-sum-ur="والدین وین کو نقشے پر چلتا دیکھتے ہیں اور دروازے تک کے منٹ، لاک اسکرین پر بھی۔ کوئی جی پی ایس ڈبہ نہیں: ڈرائیور کا فون صرف سفر کے دوران مقام بتاتا ہے۔" data-ur-name="لائیو نقشہ" style="left:3000px; top:200px" aria-label="Live map">
+      <section class="frame" data-sum="Parents watch the van move on a map and see the minutes to their door, also on the lock screen. No GPS box: the driver's phone shares its location, only during the trip." data-sum-ur="والدین وین کو نقشے پر چلتا دیکھتے ہیں اور دروازے تک کے منٹ، لاک اسکرین پر بھی۔ کوئی جی پی ایس ڈبہ نہیں: ڈرائیور کا فون صرف سفر کے دوران مقام بتاتا ہے۔" data-ur-name="لائیو نقشہ" style="left:3400px; top:200px" aria-label="Live map">
         <span class="time" data-ur="7:05 · وین نکل گئی">7:05 · the van leaves</span>
         <h2 style="position:absolute; left:0; top:44px; max-width:520px" data-ur="آپ کے بچے کی وین، &lt;mark&gt;لائیو&lt;/mark&gt;، آپ کے فون پر۔">Your child's van, <mark>live</mark>, on your phone.</h2>
         <p class="lead" style="position:absolute; left:0; top:250px; max-width:480px" data-ur="وین نقشے پر چلتی دکھائی دیتی ہے، دروازے تک کے منٹوں کے ساتھ۔ کوئی جی پی ایس ڈبہ نہیں: ڈرائیور کا اپنا فون مقام بتاتا ہے، اور صرف سفر کے دوران۔">The van moves on a map, with the minutes to your door. No GPS box: the driver's own phone shares its location, and only while the trip runs.</p>
@@ -484,7 +518,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 3 · Map plus tap -->
-      <section class="frame" data-sum="Arriving at the door is sent by the map on its own. Getting in is one tap by the driver, with siblings in one tap and five seconds to undo." data-sum-ur="دروازے پر پہنچنے کی خبر نقشہ خود دیتا ہے۔ وین میں بیٹھنا ڈرائیور کی ایک ٹیپ ہے: بہن بھائی ایک ٹیپ میں، اور واپسی کے لیے پانچ سیکنڈ۔" data-ur-name="نقشہ اور ٹیپ" style="left:4400px; top:200px" aria-label="Map plus tap">
+      <section class="frame" data-sum="Arriving at the door is sent by the map on its own. Getting in is one tap by the driver, with siblings in one tap and five seconds to undo." data-sum-ur="دروازے پر پہنچنے کی خبر نقشہ خود دیتا ہے۔ وین میں بیٹھنا ڈرائیور کی ایک ٹیپ ہے: بہن بھائی ایک ٹیپ میں، اور واپسی کے لیے پانچ سیکنڈ۔" data-ur-name="نقشہ اور ٹیپ" style="left:5000px; top:200px" aria-label="Map plus tap">
         <span class="time" data-ur="7:12 · علی وین میں">7:12 · Ali gets in</span>
         <h2 style="position:absolute; left:0; top:44px" data-ur="نقشہ بتاتا ہے وین کہاں ہے۔ ایک ٹیپ بتاتی ہے &lt;mark&gt;بچہ اس میں ہے&lt;/mark&gt;۔">The map says where the van is. A tap says <mark>your child is in it</mark>.</h2>
         <div style="position:absolute; left:0; top:262px; width:420px; display:flex; flex-direction:column; gap:14px">
@@ -511,10 +545,10 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 4 · Marketplace -->
-      <section class="frame" data-sum="Add your child, home and school, and see the verified vans whose route already passes near you, with seats, fee and on-time record. Book a seat with a one-week trial." data-sum-ur="بچہ، گھر اور اسکول بتائیں اور وہ تصدیق شدہ وینیں دیکھیں جن کا راستہ پہلے سے آپ کے قریب سے گزرتا ہے: سیٹیں، فیس اور وقت کی پابندی۔ ایک ہفتے کی آزمائش کے ساتھ سیٹ بک کریں۔" data-ur-name="وین ڈھونڈیں" style="left:5800px; top:200px" aria-label="Find a van">
+      <section class="frame" data-sum="Add your child, home and school, and see the verified vans whose route already passes near you, with seats, fee and on-time record. Book a seat with a one-week trial." data-sum-ur="بچہ، گھر اور اسکول بتائیں اور وہ تصدیق شدہ وینیں دیکھیں جن کا راستہ پہلے سے آپ کے قریب سے گزرتا ہے: سیٹیں، فیس اور وقت کی پابندی۔ ایک ہفتے کی آزمائش کے ساتھ سیٹ بک کریں۔" data-ur-name="وین ڈھونڈیں" style="left:6600px; top:200px" aria-label="Find a van">
         <span class="time" data-ur="7:20 · پڑوسی بھی شامل ہونا چاہتے ہیں">7:20 · a neighbour wants in</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:540px" data-ur="وہ وین چنیں جو پہلے ہی &lt;mark&gt;آپ کے دروازے&lt;/mark&gt; سے گزرتی ہے۔">Choose a van that already drives <mark>past your door</mark>.</h2>
-        <p class="lead" style="position:absolute; left:0; top:260px; max-width:500px" data-ur="بچہ، گھر اور اسکول بتائیں۔ پہنچ وہ تصدیق شدہ وینیں دکھاتا ہے جن کا راستہ آپ کے قریب سے گزرتا ہے: سیٹیں، فیس اور وقت کی پابندی۔ سیٹ ماہانہ ہے، ایک ہفتے کی آزمائش کے ساتھ۔">Add your child, home and school. Pohnch shows the verified vans whose route passes near you, with seats, fee and on-time record. A seat is monthly, with a one-week trial.</p>
+        <h2 class="h-sm" style="position:absolute; left:0; top:44px; max-width:560px" data-ur="وہ وین چنیں جو پہلے ہی &lt;mark&gt;آپ کے دروازے&lt;/mark&gt; سے گزرتی ہے۔">Choose a van that already drives <mark>past your door</mark>.</h2>
+        <p class="lead" style="position:absolute; left:0; top:292px; max-width:520px" data-ur="بچہ، گھر اور اسکول بتائیں۔ پہنچ وہ تصدیق شدہ وینیں دکھاتا ہے جن کا راستہ آپ کے قریب سے گزرتا ہے: سیٹیں، فیس اور وقت کی پابندی۔ سیٹ ماہانہ ہے، ایک ہفتے کی آزمائش کے ساتھ۔">Add your child, home and school. Pohnch shows the verified vans whose route passes near you, with seats, fee and on-time record. A seat is monthly, with a one-week trial.</p>
         <div class="card tilt" style="position:absolute; left:590px; top:20px; width:510px; overflow:hidden">
           <svg width="510" height="270" viewBox="0 0 510 270" aria-label="Three van routes passing near a home pin" id="mpmap">
             <rect width="510" height="270" fill="#EFE9DC"/>
@@ -531,7 +565,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 5 · Amaan -->
-      <section class="frame" data-sum="Pohnch Amaan is a separate tab and filter: a woman driver, a woman helper on board, or girls-only seats. It launches in stage 3 with a training partner." data-sum-ur="پہنچ امان ایک الگ ٹیب اور فلٹر ہے: ڈرائیور صاحبہ، وین میں امان ساتھی، یا صرف بچیوں کی سیٹیں۔ یہ تیسرے مرحلے میں تربیتی ساتھی کے ساتھ شروع ہوگا۔" data-ur-name="پہنچ امان" style="left:5800px; top:1500px" aria-label="Pohnch Amaan">
+      <section class="frame" data-sum="Pohnch Amaan is a separate tab and filter: a woman driver, a woman helper on board, or girls-only seats. It launches in stage 3 with a training partner." data-sum-ur="پہنچ امان ایک الگ ٹیب اور فلٹر ہے: ڈرائیور صاحبہ، وین میں امان ساتھی، یا صرف بچیوں کی سیٹیں۔ یہ تیسرے مرحلے میں تربیتی ساتھی کے ساتھ شروع ہوگا۔" data-ur-name="پہنچ امان" style="left:6600px; top:1900px" aria-label="Pohnch Amaan">
         <span class="time" data-ur="7:28 · بیٹی کی وین">7:28 · a daughter's van</span>
         <div class="tilt amaanbox" style="position:absolute; inset:34px 0 0 0; border-radius:32px; overflow:hidden; background:var(--amaan); color:var(--paper); box-shadow:0 26px 50px rgba(15, 94, 78, .28)">
           <div class="lattice am" style="position:absolute; right:0; top:0; bottom:0; width:430px; opacity:.85"></div>
@@ -550,16 +584,16 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 6 · Request a van -->
-      <section class="frame" data-sum="No van on your street? A request opens at 4 children going the same way. At 8, Pohnch brings a verified van and the route starts. Families pay only once the van runs." data-sum-ur="گلی میں وین نہیں؟ ایک ہی طرف جانے والے 4 بچوں پر درخواست کھلتی ہے۔ 8 پر پہنچ تصدیق شدہ وین لاتا ہے اور روٹ شروع۔ فیس تب ہی جب وین چلے۔" data-ur-name="وین کی درخواست" style="left:4400px; top:1500px" aria-label="Request a van">
+      <section class="frame" data-sum="No van on your street? A request opens at 4 children going the same way. At 8, Pohnch brings a verified van and the route starts. Families pay only once the van runs." data-sum-ur="گلی میں وین نہیں؟ ایک ہی طرف جانے والے 4 بچوں پر درخواست کھلتی ہے۔ 8 پر پہنچ تصدیق شدہ وین لاتا ہے اور روٹ شروع۔ فیس تب ہی جب وین چلے۔" data-ur-name="وین کی درخواست" style="left:5000px; top:1900px" aria-label="Request a van">
         <span class="time" data-ur="7:34 · ایسی گلی جہاں وین نہیں">7:34 · a street with no van</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:640px" data-ur="گلی میں وین نہیں؟ &lt;mark&gt;مل کر مانگیں&lt;/mark&gt;۔">No van on your street? <mark>Ask together.</mark></h2>
-        <p class="lead" style="position:absolute; left:0; top:200px; max-width:580px" data-ur="ایک ہی طرف جانے والے 4 بچوں پر درخواست کھلتی ہے۔ 8 پر پہنچ تصدیق شدہ وین لاتا ہے اور روٹ شروع۔ فیس تب ہی جب وین چلے۔">A request opens at 4 children going the same way. At 8, Pohnch brings a verified van and the route starts. Families pay only once the van runs.</p>
-        <div style="position:absolute; left:0; top:400px; width:580px">
+        <h2 class="h-sm" style="position:absolute; left:0; top:44px; max-width:640px" data-ur="گلی میں وین نہیں؟ &lt;mark&gt;مل کر مانگیں&lt;/mark&gt;۔">No van on your street? <mark>Ask together.</mark></h2>
+        <p class="lead" style="position:absolute; left:0; top:216px; max-width:580px" data-ur="ایک ہی طرف جانے والے 4 بچوں پر درخواست کھلتی ہے۔ 8 پر پہنچ تصدیق شدہ وین لاتا ہے اور روٹ شروع۔ فیس تب ہی جب وین چلے۔">A request opens at 4 children going the same way. At 8, Pohnch brings a verified van and the route starts. Families pay only once the van runs.</p>
+        <div style="position:absolute; left:0; top:420px; width:580px">
           <div style="display:flex; justify-content:space-between; font-weight:800; font-size:25px"><span data-ur="گلشن بلاک 10 سے کلفٹن">Gulshan Block 10 → Clifton</span><span style="color:var(--zam)" id="reqn">5 / 8</span></div>
           <div id="reqbar" style="display:flex; gap:8px; margin-top:12px"></div>
           <button id="reqbtn" style="margin-top:20px; height:60px; padding:0 26px; border:0; border-radius:16px; background:var(--neel); color:var(--paper); font:800 21px var(--f-display); cursor:pointer"></button>
         </div>
-        <svg width="420" height="420" viewBox="0 0 420 420" aria-label="Families asking for a van inside one neighbourhood" style="position:absolute; left:660px; top:150px">
+        <svg width="420" height="420" viewBox="0 0 420 420" aria-label="Families asking for a van inside one neighbourhood" style="position:absolute; left:670px; top:180px">
           <circle cx="210" cy="210" r="190" fill="#E8A33D" fill-opacity=".14" stroke="#E8A33D" stroke-width="3" stroke-dasharray="6 9"/>
           <g fill="#17705A" stroke="#fff" stroke-width="4"><circle cx="150" cy="140" r="15"/><circle cx="270" cy="120" r="15"/><circle cx="300" cy="250" r="15"/><circle cx="140" cy="280" r="15"/><circle cx="215" cy="205" r="17"/></g>
           <circle id="reqAli" cx="90" cy="210" r="15" fill="#fff" stroke="#17705A" stroke-width="3" stroke-dasharray="4 4"/>
@@ -569,7 +603,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 7 · Schools -->
-      <section class="frame" data-sum="Schools that run their own buses get a live fleet map, a boarding register filled by taps, and a gate handover list. Rs 300 per rider a month, with Pohnch Live for every parent." data-sum-ur="اپنی بسیں چلانے والے اسکولوں کو سب بسوں کا لائیو نقشہ، ٹیپ سے بھرا حاضری رجسٹر اور گیٹ پر حوالگی کی فہرست ملتی ہے۔ فی بچہ ماہانہ Rs 300، ہر والدین کے لیے پہنچ لائیو شامل۔" data-ur-name="اسکولوں کے لیے پہنچ" style="left:3000px; top:1500px" aria-label="Pohnch for Schools">
+      <section class="frame" data-sum="Schools that run their own buses get a live fleet map, a boarding register filled by taps, and a gate handover list. Rs 300 per rider a month, with Pohnch Live for every parent." data-sum-ur="اپنی بسیں چلانے والے اسکولوں کو سب بسوں کا لائیو نقشہ، ٹیپ سے بھرا حاضری رجسٹر اور گیٹ پر حوالگی کی فہرست ملتی ہے۔ فی بچہ ماہانہ Rs 300، ہر والدین کے لیے پہنچ لائیو شامل۔" data-ur-name="اسکولوں کے لیے پہنچ" style="left:3400px; top:1900px" aria-label="Pohnch for Schools">
         <span class="time" data-ur="7:40 · اسکول کا گیٹ">7:40 · the school gate</span>
         <h2 style="position:absolute; left:0; top:44px; max-width:560px" data-ur="اسکول کی ہر بس، &lt;mark&gt;ایک اسکرین&lt;/mark&gt; پر۔">Every school bus on <mark>one screen</mark>.</h2>
         <p class="lead" style="position:absolute; left:0; top:200px; max-width:540px" data-ur="اپنی بسیں چلانے والے اسکولوں کو ملتا ہے: سب بسوں کا لائیو نقشہ، ٹیپ سے بھرا حاضری رجسٹر، اور گیٹ پر حوالگی کی فہرست۔ ہر سوار بچے کے والدین کو پہنچ لائیو شامل۔">Schools that run their own buses get a live fleet map, a boarding register filled by taps, and a gate handover list. Every rider's parent gets Pohnch Live included.</p>
@@ -598,7 +632,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 8 · Market size -->
-      <section class="frame" data-sum="Karachi has about 8,000 registered private schools and an estimated 6,000 more unregistered. Nobody has counted the vans; our working assumption is 10,000 vans and 100,000 children. The pilot replaces guesses with counts." data-sum-ur="کراچی میں تقریباً 8,000 رجسٹرڈ نجی اسکول ہیں اور اندازاً 6,000 غیر رجسٹرڈ۔ وینیں کسی نے نہیں گنیں؛ ہمارا اندازہ 10,000 وینیں اور 100,000 بچے ہے۔ پائلٹ اندازوں کو گنتی سے بدلے گا۔" data-ur-name="کتنا بڑا" style="left:1600px; top:1500px" aria-label="How big">
+      <section class="frame" data-sum="Karachi has about 8,000 registered private schools and an estimated 6,000 more unregistered. Nobody has counted the vans; our working assumption is 10,000 vans and 100,000 children. The pilot replaces guesses with counts." data-sum-ur="کراچی میں تقریباً 8,000 رجسٹرڈ نجی اسکول ہیں اور اندازاً 6,000 غیر رجسٹرڈ۔ وینیں کسی نے نہیں گنیں؛ ہمارا اندازہ 10,000 وینیں اور 100,000 بچے ہے۔ پائلٹ اندازوں کو گنتی سے بدلے گا۔" data-ur-name="کتنا بڑا" style="left:1800px; top:1900px" aria-label="How big">
         <span class="time" data-ur="7:46 · ایسی کتنی صبحیں؟">7:46 · how many mornings like this?</span>
         <h2 style="position:absolute; left:0; top:44px; max-width:600px" data-ur="&lt;mark&gt;اسکول کی صبحوں&lt;/mark&gt; کا شہر۔">A city of <mark>school mornings</mark>.</h2>
         <div style="position:absolute; left:0; top:200px; width:560px; display:flex; flex-direction:column; gap:22px">
@@ -619,7 +653,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 9 · Money -->
-      <section class="frame" data-sum="Four ways to earn on one van: Pohnch Live at Rs 599 a child, 7% of van fees paid in the app, 12% on routes Pohnch forms, Rs 300 per rider for schools. About Rs 7,300 a van a month; break-even near 37 vans." data-sum-ur="ایک وین سے کمائی کے چار راستے: پہنچ لائیو Rs 599 فی بچہ، ایپ میں وین فیس کا 7%، پہنچ کے بنائے روٹس پر 12%، اسکولوں سے Rs 300 فی بچہ۔ فی وین تقریباً Rs 7,300 ماہانہ؛ تقریباً 37 وینوں پر خرچ پورا۔" data-ur-name="کاروباری ماڈل" style="left:1600px; top:2800px" aria-label="Business model">
+      <section class="frame" data-sum="Four ways to earn on one van: Pohnch Live at Rs 599 a child, 7% of van fees paid in the app, 12% on routes Pohnch forms, Rs 300 per rider for schools. About Rs 7,300 a van a month; break-even near 37 vans." data-sum-ur="ایک وین سے کمائی کے چار راستے: پہنچ لائیو Rs 599 فی بچہ، ایپ میں وین فیس کا 7%، پہنچ کے بنائے روٹس پر 12%، اسکولوں سے Rs 300 فی بچہ۔ فی وین تقریباً Rs 7,300 ماہانہ؛ تقریباً 37 وینوں پر خرچ پورا۔" data-ur-name="کاروباری ماڈل" style="left:1800px; top:3600px" aria-label="Business model">
         <span class="time" data-ur="7:52 · پیسہ">7:52 · the money</span>
         <h2 style="position:absolute; left:0; top:44px; max-width:560px" data-ur="ایک وین سے کمائی کے &lt;mark&gt;چار راستے&lt;/mark&gt;۔"><mark>Four ways</mark> to earn on one van.</h2>
         <div style="position:absolute; left:0; top:210px; width:540px; display:flex; flex-direction:column; gap:16px">
@@ -649,9 +683,9 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 10 · Competition -->
-      <section class="frame" data-sum="GPS tracker boxes cost up to Rs 15,000 plus a monthly fee and only know where the van is. WhatsApp groups depend on a driver typing. Pohnch knows whether your child is in the van, on phones people already own." data-sum-ur="جی پی ایس ٹریکر Rs 15,000 تک اور ماہانہ فیس، اور صرف وین کا مقام جانتے ہیں۔ واٹس ایپ گروپ ڈرائیور کے لکھنے پر چلتا ہے۔ پہنچ جانتا ہے بچہ وین میں ہے یا نہیں، انہی فونوں پر جو لوگوں کے پاس ہیں۔" data-ur-name="پہنچ کیوں جیتے گا" style="left:3000px; top:2800px" aria-label="Why Pohnch wins">
+      <section class="frame" data-sum="GPS tracker boxes cost up to Rs 15,000 plus a monthly fee and only know where the van is. WhatsApp groups depend on a driver typing. Pohnch knows whether your child is in the van, on phones people already own." data-sum-ur="جی پی ایس ٹریکر Rs 15,000 تک اور ماہانہ فیس، اور صرف وین کا مقام جانتے ہیں۔ واٹس ایپ گروپ ڈرائیور کے لکھنے پر چلتا ہے۔ پہنچ جانتا ہے بچہ وین میں ہے یا نہیں، انہی فونوں پر جو لوگوں کے پاس ہیں۔" data-ur-name="پہنچ کیوں جیتے گا" style="left:3400px; top:3600px" aria-label="Why Pohnch wins">
         <span class="time" data-ur="8:00 · اسکول، کلفٹن">8:00 · school, Clifton</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:1060px" data-ur="دوسرے وین دکھاتے ہیں۔ پہنچ &lt;mark&gt;آپ کا بچہ&lt;/mark&gt;، انہی فونوں پر جو لوگوں کے پاس ہیں۔">Others track a van. Pohnch tracks <mark>your child</mark>, on phones people own.</h2>
+        <h2 class="h-sm" style="position:absolute; left:0; top:44px; max-width:1060px" data-ur="دوسرے وین دکھاتے ہیں۔ پہنچ &lt;mark&gt;آپ کا بچہ&lt;/mark&gt;، انہی فونوں پر جو لوگوں کے پاس ہیں۔">Others track a van. Pohnch tracks <mark>your child</mark>, on phones people own.</h2>
         <div style="position:absolute; left:0; top:210px; width:620px; height:470px">
           <span data-rough="sline" data-from="60,652" data-to="60,230" style="display:none"></span>
           <span data-rough="sline" data-from="60,652" data-to="640,652" style="display:none"></span>
@@ -672,7 +706,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 11 · Roadmap -->
-      <section class="frame" data-sum="Stage 1, now to March 2027: a free pilot with 3 to 5 vans. Stage 2, 2027: the marketplace, 20 to 60 vans. Stage 3, 2028: schools and Pohnch Amaan. Each gate decides whether the next money is spent." data-sum-ur="پہلا مرحلہ، ابھی سے مارچ 2027: 3 سے 5 وینوں کا مفت پائلٹ۔ دوسرا، 2027: مارکیٹ پلیس، 20 سے 60 وینیں۔ تیسرا، 2028: اسکول اور پہنچ امان۔ ہر گیٹ طے کرتا ہے کہ اگلا پیسہ خرچ ہو یا نہیں۔" data-ur-name="آگے کا راستہ" style="left:4400px; top:2800px" aria-label="Roadmap">
+      <section class="frame" data-sum="Stage 1, now to March 2027: a free pilot with 3 to 5 vans. Stage 2, 2027: the marketplace, 20 to 60 vans. Stage 3, 2028: schools and Pohnch Amaan. Each gate decides whether the next money is spent." data-sum-ur="پہلا مرحلہ، ابھی سے مارچ 2027: 3 سے 5 وینوں کا مفت پائلٹ۔ دوسرا، 2027: مارکیٹ پلیس، 20 سے 60 وینیں۔ تیسرا، 2028: اسکول اور پہنچ امان۔ ہر گیٹ طے کرتا ہے کہ اگلا پیسہ خرچ ہو یا نہیں۔" data-ur-name="آگے کا راستہ" style="left:5000px; top:3600px" aria-label="Roadmap">
         <span class="time" data-ur="1:30 · چھٹی کا وقت">1:30 · home time</span>
         <h2 style="position:absolute; left:0; top:44px; max-width:760px" data-ur="&lt;mark&gt;پورے شہر&lt;/mark&gt; کے نیٹ ورک تک تین پڑاؤ۔">Three stops to a <mark>city-wide</mark> network.</h2>
         <svg width="1100" height="150" viewBox="0 0 1100 150" aria-hidden="true" style="position:absolute; left:0; top:190px">
@@ -691,7 +725,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       </section>
 
       <!-- 12 · Ask -->
-      <section class="frame" data-sum="Rs 3,000,000 takes Pohnch through its first year. The pilot alone needs about Rs 400,000: two test phones, store fees, hosting and four months of founder time." data-sum-ur="Rs 3,000,000 پہنچ کو پہلے سال سے گزارتے ہیں۔ صرف پائلٹ کو تقریباً Rs 400,000 چاہئیں: دو ٹیسٹ فون، اسٹور فیس، ہوسٹنگ اور بانی کے چار مہینے۔" data-ur-name="ہماری درخواست" style="left:5800px; top:2800px" aria-label="The ask">
+      <section class="frame" data-sum="Rs 3,000,000 takes Pohnch through its first year. The pilot alone needs about Rs 400,000: two test phones, store fees, hosting and four months of founder time." data-sum-ur="Rs 3,000,000 پہنچ کو پہلے سال سے گزارتے ہیں۔ صرف پائلٹ کو تقریباً Rs 400,000 چاہئیں: دو ٹیسٹ فون، اسٹور فیس، ہوسٹنگ اور بانی کے چار مہینے۔" data-ur-name="ہماری درخواست" style="left:6600px; top:3600px" aria-label="The ask">
         <span class="time" data-ur="2:05 · گھر">2:05 · home</span>
         <h2 style="position:absolute; left:0; top:44px; max-width:1000px" data-ur="&lt;mark&gt;Rs 3,000,000&lt;/mark&gt; پہلا سال گھر پہنچاتے ہیں۔"><mark>Rs 3,000,000</mark> gets the first year home.</h2>
         <div style="position:absolute; left:0; top:200px; width:1100px; display:flex; flex-direction:column; gap:26px">
@@ -751,7 +785,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
 <script src="https://cdn.jsdelivr.net/npm/roughjs@4.6.6/bundled/rough.js"></script>
 <script>
 (function () {
-  const W = 7400, H = 4200, FW = 1100, FH = 700, FAR = 0.82;
+  const W = 8200, H = 5200, FW = 1100, FH = 700, FAR = 0.82;
   const $ = (id) => document.getElementById(id);
   const world = $('world'), far = $('far'), camEl = $('cam'), route = $('route'), trail = $('trail'), van = $('van'), vanBody = $('vanBody');
   const frames = Array.from(document.querySelectorAll('.frame'));
@@ -1005,7 +1039,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     const ang = Math.atan2(q.y - q0.y, q.x - q0.x);
     const deg = ang * 180 / Math.PI;
     van.setAttribute('transform', 'translate(' + p.x + ' ' + p.y + ')');
-    vanBody.setAttribute('transform', 'rotate(' + deg + ')' + (Math.abs(deg) > 90 ? ' scale(1 -1)' : ''));
+    vanBody.setAttribute('transform', 'rotate(' + deg + ')');
     trail.style.strokeDashoffset = String(total - l);
     if (moving && !reduce) {
       const now = performance.now();
@@ -1029,7 +1063,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   }
   function frameTarget(k) {
     const f = frames[k], x = parseFloat(f.style.left), y = parseFloat(f.style.top);
-    return { x: x + FW / 2, y: y + 470, s: Math.min(vw() / 1230, (vh() - 96) / 1010) };
+    return { x: x + FW / 2, y: y + 430, s: Math.min(vw() / 1290, (vh() - 96) / 1120) };
   }
   const finTarget = () => { const o = overTarget(); return { x: W / 2, y: H / 2 + H * .2, s: o.s * .84 }; };
   const overTarget = () => ({ x: W / 2, y: H / 2 - 20, s: Math.min(vw() / (W + 100), (vh() - 60) / (H + 100)) });
@@ -1121,8 +1155,10 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     over = false; i = Math.max(0, Math.min(N - 1, k));
     clearInk();
     const riding = !wasOver && !reduce && Math.abs(i - prev) === 1;
-    if (riding) ride(frameTarget(i), prev, i, () => { drawIn(i); });
-    else fly(frameTarget(i), { vanTo: anchors[i], dip: wasOver ? 0 : undefined, lift: wasOver ? 0 : undefined, tilt: wasOver ? 3 : undefined, done: () => { drawIn(i); } });
+    document.body.classList.remove('atstop');
+    const arrive = () => { drawIn(i); setLight(i); if (!over && !fin) { document.body.classList.add('atstop'); play('clack'); } };
+    if (riding) ride(frameTarget(i), prev, i, arrive);
+    else fly(frameTarget(i), { vanTo: anchors[i], dip: wasOver ? 0 : undefined, lift: wasOver ? 0 : undefined, tilt: wasOver ? 3 : undefined, done: arrive });
     render();
     if (riding) frames[i].classList.remove('active');
     if (riding) setTimeout(() => { if (!over && !fin) { frames[i].classList.add('active'); } }, 2350);
@@ -1132,6 +1168,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   }
   function toggleOver() {
     if (fin) finale(false);
+    document.body.classList.remove('atstop');
     over = !over; render();
     fly(over ? overTarget() : frameTarget(i), { dip: 0, lift: 0, tilt: 3, dur: 1200 });
   }
@@ -1145,11 +1182,12 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     const roads = ['r1', 'r2', 'r3', 'v1', 'v2', 'v3', 'v4'].map((id) => { const pth = $(id), tl = pth.getTotalLength(), a = []; for (let l = 0; l <= tl; l += 20) { const q = pth.getPointAtLength(l); a.push([q.x, q.y]); } return a; });
     const lamps = []; for (let l = 0; l < total; l += 170) { const q = route.getPointAtLength(l); lamps.push([q.x, q.y - 70, 48]); }
     roads.forEach((a) => { for (let k = 4; k < a.length; k += 9) lamps.push([a[k][0] + 30, a[k][1] - 30, 36]); });
-    const boxes = frames.map((f) => [parseFloat(f.style.left) - 20, parseFloat(f.style.top) - 40, FW + 40, FH + 60]).concat([[230, 1540, 1040, 480]]);
+    frames.forEach((f) => { const fx0 = parseFloat(f.style.left), fy0 = parseFloat(f.style.top); [.22, .78].forEach((u) => lamps.push([fx0 + u * FW, fy0 - 100, 150])); });
+    const boxes = frames.map((f) => [parseFloat(f.style.left) - 20, parseFloat(f.style.top) - 40, FW + 40, FH + 60]).concat([[230, 1940, 1040, 480]]);
     let sd = 11; const rnd = () => { sd = (sd * 9301 + 49297) % 233280; return sd / 233280; };
     const wins = [];
-    for (let n = 0; n < 1400 && wins.length < 300; n++) {
-      const x = 80 + rnd() * 7240, y = 60 + rnd() * 3820;
+    for (let n = 0; n < 2400 && wins.length < 420; n++) {
+      const x = 80 + rnd() * (W - 160), y = 60 + rnd() * (H - 520);
       if (boxes.some(([bx, by, bw, bh]) => x > bx && x < bx + bw && y > by && y < by + bh)) continue;
       wins.push({ x, y, a: .45 + rnd() * .5, c: rnd() < .8 ? '#FBEBCF' : '#E8A33D', tw: rnd() < .2, sp: .6 + rnd() * 1.4, ph: rnd() * 6.28, on: rnd() * 1.6 });
     }
@@ -1398,24 +1436,72 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     const fm = $('farMap'), K = .25; fm.width = 13400 * K; fm.height = 10000 * K;
     const fx = fm.getContext('2d'); fx.scale(K, K); fx.translate(3000, 2500);
     let seed = 7; const rnd = () => { seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
-    fx.strokeStyle = '#ECE4D3'; fx.lineWidth = 4; fx.lineJoin = 'round';
-    for (let x = -2800; x < 10200; x += 270) for (let y = -2300; y < 7300; y += 230) {
-      if (rnd() < .18) continue;
-      const w = 170 + rnd() * 70, h = 140 + rnd() * 60, ox = x + rnd() * 20, oy = y + rnd() * 20;
-      if (rnd() < .05) { fx.fillStyle = '#EEF1E1'; fx.beginPath(); fx.roundRect ? fx.roundRect(ox, oy, w, h, 18) : fx.rect(ox, oy, w, h); fx.fill(); }
-      fx.strokeRect(ox, oy, w, h);
-    }
     fx.fillStyle = '#F0E9DA';
-    [['GULSHAN', 'گلشن', 900, 300], ['JOHAR', 'جوہر', 6600, 200], ['PECHS', 'پی ای سی ایچ ایس', 4200, 1450], ['SADDAR', 'صدر', 600, 2600], ['CLIFTON', 'کلفٹن', 5600, 4300], ['KORANGI', 'کورنگی', 8600, 2600], ['LYARI', 'لیاری', -1600, 3400]].forEach(([en, ur, x, y]) => {
+    [['GULSHAN', 'گلشن', 900, 300], ['JOHAR', 'جوہر', 7300, 200], ['PECHS', 'پی ای سی ایچ ایس', 4600, 1900], ['SADDAR', 'صدر', 400, 3300], ['CLIFTON', 'کلفٹن', 6000, 5300], ['KORANGI', 'کورنگی', 9300, 3000], ['LYARI', 'لیاری', -1800, 4100]].forEach(([en, ur, x, y]) => {
       fx.font = '800 300px Manrope, sans-serif'; if ('letterSpacing' in fx) fx.letterSpacing = '30px'; fx.textAlign = 'left'; fx.fillText(en, x, y);
       if ('letterSpacing' in fx) fx.letterSpacing = '0px'; fx.font = '200px Gulzar, serif'; fx.fillText(ur, x + 40, y + 240);
     });
+  }
+  // a miniature Karachi: low blocks drawn in 2.5D, rooftop water tanks, trees and mosques, batched into a few paths
+  function buildMini() {
+    const C = 40, cols = Math.ceil(W / C), rows = Math.ceil(H / C), occ = new Uint8Array(cols * rows);
+    const block = (x, y, w, h) => { for (let cx = Math.max(0, Math.floor(x / C)); cx <= Math.min(cols - 1, Math.floor((x + w) / C)); cx++) for (let cy = Math.max(0, Math.floor(y / C)); cy <= Math.min(rows - 1, Math.floor((y + h) / C)); cy++) occ[cy * cols + cx] = 1; };
+    const free = (x, y, w, h) => { for (let cx = Math.floor(x / C); cx <= Math.floor((x + w) / C); cx++) for (let cy = Math.floor(y / C); cy <= Math.floor((y + h) / C); cy++) { if (cx < 0 || cy < 0 || cx >= cols || cy >= rows || occ[cy * cols + cx]) return false; } return true; };
+    frames.forEach((f) => block(parseFloat(f.style.left) - 70, parseFloat(f.style.top) - 140, FW + 140, FH + 330));
+    [[220, 1920, 1080, 740], [400, 3100, 700, 660], [1060, 3800, 190, 260], [180, 4260, 460, 520], [7590, 3940, 340, 800], [70, 1140, 480, 200], [7210, 2850, 480, 200], [1060, 4350, 480, 200], [7800, 1640, 90, 600], [1490, 3400, 90, 500]].forEach((b) => block(...b));
+    block(0, 4770, W, 600);
+    for (let l = 0; l <= total; l += 24) { const q = route.getPointAtLength(l); block(q.x - 80, q.y - 80, 160, 160); }
+    ['r1', 'r2', 'r3', 'v1', 'v2', 'v3', 'v4'].forEach((id) => { const pth = $(id), tl = pth.getTotalLength(); for (let l = 0; l <= tl; l += 24) { const q = pth.getPointAtLength(l); block(q.x - 36, q.y - 36, 72, 72); } });
+    anchors.forEach((l, k) => { const q = route.getPointAtLength(l); block(q.x + 10, q.y - 200, 100, 100); if (k < N - 1) { const r = route.getPointAtLength(anchors[k + 1]); if (Math.abs(q.y - r.y) < 40) block((q.x + r.x) / 2 - 380, q.y - 100, 760, 70); } });
+    let sd = 23; const rnd = () => { sd = (sd * 9301 + 49297) % 233280; return sd / 233280; };
+    const pal = [['#F7EEDD', '#D9C7A6'], ['#F3E3C8', '#D2B88E'], ['#EEE6D8', '#CDBFA8'], ['#F6E6DC', '#D9BCAA'], ['#E8EEF2', '#BCC8D2']];
+    const D = {}; const add = (k, d) => { D[k] = (D[k] || '') + d; };
+    const rect = (x, y, w, h) => 'M' + x.toFixed(0) + ' ' + y.toFixed(0) + 'h' + w.toFixed(0) + 'v' + h.toFixed(0) + 'h' + (-w).toFixed(0) + 'z';
+    const circ = (x, y, r) => 'M' + (x - r).toFixed(1) + ' ' + y.toFixed(1) + 'a' + r.toFixed(1) + ' ' + r.toFixed(1) + ' 0 1 0 ' + (2 * r).toFixed(1) + ' 0a' + r.toFixed(1) + ' ' + r.toFixed(1) + ' 0 1 0 ' + (-2 * r).toFixed(1) + ' 0z';
+    const order = []; for (let n = 0; n < cols * rows; n++) order.push(n);
+    for (let n = order.length - 1; n > 0; n--) { const j = Math.floor(rnd() * (n + 1)); const tmp = order[n]; order[n] = order[j]; order[j] = tmp; }
+    const place = (cell, pass) => {
+      const x = (cell % cols) * C + rnd() * 16, y = Math.floor(cell / cols) * C + rnd() * 16, kind = pass === 0 ? (rnd() < .06 ? .97 : .1) : .7;
+      if (kind < .62) {
+        const w = 52 + Math.floor(rnd() * 5) * 18, d = 42 + Math.floor(rnd() * 3) * 16, h = 14 + Math.floor(rnd() * 5) * 9;
+        if (!free(x - 14, y - h - 14, w + 28, d + h + 28)) return;
+        block(x - 6, y - h - 6, w + 12, d + h + 12);
+        const c = Math.floor(rnd() * pal.length);
+        add('s', rect(x + 10, y + 10, w, d));
+        add('f' + c, rect(x, y - h + d, w, h)); add('t' + c, rect(x, y - h, w, d));
+        add('o', rect(x, y - h, w, d + h));
+        for (let wx = x + 8; wx < x + w - 12; wx += 18) add('w', rect(wx, y - h + d + 5, 8, Math.max(5, h - 12)));
+        if (rnd() < .7) { add('k', circ(x + w - 16, y - h + 14, 6)); if (rnd() < .4) add('k', circ(x + w - 32, y - h + 14, 6)); }
+        if (rnd() < .18) add('a' + Math.floor(rnd() * 3), rect(x + 4, y - h + d - 4, w - 8, 6));
+      } else if (kind < .95) {
+        const r = 18 + rnd() * 16;
+        if (!free(x - r, y - r, 2 * r + 12, 2 * r + 12)) return;
+        block(x - r + 4, y - r + 4, 2 * r - 8, 2 * r - 8);
+        add('ts', circ(x + 7, y + 9, r)); add('tc' + (rnd() < .5 ? 0 : 1), circ(x, y, r)); add('th', circ(x - r * .3, y - r * .3, r * .45));
+      } else {
+        if (!free(x - 14, y - 110, 140, 200)) return;
+        block(x - 6, y - 100, 124, 190);
+        add('s', rect(x + 10, y + 10, 100, 80)); add('f0', rect(x, y - 24 + 80, 100, 24)); add('t0', rect(x, y - 24, 100, 80)); add('o', rect(x, y - 24, 100, 104));
+        add('dome', circ(x + 50, y + 14, 22)); add('domeh', circ(x + 44, y + 8, 7));
+        add('f2', rect(x + 86, y - 92, 12, 70)); add('t2', rect(x + 86, y - 98, 12, 8)); add('dome', circ(x + 92, y - 100, 7));
+      }
+    };
+    order.forEach((c) => place(c, 0)); order.forEach((c) => place(c, 1));
+    const g = $('city'), P = (k, attrs) => { if (D[k]) g.appendChild(svgEl('path', Object.assign({ d: D[k] }, attrs))); };
+    P('s', { fill: '#141A33', 'fill-opacity': .07 }); P('ts', { fill: '#141A33', 'fill-opacity': .07 });
+    pal.forEach((c, n) => { P('f' + n, { fill: c[1] }); P('t' + n, { fill: c[0] }); });
+    P('w', { fill: '#4A4F66', 'fill-opacity': .32 });
+    ['#E8A33D', '#17705A', '#1F2A5C'].forEach((c, n) => P('a' + n, { fill: c, 'fill-opacity': .8 }));
+    P('o', { fill: 'none', stroke: '#141A33', 'stroke-opacity': .55, 'stroke-width': 1.6, 'stroke-linejoin': 'round' });
+    P('k', { fill: '#2B3047' });
+    P('tc0', { fill: '#B7D39A' }); P('tc1', { fill: '#A5C88A' }); P('th', { fill: '#D2E6BC', 'fill-opacity': .8 });
+    P('dome', { fill: '#17705A' }); P('domeh', { fill: '#DCEFE7', 'fill-opacity': .6 });
   }
   function buildCity() {
     paintFar();
     // minor roads under the main route
     const minor = $('minor');
-    const roads = { r1: 'M 120 1340 H 6900', r2: 'M 1700 2640 H 7250', r3: 'M 300 3850 H 7250', v1: 'M 1450 120 V 2300', v2: 'M 2850 120 V 3860', v3: 'M 4250 120 V 3860', v4: 'M 5650 120 V 3860' };
+    const roads = { r1: 'M 120 1430 H 7330', r2: 'M 2150 3110 H 8050', r3: 'M 300 4720 H 8050', v1: 'M 1550 120 V 2720', v2: 'M 3150 120 V 4730', v3: 'M 4750 120 V 4730', v4: 'M 6350 120 V 4730' };
     Object.entries(roads).forEach(([id, dd]) => { minor.appendChild(svgEl('path', { d: dd, fill: 'none', stroke: '#E8E1D1', 'stroke-width': 30, 'stroke-linecap': 'round' })); });
     Object.entries(roads).forEach(([id, dd]) => { minor.appendChild(svgEl('path', { id, d: dd, fill: 'none', stroke: '#FFFFFF', 'stroke-width': 20, 'stroke-linecap': 'round' })); });
     // traffic
@@ -1434,11 +1520,12 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       tr.appendChild(el);
     });
     // kites over Sea View
-    [[260, 3480, '#E8A33D', 0], [470, 3560, '#17705A', 1.2], [7120, 3300, '#A8321F', .6], [7240, 3460, '#2B3A80', 2]].forEach(([x, y, c, dl]) => {
+    [[300, 4360, '#E8A33D', 0], [520, 4440, '#17705A', 1.2], [7700, 4060, '#A8321F', .6], [7840, 4220, '#2B3A80', 2]].forEach(([x, y, c, dl]) => {
       const k = svgEl('g', {});
-      k.innerHTML = '<path d="M' + x + ' ' + y + ' Q ' + (x + 60) + ' ' + (y + 200) + ' ' + (x + 20) + ' 3840" fill="none" stroke="#4A4F66" stroke-width="2" stroke-opacity=".55"/><g><path d="M' + x + ' ' + (y - 46) + ' l30 40 l-30 40 l-30 -40 z" fill="' + c + '"/><path d="M' + x + ' ' + (y - 46) + ' v80 M' + (x - 30) + ' ' + (y - 6) + ' h60" stroke="#FAF6EE" stroke-width="2"/><path d="M' + x + ' ' + (y + 34) + ' q -12 18 4 30 q 14 12 -2 28" fill="none" stroke="' + c + '" stroke-width="3"/><animateTransform attributeName="transform" type="rotate" values="-7 ' + x + ' ' + (y + 34) + ';7 ' + x + ' ' + (y + 34) + ';-7 ' + x + ' ' + (y + 34) + '" dur="' + (4 + dl) + 's" repeatCount="indefinite"/></g>';
+      k.innerHTML = '<path d="M' + x + ' ' + y + ' Q ' + (x + 60) + ' ' + (y + 200) + ' ' + (x + 20) + ' 4710" fill="none" stroke="#4A4F66" stroke-width="2" stroke-opacity=".55"/><g><path d="M' + x + ' ' + (y - 46) + ' l30 40 l-30 40 l-30 -40 z" fill="' + c + '"/><path d="M' + x + ' ' + (y - 46) + ' v80 M' + (x - 30) + ' ' + (y - 6) + ' h60" stroke="#FAF6EE" stroke-width="2"/><path d="M' + x + ' ' + (y + 34) + ' q -12 18 4 30 q 14 12 -2 28" fill="none" stroke="' + c + '" stroke-width="3"/><animateTransform attributeName="transform" type="rotate" values="-7 ' + x + ' ' + (y + 34) + ';7 ' + x + ' ' + (y + 34) + ';-7 ' + x + ' ' + (y + 34) + '" dur="' + (4 + dl) + 's" repeatCount="indefinite"/></g>';
       $('deco').appendChild(k);
     });
+    buildMini();
     if (reduce) { $('ink').pauseAnimations(); }
   }
 
@@ -1459,29 +1546,29 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       if (Math.abs(a.y - b.y) > 40) return;
       lbl((a.x + b.x) / 2, a.y - 52, names[k]);
     });
-    lbl(7020, 1760, 'Johar Mor · جوہر موڑ', 90);
-    lbl(1380, 3060, 'Shahrah-e-Quaideen', -90);
-    lbl(3700, 3815, 'Sea View · سی ویو');
+    lbl(7830, 1940, 'Johar Mor · جوہر موڑ', 90);
+    lbl(1520, 3640, 'Shahrah-e-Quaideen', -90);
+    lbl(4100, 4682, 'Sea View · سی ویو');
     // the sea, drifting
     const sea = svgEl('g', {}); deco.appendChild(sea);
     for (let r = 0; r < 3; r++) {
-      const y = 3950 + r * 48, pts = [];
-      for (let x = -400; x <= 7800; x += 120) pts.push([x, y + ((x / 120) % 2 ? 12 : -12)]);
+      const y = 4840 + r * 48, pts = [];
+      for (let x = -400; x <= 8600; x += 120) pts.push([x, y + ((x / 120) % 2 ? 12 : -12)]);
       sea.appendChild(rc.curve(pts, { stroke: '#2B3A80', strokeWidth: 3, roughness: 1.2, seed: 20 + r }));
     }
     sea.appendChild(svgEl('animateTransform', { attributeName: 'transform', type: 'translate', values: '0 0;240 0', dur: '9s', repeatCount: 'indefinite' }));
-    deco.appendChild(svgEl('text', { x: 3700, y: 4160, 'text-anchor': 'middle', 'font-family': 'Shantell Sans, Noto Sans Arabic, cursive', 'font-weight': 700, 'font-size': 34, fill: '#2B3A80' }, 'Arabian Sea · بحیرۂ عرب'));
+    deco.appendChild(svgEl('text', { x: 4100, y: 5050, 'text-anchor': 'middle', 'font-family': 'Shantell Sans, Noto Sans Arabic, cursive', 'font-weight': 700, 'font-size': 34, fill: '#2B3A80' }, 'Arabian Sea · بحیرۂ عرب'));
     // Mazar-e-Quaid
-    const mx = 750, my = 3020;
+    const mx = 750, my = 3420;
     deco.appendChild(rc.rectangle(mx - 220, my + 40, 440, 150, { stroke: '#141A33', strokeWidth: 3, fill: '#FFFFFF', fillStyle: 'solid', roughness: 1.3, seed: 31 }));
     deco.appendChild(rc.path('M ' + (mx - 160) + ' ' + (my + 40) + ' Q ' + mx + ' ' + (my - 230) + ' ' + (mx + 160) + ' ' + (my + 40) + ' Z', { stroke: '#141A33', strokeWidth: 3, fill: '#FFFFFF', fillStyle: 'solid', roughness: 1.2, seed: 32 }));
     [-150, -50, 50, 150].forEach((dx, n) => deco.appendChild(rc.path('M ' + (mx + dx - 30) + ' ' + (my + 190) + ' V ' + (my + 110) + ' Q ' + (mx + dx) + ' ' + (my + 60) + ' ' + (mx + dx + 30) + ' ' + (my + 110) + ' V ' + (my + 190), { stroke: '#1F2A5C', strokeWidth: 2.5, roughness: 1, seed: 40 + n })));
     deco.appendChild(rc.rectangle(mx - 300, my + 190, 600, 34, { stroke: '#141A33', strokeWidth: 3, roughness: 1.4, seed: 33 }));
     deco.appendChild(svgEl('text', { x: mx, y: my + 290, 'text-anchor': 'middle', 'font-family': 'Shantell Sans, Noto Sans Arabic, cursive', 'font-weight': 700, 'font-size': 32, fill: '#141A33' }, 'Mazar-e-Quaid · مزارِ قائد'));
     // compass
-    deco.appendChild(rc.circle(1120, 3450, 120, { stroke: '#4A4F66', strokeWidth: 2.5, roughness: 1.2, seed: 50 }));
-    deco.appendChild(rc.line(1120, 3540, 1120, 3360, { stroke: '#A8321F', strokeWidth: 4, seed: 51 }));
-    deco.appendChild(svgEl('text', { x: 1120, y: 3340, 'text-anchor': 'middle', 'font-family': 'Shantell Sans, cursive', 'font-weight': 700, 'font-size': 32, fill: '#A8321F' }, 'N'));
+    deco.appendChild(rc.circle(1150, 3950, 120, { stroke: '#4A4F66', strokeWidth: 2.5, roughness: 1.2, seed: 50 }));
+    deco.appendChild(rc.line(1150, 4040, 1150, 3860, { stroke: '#A8321F', strokeWidth: 4, seed: 51 }));
+    deco.appendChild(svgEl('text', { x: 1150, y: 3840, 'text-anchor': 'middle', 'font-family': 'Shantell Sans, cursive', 'font-weight': 700, 'font-size': 32, fill: '#A8321F' }, 'N'));
     // homes and the school
     const house = (x, y, sd) => { deco.appendChild(rc.rectangle(x - 34, y - 40, 68, 52, { stroke: '#17705A', strokeWidth: 3, fill: '#DCEFE7', fillStyle: 'solid', roughness: 1.2, seed: sd })); deco.appendChild(rc.polygon([[x - 46, y - 38], [x, y - 82], [x + 46, y - 38]], { stroke: '#17705A', strokeWidth: 3, fill: '#17705A', fillStyle: 'hachure', hachureGap: 7, roughness: 1.2, seed: sd + 1 })); };
     const p0 = route.getPointAtLength(anchors[0]); house(p0.x - 110, p0.y + 10, 60);
@@ -1491,7 +1578,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     deco.appendChild(rc.polygon([[ps.x + 60, ps.y - 68], [ps.x + 130, ps.y - 112], [ps.x + 200, ps.y - 68]], { stroke: '#8A5A12', strokeWidth: 3, roughness: 1.2, seed: 71 }));
     deco.appendChild(rc.line(ps.x + 130, ps.y - 112, ps.x + 130, ps.y - 160, { stroke: '#8A5A12', strokeWidth: 3, seed: 72 }));
     deco.appendChild(rc.polygon([[ps.x + 130, ps.y - 160], [ps.x + 168, ps.y - 150], [ps.x + 130, ps.y - 140]], { stroke: '#8A5A12', strokeWidth: 2, fill: '#E8A33D', fillStyle: 'solid', seed: 73 }));
-    [[140, 1000, '1', 'The morning run', 'صبح کا سفر'], [6480, 2470, '2', 'The network', 'نیٹ ورک'], [1460, 3720, '3', 'The business', 'کاروبار']].forEach(([x, y, n, en, ur]) => {
+    [[90, 1160, '1', 'The morning run', 'صبح کا سفر'], [7230, 2870, '2', 'The network', 'نیٹ ورک'], [1080, 4370, '3', 'The business', 'کاروبار']].forEach(([x, y, n, en, ur]) => {
       const g = svgEl('g', {});
       g.innerHTML = '<path d="M' + (x + 70) + ' ' + (y + 110) + ' V' + (y + 150) + ' M' + (x + 350) + ' ' + (y + 110) + ' V' + (y + 150) + '" stroke="#4A4F66" stroke-width="8" stroke-linecap="round"/>' +
         '<rect x="' + x + '" y="' + y + '" width="420" height="112" rx="14" fill="#17705A"/><rect x="' + (x + 7) + '" y="' + (y + 7) + '" width="406" height="98" rx="9" fill="none" stroke="#FFFFFF" stroke-width="3"/>' +
@@ -1643,6 +1730,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     whoosh(dur) { const t = ac.currentTime, s = noise(dur), f = ac.createBiquadFilter(), v = ac.createGain(); f.type = 'bandpass'; f.Q.value = .8; f.frequency.setValueAtTime(260, t); f.frequency.linearRampToValueAtTime(900, t + dur * .5); f.frequency.linearRampToValueAtTime(240, t + dur); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(.16, t + dur * .45); v.gain.linearRampToValueAtTime(0, t + dur); s.connect(f).connect(v).connect(master); s.start(t); s.stop(t + dur); },
     chime() { const t = ac.currentTime; [523.25, 659.25, 783.99, 1046.5].forEach((f, n) => tone(f, t + n * .14, 1.6, 'sine', .07)); },
     dull() { const t = ac.currentTime; tone(196, t, .5, 'sine', .08, 150); },
+    clack() { const t = ac.currentTime, s = noise(.08), f = ac.createBiquadFilter(), v = ac.createGain(); f.type = 'highpass'; f.frequency.value = 1800; v.gain.setValueAtTime(.35, t); v.gain.exponentialRampToValueAtTime(.001, t + .07); s.connect(f).connect(v).connect(master); s.start(t); s.stop(t + .08); tone(2200, t + .12, .05, 'square', .015); },
     engine(dur) { const t = ac.currentTime, f = ac.createBiquadFilter(), v = ac.createGain(); f.type = 'lowpass'; f.frequency.value = 260; v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(.07, t + .5); v.gain.setValueAtTime(.07, t + dur - .7); v.gain.linearRampToValueAtTime(0, t + dur); f.connect(v).connect(master);
       [68, 71.5].forEach((hz) => { const o = ac.createOscillator(); o.type = 'sawtooth'; o.frequency.setValueAtTime(hz * .8, t); o.frequency.linearRampToValueAtTime(hz * 1.25, t + dur * .45); o.frequency.linearRampToValueAtTime(hz * .85, t + dur); o.connect(f); o.start(t); o.stop(t + dur + .05); }); },
     note(k) { const t = ac.currentTime; tone(notes5[k % notes5.length], t, 1.4, 'sine', .06); tone(notes5[k % notes5.length] * 2, t, .6, 'sine', .015); },
@@ -1689,7 +1777,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   }
   function coldEnd() {
     if (!coldOn) return;
-    coldTs.forEach(clearTimeout); coldTs = []; coldOn = false; coldRunning = false;
+    coldTs.forEach(clearTimeout); coldTs = []; coldOn = false; coldRunning = false; document.body.classList.add('atstop');
     $('cold').classList.add('fade'); document.body.classList.remove('cold');
     setTimeout(() => { $('cold').hidden = true; }, 1700);
     started = Date.now();
@@ -1698,6 +1786,8 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   }
   $('coldGo').addEventListener('click', coldRun);
   $('coldSkip').addEventListener('click', coldEnd);
+
+  frames.forEach((f) => { [.22, .78].forEach((x) => { const l = document.createElement('span'); l.className = 'lamp'; l.style.left = (x * 100) + '%'; l.innerHTML = '<i></i><b></b>'; f.appendChild(l); }); });
 
   /* ================= start ================= */
   buildCity();
