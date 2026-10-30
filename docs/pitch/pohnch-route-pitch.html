@@ -97,8 +97,13 @@ p { margin: 0; }
 input[type=range] { width: 100%; accent-color: var(--neel); height: 28px; margin: 0; }
 
 /* Urdu mode: the same layout, Urdu type rules */
+body.ur .note[data-ur] { font-size: 20px; }
+body.ur .calc [data-ur] { line-height: 1.45; font-size: 17px; }
+body.ur .calc > span[data-ur] { font-size: 13.5px; }
 body.ur [data-ur] { font-family: var(--f-urdu); direction: rtl; unicode-bidi: isolate; letter-spacing: 0; }
-body.ur .frame h1[data-ur] { font-size: 76px; line-height: 1.35; }
+body.ur .frame h1[data-ur] { font-size: 64px; line-height: 1.15; top: 292px !important; }
+body.ur #coverLead { top: 430px !important; }
+body.ur .who b, body.ur .who span { line-height: 1.35; }
 body.ur .frame h2[data-ur] { font-size: 50px; line-height: 1.45; }
 body.ur .lead[data-ur] { font-size: 24px; line-height: 1.8; }
 body.ur .sub[data-ur], body.ur .sub [data-ur] { font-size: 20px; line-height: 1.7; }
@@ -107,7 +112,7 @@ body.ur .time[data-ur] { font-size: 24px; font-weight: 700; top: -18px; line-hei
 body.ur .who [data-ur] { line-height: 1.5; }
 
 /* cover */
-.who { display: flex; align-items: center; gap: 14px; padding: 14px 20px 14px 14px; background: var(--white); border-radius: 20px; box-shadow: 0 1px 0 var(--line), 0 12px 26px rgba(20, 26, 51, .09); }
+.who { display: flex; align-items: center; gap: 12px; padding: 12px 18px 12px 12px; background: var(--white); border-radius: 20px; box-shadow: 0 1px 0 var(--line), 0 12px 26px rgba(20, 26, 51, .09); }
 .who i { width: 54px; height: 54px; border-radius: 50%; flex: none; display: flex; align-items: center; justify-content: center; font: 800 22px var(--f-display); font-style: normal; }
 .who b { font-size: 23px; display: block; }
 .who span { font-size: 18px; color: var(--ink-2); }
@@ -168,6 +173,46 @@ body.ur .fund-list b { margin-left: 0; margin-right: auto; }
 .puff.go { animation: puff 1.1s ease-out forwards; }
 @keyframes puff { from { opacity: .45; transform: scale(.5); } to { opacity: 0; transform: scale(2.4); } }
 
+/* paper, ink and kinetic type */
+#grain { position: absolute; inset: 0; pointer-events: none; opacity: .55; mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .08 0 0 0 0 .1 0 0 0 0 .2 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+#vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(120% 95% at 50% 45%, rgba(20, 26, 51, 0) 60%, rgba(20, 26, 51, .09) 100%); }
+mark { color: inherit; padding: 0 .06em; margin: 0 -.06em; background: linear-gradient(transparent 56%, rgba(232, 163, 61, .5) 56%, rgba(232, 163, 61, .5) 90%, transparent 90%) no-repeat 0 0 / 100% 100%; -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.amaanbox mark { background-image: linear-gradient(transparent 56%, rgba(232, 163, 61, .45) 56%, rgba(232, 163, 61, .45) 90%, transparent 90%); }
+body.ur mark { background-position: 100% 0; }
+.frame.active mark { animation: hl .7s cubic-bezier(.3, .7, .2, 1) 1.05s backwards; }
+@keyframes hl { from { background-size: 0 100%; } }
+.frame.active h1, .frame.active h2 { animation: write .9s cubic-bezier(.3, .7, .2, 1) .2s backwards; }
+body.ur .frame.active h1, body.ur .frame.active h2 { animation-name: writeR; }
+@keyframes write { from { clip-path: inset(-20% 100% -20% 0); } to { clip-path: inset(-20% 0 -20% 0); } }
+@keyframes writeR { from { clip-path: inset(-20% 0 -20% 100%); } to { clip-path: inset(-20% 0 -20% 0); } }
+.note::after { content: ""; position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; background: linear-gradient(135deg, rgba(250, 246, 238, 0) 50%, rgba(20, 26, 51, .10) 50%); }
+.note > span:not(.u) { display: block; margin-top: 2px; }
+.vanart .bob { animation: bob .55s ease-in-out infinite alternate; transform-box: fill-box; }
+@keyframes bob { to { transform: translateY(-3px); } }
+.frame.active .mark-dot { animation: pop .45s cubic-bezier(.2, 1.6, .4, 1) backwards; transform-box: fill-box; transform-origin: center; }
+@keyframes pop { from { transform: scale(0); } }
+.who i { padding: 0; overflow: hidden; }
+
+/* cold open */
+#cold { position: fixed; z-index: 9; top: 0; bottom: 0; left: 0; right: var(--dock-w, 0px); background: var(--night); color: var(--paper); display: flex; align-items: center; justify-content: center; transition: opacity 1.6s ease; }
+#cold.fade { opacity: 0; pointer-events: none; }
+#cold::before { content: ""; position: absolute; inset: 0; background-image: radial-gradient(rgba(250, 246, 238, .07) 1.6px, transparent 1.6px); background-size: 40px 40px; }
+#cold .cin { position: relative; display: flex; flex-direction: column; align-items: center; gap: 10px; text-align: center; padding-inline: 24px; }
+#cold .gz { font-size: 84px; color: var(--kesar); line-height: 1.3; }
+#coldClock { font: 800 150px/1 var(--f-display); letter-spacing: -6px; font-variant-numeric: tabular-nums; }
+#coldLine { font: 600 26px/1.4 var(--f-marker); color: #C9CCE0; min-height: 1.4em; max-width: 760px; }
+#coldCount { font: 800 30px var(--f-display); color: var(--shingarf); min-height: 1.2em; }
+#coldCount b { color: #F6DDD6; font-size: 64px; letter-spacing: -2px; margin-right: 10px; }
+#coldGo { margin-top: 18px; height: 52px; padding: 0 26px; border: 0; border-radius: 999px; background: var(--kesar); color: var(--ink); font: 800 18px var(--f-display); cursor: pointer; animation: breathe 2.4s ease-in-out infinite; }
+#coldSkip { position: absolute; right: max(20px, env(safe-area-inset-right, 0px)); bottom: calc(20px + env(safe-area-inset-bottom, 0px)); border: 0; background: none; color: #C9CCE0; font: 600 16px var(--f-display); cursor: pointer; text-decoration: underline; }
+@keyframes breathe { 50% { box-shadow: 0 0 0 10px rgba(232, 163, 61, .18); } }
+body.cold #dock { background: var(--night); }
+body.cold #cap b { color: var(--paper); }
+body.cold #cap span { color: #C9CCE0; }
+body.cold #brand, body.cold #clock, body.cold #nav, body.cold #hint { opacity: 0; pointer-events: none; }
+body.ur #coldLine, body.ur #coldGo, body.ur #coldCount { font-family: var(--f-urdu); }
+
 /* ---------- HUD ---------- */
 .hud { position: fixed; z-index: 6; display: flex; align-items: center; gap: 10px; }
 #brand { top: calc(14px + env(safe-area-inset-top, 0px)); left: max(16px, env(safe-area-inset-left, 0px)); background: rgba(250, 246, 238, .94); padding: 8px 16px 8px 10px; border-radius: 999px; box-shadow: 0 4px 16px rgba(20, 26, 51, .12); font-weight: 800; font-size: 15px; }
@@ -184,11 +229,12 @@ body.ur #banner { font-family: var(--f-urdu); }
 .tool.lang { font: 800 15px var(--f-urdu); }
 .sep { width: 1px; height: 26px; background: var(--line); flex: none; }
 #dots { display: flex; align-items: center; gap: 5px; padding: 0 4px; overflow-x: auto; scrollbar-width: none; }
+#dots .chap { width: 1px; height: 16px; background: var(--line); flex: none; margin: 0 3px; }
 #dots button { width: 13px; height: 13px; border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 2.5px var(--neel); padding: 0; flex: none; }
 #dots button.seen { background: var(--neel); }
 #dots button.now { width: 21px; height: 21px; background: var(--kesar); box-shadow: 0 0 0 4px var(--kesar-tint); }
 #dots button:last-child.now { background: var(--zam); box-shadow: 0 0 0 4px var(--zam-tint); }
-#hint { bottom: calc(80px + env(safe-area-inset-bottom, 0px)); left: calc((100vw - var(--dock-w, 0px)) / 2); transform: translateX(-50%); font: 600 17px/1.2 var(--f-marker); color: var(--ink-2); white-space: nowrap; }
+#hint { background: rgba(250, 246, 238, .94); padding: 8px 16px; border-radius: 999px; box-shadow: 0 4px 14px rgba(20, 26, 51, .1); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); left: calc((100vw - var(--dock-w, 0px)) / 2); transform: translateX(-50%); font: 600 17px/1.2 var(--f-marker); color: var(--ink-2); white-space: nowrap; }
 body.ur #hint { font-family: var(--f-urdu); }
 #notes { left: max(16px, env(safe-area-inset-left, 0px)); bottom: calc(80px + env(safe-area-inset-bottom, 0px)); width: min(470px, 40vw); background: var(--ink); color: var(--paper); border-radius: 20px; padding: 16px 20px; display: flex; flex-direction: column; align-items: stretch; gap: 8px; box-shadow: 0 16px 40px rgba(20, 26, 51, .3); }
 #notes header { display: flex; justify-content: space-between; gap: 12px; font: 700 15px var(--f-display); color: var(--kesar); letter-spacing: .04em; text-transform: uppercase; }
@@ -299,12 +345,14 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
 .st-lang { align-self: flex-start; height: 40px; padding: 0 16px; border: 0; border-radius: 999px; background: var(--kesar-tint); font: 800 15px var(--f-urdu); cursor: pointer; }
 
 @media (prefers-reduced-motion: reduce) {
+  .frame.active mark, .frame.active h1, .frame.active h2, .vanart .bob, .frame.active .mark-dot, #coldGo,
   .frame.active .note, .nt.in, .frame.active .fundvan, .ps.flash, .floater, .shaker.ring, .shaker.buzz, #finale .fcard, .puff.go { animation: none; }
   .tilt, #phoneBox { transition: none; }
 }
 </style>
 
 <div id="progress" aria-hidden="true"></div>
+<div id="cold" hidden><div class="cin"><span class="gz">پہنچ</span><b id="coldClock">6:50</b><span id="coldLine"></span><span id="coldCount"></span><button id="coldGo"></button></div><button id="coldSkip"></button></div>
 
 <div id="stage">
   <div id="cam">
@@ -348,17 +396,32 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <section class="frame" data-sum="A live map for parents, a full van for drivers, a desk for schools. Urdu first, on the phones Karachi already has." data-sum-ur="والدین کے لیے لائیو نقشہ، ڈرائیوروں کے لیے بھری وین، اسکولوں کے لیے ایک ڈیسک۔ اردو میں، انہی فونوں پر جو کراچی کے پاس ہیں۔" data-ur-name="پہنچ" style="left:200px; top:200px" aria-label="Pohnch">
         <span class="time" data-ur="6:55 · گھر، گلشنِ اقبال">6:55 · home, Gulshan-e-Iqbal</span>
         <div style="position:absolute; left:0; top:44px; display:flex; align-items:center; gap:30px">
-          <svg width="250" height="130" viewBox="0 0 124 64" aria-label="Pohnch mark"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#1F2A5C"/><circle cx="32" cy="32" r="9" fill="#E8A33D"/><circle cx="74" cy="32" r="5" fill="#E8A33D"/><circle cx="88" cy="32" r="3" fill="#E8A33D"/><circle cx="98" cy="32" r="3" fill="#E8A33D"/><circle cx="114" cy="32" r="6" fill="#17705A"/></svg>
+          <svg width="250" height="130" viewBox="0 0 124 64" aria-label="Pohnch mark"><path class="mark-dot" style="animation-delay:.1s" d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#1F2A5C"/><circle class="mark-dot" style="animation-delay:.9s" cx="32" cy="32" r="9" fill="#E8A33D"/><circle class="mark-dot" style="animation-delay:.65s" cx="74" cy="32" r="5" fill="#E8A33D"/><circle class="mark-dot" style="animation-delay:.5s" cx="88" cy="32" r="3" fill="#E8A33D"/><circle class="mark-dot" style="animation-delay:.4s" cx="98" cy="32" r="3" fill="#E8A33D"/><circle class="mark-dot" style="animation-delay:.25s" cx="114" cy="32" r="6" fill="#17705A"/></svg>
           <span class="gz" style="font-size:180px; color:var(--neel); line-height:1.25">پہنچ</span>
         </div>
         <span class="gz" style="position:absolute; right:0; top:110px; font-size:54px; color:var(--kesar)">فکر کم، خبر پوری</span>
         <span class="mk" style="position:absolute; right:0; top:190px; font-size:22px; color:var(--ink-2)" data-ur="">less worry, the whole story</span>
-        <h1 style="position:absolute; left:0; top:300px; font-size:92px; line-height:1.0; white-space:nowrap" data-ur="اسکول وین کے لیے کریم">Careem for school vans.</h1>
-        <p class="lead" style="position:absolute; left:0; top:410px; max-width:900px" data-ur="والدین کے لیے لائیو نقشہ، ڈرائیوروں کے لیے بھری وین، اسکولوں کے لیے ایک ڈیسک۔ اردو میں، انہی فونوں پر جو کراچی کے پاس پہلے سے ہیں۔">A live map for parents, a full van for drivers, a desk for schools. Urdu first, on the phones Karachi already has.</p>
-        <div style="position:absolute; left:0; top:536px; display:flex; gap:18px">
-          <div class="who tilt"><i style="background:var(--neel-tint); color:var(--neel)">S</i><div><b data-ur="ثنا">Sana</b><span data-ur="علی کی امی، گلشن">Ali's amma, Gulshan</span></div></div>
-          <div class="who tilt"><i style="background:var(--zam-tint); color:var(--zam-ink)">A</i><div><b data-ur="علی">Ali</b><span data-ur="تیسری جماعت، صرف پہلا نام">class 3, a first name only</span></div></div>
-          <div class="who tilt"><i style="background:var(--kesar-tint); color:var(--kesar-ink)">R</i><div><b data-ur="رفیق بھائی">Rafiq bhai</b><span data-ur="12 بچوں کی وین">drives 12 children</span></div></div>
+        <h1 style="position:absolute; left:0; top:300px; font-size:92px; line-height:1.0; white-space:nowrap" data-ur="اسکول &lt;mark&gt;وین کے لیے کریم&lt;/mark&gt;">Careem for <mark>school vans</mark>.</h1>
+        <p class="lead" id="coverLead" style="position:absolute; left:0; top:412px; max-width:640px" data-ur="والدین کے لیے لائیو نقشہ، ڈرائیوروں کے لیے بھری وین، اسکولوں کے لیے ایک ڈیسک۔">A live map for parents, a full van for drivers, a desk for schools.</p>
+        <svg class="vanart" width="400" height="200" viewBox="0 0 420 210" aria-label="A Pohnch school van with four children in the windows" style="position:absolute; left:700px; top:396px">
+          <g fill="none" stroke="#E8A33D" stroke-width="6" stroke-linecap="round"><path d="M2 92 H26"><animate attributeName="opacity" values="1;.2;1" dur="1.2s" repeatCount="indefinite"/></path><path d="M10 122 H30"><animate attributeName="opacity" values=".2;1;.2" dur="1.2s" repeatCount="indefinite"/></path><path d="M0 150 H22"><animate attributeName="opacity" values="1;.3;1" dur="1.4s" repeatCount="indefinite"/></path></g>
+          <path d="M20 204 H410" stroke="#E2DCCD" stroke-width="5" stroke-linecap="round" stroke-dasharray="2 16"/>
+          <g class="bob">
+            <path d="M40 150 V82 Q40 52 70 52 H280 Q306 52 324 74 L372 118 Q388 132 388 152 V162 Q388 172 378 172 H50 Q40 172 40 162 Z" fill="#FFFFFF" stroke="#1F2A5C" stroke-width="5" stroke-linejoin="round"/>
+            <path d="M43 132 H385" stroke="#E8A33D" stroke-width="14"/>
+            <g fill="#E6E9F5"><rect x="58" y="66" width="50" height="44" rx="10"/><rect x="118" y="66" width="50" height="44" rx="10"/><rect x="178" y="66" width="50" height="44" rx="10"/><rect x="238" y="66" width="50" height="44" rx="10"/><path d="M300 66 H312 Q318 66 322 70 L356 110 H300 Z"/></g>
+            <circle cx="83" cy="96" r="13" fill="#17705A"/><circle cx="143" cy="94" r="13" fill="#E8A33D"/><circle cx="203" cy="97" r="12" fill="#1F2A5C"/><circle cx="263" cy="95" r="13" fill="#17705A"/><circle cx="320" cy="96" r="12" fill="#141A33"/><rect x="308" y="80" width="24" height="7" rx="3" fill="#E8A33D"/>
+            <rect x="176" y="114" width="56" height="54" rx="6" fill="none" stroke="#1F2A5C" stroke-width="3"/>
+            <g transform="translate(193 140) scale(.34)"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" transform="translate(-32 -32)" fill="#1F2A5C"/><circle r="9" fill="#FAF6EE"/></g>
+            <rect x="376" y="140" width="12" height="10" rx="3" fill="#E8A33D"/>
+          </g>
+          <g transform="translate(110 174)"><circle r="26" fill="#141A33"/><circle r="11" fill="#FAF6EE"/><g stroke="#FAF6EE" stroke-width="3"><path d="M0 -20 V-12 M0 12 V20 M-20 0 H-12 M12 0 H20"/><animateTransform attributeName="transform" type="rotate" values="0;360" dur="1s" repeatCount="indefinite"/></g></g>
+          <g transform="translate(320 174)"><circle r="26" fill="#141A33"/><circle r="11" fill="#FAF6EE"/><g stroke="#FAF6EE" stroke-width="3"><path d="M0 -20 V-12 M0 12 V20 M-20 0 H-12 M12 0 H20"/><animateTransform attributeName="transform" type="rotate" values="0;360" dur="1s" repeatCount="indefinite"/></g></g>
+        </svg>
+        <div style="position:absolute; left:0; top:540px; display:flex; gap:16px">
+          <div class="who tilt"><i><svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="27" fill="#E6E9F5"/><path d="M8 58 Q27 30 46 58 Z" fill="#1F2A5C"/><circle cx="27" cy="22" r="9" fill="#1F2A5C"/><path d="M14 30 Q14 8 27 8 Q40 8 40 30" fill="none" stroke="#E8A33D" stroke-width="4.5" stroke-linecap="round"/></svg></i><div><b data-ur="ثنا">Sana</b><span data-ur="علی کی امی">Ali's amma</span></div></div>
+          <div class="who tilt"><i><svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="27" fill="#DCEFE7"/><rect x="34" y="34" width="12" height="16" rx="4" fill="#E8A33D"/><path d="M12 58 Q27 34 42 58 Z" fill="#17705A"/><circle cx="27" cy="26" r="8" fill="#17705A"/></svg></i><div><b data-ur="علی">Ali</b><span data-ur="تیسری جماعت">class 3</span></div></div>
+          <div class="who tilt"><i><svg width="54" height="54" viewBox="0 0 54 54" aria-hidden="true"><circle cx="27" cy="27" r="27" fill="#FBEBCF"/><path d="M8 58 Q27 30 46 58 Z" fill="#141A33"/><circle cx="27" cy="23" r="9" fill="#141A33"/><path d="M17 17 Q27 9 37 17 Z" fill="#E8A33D"/><rect x="15" y="16" width="26" height="4" rx="2" fill="#E8A33D"/></svg></i><div><b data-ur="رفیق بھائی">Rafiq bhai</b><span data-ur="12 بچوں کی وین">drives 12 children</span></div></div>
         </div>
         <span class="anno" style="left:30px; top:660px" data-ur="→ دبائیں اور ان کے ساتھ چلیں">press → and ride along with them</span>
         <span data-rough="arrow" data-from="380,690" data-to="530,880" style="display:none"></span>
@@ -367,7 +430,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 1 · Problem -->
       <section class="frame" data-sum="Families pay Rs 2,000 to 7,500 a child each month for a van and get no news from it. Ten of them call one driver, who answers at the wheel." data-sum-ur="گھرانے ہر بچے کی وین کے لیے ماہانہ Rs 2,000 سے 7,500 دیتے ہیں، اور کوئی خبر نہیں ملتی۔ دس گھرانے ایک ڈرائیور کو فون کرتے ہیں، جو گاڑی چلاتے ہوئے سنتے ہیں۔" data-ur-name="مسئلہ" style="left:1600px; top:200px" aria-label="The problem">
         <span class="time" data-ur="7:02 · وین کہاں ہے؟">7:02 · where is the van?</span>
-        <h2 style="position:absolute; left:0; top:44px" data-ur="ہر اسکول کی صبح، دس گھرانے ایک ڈرائیور کو فون کرتے ہیں۔">Every school morning, ten families call one driver.</h2>
+        <h2 style="position:absolute; left:0; top:44px" data-ur="ہر اسکول کی صبح، دس گھرانے &lt;mark&gt;ایک ڈرائیور&lt;/mark&gt; کو فون کرتے ہیں۔">Every school morning, ten families call <mark>one driver</mark>.</h2>
         <div class="note tilt" style="left:10px; top:240px; rotate:-3deg"><span class="u">وین نکل گئی؟</span><span data-ur="">has the van left?</span></div>
         <div class="note blue tilt" style="left:300px; top:270px; rotate:2deg"><span class="u">علی وین میں ہے؟</span><span data-ur="">is Ali in the van?</span></div>
         <div class="note green tilt" style="left:590px; top:236px; rotate:-1.5deg"><span class="u">کتنی دیر؟</span><span data-ur="">how long now?</span></div>
@@ -382,7 +445,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 2 · Live map -->
       <section class="frame" data-sum="Parents watch the van move on a map and see the minutes to their door, also on the lock screen. No GPS box: the driver's phone shares its location, only during the trip." data-sum-ur="والدین وین کو نقشے پر چلتا دیکھتے ہیں اور دروازے تک کے منٹ، لاک اسکرین پر بھی۔ کوئی جی پی ایس ڈبہ نہیں: ڈرائیور کا فون صرف سفر کے دوران مقام بتاتا ہے۔" data-ur-name="لائیو نقشہ" style="left:3000px; top:200px" aria-label="Live map">
         <span class="time" data-ur="7:05 · وین نکل گئی">7:05 · the van leaves</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:520px" data-ur="آپ کے بچے کی وین، لائیو، آپ کے فون پر۔">Your child's van, live, on your phone.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:520px" data-ur="آپ کے بچے کی وین، &lt;mark&gt;لائیو&lt;/mark&gt;، آپ کے فون پر۔">Your child's van, <mark>live</mark>, on your phone.</h2>
         <p class="lead" style="position:absolute; left:0; top:250px; max-width:480px" data-ur="وین نقشے پر چلتی دکھائی دیتی ہے، دروازے تک کے منٹوں کے ساتھ۔ کوئی جی پی ایس ڈبہ نہیں: ڈرائیور کا اپنا فون مقام بتاتا ہے، اور صرف سفر کے دوران۔">The van moves on a map, with the minutes to your door. No GPS box: the driver's own phone shares its location, and only while the trip runs.</p>
         <div class="card tilt" style="position:absolute; left:560px; top:20px; width:540px; height:440px; overflow:hidden">
           <svg width="540" height="440" viewBox="0 0 540 440" aria-label="A van moving along its route towards a home pin">
@@ -409,7 +472,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 3 · Map plus tap -->
       <section class="frame" data-sum="Arriving at the door is sent by the map on its own. Getting in is one tap by the driver, with siblings in one tap and five seconds to undo." data-sum-ur="دروازے پر پہنچنے کی خبر نقشہ خود دیتا ہے۔ وین میں بیٹھنا ڈرائیور کی ایک ٹیپ ہے: بہن بھائی ایک ٹیپ میں، اور واپسی کے لیے پانچ سیکنڈ۔" data-ur-name="نقشہ اور ٹیپ" style="left:4400px; top:200px" aria-label="Map plus tap">
         <span class="time" data-ur="7:12 · علی وین میں">7:12 · Ali gets in</span>
-        <h2 style="position:absolute; left:0; top:44px" data-ur="نقشہ بتاتا ہے وین کہاں ہے۔ ایک ٹیپ بتاتی ہے بچہ اس میں ہے۔">The map says where the van is. A tap says your child is in it.</h2>
+        <h2 style="position:absolute; left:0; top:44px" data-ur="نقشہ بتاتا ہے وین کہاں ہے۔ ایک ٹیپ بتاتی ہے &lt;mark&gt;بچہ اس میں ہے&lt;/mark&gt;۔">The map says where the van is. A tap says <mark>your child is in it</mark>.</h2>
         <div style="position:absolute; left:0; top:262px; width:420px; display:flex; flex-direction:column; gap:14px">
           <svg class="tilt" width="420" height="220" viewBox="0 15 420 220" aria-label="The van entering a circle around the home pin" style="border-radius:22px; background:#EFE9DC">
             <g fill="none" stroke="#FFFFFF" stroke-width="12"><path d="M0 80 H420"/><path d="M0 190 H420"/><path d="M150 0 V250"/></g>
@@ -429,14 +492,14 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
           <div id="holdHelp" style="font-size:24px; line-height:1.4" data-ur="&lt;b&gt;2 · وین میں۔&lt;/b&gt; وین رکی ہو تو ڈرائیور کی ایک ٹیپ۔ بہن بھائی ایک ہی ٹیپ میں۔"><b>2 · In the van.</b> One tap by the driver when the van is stopped. Siblings take one tap.</div>
           <button id="holdAgain" class="mk" hidden style="align-self:flex-start; border:0; background:none; padding:0; font-size:21px; color:var(--neel); text-decoration:underline; cursor:pointer" data-ur="دوبارہ آزمائیں">try it again</button>
         </div>
-        <span class="anno red" style="left:470px; top:200px; rotate:-2deg" data-ur="آزمائیں: سبز بٹن دبا کر رکھیں ↓">try it: hold the green button ↓</span>
-        <div class="note tilt" style="left:0; top:596px; width:420px; rotate:-2deg; font-size:22px" data-ur="کریم گاڑی دکھاتا ہے۔ ہم ایک وعدہ: آپ کا بچہ، دروازے سے گیٹ تک۔">Careem tracks a car. We track a promise: <b>your child</b>, door to gate.</div>
+        <span class="anno red" style="left:470px; top:212px; rotate:-2deg" data-ur="آزمائیں: سبز بٹن دبا کر رکھیں ↓">try it: hold the green button ↓</span>
+        <div class="note tilt" style="left:0; top:584px; width:420px; rotate:-2deg; font-size:22px" data-ur="کریم گاڑی دکھاتا ہے۔ ہم ایک وعدہ: آپ کا بچہ، دروازے سے گیٹ تک۔">Careem tracks a car. We track a promise: <b>your child</b>, door to gate.</div>
       </section>
 
       <!-- 4 · Marketplace -->
       <section class="frame" data-sum="Add your child, home and school, and see the verified vans whose route already passes near you, with seats, fee and on-time record. Book a seat with a one-week trial." data-sum-ur="بچہ، گھر اور اسکول بتائیں اور وہ تصدیق شدہ وینیں دیکھیں جن کا راستہ پہلے سے آپ کے قریب سے گزرتا ہے: سیٹیں، فیس اور وقت کی پابندی۔ ایک ہفتے کی آزمائش کے ساتھ سیٹ بک کریں۔" data-ur-name="وین ڈھونڈیں" style="left:5800px; top:200px" aria-label="Find a van">
         <span class="time" data-ur="7:20 · پڑوسی بھی شامل ہونا چاہتے ہیں">7:20 · a neighbour wants in</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:540px" data-ur="وہ وین چنیں جو پہلے ہی آپ کے دروازے سے گزرتی ہے۔">Choose a van that already drives past your door.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:540px" data-ur="وہ وین چنیں جو پہلے ہی &lt;mark&gt;آپ کے دروازے&lt;/mark&gt; سے گزرتی ہے۔">Choose a van that already drives <mark>past your door</mark>.</h2>
         <p class="lead" style="position:absolute; left:0; top:260px; max-width:500px" data-ur="بچہ، گھر اور اسکول بتائیں۔ پہنچ وہ تصدیق شدہ وینیں دکھاتا ہے جن کا راستہ آپ کے قریب سے گزرتا ہے: سیٹیں، فیس اور وقت کی پابندی۔ سیٹ ماہانہ ہے، ایک ہفتے کی آزمائش کے ساتھ۔">Add your child, home and school. Pohnch shows the verified vans whose route passes near you, with seats, fee and on-time record. A seat is monthly, with a one-week trial.</p>
         <div class="card tilt" style="position:absolute; left:590px; top:20px; width:510px; overflow:hidden">
           <svg width="510" height="270" viewBox="0 0 510 270" aria-label="Three van routes passing near a home pin" id="mpmap">
@@ -456,11 +519,11 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 5 · Amaan -->
       <section class="frame" data-sum="Pohnch Amaan is a separate tab and filter: a woman driver, a woman helper on board, or girls-only seats. It launches in stage 3 with a training partner." data-sum-ur="پہنچ امان ایک الگ ٹیب اور فلٹر ہے: ڈرائیور صاحبہ، وین میں امان ساتھی، یا صرف بچیوں کی سیٹیں۔ یہ تیسرے مرحلے میں تربیتی ساتھی کے ساتھ شروع ہوگا۔" data-ur-name="پہنچ امان" style="left:5800px; top:1500px" aria-label="Pohnch Amaan">
         <span class="time" data-ur="7:28 · بیٹی کی وین">7:28 · a daughter's van</span>
-        <div class="tilt" style="position:absolute; inset:34px 0 0 0; border-radius:32px; overflow:hidden; background:var(--amaan); color:var(--paper); box-shadow:0 26px 50px rgba(15, 94, 78, .28)">
+        <div class="tilt amaanbox" style="position:absolute; inset:34px 0 0 0; border-radius:32px; overflow:hidden; background:var(--amaan); color:var(--paper); box-shadow:0 26px 50px rgba(15, 94, 78, .28)">
           <div class="lattice am" style="position:absolute; right:0; top:0; bottom:0; width:430px; opacity:.85"></div>
           <div style="position:absolute; left:52px; top:40px; width:560px; display:flex; flex-direction:column; gap:14px">
             <span class="gz" style="font-size:66px; color:var(--kesar-tint); text-align:left">پہنچ امان</span>
-            <h2 style="color:var(--paper); font-size:54px" data-ur="پہنچ کا خواتین والا حصہ۔">The women-only side of Pohnch.</h2>
+            <h2 style="color:var(--paper); font-size:54px" data-ur="پہنچ کا &lt;mark&gt;خواتین والا&lt;/mark&gt; حصہ۔">The <mark>women-only</mark> side of Pohnch.</h2>
             <p class="lead" style="color:var(--zam-tint)" data-ur="اپنا الگ ٹیب اور فلٹر: ڈرائیور صاحبہ، وین میں امان ساتھی، یا صرف بچیوں کی سیٹیں۔ ہر امان ڈرائیور پانچ جانچ اور تربیت سے گزرتی ہیں، اور آخری سفر کے بعد &quot;میں گھر پہنچ گئی&quot; دباتی ہیں۔">Its own tab and filter: a woman driver, a woman helper on board, or girls-only seats. Every Amaan driver passes five checks and training, and taps "I'm home safe" after the last trip.</p>
             <span class="mk" style="font-size:23px; color:var(--kesar-tint); font-weight:600" data-ur="تیسرے مرحلے میں، تربیتی ساتھی اور گھر کے دوروں کے لیے خواتین عملے کے ساتھ">launches in stage 3, with a training partner and women staff for home visits</span>
           </div>
@@ -475,7 +538,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 6 · Request a van -->
       <section class="frame" data-sum="No van on your street? A request opens at 4 children going the same way. At 8, Pohnch brings a verified van and the route starts. Families pay only once the van runs." data-sum-ur="گلی میں وین نہیں؟ ایک ہی طرف جانے والے 4 بچوں پر درخواست کھلتی ہے۔ 8 پر پہنچ تصدیق شدہ وین لاتا ہے اور روٹ شروع۔ فیس تب ہی جب وین چلے۔" data-ur-name="وین کی درخواست" style="left:4400px; top:1500px" aria-label="Request a van">
         <span class="time" data-ur="7:34 · ایسی گلی جہاں وین نہیں">7:34 · a street with no van</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:640px" data-ur="گلی میں وین نہیں؟ مل کر مانگیں۔">No van on your street? Ask together.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:640px" data-ur="گلی میں وین نہیں؟ &lt;mark&gt;مل کر مانگیں&lt;/mark&gt;۔">No van on your street? <mark>Ask together.</mark></h2>
         <p class="lead" style="position:absolute; left:0; top:200px; max-width:580px" data-ur="ایک ہی طرف جانے والے 4 بچوں پر درخواست کھلتی ہے۔ 8 پر پہنچ تصدیق شدہ وین لاتا ہے اور روٹ شروع۔ فیس تب ہی جب وین چلے۔">A request opens at 4 children going the same way. At 8, Pohnch brings a verified van and the route starts. Families pay only once the van runs.</p>
         <div style="position:absolute; left:0; top:400px; width:580px">
           <div style="display:flex; justify-content:space-between; font-weight:800; font-size:25px"><span data-ur="گلشن بلاک 10 سے کلفٹن">Gulshan Block 10 → Clifton</span><span style="color:var(--zam)" id="reqn">5 / 8</span></div>
@@ -494,7 +557,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 7 · Schools -->
       <section class="frame" data-sum="Schools that run their own buses get a live fleet map, a boarding register filled by taps, and a gate handover list. Rs 300 per rider a month, with Pohnch Live for every parent." data-sum-ur="اپنی بسیں چلانے والے اسکولوں کو سب بسوں کا لائیو نقشہ، ٹیپ سے بھرا حاضری رجسٹر اور گیٹ پر حوالگی کی فہرست ملتی ہے۔ فی بچہ ماہانہ Rs 300، ہر والدین کے لیے پہنچ لائیو شامل۔" data-ur-name="اسکولوں کے لیے پہنچ" style="left:3000px; top:1500px" aria-label="Pohnch for Schools">
         <span class="time" data-ur="7:40 · اسکول کا گیٹ">7:40 · the school gate</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:560px" data-ur="اسکول کی ہر بس، ایک اسکرین پر۔">Every school bus on one screen.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:560px" data-ur="اسکول کی ہر بس، &lt;mark&gt;ایک اسکرین&lt;/mark&gt; پر۔">Every school bus on <mark>one screen</mark>.</h2>
         <p class="lead" style="position:absolute; left:0; top:200px; max-width:540px" data-ur="اپنی بسیں چلانے والے اسکولوں کو ملتا ہے: سب بسوں کا لائیو نقشہ، ٹیپ سے بھرا حاضری رجسٹر، اور گیٹ پر حوالگی کی فہرست۔ ہر سوار بچے کے والدین کو پہنچ لائیو شامل۔">Schools that run their own buses get a live fleet map, a boarding register filled by taps, and a gate handover list. Every rider's parent gets Pohnch Live included.</p>
         <div style="position:absolute; left:0; top:450px; display:flex; gap:40px">
           <div><div class="big" style="font-size:54px; color:var(--neel)">Rs 300</div><div class="sub" data-ur="فی بچہ ماہانہ، سالانہ بل">per rider a month, billed yearly</div></div>
@@ -523,13 +586,13 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 8 · Market size -->
       <section class="frame" data-sum="Karachi has about 8,000 registered private schools and an estimated 6,000 more unregistered. Nobody has counted the vans; our working assumption is 10,000 vans and 100,000 children. The pilot replaces guesses with counts." data-sum-ur="کراچی میں تقریباً 8,000 رجسٹرڈ نجی اسکول ہیں اور اندازاً 6,000 غیر رجسٹرڈ۔ وینیں کسی نے نہیں گنیں؛ ہمارا اندازہ 10,000 وینیں اور 100,000 بچے ہے۔ پائلٹ اندازوں کو گنتی سے بدلے گا۔" data-ur-name="کتنا بڑا" style="left:1600px; top:1500px" aria-label="How big">
         <span class="time" data-ur="7:46 · ایسی کتنی صبحیں؟">7:46 · how many mornings like this?</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:600px" data-ur="اسکول کی صبحوں کا شہر۔">A city of school mornings.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:600px" data-ur="&lt;mark&gt;اسکول کی صبحوں&lt;/mark&gt; کا شہر۔">A city of <mark>school mornings</mark>.</h2>
         <div style="position:absolute; left:0; top:200px; width:560px; display:flex; flex-direction:column; gap:22px">
           <div><div class="big" style="font-size:58px; color:var(--neel)">14,000</div><div class="sub" data-ur="کراچی کے نجی اسکول: تقریباً 8,000 رجسٹرڈ اور 6,000 غیر رجسٹرڈ (اے آر وائی نیوز، 2022)">private schools in Karachi: about 8,000 registered and 6,000 more unregistered (ARY News, 2022)</div></div>
           <div><div class="big" style="font-size:58px; color:var(--neel)">100,000</div><div class="sub" data-ur="وینوں میں بچے، اگر 10,000 وینیں ہوں اور ہر ایک میں 10 بچے۔ کسی نے گنا نہیں؛ یہ ہمارا اندازہ ہے۔">children in vans, if there are 10,000 vans with 10 children each. Nobody has counted; this is our working assumption.</div></div>
           <div><div class="big" style="font-size:58px; color:var(--zam)" data-rough="underline">Rs 30 m</div><div class="sub" data-ur="ماہانہ، اگر آدھے گھرانے Rs 599 میں لائیو لیں، وین فیس کی آمدن کے علاوہ">a month if half those families take Live at Rs 599, before any van-fee income</div></div>
         </div>
-        <svg class="tilt" width="460" height="460" viewBox="0 0 460 460" aria-label="Circles: 100,000 children, 50,000 on Live, the pilot's 50 children" style="position:absolute; left:640px; top:150px">
+        <svg class="tilt" width="420" height="420" viewBox="0 0 460 460" aria-label="Circles: 100,000 children, 50,000 on Live, the pilot's 50 children" style="position:absolute; left:640px; top:150px">
           <circle cx="230" cy="250" r="200" fill="#E6E9F5" stroke="#1F2A5C" stroke-width="3"/>
           <circle cx="230" cy="300" r="140" fill="#DCEFE7" stroke="#17705A" stroke-width="3"/>
           <circle cx="230" cy="390" r="30" fill="#E8A33D" stroke="#141A33" stroke-width="3"/>
@@ -538,13 +601,13 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
           <text x="230" y="300" text-anchor="middle" font-family="Shantell Sans, Noto Sans Arabic, cursive" font-weight="600" font-size="22" fill="#0B4A3D" data-ur="پائلٹ ↓">the pilot ↓</text>
           <text x="230" y="397" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="18" fill="#141A33">~50</text>
         </svg>
-        <div class="note green tilt" style="left:640px; top:612px; width:440px; rotate:-2deg; font-size:23px" data-ur="پائلٹ کا کام: اندازوں کی جگہ گنتی۔">The pilot's job: swap our guesses for counts.</div>
+        <div class="note green tilt" style="left:650px; top:584px; width:400px; rotate:-2deg; font-size:23px" data-ur="پائلٹ کا کام: اندازوں کی جگہ گنتی۔">The pilot's job: swap our guesses for counts.</div>
       </section>
 
       <!-- 9 · Money -->
       <section class="frame" data-sum="Four ways to earn on one van: Pohnch Live at Rs 599 a child, 7% of van fees paid in the app, 12% on routes Pohnch forms, Rs 300 per rider for schools. About Rs 7,300 a van a month; break-even near 37 vans." data-sum-ur="ایک وین سے کمائی کے چار راستے: پہنچ لائیو Rs 599 فی بچہ، ایپ میں وین فیس کا 7%، پہنچ کے بنائے روٹس پر 12%، اسکولوں سے Rs 300 فی بچہ۔ فی وین تقریباً Rs 7,300 ماہانہ؛ تقریباً 37 وینوں پر خرچ پورا۔" data-ur-name="کاروباری ماڈل" style="left:1600px; top:2800px" aria-label="Business model">
         <span class="time" data-ur="7:52 · پیسہ">7:52 · the money</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:560px" data-ur="ایک وین سے کمائی کے چار راستے۔">Four ways to earn on one van.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:560px" data-ur="ایک وین سے کمائی کے &lt;mark&gt;چار راستے&lt;/mark&gt;۔"><mark>Four ways</mark> to earn on one van.</h2>
         <div style="position:absolute; left:0; top:210px; width:540px; display:flex; flex-direction:column; gap:16px">
           <div style="display:flex; gap:16px; align-items:baseline"><b class="big" style="font-size:42px; color:var(--neel); width:170px; flex:none">Rs 599</b><span style="font-size:22px; line-height:1.4" data-ur="پہنچ لائیو، فی بچہ ماہانہ۔ بنیادی خبریں مفت۔">Pohnch Live, per child a month. Basic alerts stay free.</span></div>
           <div style="display:flex; gap:16px; align-items:baseline"><b class="big" style="font-size:42px; color:var(--zam); width:170px; flex:none">7%</b><span style="font-size:22px; line-height:1.4" data-ur="ایپ میں ادا ہونے والی وین فیس کا، ڈرائیور کی طرف سے۔">of van fees paid in the app, from the driver's side.</span></div>
@@ -574,14 +637,14 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 10 · Competition -->
       <section class="frame" data-sum="GPS tracker boxes cost up to Rs 15,000 plus a monthly fee and only know where the van is. WhatsApp groups depend on a driver typing. Pohnch knows whether your child is in the van, on phones people already own." data-sum-ur="جی پی ایس ٹریکر Rs 15,000 تک اور ماہانہ فیس، اور صرف وین کا مقام جانتے ہیں۔ واٹس ایپ گروپ ڈرائیور کے لکھنے پر چلتا ہے۔ پہنچ جانتا ہے بچہ وین میں ہے یا نہیں، انہی فونوں پر جو لوگوں کے پاس ہیں۔" data-ur-name="پہنچ کیوں جیتے گا" style="left:3000px; top:2800px" aria-label="Why Pohnch wins">
         <span class="time" data-ur="8:00 · اسکول، کلفٹن">8:00 · school, Clifton</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:1060px" data-ur="دوسرے وین دکھاتے ہیں۔ پہنچ آپ کا بچہ، انہی فونوں پر جو لوگوں کے پاس ہیں۔">Others track a van. Pohnch tracks your child, on phones people own.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:1060px" data-ur="دوسرے وین دکھاتے ہیں۔ پہنچ &lt;mark&gt;آپ کا بچہ&lt;/mark&gt;، انہی فونوں پر جو لوگوں کے پاس ہیں۔">Others track a van. Pohnch tracks <mark>your child</mark>, on phones people own.</h2>
         <div style="position:absolute; left:0; top:210px; width:620px; height:470px">
-          <span data-rough="sline" data-from="60,680" data-to="60,230" style="display:none"></span>
-          <span data-rough="sline" data-from="60,680" data-to="640,680" style="display:none"></span>
+          <span data-rough="sline" data-from="60,652" data-to="60,230" style="display:none"></span>
+          <span data-rough="sline" data-from="60,652" data-to="640,652" style="display:none"></span>
           <span class="mk" style="position:absolute; left:80px; top:6px; font-size:20px; color:var(--ink-2)" data-ur="↑ جانتا ہے بچہ وین میں ہے یا نہیں">↑ knows whether your child is in it</span>
-          <span class="mk" style="position:absolute; left:80px; top:432px; font-size:20px; color:var(--ink-2)" data-ur="صرف وین کا مقام">knows only where the van is</span>
-          <span class="mk" style="position:absolute; left:420px; top:478px; font-size:20px; color:var(--ink-2)" data-ur="فون پر چلتا ہے →">runs on phones →</span>
-          <span class="mk" style="position:absolute; left:60px; top:478px; font-size:20px; color:var(--ink-2)" data-ur="ڈبہ چاہیے">needs a box</span>
+          <span class="mk" style="position:absolute; left:80px; top:404px; font-size:20px; color:var(--ink-2)" data-ur="صرف وین کا مقام">knows only where the van is</span>
+          <span class="mk" style="position:absolute; left:420px; top:450px; font-size:20px; color:var(--ink-2)" data-ur="فون پر چلتا ہے →">runs on phones →</span>
+          <span class="mk" style="position:absolute; left:60px; top:450px; font-size:20px; color:var(--ink-2)" data-ur="ڈبہ چاہیے">needs a box</span>
           <div style="position:absolute; left:90px; top:320px; width:240px"><b style="font-size:22px" data-ur="جی پی ایس ٹریکر ڈبہ">GPS tracker box</b><div style="font-size:18px; color:var(--ink-2); line-height:1.35" data-ur="Rs 15,000 تک، اور ماہانہ فیس">up to Rs 15,000 plus a monthly fee</div></div>
           <div style="position:absolute; left:360px; top:320px; width:240px"><b style="font-size:22px" data-ur="رائیڈ ایپس">Ride-hailing apps</b><div style="font-size:18px; color:var(--ink-2); line-height:1.35" data-ur="ایک سفر کی گاڑی، ماہانہ سیٹ نہیں">a car for one ride, not a monthly seat</div></div>
           <div style="position:absolute; left:250px; top:156px; width:260px"><b style="font-size:22px" data-ur="وین کا واٹس ایپ گروپ">The van's WhatsApp group</b><div style="font-size:18px; color:var(--ink-2); line-height:1.35" data-ur="صرف جب ڈرائیور لکھ سکے">only when the driver can type</div></div>
@@ -597,7 +660,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 11 · Roadmap -->
       <section class="frame" data-sum="Stage 1, now to March 2027: a free pilot with 3 to 5 vans. Stage 2, 2027: the marketplace, 20 to 60 vans. Stage 3, 2028: schools and Pohnch Amaan. Each gate decides whether the next money is spent." data-sum-ur="پہلا مرحلہ، ابھی سے مارچ 2027: 3 سے 5 وینوں کا مفت پائلٹ۔ دوسرا، 2027: مارکیٹ پلیس، 20 سے 60 وینیں۔ تیسرا، 2028: اسکول اور پہنچ امان۔ ہر گیٹ طے کرتا ہے کہ اگلا پیسہ خرچ ہو یا نہیں۔" data-ur-name="آگے کا راستہ" style="left:4400px; top:2800px" aria-label="Roadmap">
         <span class="time" data-ur="1:30 · چھٹی کا وقت">1:30 · home time</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:760px" data-ur="پورے شہر کے نیٹ ورک تک تین پڑاؤ۔">Three stops to a city-wide network.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:760px" data-ur="&lt;mark&gt;پورے شہر&lt;/mark&gt; کے نیٹ ورک تک تین پڑاؤ۔">Three stops to a <mark>city-wide</mark> network.</h2>
         <svg width="1100" height="150" viewBox="0 0 1100 150" aria-hidden="true" style="position:absolute; left:0; top:190px">
           <path d="M40 100 H1060" stroke="#1F2A5C" stroke-width="8" stroke-linecap="round" stroke-dasharray="2 18"/>
           <circle cx="160" cy="100" r="28" fill="#1F2A5C"/><circle cx="550" cy="100" r="28" fill="#E8A33D"/><circle cx="940" cy="100" r="28" fill="#0F5E4E"/>
@@ -616,7 +679,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
       <!-- 12 · Ask -->
       <section class="frame" data-sum="Rs 3,000,000 takes Pohnch through its first year. The pilot alone needs about Rs 400,000: two test phones, store fees, hosting and four months of founder time." data-sum-ur="Rs 3,000,000 پہنچ کو پہلے سال سے گزارتے ہیں۔ صرف پائلٹ کو تقریباً Rs 400,000 چاہئیں: دو ٹیسٹ فون، اسٹور فیس، ہوسٹنگ اور بانی کے چار مہینے۔" data-ur-name="ہماری درخواست" style="left:5800px; top:2800px" aria-label="The ask">
         <span class="time" data-ur="2:05 · گھر">2:05 · home</span>
-        <h2 style="position:absolute; left:0; top:44px; max-width:1000px" data-ur="Rs 3,000,000 پہلا سال گھر پہنچاتے ہیں۔">Rs 3,000,000 gets the first year home.</h2>
+        <h2 style="position:absolute; left:0; top:44px; max-width:1000px" data-ur="&lt;mark&gt;Rs 3,000,000&lt;/mark&gt; پہلا سال گھر پہنچاتے ہیں۔"><mark>Rs 3,000,000</mark> gets the first year home.</h2>
         <div style="position:absolute; left:0; top:200px; width:1100px; display:flex; flex-direction:column; gap:26px">
           <div style="position:relative; padding-top:24px">
             <div class="fund-road" id="fundRoad"></div>
@@ -625,10 +688,11 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
           <div class="fund-list" id="fundList"></div>
         </div>
         <div class="note tilt" style="left:0; top:520px; width:430px; rotate:-2deg; font-size:23px" data-ur="صرف پائلٹ کو تقریباً Rs 400,000 چاہئیں: دو ٹیسٹ فون، اسٹور فیس، ہوسٹنگ، بانی کے چار مہینے۔">The pilot alone needs about <b>Rs 400,000</b>: two test phones, store fees, hosting, four months of founder time.</div>
-        <div style="position:absolute; left:520px; top:500px; display:flex; flex-direction:column; gap:4px">
+        <div style="position:absolute; left:520px; top:478px; display:flex; flex-direction:column; gap:4px">
           <span class="gz" style="font-size:54px; color:var(--neel); text-align:left">فکر کم، خبر پوری</span>
           <b style="font-size:27px" data-ur="پہلی دس وینوں کو پہنچنے میں مدد کریں۔">Help the first ten vans arrive.</b>
-          <span style="font-size:21px; color:var(--ink-2)" data-ur="[آپ کا نام] · [یونیورسٹی] · [فون] · [ای میل]">[your name] · [university] · [phone] · [email]</span>
+          <span style="font-size:21px; color:var(--ink-2)" data-ur="محمد حسن · حبیب یونیورسٹی">Mohammad Hassan · Habib University</span>
+          <span style="font-size:21px; color:var(--ink-2); font-variant-numeric:tabular-nums">0300 1478729 · mh10949@st.habib.edu.pk</span>
         </div>
       </section>
     </div>
@@ -636,6 +700,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     <div class="light" id="dusk" style="opacity:0"></div>
     <div class="light" id="gloom"></div>
   </div>
+  <div id="grain" aria-hidden="true"></div><div id="vignette" aria-hidden="true"></div>
   <canvas id="draw" aria-hidden="true"></canvas>
 </div>
 
@@ -659,6 +724,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   <button class="navbtn" id="next" aria-label="Next stop"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M9 6l6 6-6 6"/></svg></button>
   <span class="sep"></span>
   <button class="tool" id="play" aria-pressed="false" aria-label="Autoplay (P)" title="Autoplay (P)"><svg id="playIc" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M7 4.5v15l13-7.5z"/></svg></button>
+  <button class="tool" id="sound" aria-pressed="false" aria-label="Sound (S)" title="Sound (S)"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor"/><path id="soundWaves" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" opacity=".35"/></svg></button>
   <button class="tool" id="without" aria-pressed="false" aria-label="Without Pohnch (W)" title="Without Pohnch (W)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
   <button class="tool lang" id="lang" aria-label="Urdu or English (U)" title="Urdu or English (U)">اردو</button>
   <button class="tool" id="pen" aria-pressed="false" aria-label="Draw on the board (D)" title="Draw on the board (D)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1L19 8a2.1 2.1 0 0 0-3-3L5 16z"/><path d="M14 7l3 3"/></svg></button>
@@ -896,10 +962,15 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     for (let l = 0; l <= total; l += 8) { const p = route.getPointAtLength(l); const d = (p.x - x) ** 2 + (p.y - y) ** 2; if (d < bd) { bd = d; best = l; } }
     return best;
   });
+  const roadDots = [], signs = [], signNums = [];
   anchors.forEach((l, k) => {
-    const p = route.getPointAtLength(l);
-    stopsG.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 20, stroke: '#FFFFFF', 'stroke-width': 6, fill: '#E2DCCD' }));
+    const p = route.getPointAtLength(l), sx2 = p.x + 54;
+    roadDots.push(stopsG.appendChild(svgEl('circle', { cx: p.x, cy: p.y, r: 20, stroke: '#FFFFFF', 'stroke-width': 6, fill: '#E2DCCD' })));
+    stopsG.appendChild(svgEl('path', { d: 'M' + sx2 + ' ' + (p.y - 18) + ' V' + (p.y - 124), stroke: '#141A33', 'stroke-width': 5, 'stroke-linecap': 'round' }));
+    signs.push(stopsG.appendChild(svgEl('circle', { cx: sx2, cy: p.y - 150, r: 27, stroke: '#FFFFFF', 'stroke-width': 5, fill: '#E2DCCD' })));
+    signNums.push(stopsG.appendChild(svgEl('text', { x: sx2, y: p.y - 141, 'text-anchor': 'middle', 'font-family': 'Manrope, sans-serif', 'font-weight': 800, 'font-size': 25, fill: '#4A4F66' }, String(k + 1))));
     stopsG.appendChild(svgEl('text', { x: p.x, y: p.y + 78, 'text-anchor': 'middle', 'font-family': 'Shantell Sans, cursive', 'font-weight': 700, 'font-size': 30, fill: '#A8321F' }, times[k]));
+    if (k === 5 || k === 9) { const sp = document.createElement('span'); sp.className = 'chap'; $('dots').appendChild(sp); }
     const b = document.createElement('button');
     b.setAttribute('aria-label', 'Stop ' + (k + 1) + ': ' + frames[k].getAttribute('aria-label'));
     b.addEventListener('click', () => go(k));
@@ -981,9 +1052,9 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   function render() {
     if (document.body.classList.contains('read')) return;
     document.body.classList.toggle('over', over || fin);
-    Array.from($('dots').children).forEach((b, k) => { b.className = k === i ? 'now' : (k < i ? 'seen' : ''); b.setAttribute('aria-current', k === i ? 'step' : 'false'); });
-    const cs = stopsG.querySelectorAll('circle');
-    cs.forEach((c, k) => { c.setAttribute('fill', k === i ? (k === N - 1 ? '#17705A' : '#E8A33D') : (k < i ? '#1F2A5C' : '#E2DCCD')); c.setAttribute('r', k === i ? 27 : 19); });
+    Array.from($('dots').querySelectorAll('button')).forEach((b, k) => { b.className = k === i ? 'now' : (k < i ? 'seen' : ''); b.setAttribute('aria-current', k === i ? 'step' : 'false'); });
+    roadDots.forEach((c, k) => { c.setAttribute('fill', k === i ? (k === N - 1 ? '#17705A' : '#E8A33D') : (k < i ? '#1F2A5C' : '#E2DCCD')); c.setAttribute('r', k === i ? 27 : 19); });
+    signs.forEach((c, k) => { c.setAttribute('fill', k === i ? (k === N - 1 ? '#17705A' : '#E8A33D') : (k < i ? '#1F2A5C' : '#E2DCCD')); signNums[k].setAttribute('fill', k === i ? (k === N - 1 ? '#FFFFFF' : '#141A33') : (k < i ? '#FFFFFF' : '#4A4F66')); });
     frames.forEach((f, k) => f.classList.toggle('active', k === i && !over && !fin));
     $('prev').disabled = i === 0 && !fin;
     $('next').disabled = fin;
@@ -1005,7 +1076,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     clearInk();
     fly(frameTarget(i), { vanTo: anchors[i], dip: wasOver ? 0 : undefined, lift: wasOver ? 0 : undefined, tilt: wasOver ? 3 : undefined, done: () => { drawIn(i); } });
     render();
-    if (i !== prev || wasOver) drawPhone(true, i === 1 ? 'ring' : null);
+    if (i !== prev || wasOver) { drawPhone(true, i === 1 ? 'ring' : null); play('whoosh', 1.3); if (i === 1) setTimeout(() => play('ring'), 900); }
     if (playing && !fromPlay) schedule();
   }
   function toggleOver() {
@@ -1017,10 +1088,11 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     fin = on; $('finale').hidden = !on;
     if (on) {
       over = false; if (playing) setPlay(false);
-      $('finT').textContent = L('Rs 3,000,000 · the first year', 'Rs 3,000,000 · پہلا سال');
-      $('finS').textContent = L('[your name] · [phone] · [email] · thank you', '[آپ کا نام] · [فون] · [ای میل] · شکریہ');
+      $('finT').textContent = L('Rs 3,000,000 for the first year · Rs 400,000 starts the pilot', 'پہلا سال Rs 3,000,000 · پائلٹ Rs 400,000 سے');
+      $('finS').textContent = L('Mohammad Hassan · Habib University · 0300 1478729 · mh10949@st.habib.edu.pk', 'محمد حسن · حبیب یونیورسٹی · 0300 1478729 · mh10949@st.habib.edu.pk');
       $('finBack').textContent = L('Back to the route', 'واپس راستے پر');
       fly(overTarget(), { dip: 0, lift: 0, tilt: 3, dur: 1600 });
+      setTimeout(() => play('chime'), 900);
       if (!reduce) { trail.style.transition = 'none'; trail.style.strokeDashoffset = String(total); void trail.getBoundingClientRect(); trail.style.transition = 'stroke-dashoffset 3s ease .3s, opacity .6s ease'; trail.style.strokeDashoffset = '0'; }
       else trail.style.strokeDashoffset = '0';
     } else { trail.style.transition = ''; trail.style.strokeDashoffset = String(total - vanLen); }
@@ -1047,7 +1119,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   function toggleNotes() { const n = $('notes'); n.hidden = !n.hidden; $('notesBtn').setAttribute('aria-pressed', String(!n.hidden)); }
   setInterval(() => { if (started === null) return; const s = Math.floor((Date.now() - started) / 1000); $('notesTimer').textContent = Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }, 1000);
   function renderKeys() {
-    const rows = [['→  Space', 'next stop', 'اگلا پڑاؤ'], ['←', 'back', 'پیچھے'], ['O', 'whole board', 'پورا نقشہ'], ['W', 'the same minute without Pohnch', 'یہی لمحہ پہنچ کے بغیر'], ['U', 'Urdu or English', 'اردو یا انگریزی'], ['D', 'draw on the board', 'نقشے پر لکھیں'], ['N', 'speaker notes and timer', 'نوٹس اور ٹائمر'], ['P', 'autoplay, 12 s a stop', 'خودکار، ہر پڑاؤ 12 سیکنڈ'], ['Esc', 'close', 'بند کریں']];
+    const rows = [['→  Space', 'next stop', 'اگلا پڑاؤ'], ['←', 'back', 'پیچھے'], ['O', 'whole board', 'پورا نقشہ'], ['W', 'the same minute without Pohnch', 'یہی لمحہ پہنچ کے بغیر'], ['U', 'Urdu or English', 'اردو یا انگریزی'], ['D', 'draw on the board', 'نقشے پر لکھیں'], ['N', 'speaker notes and timer', 'نوٹس اور ٹائمر'], ['P', 'autoplay, 12 s a stop', 'خودکار، ہر پڑاؤ 12 سیکنڈ'], ['S', 'sound on or off', 'آواز'], ['Esc', 'close', 'بند کریں']];
     $('keys').innerHTML = '<h3>' + L('Keys', 'بٹن') + '</h3>' + rows.map((r) => '<kbd>' + r[0] + '</kbd><span' + (lang === 'ur' ? ' class="u"' : '') + '>' + L(r[1], r[2]) + '</span>').join('');
   }
   function toggleKeys(force) { const k = $('keys'); k.hidden = force != null ? !force : !k.hidden; if (!k.hidden) renderKeys(); }
@@ -1058,6 +1130,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     $('without').setAttribute('aria-pressed', String(on));
     $('banner').hidden = !on; $('banner').textContent = L('The same morning, without Pohnch · W to switch back', 'یہی صبح، پہنچ کے بغیر · واپسی کے لیے W');
     drawPhone(true, on ? 'buzz' : null);
+    play(on ? 'dull' : 'ping', true);
   }
 
   /* ================= Urdu / English ================= */
@@ -1078,7 +1151,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     renderVanList(); reqRender(); calc(); renderFunds(); renderUndo();
     if (!$('keys').hidden) renderKeys();
     if (without) $('banner').textContent = L('The same morning, without Pohnch · W to switch back', 'یہی صبح، پہنچ کے بغیر · واپسی کے لیے W');
-    if (fin) { $('finT').textContent = L('Rs 3,000,000 · the first year', 'Rs 3,000,000 · پہلا سال'); $('finS').textContent = L('[your name] · [phone] · [email] · thank you', '[آپ کا نام] · [فون] · [ای میل] · شکریہ'); $('finBack').textContent = L('Back to the route', 'واپس راستے پر'); }
+    if (fin) { $('finT').textContent = L('Rs 3,000,000 for the first year · Rs 400,000 starts the pilot', 'پہلا سال Rs 3,000,000 · پائلٹ Rs 400,000 سے'); $('finS').textContent = L('Mohammad Hassan · Habib University · 0300 1478729 · mh10949@st.habib.edu.pk', 'محمد حسن · حبیب یونیورسٹی · 0300 1478729 · mh10949@st.habib.edu.pk'); $('finBack').textContent = L('Back to the route', 'واپس راستے پر'); }
     render(); drawPhone(false);
     if (sketched) sketchMarks();
     if (document.body.classList.contains('read')) buildStory();
@@ -1119,6 +1192,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   frames.forEach((f, k) => f.addEventListener('click', (e) => { if (over) { e.preventDefault(); go(k); } }));
   addEventListener('keydown', (e) => {
     if (document.body.classList.contains('read')) return;
+    if (coldOn) { if (e.key === 'Escape') coldEnd(); else if (e.key.toLowerCase() === 's') setSound(!soundOn); else if (e.key.toLowerCase() === 'u') { setLang(lang === 'ur' ? 'en' : 'ur'); coldInit(); } else if (!coldRunning) { e.preventDefault(); coldRun(); } else if (['ArrowRight', ' ', 'Enter'].includes(e.key)) { e.preventDefault(); coldEnd(); } return; }
     const t = e.target, onCtl = t.closest && t.closest('input, button');
     if (t.tagName === 'INPUT') return;
     const k = e.key.toLowerCase();
@@ -1132,6 +1206,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     else if (k === 'w') setWithout(!without);
     else if (k === 'u') setLang(lang === 'ur' ? 'en' : 'ur');
     else if (k === 'd') setPen(!drawing);
+    else if (k === 's') setSound(!soundOn);
     else if (e.key === '?' || k === 'h') toggleKeys();
   });
   let sx = null;
@@ -1279,6 +1354,15 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     deco.appendChild(rc.polygon([[ps.x + 60, ps.y - 68], [ps.x + 130, ps.y - 112], [ps.x + 200, ps.y - 68]], { stroke: '#8A5A12', strokeWidth: 3, roughness: 1.2, seed: 71 }));
     deco.appendChild(rc.line(ps.x + 130, ps.y - 112, ps.x + 130, ps.y - 160, { stroke: '#8A5A12', strokeWidth: 3, seed: 72 }));
     deco.appendChild(rc.polygon([[ps.x + 130, ps.y - 160], [ps.x + 168, ps.y - 150], [ps.x + 130, ps.y - 140]], { stroke: '#8A5A12', strokeWidth: 2, fill: '#E8A33D', fillStyle: 'solid', seed: 73 }));
+    [[140, 1000, '1', 'The morning run', 'صبح کا سفر'], [6480, 2470, '2', 'The network', 'نیٹ ورک'], [1460, 3720, '3', 'The business', 'کاروبار']].forEach(([x, y, n, en, ur]) => {
+      const g = svgEl('g', {});
+      g.innerHTML = '<path d="M' + (x + 70) + ' ' + (y + 110) + ' V' + (y + 150) + ' M' + (x + 350) + ' ' + (y + 110) + ' V' + (y + 150) + '" stroke="#4A4F66" stroke-width="8" stroke-linecap="round"/>' +
+        '<rect x="' + x + '" y="' + y + '" width="420" height="112" rx="14" fill="#17705A"/><rect x="' + (x + 7) + '" y="' + (y + 7) + '" width="406" height="98" rx="9" fill="none" stroke="#FFFFFF" stroke-width="3"/>' +
+        '<circle cx="' + (x + 56) + '" cy="' + (y + 56) + '" r="28" fill="#FFFFFF"/><text x="' + (x + 56) + '" y="' + (y + 66) + '" text-anchor="middle" font-family="Manrope, sans-serif" font-weight="800" font-size="30" fill="#17705A">' + n + '</text>' +
+        '<text x="' + (x + 100) + '" y="' + (y + 50) + '" font-family="Manrope, sans-serif" font-weight="800" font-size="30" fill="#FFFFFF">' + en + '</text>' +
+        '<text x="' + (x + 100) + '" y="' + (y + 90) + '" font-family="Noto Sans Arabic, sans-serif" font-weight="700" font-size="26" fill="#DCEFE7">' + ur + '</text>';
+      deco.appendChild(g);
+    });
     sketchMarks();
   }
   // per-frame annotations, grouped so they can be redrawn on arrival and after a language switch
@@ -1329,7 +1413,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     st.van = k;
     mpaths.forEach((p, j) => { p.setAttribute('stroke', j === k ? vans[j].c : '#B9B2A2'); p.setAttribute('stroke-width', j === k ? 9 : 6); });
     Array.from(mpl.children).forEach((b, j) => { b.style.boxShadow = j === k ? 'inset 0 0 0 2.5px ' + vans[j].c : ''; b.setAttribute('aria-pressed', String(j === k)); });
-    if (!quiet && i === 4) drawPhone(true, 'buzz');
+    if (!quiet && i === 4) { drawPhone(true, 'buzz'); play('ping', true); }
   }
   function reqRender() {
     const n = st.joined ? 6 : 5, bar = $('reqbar'); bar.innerHTML = '';
@@ -1341,7 +1425,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     btn.style.background = st.joined ? '#DCEFE7' : '#1F2A5C'; btn.style.color = st.joined ? '#0B4A3D' : '#FAF6EE';
     const a = $('reqAli'); a.setAttribute('fill', st.joined ? '#E8A33D' : '#FFFFFF'); a.setAttribute('stroke-dasharray', st.joined ? 'none' : '4 4'); a.setAttribute('stroke', st.joined ? '#FFFFFF' : '#17705A');
   }
-  $('reqbtn').addEventListener('click', () => { st.joined = !st.joined; reqRender(); if (i === 6) drawPhone(true, 'buzz'); });
+  $('reqbtn').addEventListener('click', () => { st.joined = !st.joined; reqRender(); if (i === 6) { drawPhone(true, 'buzz'); play('ping', true); } });
 
   const hold = $('hold'); let hT = null, uT = null, uN = 5;
   function renderUndo() { $('undoT').textContent = L("Sent to Ali's family · " + uN + ' s to undo', 'علی کے گھر خبر گئی · واپسی ' + uN + ' سیکنڈ'); $('undoT').className = lang === 'ur' ? 'u' : ''; }
@@ -1354,6 +1438,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     $('undo').hidden = false; uN = 5; renderUndo();
     clearInterval(uT); uT = setInterval(() => { uN -= 1; renderUndo(); if (uN <= 0) { clearInterval(uT); $('undo').hidden = true; $('holdAgain').hidden = false; } }, 1000);
     if (i === 3) drawPhone(true, 'buzz');
+    play('ping');
   }
   function holdReset() {
     clearInterval(uT); st.held = false; hold.classList.remove('done');
@@ -1383,7 +1468,7 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
   document.querySelectorAll('#priceChips button').forEach((b) => b.addEventListener('click', () => {
     st.price = +b.dataset.p;
     document.querySelectorAll('#priceChips button').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
-    calc(); if (i === 9) drawPhone(true, 'buzz');
+    calc(); if (i === 9) { drawPhone(true, 'buzz'); play('ping', true); }
   }));
 
   const funds = [['Team: founder, ops lead, driver onboarding', 'ٹیم: بانی، آپریشنز، ڈرائیور آن بورڈنگ', 1355000, '#1F2A5C'], ['App stores, hosting, maps, SMS', 'ایپ اسٹور، ہوسٹنگ، نقشے، ایس ایم ایس', 400000, '#E8A33D'], ['Launch: marketing, printing, events', 'لانچ: مارکیٹنگ، پرنٹنگ، تقریبات', 350000, '#17705A'], ['Driver first-month guarantee', 'ڈرائیور کی پہلے مہینے کی ضمانت', 200000, '#8A5A12'], ['Test phones, Android and iPhone', 'ٹیسٹ فون، اینڈرائیڈ اور آئی فون', 150000, '#2B3A80'], ['Company, legal, privacy review', 'کمپنی، قانونی، پرائیویسی جائزہ', 150000, '#0F5E4E'], ['Reserve', 'ریزرو', 395000, '#B9B2A2']];
@@ -1400,11 +1485,85 @@ body.ur .st .cap, body.ur .st .cap b { font-family: var(--f-urdu); line-height: 
     });
   }
 
+  /* ================= sound, made in the page ================= */
+  let ac = null, master = null, soundOn = false, amb = null, ambT = null;
+  function audio() {
+    if (!ac) { const A = window.AudioContext || window.webkitAudioContext; if (!A) return null; ac = new A(); master = ac.createGain(); master.gain.value = .9; master.connect(ac.destination); }
+    if (ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function tone(f, t, dur, type, g, f2) {
+    const o = ac.createOscillator(), v = ac.createGain();
+    o.type = type || 'sine'; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+    v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(g, t + .012); v.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(v).connect(master); o.start(t); o.stop(t + dur + .05);
+  }
+  function noise(dur) { const b = ac.createBuffer(1, Math.ceil(ac.sampleRate * dur), ac.sampleRate), d = b.getChannelData(0); let last = 0; for (let n = 0; n < d.length; n++) { last = (last + .04 * (Math.random() * 2 - 1)) / 1.04; d[n] = last * 3.2; } const s = ac.createBufferSource(); s.buffer = b; return s; }
+  const sfx = {
+    ring() { const t = ac.currentTime; for (let r = 0; r < 2; r++) for (let n = 0; n < 8; n++) { const tt = t + r * .9 + n * .05; tone(440, tt, .05, 'sine', .05); tone(480, tt, .05, 'sine', .05); } },
+    ping(soft) { const t = ac.currentTime, g = soft ? .05 : .11; tone(1046.5, t, .55, 'sine', g); tone(1568, t + .09, .7, 'sine', g * .8); },
+    horn() { const t = ac.currentTime; [0, .26].forEach((d) => { tone(311, t + d, .2, 'triangle', .07); tone(392, t + d, .2, 'triangle', .05); }); },
+    whoosh(dur) { const t = ac.currentTime, s = noise(dur), f = ac.createBiquadFilter(), v = ac.createGain(); f.type = 'bandpass'; f.Q.value = .8; f.frequency.setValueAtTime(260, t); f.frequency.linearRampToValueAtTime(900, t + dur * .5); f.frequency.linearRampToValueAtTime(240, t + dur); v.gain.setValueAtTime(0, t); v.gain.linearRampToValueAtTime(.16, t + dur * .45); v.gain.linearRampToValueAtTime(0, t + dur); s.connect(f).connect(v).connect(master); s.start(t); s.stop(t + dur); },
+    chime() { const t = ac.currentTime; [523.25, 659.25, 783.99, 1046.5].forEach((f, n) => tone(f, t + n * .14, 1.6, 'sine', .07)); },
+    dull() { const t = ac.currentTime; tone(196, t, .5, 'sine', .08, 150); }
+  };
+  function play(name, arg) { if (!soundOn || !audio()) return; sfx[name](arg); }
+  function setAmbient(on) {
+    if (on) {
+      const s = noise(4), f = ac.createBiquadFilter(), v = ac.createGain(); s.loop = true; f.type = 'lowpass'; f.frequency.value = 420; v.gain.value = .045; s.connect(f).connect(v).connect(master); s.start(); amb = s;
+      const far = () => { if (!soundOn) return; const t = ac.currentTime, g = .012; [0, .2].forEach((d) => tone(330 + Math.random() * 60, t + d, .16, 'triangle', g)); ambT = setTimeout(far, 7000 + Math.random() * 9000); };
+      ambT = setTimeout(far, 4000);
+    } else { if (amb) { amb.stop(); amb = null; } clearTimeout(ambT); }
+  }
+  function setSound(on) {
+    if (on && !audio()) return;
+    soundOn = on; $('sound').setAttribute('aria-pressed', String(on)); $('soundWaves').setAttribute('opacity', on ? '1' : '.35');
+    setAmbient(on); if (on) sfx.ping(true);
+  }
+  $('sound').addEventListener('click', () => setSound(!soundOn));
+
+  /* ================= cold open ================= */
+  let coldOn = false, coldRunning = false, coldTs = [];
+  function coldInit() {
+    if (reduce || document.body.classList.contains('read')) return;
+    coldOn = true; document.body.classList.add('cold'); $('cold').hidden = false;
+    $('coldLine').textContent = L('Karachi. A school morning.', 'کراچی۔ ایک اسکول کی صبح۔');
+    $('coldGo').textContent = L('Press → to begin', 'شروع کرنے کے لیے → دبائیں');
+    $('coldSkip').textContent = L('Skip the opening', 'شروعات چھوڑیں');
+    $('coldCount').textContent = '';
+  }
+  function coldRun() {
+    if (!coldOn || coldRunning) return;
+    coldRunning = true; $('coldGo').hidden = true;
+    if (dockW) { $('shaker').innerHTML = phone(1, st, false); const c = capFor(1, st, false); $('capWho').textContent = c[0]; $('capSub').textContent = c[1]; const sh = $('shaker'); sh.classList.remove('ring'); void sh.offsetWidth; sh.classList.add('ring'); }
+    $('coldLine').textContent = L('Ten families. One driver. And he is driving.', 'دس گھرانے۔ ایک ڈرائیور۔ اور وہ گاڑی چلا رہے ہیں۔');
+    play('ring');
+    for (let n = 1; n <= 9; n++) coldTs.push(setTimeout(() => {
+      $('coldCount').innerHTML = '<b>' + n + '</b>' + L(n === 1 ? 'missed call' : 'missed calls', 'مسڈ کالیں');
+      $('coldClock').textContent = '6:5' + Math.min(4, Math.floor(n * 5 / 9));
+      if (n === 5) play('ring');
+    }, 300 + n * 380));
+    coldTs.push(setTimeout(() => { $('coldClock').textContent = '6:55'; $('coldCount').textContent = ''; $('coldLine').textContent = L('Now the same morning, with Pohnch.', 'اب یہی صبح، پہنچ کے ساتھ۔'); }, 4300));
+    coldTs.push(setTimeout(coldEnd, 6000));
+  }
+  function coldEnd() {
+    if (!coldOn) return;
+    coldTs.forEach(clearTimeout); coldTs = []; coldOn = false; coldRunning = false;
+    $('cold').classList.add('fade'); document.body.classList.remove('cold');
+    setTimeout(() => { $('cold').hidden = true; }, 1700);
+    started = Date.now();
+    frames[0].classList.remove('active'); void frames[0].offsetWidth; render(); drawIn(0); drawPhone(true);
+    play('horn');
+  }
+  $('coldGo').addEventListener('click', coldRun);
+  $('coldSkip').addEventListener('click', coldEnd);
+
   /* ================= start ================= */
   buildCity();
   renderVanList(); reqRender(); calc(); renderFunds(); renderUndo();
   placeVan(anchors[0]);
   layout();
+  coldInit();
   const ready = () => { fontsReady = true; if (!document.body.classList.contains('read') && !sketched) { sketch(); drawIn(0); } };
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(ready); else ready();
 })();
