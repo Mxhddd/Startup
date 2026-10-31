@@ -8,8 +8,8 @@ playwright-report/
 .expo/
 dist/
 web-build/
-ios/
-android/
+/apps/*/ios/
+/apps/*/android/
 *.tsbuildinfo
 coverage/
 .DS_Store
