@@ -28,7 +28,7 @@ const CHILD_STEPS = ['picked', 'dropped'];
 
 // Database error codes -> HTTP status. Anything else is a 500 with no detail.
 const KNOWN: Record<string, number> = {
-  not_your_van: 403, not_your_child: 403, not_admin: 403, not_family_owner: 403,
+  not_your_van: 403, not_your_child: 403, not_admin: 403, not_family_owner: 403, stop_list_mismatch: 422,
   van_switched_off: 403, van_not_verified: 403,
   trip_not_found: 404, membership_not_found: 404, user_not_found: 404,
   invite_invalid: 410,
@@ -143,10 +143,36 @@ export const actions: Record<string, Action> = {
     await call(deps, 'verify_van', { p_actor: actor, p_van: uuid(body, 'vanId') });
     return { ok: true };
   },
+  'admin.endTrip': async ({ actor, body, deps }) => {
+    await call(deps, 'admin_end_trip', { p_actor: actor, p_trip: uuid(body, 'tripId') });
+    return { ok: true };
+  },
+  // A parent takes their child off the van; a driver removes a rider.
+  'van.leave': async ({ actor, body, deps }) => {
+    await call(deps, 'leave_van', { p_actor: actor, p_child: uuid(body, 'childId') });
+    return { ok: true };
+  },
+  'rider.remove': async ({ actor, body, deps }) => {
+    await call(deps, 'remove_rider', { p_actor: actor, p_membership: uuid(body, 'membershipId') });
+    return { ok: true };
+  },
   'admin.switchOff': async ({ actor, body, deps }) => {
     await call(deps, 'switch_off_van', { p_actor: actor, p_van: uuid(body, 'vanId'), p_off: bool(body, 'off') });
     return { ok: true };
   },
+};
+
+// How often one person may call each action (count per window). Generous for real use, tight enough
+// to stop a runaway phone or someone probing (e.g. family.add looking up phone numbers).
+const HOUR = 3600;
+const DAY = 86400;
+export const LIMITS: Record<string, [max: number, windowS: number]> = {
+  position: [1500, HOUR], tap: [600, HOUR], 'tap.undo': [200, HOUR], late: [30, HOUR],
+  'trip.start': [20, HOUR], 'trip.end': [40, HOUR],
+  'invite.van': [20, DAY], 'invite.driver': [20, DAY], 'invite.accept': [30, HOUR],
+  'membership.decide': [200, HOUR], 'absence.set': [60, HOUR], 'absence.clear': [60, HOUR], 'dayoff.set': [30, DAY],
+  'family.add': [10, DAY], 'van.leave': [20, HOUR], 'rider.remove': [60, HOUR],
+  'admin.verify': [300, HOUR], 'admin.switchOff': [300, HOUR], 'admin.endTrip': [300, HOUR],
 };
 
 const json = (status: number, body: unknown) =>
@@ -177,6 +203,12 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
   } catch {
     return done(400, { error: 'bad_json' });
   }
+
+  // Rate limit (counted in the database, per person and action). If the check itself fails we let the
+  // call through: a driver's tap matters more than the limit.
+  const [max, windowS] = LIMITS[name] ?? [300, HOUR];
+  const limit = await deps.rpc('rate_hit', { p_actor: actor, p_bucket: name, p_max: max, p_window_s: windowS }).catch(() => ({ data: true, error: null }));
+  if (limit.data === false) return done(429, { error: 'too_many' });
 
   try {
     return done(200, await action({ actor, body, deps }));

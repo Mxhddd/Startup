@@ -251,5 +251,11 @@
   "driver.invite.accept": "Add their request",
   "driver.invite.needVan": "Set up your van first, then open this link again.",
   "driver.invite.done": "Request added",
-  "driver.invite.bad": "This link is old or wrong. Ask the family for a new one."
+  "driver.invite.bad": "This link is old or wrong. Ask the family for a new one.",
+  "driver.families.ridersTitle": "Children riding",
+  "driver.families.remove": "Remove from van",
+  "parent.family.leave": "Take {name} off this van",
+  "parent.family.leaveHint": "Hold to confirm. To rejoin you'll need a new link from the driver.",
+  "parent.offline": "No signal: showing the last information",
+  "admin.endTrip": "End trip"
 }

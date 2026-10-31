@@ -251,5 +251,11 @@
   "driver.invite.accept": "درخواست شامل کریں",
   "driver.invite.needVan": "پہلے اپنی وین لگائیں، پھر یہ لنک دوبارہ کھولیں۔",
   "driver.invite.done": "درخواست شامل ہو گئی",
-  "driver.invite.bad": "یہ لنک پرانا یا غلط ہے۔ خاندان سے نیا لنک مانگیں۔"
+  "driver.invite.bad": "یہ لنک پرانا یا غلط ہے۔ خاندان سے نیا لنک مانگیں۔",
+  "driver.families.ridersTitle": "سوار بچے",
+  "driver.families.remove": "وین سے ہٹائیں",
+  "parent.family.leave": "{name} کو اس وین سے ہٹائیں",
+  "parent.family.leaveHint": "دبائے رکھیں۔ دوبارہ جڑنے کے لیے ڈرائیور کا نیا لنک چاہیے ہوگا۔",
+  "parent.offline": "سگنل نہیں: آخری معلومات دکھ رہی ہیں",
+  "admin.endTrip": "سفر ختم کریں"
 }

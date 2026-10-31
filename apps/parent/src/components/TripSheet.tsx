@@ -69,6 +69,7 @@ export function TripSheet() {
 
   // idle or live
   const items = p.timeline.items;
+  const offline = p.error !== null;
   const stale = p.signal?.stale ?? false;
   const nextTime = p.kind === 'morning' ? p.stop?.morning_time : p.stop?.afternoon_time;
 
@@ -85,6 +86,11 @@ export function TripSheet() {
         </View>
       ) : null}
 
+      {offline ? (
+        <View accessibilityRole="alert" style={{ backgroundColor: colors.siyahi, borderRadius: radius.card, padding: space.md }}>
+          <AppText color={colors.ghee}>{t('parent.offline')}</AppText>
+        </View>
+      ) : null}
       {p.phase === 'live' && p.eta !== null ? <EtaPill minutes={p.eta} to="home" stale={stale} /> : null}
       {p.phase === 'live' && stale && p.signal ? (
         <OfflineBanner side="parent" secondsAgo={p.signal.secondsAgo} />

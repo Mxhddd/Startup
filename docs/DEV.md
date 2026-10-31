@@ -141,3 +141,42 @@ The admin numbers come from database functions that only answer the team (`admin
 5. Check `https://pohnch.pk/.well-known/assetlinks.json` and `/apple-app-site-association` show the right ids before building the apps for the stores.
 
 **About invite tokens and logs:** our code never reads the token on the server (every `/i/...` link shows the same static page, and it is never cached or indexed and never passed on as a referrer). Vercel's own request logs still record page addresses, so in the Vercel project keep log retention at the minimum and add no log drains. Supabase stores only the token's hash.
+
+## Hardening (B8)
+
+### What the review found and fixed
+
+| Found | Fix | Proved by |
+| --- | --- | --- |
+| Deleting a parent's account was blocked (their chutti and join requests pointed at them) | those references become empty; the family, children and their steps are deleted | `070-hardening.test.sql` |
+| A driver could make two vans; the app expects one | one van per driver | `070` |
+| A dead phone left a trip running, which blocked the next day's start | starting a trip ends this van's trips from earlier days; a job every 15 min ends trips with no news for 3 hours; the team can end a trip on the admin page | `070` |
+| No way to leave a van | parents can take their child off a van, drivers can remove a rider (hold to confirm) | `070`, handler tests |
+| A parent who also drives saw their riders as their own children | the parent app lists only the person's own families' children | code review |
+| "Too many requests" made the offline queue drop a tap | 408 and 429 are retried like no signal | `login.test.ts` |
+| The driver's Stops screen failed silently without signal | says "No signal. Try again." | screen audit |
+
+The 30-day position cleanup is now tested (`070`), and a whole school day runs as one test (`080-school-day.test.sql`): chutti, the morning run with "arriving", a tap, an undo and the tap again, reached school, the afternoon run, the parent's view, the push list and the admin numbers.
+
+### Rate limits
+
+- Login codes (Supabase Auth): one SMS per number every 30 s; per IP address 30 codes, 30 sign-ins and 30 code checks an hour (`supabase/config.toml`; set the same under Authentication > Rate Limits in the dashboard).
+- The `app` Edge Function: a limit per person and action (`LIMITS` in `supabase/functions/_shared/handler.ts`), counted in the database; over the limit gets 429 and the app retries later. `family.add` allows 10 a day, so nobody can use it to test which phone numbers have accounts.
+
+### The leak check
+
+`pnpm check:leaks` (run by GitHub after every push, on the built website and both apps):
+- no `console.*` outside the two Edge Function entry points, and server log lines may only print the action, status, push step and counts;
+- no `.env` file committed;
+- no server secret, private key, or phone number (other than the public pilot WhatsApp number) in any bundle.
+
+### Every screen's states
+
+| Screen | Empty | Loading | Offline | Error |
+| --- | --- | --- | --- | --- |
+| Driver: Today | no van -> set up; no riders -> send the link | "Loading…" | "No signal. Try again." + retry | same, with retry |
+| Driver: Trip | "Every child is done" | (opens from Today) | taps wait in the queue; "3 taps saved on this phone" | location off -> banner |
+| Driver: Stops / Families / Van | "No stops yet" / "No requests yet" | from Today's data | "No signal. Try again." | generic message |
+| Parent: Home | add a child / join a van / waiting / no trip now | "Loading…" | "No signal: showing the last information"; van grey with "last seen" | retry |
+| Parent: forms | — | button disabled while saving | message under the form | message under the form |
+| Website: admin | "No drivers waiting", "No trips yet today" | "Loading…" | "Something went wrong. Refresh." | same |

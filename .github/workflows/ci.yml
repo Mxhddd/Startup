@@ -30,6 +30,10 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres@localhost:54329/postgres
       - run: pnpm build:web
+      - name: Build the app bundles and check that nothing secret or personal is inside
+        run: |
+          pnpm bundle:apps
+          pnpm check:leaks
       - run: pnpm --filter @pohnch/web exec playwright install --with-deps chromium
       - run: pnpm test:web
         env:

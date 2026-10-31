@@ -1,7 +1,7 @@
 // Families: share the van's invite link, and approve each request with the child's stop.
 import { driver } from '@pohnch/client';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ApprovalCard, InviteCard } from '@pohnch/ui/native';
+import { AppText, ApprovalCard, InviteCard, TapButton } from '@pohnch/ui/native';
 import { useState } from 'react';
 import { Pressable, Share, View } from 'react-native';
 import { Screen } from '../components/Screen';
@@ -38,6 +38,19 @@ export default function Families() {
       {van.verified_at ? <InviteCard onShare={share} /> : <AppText variant="secondary">{t('driver.families.needsCheck')}</AppText>}
       {error ? <AppText color={colors.dangerText}>{t('error.generic')}</AppText> : null}
       <AppText variant="secondary">{t('driver.families.riders', { n: d.riders.length })}</AppText>
+      {d.riders.length > 0 ? <AppText variant="title">{t('driver.families.ridersTitle')}</AppText> : null}
+      {d.riders.map((r) => (
+        <View key={r.childId} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.white, borderRadius: radius.card, borderWidth: 1, borderColor: colors.line, padding: space.md }}>
+          <View style={{ flex: 1 }}>
+            <AppText bold>{r.firstName}</AppText>
+            <AppText variant="small" color={colors.ink2}>{d.stops.find((s) => s.id === r.stopId)?.label ?? '—'}</AppText>
+          </View>
+          <View style={{ width: 170 }}>
+            {/* Hold to confirm: removing a child is not something to do by accident. */}
+            <TapButton hold label={t('driver.families.remove')} onConfirm={() => r.membershipId && driver.driverApi.removeRider(r.membershipId).then(d.actions.refresh).catch(() => setError(true))} />
+          </View>
+        </View>
+      ))}
       <AppText variant="title">{t('driver.families.requests')}</AppText>
       {d.requests.length === 0 ? <AppText variant="secondary">{t('driver.families.none')}</AppText> : null}
       {d.requests.map((r) => (

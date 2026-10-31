@@ -134,7 +134,7 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
     return () => clearInterval(id);
   }, [load]);
 
-  const act = async (action: 'admin.verify' | 'admin.switchOff', body: Record<string, unknown>) => {
+  const act = async (action: 'admin.verify' | 'admin.switchOff' | 'admin.endTrip', body: Record<string, unknown>) => {
     try {
       await api(action, body);
       await load();
@@ -190,6 +190,9 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
           <span style={{ color: tr.status === 'running' && tr.last_position_at && Date.now() - Date.parse(tr.last_position_at) > 60_000 ? colors.dangerText : colors.ink2 }}>
             {tr.last_position_at ? t('admin.trips.lastSeen', { age: age(tr.last_position_at) }) : t('admin.trips.noPosition')}
           </span>
+          {tr.status === 'running' ? (
+            <button type="button" style={btn(colors.white, colors.shingarf)} onClick={() => act('admin.endTrip', { tripId: tr.trip_id })}>{t('admin.endTrip')}</button>
+          ) : null}
         </div>
       ))}
 

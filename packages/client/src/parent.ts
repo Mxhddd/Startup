@@ -24,8 +24,16 @@ export async function ensureFamily(): Promise<string> {
   return check(await db().supabase.rpc('ensure_family')) as string;
 }
 
+/** This person's own children (their families'), not the riders they may see as a driver. */
 export async function myChildren(): Promise<Child[]> {
-  return check(await db().supabase.from('child_points').select('id, first_name, school_name, lat, lng').order('first_name')) as Child[];
+  const { supabase } = db();
+  const uid = (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return [];
+  const fams = check(await supabase.from('family_members').select('family_id').eq('user_id', uid)) as { family_id: string }[];
+  if (fams.length === 0) return [];
+  return check(
+    await supabase.from('child_points').select('id, first_name, school_name, lat, lng').in('family_id', fams.map((f) => f.family_id)).order('first_name'),
+  ) as Child[];
 }
 
 export async function addChild(c: { firstName: string; schoolName: string; lat: number; lng: number }): Promise<string> {
@@ -126,4 +134,5 @@ export const parentApi = {
   joinVan: (token: string, childId: string) => db().api<{ membershipId: string }>('invite.accept', { token, childId }),
   inviteDriver: (childId: string) => db().api<{ url: string }>('invite.driver', { childId }),
   addFamilyMember: (phone: string) => db().api('family.add', { phone }),
+  leaveVan: (childId: string) => db().api('van.leave', { childId }),
 };

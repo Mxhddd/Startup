@@ -11,6 +11,13 @@ site_url = "https://pohnch.pk"
 enable_signup = true
 jwt_expiry = 3600
 
+# Limits on login codes: one SMS per number every 30 s (below), and these per hour per IP address.
+[auth.rate_limit]
+sms_sent = 30
+sign_in_sign_ups = 30
+token_verifications = 30
+token_refresh = 150
+
 [auth.sms]
 enable_signup = true
 enable_confirmations = true

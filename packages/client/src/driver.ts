@@ -72,7 +72,7 @@ export async function ridersOf(vanId: string): Promise<{ riders: RiderRow[]; req
   for (const r of rows) {
     const k = byId.get(r.child_id);
     if (!k) continue;
-    if (r.status === 'approved') riders.push({ childId: r.child_id, firstName: k.first_name, stopId: r.stop_id });
+    if (r.status === 'approved') riders.push({ childId: r.child_id, firstName: k.first_name, stopId: r.stop_id, membershipId: r.id });
     else requests.push({ membershipId: r.id, childId: r.child_id, firstName: k.first_name, lat: k.lat, lng: k.lng });
   }
   return { riders, requests };
@@ -110,6 +110,7 @@ export const driverApi = {
   acceptFamilyInvite: (token: string, vanId: string) => db().api<{ membershipId: string }>('invite.accept', { token, vanId }),
   decide: (membershipId: string, approve: boolean, stopId: string | null) => db().api('membership.decide', { membershipId, approve, stopId }),
   dayOff: (vanId: string, date: string, off: boolean) => db().api('dayoff.set', { vanId, date, off }),
+  removeRider: (membershipId: string) => db().api('rider.remove', { membershipId }),
   position: (body: { tripId: string; lat: number; lng: number; heading: number | null; speed: number | null; recordedAt: string }) =>
     db().api<{ arriving: string[] }>('position', body),
   /** Used by the offline queue to send anything it holds. */

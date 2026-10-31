@@ -2,7 +2,7 @@
 // each stop (siblings together), who is on chutti, and who has been tapped. The first stop with someone
 // still waiting is "next" and gets the big button.
 export type StopRow = { id: string; position: number; label: string };
-export type RiderRow = { childId: string; firstName: string; stopId: string | null };
+export type RiderRow = { childId: string; firstName: string; stopId: string | null; membershipId?: string };
 export type EventRow = { childId: string | null; step: string; undone: boolean };
 
 export type StopGroup = {

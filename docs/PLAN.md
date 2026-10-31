@@ -54,4 +54,20 @@ Startup/
 
 ## Battery and data notes
 
-Filled in at B8 after measuring an hour-long trip on a cheap Android phone.
+**Status: estimates. To be measured on a real phone before the soft start (steps below).**
+
+| | Estimate | How it was worked out |
+| --- | --- | --- |
+| Driver phone, data | about 0.8-1.3 MB per hour of trip | one position every 5 s moving / 30 s stopped, about 1.8 KB per send with headers (most of it the login token); taps are tiny |
+| Driver phone, per month | about 40-60 MB | two 45-minute runs a school day; well inside the Rs 500 data top-up |
+| Driver phone, battery | goal under 10% per trip | GPS on high accuracy only during the trip, screen mostly on |
+| Parent phone, data | about 1 MB per hour with the map open | a small update for every position; nothing when no trip is running |
+
+### Measuring it (one morning, about 1.5 hours)
+
+1. Phone: a cheap Android (the kind most drivers have), battery saver off, Pohnch Driver installed as a development build, signed in as a test driver with a verified test van.
+2. Charge to 100%. Settings > Network > Data usage: note Pohnch Driver's number. Close other apps.
+3. Start a real trip and drive (or ride along on) a normal school route for 60 minutes. Tap the stops as usual.
+4. End the trip. Write down: battery % used, Pohnch Driver's data used, how many positions arrived (admin page: the trip's last position should never be more than 30 s old while moving).
+5. Repeat once with the screen off for most of the drive (the phone in a holder, screen timing out).
+6. Write the numbers here, replacing the estimates. If battery use is over 10% per trip, lower the moving rate from 5 s to 8 s (`MOVING_EVERY_MS` in packages/core/src/cadence.ts) and measure again.

@@ -41,6 +41,12 @@ describe('Edge Function client', () => {
     expect((err as ApiError).retryable).toBe(true);
   });
 
+  it('treats "too many requests" and timeouts as try-again-later', () => {
+    expect(new ApiError('too_many', 429).retryable).toBe(true);
+    expect(new ApiError('timeout', 408).retryable).toBe(true);
+    expect(new ApiError('not_your_van', 403).retryable).toBe(false);
+  });
+
   it('does not call the server when logged out', async () => {
     const f = ok({});
     const api = createAppApi({ functionsUrl: 'u', getToken: async () => null, fetch: f });

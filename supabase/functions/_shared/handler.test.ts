@@ -9,7 +9,7 @@ const VAN = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 
 function setup(rpcResult: { data?: unknown; error?: { message: string } | null } = {}) {
   const logs: string[] = [];
-  const rpc = vi.fn(async () => ({ data: rpcResult.data ?? null, error: rpcResult.error ?? null }));
+  const rpc = vi.fn(async (_fn: string, _args?: Record<string, unknown>): Promise<{ data: unknown; error: { message: string } | null }> => ({ data: rpcResult.data ?? null, error: rpcResult.error ?? null }));
   const deps: Deps = {
     userFromToken: async (jwt) => (jwt === 'good-token' ? DRIVER : null),
     rpc,
@@ -91,7 +91,7 @@ describe('the app Edge Function', () => {
     const token = url.split('/i/')[1] ?? '';
     expect(url.startsWith('https://pohnch.pk/i/')).toBe(true);
     expect(isInviteToken(token)).toBe(true);
-    const [, args] = rpc.mock.calls[0] as unknown as [string, { p_token_hash: string }];
+    const [, args] = rpc.mock.calls.find(([fn]) => fn === 'create_van_invite') as unknown as [string, { p_token_hash: string }];
     expect(args.p_token_hash).toBe('\\x' + (await hashToken(token)));
     expect(JSON.stringify(rpc.mock.calls)).not.toContain(token);
     expect(logs.join('\n')).not.toContain(token);
@@ -162,5 +162,45 @@ describe('pushes after steps', () => {
     const { post, notify } = withNotify([{ child_id: VAN }]);
     await post('position', { tripId: TRIP, lat: 24.9, lng: 67.1, recordedAt: '2026-11-02T02:10:00Z' });
     expect(notify).toHaveBeenCalledWith({ tripId: TRIP, step: 'arriving', children: [VAN] });
+  });
+});
+
+describe('rate limits', () => {
+  it('refuses with 429 when the database says the person is over the limit', async () => {
+    const { deps, rpc } = setup();
+    rpc.mockImplementation(async (fn: string) => (fn === 'rate_hit' ? { data: false, error: null } : { data: 1, error: null }));
+    const res = await handle(
+      new Request('https://x/functions/v1/app/family.add', { method: 'POST', headers: { authorization: 'Bearer good-token' }, body: JSON.stringify({ phone: '03001234567' }) }),
+      deps,
+    );
+    expect(res.status).toBe(429);
+    expect(rpc).not.toHaveBeenCalledWith('user_id_by_phone', expect.anything());
+  });
+
+  it("counts each call against that action's own limit", async () => {
+    const { post, rpc } = setup({ data: 1 });
+    await post('family.add', { phone: '03001234567' });
+    expect(rpc).toHaveBeenCalledWith('rate_hit', { p_actor: DRIVER, p_bucket: 'family.add', p_max: 10, p_window_s: 86400 });
+  });
+
+  it('lets the call through if the limit check itself fails (a tap matters more)', async () => {
+    const { deps, rpc } = setup();
+    rpc.mockImplementation(async (fn: string) => {
+      if (fn === 'rate_hit') throw new Error('db down');
+      return { data: 1, error: null };
+    });
+    const res = await handle(
+      new Request('https://x/functions/v1/app/trip.end', { method: 'POST', headers: { authorization: 'Bearer good-token' }, body: JSON.stringify({ tripId: TRIP }) }),
+      deps,
+    );
+    expect(res.status).toBe(200);
+  });
+});
+
+describe('leaving a van', () => {
+  it('passes the parent and child to leave_van', async () => {
+    const { post, rpc } = setup({ data: null });
+    expect((await post('van.leave', { childId: VAN })).status).toBe(200);
+    expect(rpc).toHaveBeenCalledWith('leave_van', { p_actor: DRIVER, p_child: VAN });
   });
 });

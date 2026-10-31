@@ -11,7 +11,9 @@
     "build:web": "pnpm --filter @pohnch/web build",
     "test:web": "pnpm --filter @pohnch/web test:e2e",
     "check": "pnpm typecheck && pnpm test && pnpm build:web",
-    "test:db": "node supabase/tests/run.mjs"
+    "test:db": "node supabase/tests/run.mjs",
+    "bundle:apps": "pnpm --filter @pohnch/parent bundle:check && pnpm --filter @pohnch/driver bundle:check",
+    "check:leaks": "node scripts/check-leaks.mjs apps/web/.next/static apps/web/.next/server/app apps/parent/dist apps/driver/dist"
   },
   "devDependencies": {
     "typescript": "~6.0.3"

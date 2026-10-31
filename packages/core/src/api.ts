@@ -5,7 +5,7 @@ export class ApiError extends Error {
   }
   /** No signal or the server didn't answer: worth retrying later (the offline queue does). */
   get retryable(): boolean {
-    return this.status === 0 || this.status >= 500;
+    return this.status === 0 || this.status === 408 || this.status === 429 || this.status >= 500;
   }
 }
 
