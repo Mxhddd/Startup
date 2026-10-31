@@ -12,6 +12,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { DriverProvider } from '../state/DriverStore';
+import '../location/tripLocation'; // defines the trip-only location task at start-up
 
 SplashScreen.preventAutoHideAsync();
 
@@ -52,7 +54,9 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <LangProvider>
           <StatusBar style="dark" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ghee } }} />
+          <DriverProvider key={session?.user.id ?? 'out'}>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ghee } }} />
+          </DriverProvider>
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
         </LangProvider>
       </SafeAreaProvider>

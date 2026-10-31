@@ -24,3 +24,12 @@ export function karachiClock(at: Date): string {
   const minute = parts.find((p) => p.type === 'minute')?.value ?? '';
   return `${hour}:${minute}`;
 }
+
+/** The hour (0-23) in Karachi: before 11 the van is on its morning run. */
+export function karachiHour(at: Date): number {
+  return Number(new Intl.DateTimeFormat('en-GB', { timeZone: KARACHI_TZ, hour: '2-digit', hour12: false }).format(at)) % 24;
+}
+
+export function defaultRunKind(at: Date): 'morning' | 'afternoon' {
+  return karachiHour(at) < 11 ? 'morning' : 'afternoon';
+}

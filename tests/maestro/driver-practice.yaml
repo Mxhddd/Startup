@@ -1,0 +1,23 @@
+# The practice run, start to finish: tap each stop, undo once, hold "reached school".
+# Works without a server. Run: maestro test tests/maestro/driver-practice.yaml
+appId: pk.pohnch.driver
+---
+- launchApp
+- tapOn:
+    id: "nav-practice"
+- assertVisible: "مشق"
+- tapOn:
+    id: "stop-0-tap"
+- assertVisible:
+    id: "undo-bar"
+- tapOn:
+    id: "undo-button"
+- assertVisible:
+    id: "stop-0-tap"
+- tapOn:
+    id: "stop-0-tap"
+- tapOn:
+    id: "stop-2-tap"
+- longPressOn:
+    id: "finish-trip"
+- assertVisible: "بہت خوب! مشق مکمل۔"

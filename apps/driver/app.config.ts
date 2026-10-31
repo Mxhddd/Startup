@@ -12,6 +12,9 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: 'pk.pohnch.driver',
     supportsTablet: false,
+    infoPlist: {
+      UIBackgroundModes: ['location'],
+    },
   },
   android: {
     package: 'pk.pohnch.driver',
@@ -28,6 +31,17 @@ const config: ExpoConfig = {
   plugins: [
     'expo-router',
     'expo-font',
+    [
+      'expo-location',
+      {
+        // Shown by the phone when it asks. Location is used only during a trip.
+        locationWhenInUsePermission: 'Pohnch shares the van’s location with its families only while a trip is running. پہنچ صرف سفر کے دوران وین کی جگہ اس کے خاندانوں کو دکھاتا ہے۔',
+        locationAlwaysAndWhenInUsePermission: 'So families see the van with your screen off, Pohnch needs location during trips. It stops when the trip ends. سفر ختم ہوتے ہی لوکیشن بند ہو جاتی ہے۔',
+        isIosBackgroundLocationEnabled: true,
+        isAndroidBackgroundLocationEnabled: true,
+        isAndroidForegroundServiceEnabled: true,
+      },
+    ],
     ['expo-splash-screen', { backgroundColor: '#141A33', image: './assets/splash-icon.png', imageWidth: 180 }],
   ],
   experiments: { typedRoutes: true },

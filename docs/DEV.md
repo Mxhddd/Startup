@@ -68,3 +68,18 @@ Everything about the database, its security rules and the Edge Functions is expl
 9. Make yourself the team: in the SQL editor, `insert into admins values ('<your user id>');` (your id is under Authentication > Users after you first log in).
 
 Until step 8, the apps open without login, so screens can still be built and tried.
+
+## The driver app (B4)
+
+| Screen | File | What it does |
+| --- | --- | --- |
+| Today | `apps/driver/src/app/index.tsx` | Set up the van, see today's list, hold to start the next run. Goes to the trip screen while a trip runs. |
+| Van | `setup.tsx` | Name, school, plate. |
+| Stops | `stops.tsx` | Tap the map to add stops in order; rename, move up/down, remove. |
+| Families | `families.tsx` | Share the van's invite link; approve each request with the child's stop (after the team verifies the driver). |
+| Trip | `trip.tsx` + `components/RunScreen.tsx` | One big button for the next stop, siblings in one tap, 5-second undo, help, hold for "reached school" / "end trip". |
+| Practice | `practice.tsx` | The same trip screen with pretend children; sends nothing. Works without a server. |
+
+How a tap travels: `RunScreen` -> `DriverStore.tapStop` shows it at once and saves it in the offline queue (`@pohnch/core` `createQueue`, kept in AsyncStorage) -> the queue sends it to the `app` Edge Function in order, retrying every 5 s without signal.
+
+Location (`apps/driver/src/location/tripLocation.ts`): starts with a trip, stops when it ends (and whenever the app finds no running trip). On Android it runs as a foreground service with a notification saying the location is shared. Positions go every 5 s while moving and every 30 s when stopped; one that can't be sent is dropped.

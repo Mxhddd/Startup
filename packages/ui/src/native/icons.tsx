@@ -15,7 +15,7 @@ export function StarIcon({ size = 24, color }: { size?: number; color: string })
 }
 
 // Simple line icons on a 24 grid, drawn with round caps.
-const STEP_PATHS: Record<Step | 'home' | 'help' | 'check' | 'phone' | 'share' | 'signal', string> = {
+const STEP_PATHS = {
   // van leaving: van body with a motion line
   left: 'M3 16V9a2 2 0 0 1 2-2h9l4 4h1a2 2 0 0 1 2 2v3M3 16h18M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z',
   // a child in the van: person with a tick
@@ -32,7 +32,13 @@ const STEP_PATHS: Record<Step | 'home' | 'help' | 'check' | 'phone' | 'share' | 
   phone: 'M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a1 1 0 0 1-1 1A16 16 0 0 1 4 5a1 1 0 0 1 1-1Z',
   share: 'M12 3v12M7 8l5-5 5 5M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5',
   signal: 'M2 20h2M7 20v-4M12 20v-8M17 20V8M22 20V4M3 3l18 18',
-};
+  // points right; flip it for the reading direction
+  arrow: 'M4 12h15M13 6l6 6-6 6',
+  plus: 'M12 5v14M5 12h14',
+  up: 'M12 19V5M6 11l6-6 6 6',
+  down: 'M12 5v14M6 13l6 6 6-6',
+  close: 'M6 6l12 12M18 6L6 18',
+} satisfies Record<Step | string, string>;
 
 export type IconName = keyof typeof STEP_PATHS;
 

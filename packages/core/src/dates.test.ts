@@ -20,3 +20,12 @@ describe('karachiClock', () => {
     expect(karachiClock(new Date('2026-11-02T09:05:00Z'))).toBe('2:05');
   });
 });
+
+import { defaultRunKind, karachiHour } from './dates';
+describe('morning or afternoon', () => {
+  it('follows Karachi time, whatever the phone is set to', () => {
+    expect(karachiHour(new Date('2026-11-02T02:00:00Z'))).toBe(7);
+    expect(defaultRunKind(new Date('2026-11-02T02:00:00Z'))).toBe('morning');
+    expect(defaultRunKind(new Date('2026-11-02T08:30:00Z'))).toBe('afternoon');
+  });
+});
