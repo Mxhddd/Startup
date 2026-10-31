@@ -104,10 +104,13 @@ function useDriverState() {
 
   const running = s.trips.find((t) => t.status === 'running') ?? null;
 
+  // The run to show: the running one, else the next one not done today (morning first), else by the clock.
+  const doneKinds = new Set(s.trips.filter((x) => !x.is_practice && x.status !== 'cancelled').map((x) => x.kind));
+  const nextKind: 'morning' | 'afternoon' | null = !doneKinds.has('morning') ? 'morning' : !doneKinds.has('afternoon') ? 'afternoon' : null;
   const run = useMemo(() => {
-    const kind = running?.kind ?? defaultRunKind(new Date());
+    const kind = running?.kind ?? nextKind ?? defaultRunKind(new Date());
     return { kind, groups: buildRun({ stops: s.stops, riders: s.riders, absentChildIds: s.absent, events: s.events, kind, noStopLabel: '—' }) };
-  }, [running, s.stops, s.riders, s.absent, s.events]);
+  }, [running, nextKind, s.stops, s.riders, s.absent, s.events]);
 
   const actions = {
     refresh,
@@ -165,7 +168,7 @@ function useDriverState() {
     },
   };
 
-  return { ...s, pending, undo, running, run, location, progress: runProgress(run.groups), actions };
+  return { ...s, pending, undo, running, run, nextKind, location, progress: runProgress(run.groups), actions };
 }
 
 export type DriverStore = ReturnType<typeof useDriverState>;

@@ -18,6 +18,7 @@ export function ChildRow({
   isNext = false,
   onTap,
   testID,
+  readOnly = false,
 }: {
   names: string[];
   stop: string;
@@ -27,12 +28,14 @@ export function ChildRow({
   isNext?: boolean;
   onTap: () => void;
   testID?: string;
+  /** A preview of the list (Today screen): no buttons, tapping happens on the trip screen. */
+  readOnly?: boolean;
 }) {
   const { t, dir, lang } = useLang();
   const joined = names.join(lang === 'ur' ? '، ' : ', ');
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
 
-  if (isNext && state === 'waiting') {
+  if (isNext && state === 'waiting' && !readOnly) {
     return (
       <View testID={testID} style={{ gap: 8 }}>
         <AppText variant="small" bold color={colors.ink2}>
@@ -71,7 +74,7 @@ export function ChildRow({
         </AppText>
       </View>
       {state === 'absent' ? <AbsentChip /> : null}
-      {state === 'waiting' ? (
+      {state === 'waiting' && !readOnly ? (
         <View style={{ width: 128 }}>
           <TapButton size="later" tone={step} label={t(`tap.${step}.short`)} onConfirm={onTap} />
         </View>

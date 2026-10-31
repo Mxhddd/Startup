@@ -27,8 +27,7 @@ export default function DriverToday() {
 
   if (configured && d.running) return <Redirect href="/trip" />;
 
-  const doneKinds = new Set(d.trips.filter((x) => !x.is_practice && x.status !== 'cancelled').map((x) => x.kind));
-  const nextKind = !doneKinds.has('morning') ? 'morning' : !doneKinds.has('afternoon') ? 'afternoon' : null;
+  const nextKind = d.nextKind;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee, paddingTop: insets.top + space.lg }}>
@@ -79,7 +78,7 @@ export default function DriverToday() {
             ) : (
               d.run.groups.map((g, i) => (
                 <ChildRow key={g.stopId ?? i} names={g.children.map((c) => c.firstName)} stop={g.label} step={d.run.kind === 'morning' ? 'picked' : 'dropped'}
-                  state={g.state === 'absent' ? 'absent' : 'waiting'} onTap={() => undefined} />
+                  state={g.state === 'absent' ? 'absent' : 'waiting'} readOnly onTap={() => undefined} />
               ))
             )}
           </>
