@@ -20,6 +20,8 @@ export async function notifyTrip(job: NotifyJob, deps: NotifyDeps): Promise<void
     const messages = buildPushes(job.step, recipients, job.reason);
     const { sent, dead } = await sendExpoPushes(messages, { fetch: deps.fetch, accessToken: deps.expoAccessToken });
     if (dead.length) await deps.rpc('remove_push_tokens', { p_tokens: dead });
+    // Counts only, for the admin page's "alerts delivered".
+    await deps.rpc('record_push_stats', { p_sent: sent, p_dead: dead.length, p_failed: messages.length - sent - dead.length });
     deps.log(`push ${job.step} sent=${sent} dead=${dead.length}`);
   } catch {
     deps.log(`push ${job.step} failed`);

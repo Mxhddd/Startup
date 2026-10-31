@@ -1,0 +1,56 @@
+import { expect, test, type BrowserContext } from '@playwright/test';
+
+// The admin page talks to Supabase at http://127.0.0.1:9 in these tests; we answer those calls here.
+const SB = 'http://127.0.0.1:9';
+const USER = '00000000-0000-4000-8000-0000000000aa';
+const b64 = (o: unknown) => Buffer.from(JSON.stringify(o)).toString('base64url');
+const jwt = `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub: USER, role: 'authenticated', exp: Math.floor(Date.now() / 1000) + 3600 })}.sig`;
+const session = { access_token: jwt, refresh_token: 'r', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user: { id: USER, aud: 'authenticated', role: 'authenticated' } };
+
+async function fakeSupabase(ctx: BrowserContext, opts: { loggedIn: boolean; admin: boolean }) {
+  const calls: string[] = [];
+  if (opts.loggedIn) await ctx.addInitScript((s) => localStorage.setItem('sb-127-auth-token', JSON.stringify(s)), session);
+  await ctx.route(`${SB}/**`, async (route) => {
+    const u = new URL(route.request().url());
+    calls.push(u.pathname);
+    const json = (body: unknown) => route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+    if (u.pathname === '/rest/v1/admins') return json(opts.admin ? [{ user_id: USER }] : []);
+    if (u.pathname === '/rest/v1/rpc/admin_stats') return json({ days: 7, trips: 10, tripsTracked: 8, familiesActive: 20, familiesWithAlerts: 9, alertsSent: 312, alertsFailed: 4 });
+    if (u.pathname === '/rest/v1/rpc/admin_vans')
+      return json([
+        { van_id: 'v-new', van_name: 'Kamran bhai van', school_name: 'School', plate: null, driver_name: 'Kamran bhai', driver_phone: '923001112223', verified_at: null, switched_off_at: null, riders: 0, waiting: 2 },
+        { van_id: 'v-ok', van_name: 'Rafiq bhai van', school_name: 'School', plate: 'KHI-1', driver_name: 'Rafiq bhai', driver_phone: '923004445556', verified_at: '2026-10-01T00:00:00Z', switched_off_at: null, riders: 9, waiting: 0 },
+      ]);
+    if (u.pathname === '/rest/v1/rpc/admin_trips_today')
+      return json([{ trip_id: 't1', van_name: 'Rafiq bhai van', driver_name: 'Rafiq bhai', kind: 'morning', status: 'running', started_at: new Date().toISOString(), last_position_at: new Date(Date.now() - 20_000).toISOString(), riders: 9, done: 4 }]);
+    if (u.pathname === '/functions/v1/app/admin.verify') return json({ ok: true });
+    return json([]);
+  });
+  return calls;
+}
+
+test('logged out: only the team login form, and no data is asked for', async ({ context, page }) => {
+  const calls = await fakeSupabase(context, { loggedIn: false, admin: false });
+  await page.goto('/admin');
+  await expect(page.getByTestId('admin-login')).toBeVisible();
+  expect(calls.filter((c) => c.startsWith('/rest/'))).toEqual([]);
+});
+
+test('logged in but not on the team: "not for you", and no admin numbers are asked for', async ({ context, page }) => {
+  const calls = await fakeSupabase(context, { loggedIn: true, admin: false });
+  await page.goto('/admin');
+  await expect(page.getByTestId('not-allowed')).toBeVisible();
+  expect(calls.filter((c) => c.includes('/rpc/'))).toEqual([]);
+});
+
+test('the team sees the four numbers, the check queue, and verifies a driver', async ({ context, page }) => {
+  const calls = await fakeSupabase(context, { loggedIn: true, admin: true });
+  await page.goto('/admin');
+  await expect(page.getByTestId('stat-tracked')).toContainText('80%');
+  await expect(page.getByTestId('stat-live')).toContainText('45%');
+  await expect(page.getByTestId('stat-alerts')).toContainText('312');
+  await expect(page.getByTestId('queue-row')).toHaveCount(1);
+  await expect(page.getByTestId('trip-row')).toContainText('4 / 9');
+  await page.getByTestId('queue-row').getByRole('button').click();
+  await expect.poll(() => calls.includes('/functions/v1/app/admin.verify')).toBe(true);
+});

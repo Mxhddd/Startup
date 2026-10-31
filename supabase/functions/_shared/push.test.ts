@@ -54,6 +54,7 @@ describe('sending', () => {
     const f = vi.fn(async () => new Response(JSON.stringify({ data: [{ status: 'error', details: { error: 'DeviceNotRegistered' } }] })));
     await notifyTrip({ tripId: 't', step: 'picked', children: ['c-ali'] }, { rpc, fetch: f as unknown as typeof fetch, log: (l) => logs.push(l) });
     expect(rpc).toHaveBeenCalledWith('remove_push_tokens', { p_tokens: ['gone'] });
+    expect(rpc).toHaveBeenCalledWith('record_push_stats', { p_sent: 0, p_dead: 1, p_failed: 0 });
     expect(logs).toEqual(['push picked sent=0 dead=1']);
     expect(logs.join('')).not.toContain('علی');
   });

@@ -106,6 +106,8 @@ export const driverApi = {
   late: (tripId: string, reason: 'traffic' | 'breakdown' | 'roadClosed', clientId: string) => db().api('late', { tripId, reason, clientId }),
   undo: (clientId: string) => db().api('tap.undo', { clientId }),
   inviteLink: (vanId: string) => db().api<{ url: string }>('invite.van', { vanId }),
+  /** A parent's "invite my driver" link: their child's request joins this driver's van. */
+  acceptFamilyInvite: (token: string, vanId: string) => db().api<{ membershipId: string }>('invite.accept', { token, vanId }),
   decide: (membershipId: string, approve: boolean, stopId: string | null) => db().api('membership.decide', { membershipId, approve, stopId }),
   dayOff: (vanId: string, date: string, off: boolean) => db().api('dayoff.set', { vanId, date, off }),
   position: (body: { tripId: string; lat: number; lng: number; heading: number | null; speed: number | null; recordedAt: string }) =>

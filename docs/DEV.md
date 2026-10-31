@@ -119,3 +119,25 @@ In the parent app (`apps/parent/src/notifications/`, `src/widgets/`):
 
 - The Android ongoing notification and the Live Activity are updated by the parent app while it runs in the background; if the phone stops the app, step pushes still arrive but the minutes stop updating. B8 measures this on real phones; updating the Live Activity from the server by push (APNs) is ready in `expo-widgets` if needed.
 - The iPhone map, widget and Live Activity use Apple's star symbol in kesar, not our eight-point star (widgets can't load our SVG yet).
+
+## The website and admin page (B7)
+
+| Page | File | What it does |
+| --- | --- | --- |
+| `/`, `/en` | `apps/web/app/Landing.tsx` | What Pohnch is, how it works, drivers, privacy in one line, WhatsApp. |
+| `/privacy`, `/en/privacy` | `Privacy.tsx` | The privacy policy in plain words (all text in `packages/messages`). |
+| `/i/<token>` | `invite/` | One static page for every invite link; the browser builds the "open in Pohnch / Pohnch Driver" links. |
+| `/.well-known/...` | `api/app-links/` | The files that let `pohnch.pk/i/...` open the parent app directly. |
+| `/admin` | `admin/` | The Pohnch team: login, the 4 numbers, driver checks, all vans (switch off), today's trips. |
+
+The admin numbers come from database functions that only answer the team (`admin_stats`, `admin_vans`, `admin_trips_today`); "alerts delivered" is counted per day by the push sender (counts only).
+
+### Putting it online on Vercel
+
+1. vercel.com > Add New > Project > import `Mxhddd/Startup`, root directory `apps/web`.
+2. Environment variables: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `NEXT_PUBLIC_SITE_URL=https://pohnch.pk`, and once the apps exist `APPLE_TEAM_ID` (Apple Developer > Membership) and `ANDROID_CERT_SHA256` (`pnpm dlx eas-cli credentials` > Android > the SHA-256 fingerprint).
+3. Domains: add `pohnch.pk` and point the registrar's DNS at Vercel as it shows.
+4. Make yourself the team: after logging in once in an app, run `insert into admins values ('<your user id>');` in Supabase's SQL editor.
+5. Check `https://pohnch.pk/.well-known/assetlinks.json` and `/apple-app-site-association` show the right ids before building the apps for the stores.
+
+**About invite tokens and logs:** our code never reads the token on the server (every `/i/...` link shows the same static page, and it is never cached or indexed and never passed on as a referrer). Vercel's own request logs still record page addresses, so in the Vercel project keep log retention at the minimum and add no log drains. Supabase stores only the token's hash.
