@@ -6,6 +6,19 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
+    # Postgres 16 with PostGIS for the database tests (pgTAP is added in a step below).
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env:
+          POSTGRES_HOST_AUTH_METHOD: trust
+        ports:
+          - 54329:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -16,13 +29,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
-      - name: Start Postgres with PostGIS and pgTAP for the database tests
+      - name: Add pgTAP to the database and psql to the runner
         run: |
-          sudo apt-get update -q
-          sudo apt-get install -y -q postgresql-16-postgis-3 postgresql-16-pgtap
-          sudo -u postgres /usr/lib/postgresql/16/bin/initdb -D /tmp/pg -A trust -U postgres
-          sudo -u postgres /usr/lib/postgresql/16/bin/pg_ctl -D /tmp/pg -o "-p 54329 -k /tmp" -l /tmp/pg.log start
+          docker exec ${{ job.services.postgres.id }} sh -c "apt-get update -q && apt-get install -y -q postgresql-16-pgtap"
+          command -v psql || (sudo apt-get update -q && sudo apt-get install -y -q postgresql-client)
       - run: pnpm test:db
+        env:
+          DATABASE_URL: postgres://postgres@localhost:54329/postgres
       - run: pnpm build:web
       - run: pnpm --filter @pohnch/web exec playwright install --with-deps chromium
       - run: pnpm test:web
