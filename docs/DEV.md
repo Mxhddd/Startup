@@ -83,3 +83,16 @@ Until step 8, the apps open without login, so screens can still be built and tri
 How a tap travels: `RunScreen` -> `DriverStore.tapStop` shows it at once and saves it in the offline queue (`@pohnch/core` `createQueue`, kept in AsyncStorage) -> the queue sends it to the `app` Edge Function in order, retrying every 5 s without signal.
 
 Location (`apps/driver/src/location/tripLocation.ts`): starts with a trip, stops when it ends (and whenever the app finds no running trip). On Android it runs as a foreground service with a notification saying the location is shared. Positions go every 5 s while moving and every 30 s when stopped; one that can't be sent is dropped.
+
+## The parent app (B5)
+
+| Screen | File | What it does |
+| --- | --- | --- |
+| Home | `apps/parent/src/app/index.tsx` + `components/TripSheet.tsx` | The map with the van (gliding, heading, grey when the signal is stale), your stop and home; the sheet shows what fits the moment: add a child, join a van, waiting for approval, no trip now, or live minutes and the timeline. Chutti for today. |
+| Add child | `child.tsx` | First name, school, and the home pin placed by tapping the map (never the phone's location). |
+| Join | `join.tsx`, `i/[token].tsx` | Paste the driver's link or open it from WhatsApp; pick the child; the driver then approves. A link opened while logged out waits in memory until login. |
+| Family | `family.tsx` | Add up to 3 more people by phone number; add a child; join a van. |
+
+How the van moves on a parent's map: the driver app sends a position -> Supabase Realtime tells the parent app something changed -> it re-reads the van's latest position (row-level security decides whether it may) -> `useGlide` slides the marker there over a second. Minutes come from `etaMinutes` in `@pohnch/core`: distance, the van's recent speed, Karachi road detours, and how many stops are still ahead (`stops_ahead` returns only a number).
+
+Browser preview with made-up data: the parent screens can be checked without a server by answering the app's Supabase requests in Playwright (see how B5 was checked in the commit history).

@@ -12,6 +12,8 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ParentProvider } from '../state/ParentStore';
+import { rememberInvite, takeInvite } from '../state/pendingInvite';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -22,8 +24,13 @@ function AuthGate({ ready, signedIn, configured }: { ready: boolean; signedIn: b
   useEffect(() => {
     if (!ready || !configured) return;
     const here = segments[0] as string | undefined;
+    const linkToken = (segments as string[])[1];
+    if (!signedIn && here === 'i' && typeof linkToken === 'string') rememberInvite(linkToken);
     if (!signedIn && here !== 'login' && here !== 'gallery') router.replace('/login');
-    if (signedIn && here === 'login') router.replace('/');
+    if (signedIn && here === 'login') {
+      const token = takeInvite();
+      router.replace(token ? { pathname: '/i/[token]', params: { token } } : '/');
+    }
   }, [ready, signedIn, configured, segments]);
   return null;
 }
@@ -52,7 +59,9 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <LangProvider>
           <StatusBar style="dark" />
-          <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ghee } }} />
+          <ParentProvider key={session?.user.id ?? 'out'} enabled={configured && !!session}>
+            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ghee } }} />
+          </ParentProvider>
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
         </LangProvider>
       </SafeAreaProvider>

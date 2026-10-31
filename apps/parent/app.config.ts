@@ -12,9 +12,19 @@ const config: ExpoConfig = {
   ios: {
     bundleIdentifier: 'pk.pohnch.parent',
     supportsTablet: false,
+    // Driver invite links (pohnch.pk/i/...) open the app. The website serves the matching file in B7.
+    associatedDomains: ['applinks:pohnch.pk'],
   },
   android: {
     package: 'pk.pohnch.parent',
+    intentFilters: [
+      {
+        action: 'VIEW',
+        autoVerify: true,
+        data: [{ scheme: 'https', host: 'pohnch.pk', pathPrefix: '/i/' }],
+        category: ['BROWSABLE', 'DEFAULT'],
+      },
+    ],
     adaptiveIcon: {
       backgroundColor: '#1F2A5C',
       foregroundImage: './assets/android-icon-foreground.png',
