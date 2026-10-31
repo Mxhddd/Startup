@@ -5,3 +5,13 @@ node_modules/
 .vercel/
 test-results/
 playwright-report/
+.expo/
+dist/
+web-build/
+ios/
+android/
+*.tsbuildinfo
+coverage/
+.DS_Store
+next-env.d.ts
+expo-env.d.ts

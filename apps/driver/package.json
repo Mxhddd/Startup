@@ -1,0 +1,37 @@
+{
+  "name": "@pohnch/driver",
+  "version": "0.1.0",
+  "private": true,
+  "main": "expo-router/entry",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "typecheck": "tsc --noEmit",
+    "bundle:check": "expo export --platform android --output-dir dist"
+  },
+  "dependencies": {
+    "@expo-google-fonts/gulzar": "^0.4.2",
+    "@expo-google-fonts/manrope": "^0.4.3",
+    "@expo-google-fonts/noto-sans-arabic": "^0.4.3",
+    "@pohnch/core": "workspace:*",
+    "@pohnch/messages": "workspace:*",
+    "@pohnch/ui": "workspace:*",
+    "expo": "~58.0.21",
+    "expo-constants": "~58.0.14",
+    "expo-dev-client": "~58.0.17",
+    "expo-font": "~58.0.11",
+    "expo-linking": "~58.0.15",
+    "expo-router": "~58.0.28",
+    "expo-splash-screen": "~58.0.12",
+    "expo-status-bar": "~58.0.4",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-safe-area-context": "~5.10.1",
+    "react-native-screens": "~4.30.0"
+  },
+  "devDependencies": {
+    "@types/react": "~19.3.0",
+    "typescript": "~6.0.3"
+  }
+}

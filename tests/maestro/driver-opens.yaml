@@ -1,0 +1,12 @@
+# Opens the driver app and checks the empty Today screen in Urdu and English.
+# Run: maestro test tests/maestro/driver-opens.yaml
+appId: pk.pohnch.driver
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: "today-empty"
+- assertVisible: "آج"
+- tapOn:
+    id: "lang-switch"
+- assertVisible: "Today"

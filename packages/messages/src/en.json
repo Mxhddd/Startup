@@ -1,0 +1,17 @@
+{
+  "app.parent.name": "Pohnch",
+  "app.driver.name": "Pohnch Driver",
+  "brand.tagline": "Less worry, the whole story",
+  "lang.switch": "اردو",
+  "lang.switch.label": "Change language to Urdu",
+  "parent.map.label": "Map of your van",
+  "parent.sheet.title": "Today's trip",
+  "parent.sheet.empty": "No van yet. Open your driver's invite, or invite them to Pohnch.",
+  "driver.today.title": "Today",
+  "driver.today.empty": "No stops yet. Once the van and its stops are set up, today's list shows here.",
+  "web.title": "Pohnch · your school van, on your phone",
+  "web.hero": "Your child's school van, on your phone",
+  "web.lead": "Watch the van move on a map. An alert when your child gets in, and when they reach school.",
+  "web.cta": "WhatsApp",
+  "web.pilot": "Free during the pilot"
+}

@@ -1,0 +1,15 @@
+# Opens the parent app on a real phone or emulator, checks the map and the empty trip sheet,
+# then switches to English and back. Run: maestro test tests/maestro/parent-opens.yaml
+appId: pk.pohnch.parent
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: "parent-map"
+- assertVisible: "آج کا سفر"
+- tapOn:
+    id: "lang-switch"
+- assertVisible: "Today's trip"
+- tapOn:
+    id: "lang-switch"
+- assertVisible: "آج کا سفر"
