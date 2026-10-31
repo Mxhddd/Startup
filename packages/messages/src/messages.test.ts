@@ -25,3 +25,18 @@ describe('messages', () => {
     expect(otherLang('ur')).toBe('en');
   });
 });
+
+describe('placeholders', () => {
+  it('fills {min} and {name} in both languages', () => {
+    expect(t('en', 'eta.home', { min: 6 })).toBe('Home in 6 min');
+    expect(t('ur', 'eta.home', { min: 6 })).toBe('6 منٹ میں گھر');
+    expect(t('en', 'undo.marked', { name: 'Ali', step: 'In the van' })).toBe('Ali: In the van');
+  });
+
+  it('uses the same placeholders in Urdu and English for every key', () => {
+    const names = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
+    for (const key of Object.keys(en) as (keyof typeof en)[]) {
+      expect(names(ur[key]), key).toEqual(names(en[key]));
+    }
+  });
+});

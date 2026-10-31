@@ -4,13 +4,17 @@ import ur from './ur.json';
 
 export type Lang = 'ur' | 'en';
 export type MessageKey = keyof typeof en;
+export type Vars = Record<string, string | number>;
 
 const tables: Record<Lang, Record<MessageKey, string>> = { ur, en };
 
 export const DEFAULT_LANG: Lang = 'ur';
 
-export function t(lang: Lang, key: MessageKey): string {
-  return tables[lang][key];
+/** Looks up a key and fills placeholders like {min} or {name}. */
+export function t(lang: Lang, key: MessageKey, vars?: Vars): string {
+  const text = tables[lang][key];
+  if (!vars) return text;
+  return text.replace(/\{(\w+)\}/g, (whole, name: string) => (name in vars ? String(vars[name]) : whole));
 }
 
 /** Urdu reads right to left; English left to right. */

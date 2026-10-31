@@ -41,3 +41,12 @@ The apps use libraries with native code (maps), so they run as a **development b
 4. Same for `apps/driver` with `EAS_PROJECT_ID_DRIVER`.
 
 The phone tests need Maestro (maestro.mobile.dev) and a phone or emulator with the app installed: `maestro test tests/maestro`.
+
+## The component gallery
+
+Every shared component (B2) is on one hidden screen in each app, in every state, in Urdu and English.
+
+- On the phone: long-press the screen title ("آج" in the driver app, "آج کا سفر" in the parent app), or open the link `pohnch-driver://gallery` / `pohnch://gallery`.
+- In a browser, no phone needed: `pnpm --filter @pohnch/driver web`, then open the address it prints and add `/gallery`. The map is a plain stand-in on the web; everything else looks as on the phone.
+
+The components live in `packages/ui/src/native/`, one file each, named as in CLAUDE.md. The timing rules behind them (hold 0.8 s, undo 5 s, signal stale after 30 s) are plain functions in `packages/core` with tests, so the numbers live in one place.

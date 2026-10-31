@@ -1,42 +1,32 @@
-// Parent home (stage 1, empty state): the map fills the screen; the bottom sheet holds today's trip.
+// Parent home (stage 1, empty state): the map fills the screen; the MapSheet holds today's trip.
 // Until a van is joined, the sheet says how to connect one. B5 fills in the van, ETA and timeline.
-import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, LangSwitch } from '@pohnch/ui/native';
-import { View } from 'react-native';
+// Long-press the sheet title to open the hidden component gallery.
+import { colors, space, useLang } from '@pohnch/ui';
+import { AppText, LangSwitch, MapSheet } from '@pohnch/ui/native';
+import { router } from 'expo-router';
+import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandMap } from '../components/BrandMap';
 
 export default function ParentHome() {
-  const { t, dir } = useLang();
+  const { t } = useLang();
   const insets = useSafeAreaInsets();
   return (
-    <View style={{ flex: 1, backgroundColor: colors.ghee, direction: dir }}>
+    <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       <BrandMap accessibilityLabel={t('parent.map.label')} />
 
       <View style={{ position: 'absolute', top: insets.top + space.md, left: space.lg, right: space.lg, flexDirection: 'row', justifyContent: 'flex-end' }}>
         <LangSwitch />
       </View>
 
-      <View
-        testID="trip-sheet"
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: colors.ghee,
-          borderTopLeftRadius: radius.sheet,
-          borderTopRightRadius: radius.sheet,
-          paddingHorizontal: space.xl,
-          paddingTop: space.md,
-          paddingBottom: insets.bottom + space.xl,
-          gap: space.sm,
-        }}
-      >
-        <View style={{ alignSelf: 'center', width: 40, height: 5, borderRadius: 3, backgroundColor: colors.line, marginBottom: space.sm }} />
-        <AppText variant="title">{t('parent.sheet.title')}</AppText>
-        <AppText variant="secondary">{t('parent.sheet.empty')}</AppText>
-      </View>
+      <MapSheet peek={200} open={420} bottomInset={insets.bottom}>
+        <View testID="trip-sheet" style={{ gap: space.sm }}>
+          <Pressable onLongPress={() => router.push('/gallery')} accessibilityHint={t('gallery.open')}>
+            <AppText variant="title">{t('parent.sheet.title')}</AppText>
+          </Pressable>
+          <AppText variant="secondary">{t('parent.sheet.empty')}</AppText>
+        </View>
+      </MapSheet>
     </View>
   );
 }

@@ -1,0 +1,12 @@
+# Opens the hidden component gallery in the driver app and checks the hold-to-confirm button.
+appId: pk.pohnch.driver
+---
+- launchApp
+- longPressOn:
+    id: "today-title"
+- assertVisible:
+    id: "gallery"
+- assertVisible: "TapButton"
+- longPressOn:
+    id: "hold-demo"
+- assertVisible: "last action: trip started (hold)"

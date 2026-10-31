@@ -1,3 +1,21 @@
 // React Native pieces. Kept apart from src/index.ts so the theme can be used on the website without React Native.
-export { AppText } from './native/AppText';
+export { AppText, type TextVariant } from './native/AppText';
 export { LangSwitch } from './native/LangSwitch';
+export { StarIcon, Icon, type IconName } from './native/icons';
+export { TapButton } from './native/TapButton';
+export { UndoBar } from './native/UndoBar';
+export { AbsentChip } from './native/AbsentChip';
+export { ChildRow, type ChildRowState } from './native/ChildRow';
+export { OfflineBanner } from './native/OfflineBanner';
+export { TripHeader } from './native/TripHeader';
+export { HelpSheet, type LateReason } from './native/HelpSheet';
+export { EtaPill } from './native/EtaPill';
+export { VanMarker } from './native/VanMarker';
+export { StopPin } from './native/StopPin';
+export { RouteDots } from './native/RouteDots';
+export { TimelineEvent } from './native/TimelineEvent';
+export { VanBadge } from './native/VanBadge';
+export { ApprovalCard } from './native/ApprovalCard';
+export { InviteCard } from './native/InviteCard';
+export { MapSheet } from './native/MapSheet';
+export { ComponentGallery } from './native/ComponentGallery';

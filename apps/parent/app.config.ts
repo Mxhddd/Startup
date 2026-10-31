@@ -26,7 +26,7 @@ const config: ExpoConfig = {
     // The parent app never asks for location (CLAUDE.md): block the permission even if a library adds it.
     blockedPermissions: ['android.permission.ACCESS_FINE_LOCATION', 'android.permission.ACCESS_COARSE_LOCATION', 'android.permission.ACCESS_BACKGROUND_LOCATION'],
   },
-  web: { favicon: './assets/favicon.png' },
+  web: { favicon: './assets/favicon.png', output: 'single' },
   plugins: [
     'expo-router',
     'expo-font',

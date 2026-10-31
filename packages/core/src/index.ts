@@ -1,2 +1,7 @@
 export { KARACHI_TZ, karachiDate, karachiClock } from './dates';
 export { PILOT_WHATSAPP } from './contact';
+export { HOLD_MS, UNDO_MS, holdProgress, undoSecondsLeft } from './taps';
+export { STALE_AFTER_S, signalState, ageParts, type Signal } from './signal';
+export { splitRuns, isolateLtr, LRI, PDI, type Run } from './bidi';
+export { lerp, lerpLatLng, bearing, headingDelta, type LatLng } from './motion';
+export { createHold, createUndoCountdown } from './controllers';

@@ -24,7 +24,7 @@ const config: ExpoConfig = {
       googleMaps: { apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_KEY ?? '' },
     },
   },
-  web: { favicon: './assets/favicon.png' },
+  web: { favicon: './assets/favicon.png', output: 'single' },
   plugins: [
     'expo-router',
     'expo-font',

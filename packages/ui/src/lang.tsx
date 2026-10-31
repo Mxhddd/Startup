@@ -1,12 +1,12 @@
 // The language switch. Urdu is the default; English is one tap away and the whole layout flips direction.
 import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
-import { DEFAULT_LANG, dirOf, otherLang, t, type Lang, type MessageKey } from '@pohnch/messages';
+import { DEFAULT_LANG, dirOf, otherLang, t, type Lang, type MessageKey, type Vars } from '@pohnch/messages';
 import { fonts } from './theme';
 
 type LangValue = {
   lang: Lang;
   dir: 'rtl' | 'ltr';
-  t: (key: MessageKey) => string;
+  t: (key: MessageKey, vars?: Vars) => string;
   toggle: () => void;
   setLang: (lang: Lang) => void;
 };
@@ -19,7 +19,7 @@ export function LangProvider({ children, initial = DEFAULT_LANG }: { children: R
     () => ({
       lang,
       dir: dirOf(lang),
-      t: (key) => t(lang, key),
+      t: (key, vars) => t(lang, key, vars),
       toggle: () => setLang((l) => otherLang(l)),
       setLang,
     }),

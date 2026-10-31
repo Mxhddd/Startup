@@ -9,11 +9,15 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@pohnch/messages": "workspace:*"
+    "@pohnch/messages": "workspace:*",
+    "@pohnch/core": "workspace:*"
   },
   "peerDependencies": {
     "react": "*",
-    "react-native": "*"
+    "react-native": "*",
+    "react-native-reanimated": "*",
+    "react-native-gesture-handler": "*",
+    "react-native-svg": "*"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
