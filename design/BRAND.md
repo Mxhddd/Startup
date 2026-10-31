@@ -20,16 +20,18 @@ Premium, but local craft. Think a well-made Karachi thing: indigo and saffron, a
 
 ## Logo
 
-Round 6 (October 2026): the word and the mark are one drawing. Files in `design/logo/`; the scripts that draw them are in `design/logo/source/` (fontTools + HarfBuzz on Noto Nastaliq Urdu Bold).
+Round 7, final (October 2026): **ek sitara**, one star. Files in `design/logo/` (SVG and transparent PNG); `design/logo/source/final2.py` draws them from the fonts (Noto Nastaliq Urdu Bold, Manrope ExtraBold). Design canvas: https://claude.ai/artifact/R6jXrX99VJxFeCH2GbKd5z
 
-- **Mark ("the path arrives", Nastaliq crown)**: پہنچ in Noto Nastaliq Urdu Bold, neel, with its own dots turned into the route. The dot of ن becomes the eight-point star (kesar, neel centre dot). The dots of پ start the route: the first is the green home dot (zamurrad; pista on dark), the others are kesar. The dots of چ are kesar. A ring of kesar route dots, growing in size, runs from the home dot under the word and up to the star: the path arrives.
-- **Compact** (`pohnch-logo-compact`): the same word and star without the route ring. Use for headers, small print and anything under 120 px wide.
-- **Latin wordmark** (`pohnch-wordmark-latin`): "Pohnch" in Manrope ExtraBold with the star as the "o".
-- **Lockup** (`pohnch-lockup`): the Urdu mark beside the Latin wordmark and the tagline LESS WORRY, THE WHOLE STORY (outlined, so no font is needed).
-- **App icon and anything under 32 px**: the star with its centre dot only, kesar on a neel rounded square (`pohnch-app-icon`).
-- Colourways: on ghee (neel word, kesar star and route, zamurrad home dot); on neel (ghee word, kesar star and route, pista home dot); one colour (all neel) for stamps and single-colour print.
-- Don't: stretch, rotate, outline, re-typeset the word in another font, or move the dots. Minimum width 96 px for the full mark, 48 px for compact; clear space half the star's width.
-- History: the round 4 mark (route dots into a star beside Gulzar text) is replaced; `explorations-A-to-E.png` shows the directions considered.
+- **One star, one accent.** The letters are one colour; the eight-point star (khatim) is the only colour, in kesar. It is the o of Pohnch and the dot of ن in پہنچ.
+- **A real hole.** The star's centre is punched through (radius a third of the star's), so it sits on any ground. No separate centre dot colour.
+- **Urdu mark** (`pohnch-mark-urdu`): پہنچ in Noto Nastaliq Urdu Bold, all dots in the letter colour, the ن dot as the kesar star. App splash, posters, stickers.
+- **Latin wordmark** (`pohnch-wordmark`): Pohnch in Manrope ExtraBold, the star as the o.
+- **Lockup** (`pohnch-lockup`, `pohnch-lockup-tagline`): the wordmark with پہنچ beside it, sized to span the full height of Pohnch. The star appears once: in the lockup the ن dot is a plain kesar dot. Tagline LESS WORRY, THE WHOLE STORY is outlined: kesar on neel, neel on ghee.
+- **App icon** (`pohnch-app-icon`): kesar star on a neel rounded square. **Favicon / under 32 px** (`pohnch-star`): the star alone.
+- Colourways: on ghee (neel letters, kesar star), on neel (ghee letters, kesar star), one colour (`-one-colour` neel, `-white`) for stamps, vinyl cuts and single-ink print.
+- Minimum sizes: wordmark 120 px wide, Urdu mark 56 px tall; below that, the star alone. Clear space: the star's width on every side.
+- Don't: stretch, rotate, outline, retype the letters in another font, recolour the letters kesar, or add a second star.
+- History: round 6 (route-dot ring) and earlier marks are in `design/logo/archive/`.
 
 ## Craft kit
 

@@ -3,15 +3,19 @@ sys.path.insert(0, '../logo')
 import os
 os.chdir('../logo')
 from final import *
+import final2
 os.chdir('../posters')
 
-LOGO = svgdoc(mark('ring'))
-LOGO_DARK = svgdoc(mark('ring', True))
-COMPACT_DARK = svgdoc(mark('crown', True))
-LOCKUP = svgdoc(lockup())
-LOCKUP_DARK = svgdoc(lockup(True))
-LATIN_DARK = svgdoc(latin_word(True))
-STARI = lambda s, f=KESAR, d=NEEL: f'<svg width="{s}" height="{s}" viewBox="0 0 64 64" aria-hidden="true"><path d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="{f}"/><circle cx="32" cy="32" r="9" fill="{d}"/></svg>'
+import final2 as F2
+def _d(g_bb, pad=60):
+    g, bb = g_bb; return F2.doc(g, bb, pad)
+LOGO = _d(F2.urdu_parts(NEEL, KESAR))
+LOGO_DARK = _d(F2.urdu_parts(GHEE, KESAR))
+COMPACT_DARK = LOGO_DARK
+LOCKUP = _d(F2.lockup(NEEL, KESAR), 80)
+LOCKUP_DARK = _d(F2.lockup(GHEE, KESAR), 80)
+LATIN_DARK = _d(F2.latin_parts(GHEE, KESAR))
+STARI = lambda s, f=KESAR, d=None: f'<svg width="{s}" height="{s}" viewBox="0 0 64 64" aria-hidden="true"><path d="{F2.star_d(32, 32, 28)}" fill="{f}" fill-rule="evenodd"/></svg>'
 CHAT = '<svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 4C13 4 4 12.3 4 22.6c0 5.4 2.5 10.2 6.5 13.6L8.6 44l8.6-4.4c2.1.6 4.4 1 6.8 1 11 0 20-8.3 20-18.6S35 4 24 4z" fill="currentColor"/><path d="M17.2 15.5c.5-1.1 1.6-1.2 2.1-.2l2 4c.3.7.2 1.4-.3 1.9l-1.2 1.3c1.3 2.6 3.4 4.7 6 6l1.3-1.2c.5-.5 1.3-.6 1.9-.3l4 2c1 .5.9 1.6-.2 2.1-2.5 1.4-5.4 1-8.7-1.2-3.1-2-5.6-4.6-7.6-7.6-2.2-3.4-2.6-6.3-1.3-8.8z" fill="#FAF6EE"/></svg>'
 PHONE_NO = '0300 1478729'
 
