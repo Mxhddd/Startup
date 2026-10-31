@@ -1,6 +1,6 @@
 # Build plan (v5)
 
-The full plan with the architecture diagram, costs and risks is the doc **Pohnch build plan**: https://claude.ai/artifact/QSiSNBiLTUZdoBrZ2vzvv1. This file is the short version for the repo. The step-by-step prompts are in `BUILD_PROMPTS.md`.
+The full plan with the architecture diagram, costs and risks is the doc **Pohnch build plan**: https://claude.ai/artifact/QSiSNBiLTUZdoBrZ2vzvv1. The pilot plan (journeys, features, data, B0–B9 weeks, pilot calendar, budget, risks, ideas) is the doc **Pohnch pilot and build plan**: https://claude.ai/artifact/237T2NHVfSw3a5tvywsnGp. Posters to print: `design/print/Pohnch-posters-print.pdf`. This file is the short version for the repo. The step-by-step prompts are in `BUILD_PROMPTS.md`.
 
 ## Three front ends, one backend
 

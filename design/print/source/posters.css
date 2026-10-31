@@ -1,0 +1,208 @@
+@page { margin: 0; }
+* { box-sizing: border-box; }
+:root { --paper: #FAF6EE; --ink: #141A33; --ink2: #4A4F66; --neel: #1F2A5C; --kesar: #E8A33D; --ktint: #FBEBCF; --zam: #17705A; --ztint: #DCEFE7; --line: #E2DCCD; --sh: #A8321F; }
+html, body { margin: 0; padding: 0; background: #888; }
+body { font-family: "Manrope", Arial, sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { position: relative; overflow: hidden; background: var(--paper); margin: 0 auto 10mm; display: flex; flex-direction: column; }
+.grid { position: absolute; inset: 0; background-image: radial-gradient(#E6DDC9 0.42mm, transparent 0.45mm); background-size: 7mm 7mm; opacity: .9; }
+.page > *:not(.grid) { position: relative; }
+.u { font-family: "Noto Sans Arabic", "Manrope", sans-serif; direction: rtl; }
+.nq { font-family: "Noto Nastaliq Urdu", "Noto Sans Arabic", "Manrope", serif; direction: rtl; font-weight: 700; }
+.gz { font-family: "Gulzar", serif; direction: rtl; }
+.mk { font-family: "Shantell Sans", cursive; }
+.lat { font-family: "Manrope", sans-serif; direction: ltr; }
+.en { font-family: "Manrope", sans-serif; direction: ltr; color: var(--ink2); }
+mark { color: inherit; background: linear-gradient(transparent 58%, rgba(232, 163, 61, .55) 58%, rgba(232, 163, 61, .55) 92%, transparent 92%); padding: 0 .05em; }
+.mark svg { width: 100%; height: 100%; display: block; }
+.num { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: var(--neel); color: var(--paper); font-family: "Manrope", sans-serif; font-weight: 800; flex: none; }
+.num.soon { background: var(--kesar); color: var(--ink); font-family: "Noto Sans Arabic", "Manrope", sans-serif; font-size: 70% !important; }
+
+/* call to action */
+.cta { display: flex; align-items: center; gap: 4mm; direction: rtl; }
+.cta .chat { color: var(--zam); flex: none; }
+.cta .chat svg { width: 100%; height: 100%; display: block; }
+.cta .lbl { display: block; font-weight: 700; }
+.cta b { font-family: "Manrope", sans-serif; font-weight: 800; direction: ltr; display: block; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.cta.dark { color: var(--paper); }
+.cta.dark .chat { color: #A7D47E; }
+.cta.big .chat { width: 22mm; height: 22mm; }
+.cta.big .lbl { font-size: 7mm; line-height: 1.5; }
+.cta.big b { font-size: 15mm; line-height: 1.05; }
+.cta:not(.big) .chat { width: 13mm; height: 13mm; }
+.cta:not(.big) .lbl { font-size: 4.2mm; line-height: 1.5; }
+.cta:not(.big) b { font-size: 9mm; line-height: 1.05; }
+
+/* phone */
+.phone { width: 300px; height: 624px; border-radius: 50px; background: #0E1226; padding: 10px; box-shadow: 0 0 0 2px #2A2F48 inset, 0 30px 60px rgba(20, 26, 51, .3); }
+.ps { width: 280px; height: 604px; border-radius: 40px; overflow: hidden; position: relative; }
+.lattice { background-color: #1F2A5C; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40'%3E%3Cpath transform='translate(6 6) scale(0.44)' d='M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z' fill='%232B3A80'/%3E%3Ccircle cx='20' cy='20' r='1.6' fill='%23E8A33D'/%3E%3C/svg%3E"); }
+.di { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); width: 92px; height: 27px; border-radius: 14px; background: #000; }
+.lk-time { position: absolute; left: 0; right: 0; top: 64px; text-align: center; color: #FAF6EE; font: 800 76px/1 "Manrope", sans-serif; letter-spacing: -2px; }
+.nt { position: absolute; left: 12px; right: 12px; top: 190px; background: rgba(250, 246, 238, .97); border-radius: 22px; padding: 11px 14px 12px; display: flex; flex-direction: column; gap: 2px; box-shadow: 0 8px 20px rgba(0, 0, 0, .2); }
+.nt .h { display: flex; align-items: center; gap: 6px; font: 800 12.5px "Manrope", sans-serif; color: #4A4F66; letter-spacing: .04em; }
+.nt .h em { margin-left: auto; font-style: normal; font-weight: 600; }
+.nt b { font: 800 17px/1.55 "Noto Sans Arabic", "Manrope", sans-serif; direction: rtl; text-align: right; }
+.nt span { font: 600 14.5px/1.55 "Noto Sans Arabic", "Manrope", sans-serif; color: #4A4F66; direction: rtl; text-align: right; }
+.la { position: absolute; left: 12px; right: 12px; top: 300px; background: #0E1226; color: #FAF6EE; border-radius: 26px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.la .r { display: flex; align-items: center; justify-content: space-between; }
+.la .m { font: 800 30px/1 "Manrope", sans-serif; color: #E8A33D; }
+.la .t { font: 700 15px/1.5 "Noto Sans Arabic", "Manrope", sans-serif; color: #C9CCE0; direction: rtl; }
+.la .bar { position: relative; height: 8px; border-radius: 4px; background: #2A2F48; }
+.la .bar i { position: absolute; top: 0; bottom: 0; right: 0; width: 14%; border-radius: 4px; background: #E8A33D; }
+.la .bar s { position: absolute; top: -5px; right: calc(14% - 9px); width: 18px; height: 18px; border-radius: 50%; background: #E8A33D; border: 3px solid #0E1226; }
+.dhead { position: absolute; left: 0; right: 0; top: 52px; padding: 0 18px; text-align: right; display: flex; flex-direction: column; }
+.dhead b { font: 800 22px/1.5 "Noto Sans Arabic", "Manrope", sans-serif; }
+.dhead span { font: 600 14px/1.5 "Noto Sans Arabic", "Manrope", sans-serif; color: #4A4F66; }
+.drow { position: relative; margin: 0 14px; display: flex; align-items: center; gap: 10px; direction: rtl; height: 54px; border-radius: 16px; padding: 0 14px; background: #fff; box-shadow: inset 0 0 0 1px #E2DCCD; }
+.drow + .drow, .drow + .dtap, .dtap + .drow { margin-top: 8px; }
+.ps > .drow:first-of-type { margin-top: 130px; }
+.drow i { width: 16px; height: 16px; border-radius: 50%; background: #17705A; flex: none; }
+.drow i.o { background: none; box-shadow: inset 0 0 0 3px #B9B2A2; }
+.drow b { font: 700 17px "Noto Sans Arabic", "Manrope", sans-serif; flex: 1; text-align: right; }
+.drow em { font: 700 14px "Manrope", sans-serif; font-style: normal; color: #4A4F66; }
+.drow.done { background: #DCEFE7; box-shadow: none; }
+.dtap { margin: 8px 14px 0; height: 112px; border-radius: 24px; background: #17705A; color: #fff; display: flex; align-items: center; gap: 16px; padding: 0 18px; direction: rtl; box-shadow: 0 7px 0 #0B4A3D; }
+.dtap .ic { width: 66px; height: 66px; border-radius: 18px; background: #fff; color: #17705A; display: flex; align-items: center; justify-content: center; font: 800 36px "Manrope", sans-serif; flex: none; }
+.dtap span:last-child { display: flex; flex-direction: column; }
+.dtap b { font: 800 27px/1.4 "Noto Sans Arabic", "Manrope", sans-serif; }
+.dtap small { font: 700 15px/1.4 "Noto Sans Arabic", "Manrope", sans-serif; opacity: .9; }
+
+/* ===== A3 school-gate poster ===== */
+.a3 { padding: 18mm 18mm 14mm; gap: 8mm; }
+.a3-top { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 4mm; }
+.a3 .mark { width: 98mm; height: 98mm; }
+.kicker { font-size: 7mm; font-weight: 700; color: var(--sh); display: block; }
+.a3-title h1 { margin: 2mm 0 0; font-size: 19mm; line-height: 1.75; }
+.a3-title .sub { margin: 0; font-size: 7.4mm; font-weight: 700; line-height: 1.7; color: var(--neel); }
+.a3-title .en { margin: 2mm auto 0; font-size: 5mm; line-height: 1.45; max-width: 220mm; }
+.a3-mid { display: flex; gap: 10mm; align-items: center; direction: rtl; flex: 1; }
+.steps { flex: 1; display: flex; flex-direction: column; gap: 6mm; }
+.step { display: flex; gap: 5mm; align-items: center; direction: rtl; }
+.step .num { width: 15mm; height: 15mm; font-size: 8mm; box-shadow: 0 0 0 1.4mm var(--ktint); }
+.step b { display: block; font-size: 7.4mm; line-height: 1.6; text-align: right; }
+.step .en { display: block; font-size: 4.2mm; line-height: 1.35; text-align: right; direction: ltr; }
+.note { background: var(--ktint); padding: 5mm 6mm; font-size: 5.6mm; line-height: 1.55; transform: rotate(-1.5deg); box-shadow: 0 2mm 5mm rgba(20, 26, 51, .12); direction: rtl; text-align: right; font-family: "Noto Sans Arabic", "Manrope", sans-serif; font-weight: 700; }
+.note .en { font-family: "Shantell Sans", cursive; font-size: 4.3mm; direction: ltr; display: block; text-align: left; }
+.phonewrap { position: relative; width: 300px; height: 624px; transform: scale(1.18); transform-origin: center; margin: 12mm 10mm; flex: none; }
+.phonewrap .routebg { position: absolute; left: -90px; top: -60px; width: 480px; height: 760px; }
+.phonewrap .phone { position: relative; }
+.offer { display: flex; align-items: center; justify-content: space-between; gap: 8mm; background: var(--neel); color: var(--paper); border-radius: 8mm; padding: 7mm 10mm; direction: rtl; }
+.offer > div:first-child { display: flex; flex-direction: column; }
+.offer > div:first-child b { font-size: 10mm; line-height: 1.6; color: var(--kesar); }
+.offer > div:first-child .en { color: #DCE0F0; font-size: 4.6mm; direction: ltr; text-align: right; }
+.foot { display: flex; align-items: baseline; justify-content: space-between; direction: rtl; }
+.foot .gz { font-size: 12mm; color: var(--neel); line-height: 1.5; }
+.foot .en { font-size: 4.6mm; }
+
+/* ===== A4 flyers and driver poster ===== */
+.a4 { padding: 13mm 13mm 9mm; gap: 6mm; }
+.fl-top { display: flex; align-items: center; gap: 6mm; direction: rtl; }
+.fl-top .mark.sm { width: 46mm; height: 46mm; flex: none; }
+.fl-top .kicker { font-size: 5mm; text-align: right; }
+.fl-top h1 { margin: 1mm 0 0; font-size: 11.5mm; line-height: 1.75; text-align: right; }
+.fl-top h1.lat { font-size: 12mm; line-height: 1.12; text-align: left; letter-spacing: -.02em; font-weight: 800; }
+.en-top { direction: ltr; justify-content: space-between; }
+.en-top .kicker { text-align: left; }
+.ba { display: grid; grid-template-columns: 1fr 1.25fr; gap: 5mm; direction: rtl; }
+.flyer.en .ba { direction: ltr; }
+.card { border-radius: 5mm; padding: 5mm 6mm; position: relative; }
+.card.before { background: #F3EDE1; box-shadow: inset 0 0 0 .4mm var(--line); }
+.card.after { background: #fff; box-shadow: 0 0 0 .6mm var(--zam) inset, 0 3mm 7mm rgba(20, 26, 51, .08); }
+.card .tag { display: inline-block; font: 700 4.4mm "Noto Sans Arabic", "Manrope", sans-serif; padding: .5mm 3.5mm; border-radius: 99px; background: var(--ink2); color: var(--paper); }
+.card.after .tag { background: var(--zam); }
+.card .tag.lat { font: 800 4mm "Manrope", sans-serif; padding: 1mm 3.5mm; }
+.card ul { margin: 3mm 0 0; padding: 0 5mm 0 0; font-size: 4.6mm; line-height: 1.75; font-weight: 600; }
+.card ul.lat { padding: 0 0 0 5mm; font-size: 4.3mm; line-height: 1.5; }
+.card.before ul { color: var(--ink2); }
+.card li::marker { color: var(--kesar); }
+.privacy { font-size: 4.2mm; line-height: 1.7; font-weight: 600; color: var(--neel); background: #E6E9F5; border-radius: 4mm; padding: 3mm 5mm; text-align: right; }
+.privacy.lat { text-align: left; line-height: 1.45; }
+.join h2 { margin: 0 0 2mm; font-size: 6.4mm; text-align: right; font-weight: 800; }
+.join h2.lat { text-align: left; letter-spacing: -.01em; }
+.jsteps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4mm; direction: rtl; }
+.jsteps.lat { direction: ltr; }
+.jsteps > div { background: #fff; border-radius: 4mm; padding: 4mm; font-size: 4.3mm; line-height: 1.65; font-weight: 700; display: flex; flex-direction: column; gap: 2mm; box-shadow: 0 0 0 .3mm var(--line) inset; text-align: right; }
+.jsteps.lat > div { text-align: left; line-height: 1.4; }
+.jsteps .num { width: 9mm; height: 9mm; font-size: 4.6mm; }
+.offer.slim { padding: 5mm 7mm; border-radius: 6mm; margin-top: auto; }
+.offer.slim > b { font-size: 7.4mm; line-height: 1.6; color: var(--kesar); }
+.offer.slim > b.lat { font-weight: 800; letter-spacing: -.01em; }
+.foot.sm .gz { font-size: 8mm; }
+.foot.sm .en { font-size: 3.8mm; }
+.drv { display: flex; gap: 4mm; align-items: center; direction: rtl; }
+.pts { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4mm; flex: 1; }
+.pts li { display: flex; gap: 4mm; align-items: flex-start; }
+.pts .num { width: 10mm; height: 10mm; font-size: 5mm; margin-top: 1mm; background: var(--zam); }
+.pts b { display: block; font-size: 5.2mm; line-height: 1.6; }
+.pts span { display: block; font-size: 4mm; line-height: 1.6; color: var(--ink2); font-weight: 600; }
+.phonewrap.d { transform: scale(.62); margin: -40mm -18mm -40mm -16mm; }
+.note2 { background: var(--ztint); padding: 4mm 5mm; font: 700 4.8mm/1.6 "Noto Sans Arabic", "Manrope", sans-serif; direction: rtl; text-align: right; transform: rotate(-1deg); box-shadow: 0 1.5mm 4mm rgba(20, 26, 51, .1); }
+.note2 .en { font-family: "Shantell Sans", cursive; font-size: 3.9mm; display: block; direction: ltr; text-align: left; }
+
+/* ===== wallet cards ===== */
+.cards { padding: 10mm; align-items: center; justify-content: center; background: #fff; }
+.cardgrid { display: grid; grid-template-columns: 85mm 85mm; grid-auto-rows: 55mm; gap: 0; outline: .2mm dashed #999; }
+.wcard { width: 85mm; height: 55mm; background: var(--neel); color: var(--paper); display: flex; direction: rtl; outline: .2mm dashed #fff; outline-offset: -.1mm; overflow: hidden; }
+.wl { width: 30mm; display: flex; align-items: center; justify-content: center; background: #18224C; }
+.mark.xs { width: 26mm; height: 34mm; }
+.wr { flex: 1; padding: 3.5mm 4mm; display: flex; flex-direction: column; gap: .8mm; }
+.wr > b { font-size: 4.2mm; color: var(--kesar); line-height: 1.6; }
+.wr ol { margin: 0; padding: 0 4mm 0 0; font-size: 3.1mm; line-height: 1.65; font-weight: 600; }
+.wr .wa { margin-top: auto; display: flex; align-items: center; gap: 1.5mm; direction: ltr; justify-content: flex-end; color: #A7D47E; }
+.wr .wa svg { width: 5mm; height: 5mm; }
+.wr .wa b { font-size: 4mm; color: var(--paper); font-family: "Manrope", sans-serif; }
+.cut { margin: 5mm 0 0; font-size: 3.4mm; color: #666; text-align: center; }
+
+/* ===== stickers ===== */
+.stickers { padding: 10mm; gap: 8mm; align-items: center; background: #fff; }
+.stk { background: var(--neel); color: var(--paper); border-radius: 6mm; display: flex; align-items: center; gap: 6mm; direction: rtl; outline: .25mm dashed #999; outline-offset: 2mm; }
+.stk.big { width: 190mm; height: 110mm; padding: 8mm 10mm; }
+.stk.big .mark { width: 72mm; height: 92mm; flex: none; }
+.stxt { display: flex; flex-direction: column; gap: 1.5mm; text-align: right; }
+.stk.big .stxt b { font-size: 12mm; line-height: 1.55; color: var(--kesar); }
+.stk.big .stxt span.u { font-size: 7mm; line-height: 1.6; font-weight: 700; }
+.stk.big .stxt span.lat { font-size: 4.4mm; color: #DCE0F0; }
+.stk .wa { display: flex; align-items: center; gap: 2.5mm; direction: ltr; justify-content: flex-end; color: #A7D47E; margin-top: 2mm; }
+.stk .wa svg { width: 10mm; height: 10mm; }
+.stk .wa b { font-family: "Manrope", sans-serif; font-weight: 800; font-size: 10mm; color: var(--paper); }
+.stkrow { display: flex; gap: 10mm; }
+.stk.small { width: 90mm; height: 60mm; padding: 5mm 6mm; }
+.stk.small .mark { width: 30mm; height: 42mm; flex: none; }
+.stk.small .stxt b { font-size: 8mm; line-height: 1.55; color: var(--kesar); }
+.stk.small .stxt span { font-size: 5mm; font-weight: 700; }
+.stk.light { background: var(--paper); color: var(--ink); }
+.stk.light .stxt b { color: var(--neel); }
+.stk.round { width: 60mm; height: 60mm; border-radius: 50%; justify-content: center; padding: 6mm; }
+.stk.round .mark { width: 42mm; height: 46mm; }
+.stk.round .lat-wrap { width: 46mm; }
+.stk.round .lat-wrap svg { width: 100%; height: auto; display: block; }
+
+/* fixes after first proof */
+.nt .h { direction: ltr; }
+.la .r { direction: ltr; }
+.la .t { direction: rtl; }
+.cta b, .wa b { white-space: nowrap; }
+.a3 { gap: 6mm; }
+.a3 .mark { width: 74mm; height: 74mm; }
+.a3-title h1 { font-size: 17mm; line-height: 1.7; }
+.phonewrap { transform: scale(1); margin: 4mm 6mm; }
+.phonewrap .routebg { left: -70px; top: -40px; width: 440px; height: 700px; }
+.pts .num.soon { background: var(--kesar); color: var(--ink); font-size: 3.4mm; }
+.pts .num svg { width: 5.5mm; height: 5.5mm; }
+.phonewrap.d { transform: scale(.74); margin: -26mm -10mm -26mm -12mm; }
+.stk .wa { flex-wrap: nowrap; }
+.stk.big .stxt { max-width: 100mm; }
+.stk.small .stxt span { white-space: nowrap; }
+.stk.light .stxt b { font-size: 6.6mm; }
+
+/* A3: logo beside the headline */
+.a3-top { flex-direction: row; direction: rtl; align-items: center; text-align: right; gap: 8mm; }
+.a3 .mark { width: 78mm; height: 92mm; flex: none; }
+.a3-title { flex: 1; }
+.a3-title h1 { font-size: 16mm; line-height: 1.85; margin: 0 0 3mm; }
+.a3-title .en { margin: 1mm 0 0; text-align: right; direction: ltr; }
+.a3-mid { flex: 0 0 auto; }
+.offer { margin-top: auto; }
+.dlist { position: absolute; top: 116px; left: 0; right: 0; }
+.dlist .drow:first-child { margin-top: 0; }
+.dtap b { font-size: 23px; white-space: nowrap; } .dtap small { font-size: 13px; }
