@@ -78,3 +78,13 @@ export function canUndoChutti(date: string, today: string, vanLeftToday: boolean
   if (date < today) return false;
   return !vanLeftToday;
 }
+
+/**
+ * The route-dots line for the Android ongoing notification and the Live Activity: dots done, the van as
+ * a star, and the stops still ahead of yours, ending at your stop. Five places in all.
+ */
+export function routeDotsLine(stopsAhead: number | null, slots = 5): string {
+  const ahead = Math.max(0, Math.min(slots - 2, stopsAhead ?? 0));
+  const done = slots - 2 - ahead;
+  return ['●'.repeat(done), '★', '○'.repeat(ahead), '◉'].join('');
+}

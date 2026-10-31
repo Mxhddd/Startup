@@ -179,5 +179,8 @@
   "parent.family.added": "Added",
   "parent.family.notFound": "No Pohnch account on that number. Ask them to open Pohnch and log in first.",
   "parent.family.full": "At most 3 more people",
-  "parent.menu": "Menu"
+  "parent.menu": "Menu",
+  "notify.channel.trip": "Trip alerts",
+  "notify.channel.live": "Van on the way",
+  "notify.live.body": "{dots}  ·  {van}"
 }

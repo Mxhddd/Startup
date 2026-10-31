@@ -131,3 +131,36 @@ describe('invite tokens', () => {
     expect(h).toBe('ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad');
   });
 });
+
+describe('pushes after steps', () => {
+  function withNotify(data: unknown) {
+    const s = setup({ data });
+    const notify = vi.fn(async () => undefined);
+    s.deps.notify = notify;
+    return { ...s, notify };
+  }
+
+  it("pushes a newly stored tap to the children's families", async () => {
+    const { post, notify } = withNotify(1);
+    await post('tap', { tripId: TRIP, step: 'picked', childIds: [VAN], clientId: CLIENT, happenedAt: '2026-11-02T02:12:00Z' });
+    expect(notify).toHaveBeenCalledWith({ tripId: TRIP, step: 'picked', children: [VAN] });
+  });
+
+  it('stays quiet for a tap the offline queue sent twice', async () => {
+    const { post, notify } = withNotify(0);
+    await post('tap', { tripId: TRIP, step: 'reached_school', clientId: CLIENT, happenedAt: '2026-11-02T02:40:00Z' });
+    expect(notify).not.toHaveBeenCalled();
+  });
+
+  it('tells every family when the morning trip starts', async () => {
+    const { post, notify } = withNotify(TRIP);
+    await post('trip.start', { vanId: VAN, kind: 'morning', clientId: CLIENT });
+    expect(notify).toHaveBeenCalledWith({ tripId: TRIP, step: 'left', children: null });
+  });
+
+  it('sends "at your door" for children whose stop the van reached', async () => {
+    const { post, notify } = withNotify([{ child_id: VAN }]);
+    await post('position', { tripId: TRIP, lat: 24.9, lng: 67.1, recordedAt: '2026-11-02T02:10:00Z' });
+    expect(notify).toHaveBeenCalledWith({ tripId: TRIP, step: 'arriving', children: [VAN] });
+  });
+});

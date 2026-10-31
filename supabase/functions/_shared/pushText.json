@@ -1,0 +1,30 @@
+{
+  "ur": {
+    "app.parent.name": "پہنچ",
+    "step.left": "وین نکل گئی",
+    "step.picked": "وین میں بیٹھ گئے",
+    "step.reachedSchool": "اسکول پہنچ گئے",
+    "step.leftSchool": "اسکول سے نکلے",
+    "step.dropped": "گھر اتار دیا",
+    "eta.door": "وین دروازے پر ہے",
+    "parent.late": "وین کو دیر ہو رہی ہے: {reason}",
+    "help.reason.traffic": "ٹریفک",
+    "help.reason.breakdown": "گاڑی خراب",
+    "help.reason.roadClosed": "سڑک بند",
+    "timeline.by": "{who} نے مارک کیا"
+  },
+  "en": {
+    "app.parent.name": "Pohnch",
+    "step.left": "Van left",
+    "step.picked": "In the van",
+    "step.reachedSchool": "Reached school",
+    "step.leftSchool": "Left school",
+    "step.dropped": "Dropped home",
+    "eta.door": "The van is at your door",
+    "parent.late": "The van is running late: {reason}",
+    "help.reason.traffic": "Traffic",
+    "help.reason.breakdown": "Breakdown",
+    "help.reason.roadClosed": "Road closed",
+    "timeline.by": "Marked by {who}"
+  }
+}

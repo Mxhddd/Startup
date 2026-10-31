@@ -66,3 +66,14 @@ describe('chutti undo', () => {
     expect(canUndoChutti('2026-11-02', '2026-11-02', true)).toBe(false);
   });
 });
+
+import { routeDotsLine } from './index';
+describe('route dots line', () => {
+  it('shows the van as a star moving towards your stop', () => {
+    expect(routeDotsLine(3)).toBe('★○○○◉');
+    expect(routeDotsLine(1)).toBe('●●★○◉');
+    expect(routeDotsLine(0)).toBe('●●●★◉');
+    expect(routeDotsLine(9)).toBe('★○○○◉');
+    expect(routeDotsLine(null)).toBe('●●●★◉');
+  });
+});

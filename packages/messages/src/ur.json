@@ -179,5 +179,8 @@
   "parent.family.added": "شامل کر دیا گیا",
   "parent.family.notFound": "اس نمبر پر پہنچ کا اکاؤنٹ نہیں۔ پہلے وہ پہنچ کھول کر لاگ ان کریں۔",
   "parent.family.full": "زیادہ سے زیادہ 3 اور لوگ",
-  "parent.menu": "مینو"
+  "parent.menu": "مینو",
+  "notify.channel.trip": "سفر کی اطلاعات",
+  "notify.channel.live": "وین راستے میں",
+  "notify.live.body": "{dots}  ·  {van}"
 }

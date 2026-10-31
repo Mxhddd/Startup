@@ -96,3 +96,26 @@ Location (`apps/driver/src/location/tripLocation.ts`): starts with a trip, stops
 How the van moves on a parent's map: the driver app sends a position -> Supabase Realtime tells the parent app something changed -> it re-reads the van's latest position (row-level security decides whether it may) -> `useGlide` slides the marker there over a second. Minutes come from `etaMinutes` in `@pohnch/core`: distance, the van's recent speed, Karachi road detours, and how many stops are still ahead (`stops_ahead` returns only a number).
 
 Browser preview with made-up data: the parent screens can be checked without a server by answering the app's Supabase requests in Playwright (see how B5 was checked in the commit history).
+
+## Alerts and the lock screen (B6)
+
+How a push travels: the driver taps -> the `app` Edge Function stores the step -> if it is new (not a resend from the offline queue) it asks the database who should hear (`push_recipients`: that child's family for "in the van", "dropped" and "at your door"; every family on the van for "left", "reached school" and "late", except children on chutti; nothing for practice trips) -> builds one message per phone in that phone's language (`supabase/functions/_shared/push.ts`) -> sends it through Expo's push service -> forgets phones that no longer exist. Logs carry counts only.
+
+The words come from `packages/messages`. After changing any `step.*`, `eta.door`, `parent.late`, `help.reason.*` or `timeline.by` text, run `node scripts/gen-push-text.mjs` (a test fails until you do).
+
+In the parent app (`apps/parent/src/notifications/`, `src/widgets/`):
+- After login it asks permission and registers the phone (`register_push_token`).
+- Android: a quiet ongoing notification during a live trip ("6 منٹ میں گھر", then the route dots), updated in place and removed when the child is in or the trip ends.
+- iPhone: a Live Activity and Dynamic Island with the same minutes and dots, and a home-screen / lock-screen widget with the live minutes or the next trip. These need a development build (not Expo Go) and are made by `expo-widgets` at build time.
+
+### Setting push up (once the accounts exist)
+
+1. Expo: create an access token (expo.dev > Account settings > Access tokens) and `supabase secrets set EXPO_ACCESS_TOKEN=...`.
+2. Android: in Firebase, create a project for `pk.pohnch.parent`, then upload its FCM V1 service-account key with `pnpm dlx eas-cli credentials` (Android > push notifications).
+3. iPhone (needs the Apple Developer account): `pnpm dlx eas-cli credentials` creates the push key; EAS also sets up the App Group (`group.pk.pohnch.parent`) the widget shares with the app.
+4. Build a development build with `eas build --profile development` and allow notifications when the app asks.
+
+### Known limits (stage 1)
+
+- The Android ongoing notification and the Live Activity are updated by the parent app while it runs in the background; if the phone stops the app, step pushes still arrive but the minutes stop updating. B8 measures this on real phones; updating the Live Activity from the server by push (APNs) is ready in `expo-widgets` if needed.
+- The iPhone map, widget and Live Activity use Apple's star symbol in kesar, not our eight-point star (widgets can't load our SVG yet).

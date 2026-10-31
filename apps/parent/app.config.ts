@@ -14,6 +14,7 @@ const config: ExpoConfig = {
     supportsTablet: false,
     // Driver invite links (pohnch.pk/i/...) open the app. The website serves the matching file in B7.
     associatedDomains: ['applinks:pohnch.pk'],
+    infoPlist: { NSSupportsLiveActivities: true },
   },
   android: {
     package: 'pk.pohnch.parent',
@@ -40,6 +41,23 @@ const config: ExpoConfig = {
   plugins: [
     'expo-router',
     'expo-font',
+    ['expo-notifications', { color: '#1F2A5C', defaultChannel: 'trip', icon: './assets/android-icon-monochrome.png' }],
+    // iPhone: the trip's Live Activity (src/widgets/VanActivity.tsx) and the home-screen widget.
+    [
+      'expo-widgets',
+      {
+        bundleIdentifier: 'pk.pohnch.parent.widgets',
+        groupIdentifier: 'group.pk.pohnch.parent',
+        widgets: [
+          {
+            name: 'NextTripWidget',
+            displayName: 'Pohnch',
+            description: 'Your van at a glance · وین ایک نظر میں',
+            ios: { supportedFamilies: ['systemSmall', 'accessoryRectangular'], initialLayout: 'src/widgets/NextTripWidget.tsx' },
+          },
+        ],
+      },
+    ],
     ['expo-splash-screen', { backgroundColor: '#1F2A5C', image: './assets/splash-icon.png', imageWidth: 180 }],
   ],
   experiments: { typedRoutes: true },

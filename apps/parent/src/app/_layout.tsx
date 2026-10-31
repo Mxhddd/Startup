@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ParentProvider } from '../state/ParentStore';
+import { TripNotifications } from '../notifications/TripNotifications';
 import { rememberInvite, takeInvite } from '../state/pendingInvite';
 
 SplashScreen.preventAutoHideAsync();
@@ -61,6 +62,7 @@ export default function RootLayout() {
           <StatusBar style="dark" />
           <ParentProvider key={session?.user.id ?? 'out'} enabled={configured && !!session}>
             <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ghee } }} />
+            <TripNotifications signedIn={configured && !!session} />
           </ParentProvider>
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
         </LangProvider>

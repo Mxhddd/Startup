@@ -5,6 +5,7 @@
 // Logs say only which action ran and how it ended: never tokens, phone numbers or children's names.
 import { BadInput, bool, date, isoTime, num, oneOf, optionalUuid, phone, uuid, uuids } from './validate.ts';
 import { byteaHex, hashToken, isInviteToken, newInviteToken } from './tokens.ts';
+import type { NotifyJob } from './notify.ts';
 
 export type Deps = {
   /** Returns the user id for a valid login token, or null. */
@@ -14,6 +15,8 @@ export type Deps = {
   siteUrl: string;
   log: (line: string) => void;
   newToken?: () => string;
+  /** Sends the pushes for a stored step (notify.ts). Optional so tests can leave it out. */
+  notify?: (job: NotifyJob) => Promise<void>;
 };
 
 type Body = Record<string, unknown>;
@@ -50,12 +53,16 @@ async function inviteLink(deps: Deps, make: (hashHex: string) => Promise<unknown
 }
 
 export const actions: Record<string, Action> = {
-  'trip.start': async ({ actor, body, deps }) => ({
-    tripId: await call(deps, 'start_trip', {
-      p_actor: actor, p_van: uuid(body, 'vanId'), p_kind: oneOf(body, 'kind', ['morning', 'afternoon'] as const),
+  'trip.start': async ({ actor, body, deps }) => {
+    const kind = oneOf(body, 'kind', ['morning', 'afternoon'] as const);
+    const tripId = (await call(deps, 'start_trip', {
+      p_actor: actor, p_van: uuid(body, 'vanId'), p_kind: kind,
       p_client_id: uuid(body, 'clientId'), p_practice: bool(body, 'practice', false),
-    }),
-  }),
+    })) as string;
+    // "The van has left" / "left school" for every family on the van (none for practice trips).
+    await deps.notify?.({ tripId, step: kind === 'morning' ? 'left' : 'left_school', children: null });
+    return { tripId };
+  },
   'trip.end': async ({ actor, body, deps }) => {
     await call(deps, 'end_trip', { p_actor: actor, p_trip: uuid(body, 'tripId') });
     return { ok: true };
@@ -63,28 +70,35 @@ export const actions: Record<string, Action> = {
   tap: async ({ actor, body, deps }) => {
     const step = oneOf(body, 'step', STEPS);
     const children = CHILD_STEPS.includes(step) ? uuids(body, 'childIds') : null;
-    return {
-      stored: await call(deps, 'record_tap', {
-        p_actor: actor, p_trip: uuid(body, 'tripId'), p_step: step, p_children: children,
-        p_client_id: uuid(body, 'clientId'), p_happened_at: isoTime(body, 'happenedAt'),
-      }),
-    };
+    const tripId = uuid(body, 'tripId');
+    const stored = (await call(deps, 'record_tap', {
+      p_actor: actor, p_trip: tripId, p_step: step, p_children: children,
+      p_client_id: uuid(body, 'clientId'), p_happened_at: isoTime(body, 'happenedAt'),
+    })) as number;
+    // Only a newly stored step sends a push: a tap resent by the offline queue stays quiet.
+    if (stored > 0) await deps.notify?.({ tripId, step, children });
+    return { stored };
   },
   'tap.undo': async ({ actor, body, deps }) => ({ undone: await call(deps, 'undo_tap', { p_actor: actor, p_client_id: uuid(body, 'clientId') }) }),
-  late: async ({ actor, body, deps }) => ({
-    stored: await call(deps, 'report_late', {
-      p_actor: actor, p_trip: uuid(body, 'tripId'), p_reason: oneOf(body, 'reason', ['traffic', 'breakdown', 'roadClosed'] as const), p_client_id: uuid(body, 'clientId'),
-    }),
-  }),
+  late: async ({ actor, body, deps }) => {
+    const tripId = uuid(body, 'tripId');
+    const reason = oneOf(body, 'reason', ['traffic', 'breakdown', 'roadClosed'] as const);
+    const stored = (await call(deps, 'report_late', { p_actor: actor, p_trip: tripId, p_reason: reason, p_client_id: uuid(body, 'clientId') })) as number;
+    if (stored > 0) await deps.notify?.({ tripId, step: 'late', children: null, reason });
+    return { stored };
+  },
   position: async ({ actor, body, deps }) => {
+    const tripId = uuid(body, 'tripId');
     const rows = (await call(deps, 'record_position', {
-      p_actor: actor, p_trip: uuid(body, 'tripId'),
+      p_actor: actor, p_trip: tripId,
       p_lat: num(body, 'lat', -90, 90), p_lng: num(body, 'lng', -180, 180),
       p_heading: num(body, 'heading', 0, 360, true), p_speed: num(body, 'speed', 0, 80, true),
       p_recorded_at: isoTime(body, 'recordedAt'),
     })) as { child_id: string }[] | null;
-    // B6 sends the "arriving" pushes for these children.
-    return { arriving: (rows ?? []).map((r) => r.child_id) };
+    const arriving = (rows ?? []).map((r) => r.child_id);
+    // "The van is at your door" for the families whose stop the van just reached.
+    if (arriving.length) await deps.notify?.({ tripId, step: 'arriving', children: arriving });
+    return { arriving };
   },
   'invite.van': async ({ actor, body, deps }) => {
     const van = uuid(body, 'vanId');
