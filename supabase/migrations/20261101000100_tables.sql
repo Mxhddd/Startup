@@ -5,6 +5,7 @@
 
 create extension if not exists postgis with schema extensions;
 create extension if not exists pgcrypto with schema extensions;
+create extension if not exists "uuid-ossp" with schema extensions;
 
 create type public.trip_kind as enum ('morning', 'afternoon');
 create type public.trip_status as enum ('running', 'ended', 'cancelled');
@@ -127,6 +128,7 @@ create table public.trip_events (
   step public.trip_step not null,
   reason text check (reason in ('traffic', 'breakdown', 'roadClosed')),
   client_id uuid not null unique,
+  tap_id uuid, -- the phone's id for the whole tap (siblings share it); undo uses it
   created_by uuid references public.profiles (id), -- null when automatic ("arriving")
   happened_at timestamptz not null,                 -- when it happened on the phone (may be queued offline)
   created_at timestamptz not null default now(),

@@ -1,0 +1,36 @@
+# Settings for running Supabase on your laptop (`supabase start`, needs Docker). The online project's
+# settings are made in the Supabase dashboard; docs/DEV.md lists them.
+project_id = "pohnch"
+
+[api]
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+
+[auth]
+site_url = "https://pohnch.pk"
+enable_signup = true
+jwt_expiry = 3600
+
+[auth.sms]
+enable_signup = true
+enable_confirmations = true
+max_frequency = "30s"
+
+# Pretend numbers for trying login on your laptop without an SMS gateway: type the number, then the code.
+[auth.sms.test_otp]
+923000000001 = "123456"
+923000000002 = "123456"
+923000000003 = "123456"
+
+# The real SMS gateway goes through our send-sms Edge Function (switched on in the online project).
+[auth.hook.send_sms]
+enabled = false
+uri = "http://host.docker.internal:54321/functions/v1/send-sms"
+secrets = "env(SEND_SMS_HOOK_SECRET)"
+
+[functions.app]
+verify_jwt = true
+
+# Supabase signs hook calls itself; the function checks that signature.
+[functions.send-sms]
+verify_jwt = false

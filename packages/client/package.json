@@ -1,0 +1,23 @@
+{
+  "name": "@pohnch/client",
+  "version": "0.0.0",
+  "private": true,
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@pohnch/core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@supabase/supabase-js": "*",
+    "expo-secure-store": "*",
+    "react": "*",
+    "react-native": "*"
+  },
+  "devDependencies": {
+    "vitest": "^5.0.5"
+  }
+}

@@ -19,3 +19,4 @@ export { ApprovalCard } from './native/ApprovalCard';
 export { InviteCard } from './native/InviteCard';
 export { MapSheet } from './native/MapSheet';
 export { ComponentGallery } from './native/ComponentGallery';
+export { PhoneLogin, LoginInputError, type LoginError, type PhoneLoginProps } from './native/PhoneLogin';

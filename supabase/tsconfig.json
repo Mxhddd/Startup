@@ -1,0 +1,5 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": { "allowImportingTsExtensions": true, "lib": ["ES2022", "DOM"] },
+  "include": ["functions/_shared"]
+}

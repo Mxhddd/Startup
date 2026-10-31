@@ -16,6 +16,13 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
+      - name: Start Postgres with PostGIS and pgTAP for the database tests
+        run: |
+          sudo apt-get update -q
+          sudo apt-get install -y -q postgresql-16-postgis-3 postgresql-16-pgtap
+          sudo -u postgres /usr/lib/postgresql/16/bin/initdb -D /tmp/pg -A trust -U postgres
+          sudo -u postgres /usr/lib/postgresql/16/bin/pg_ctl -D /tmp/pg -o "-p 54329 -k /tmp" -l /tmp/pg.log start
+      - run: pnpm test:db
       - run: pnpm build:web
       - run: pnpm --filter @pohnch/web exec playwright install --with-deps chromium
       - run: pnpm test:web

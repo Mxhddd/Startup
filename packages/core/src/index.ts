@@ -5,3 +5,6 @@ export { STALE_AFTER_S, signalState, ageParts, type Signal } from './signal';
 export { splitRuns, isolateLtr, LRI, PDI, type Run } from './bidi';
 export { lerp, lerpLatLng, bearing, headingDelta, type LatLng } from './motion';
 export { createHold, createUndoCountdown } from './controllers';
+export { normalisePkMobile, displayPkMobile } from './phone';
+export { ApiError, createAppApi, type AppApi } from './api';
+export { chunkedStorage, type KeyStore } from './chunkedStorage';
