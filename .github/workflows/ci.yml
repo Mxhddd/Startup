@@ -6,19 +6,6 @@ on:
 jobs:
   check:
     runs-on: ubuntu-latest
-    # Postgres 16 with PostGIS for the database tests (pgTAP is added in a step below).
-    services:
-      postgres:
-        image: postgis/postgis:16-3.5
-        env:
-          POSTGRES_HOST_AUTH_METHOD: trust
-        ports:
-          - 54329:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 20
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
@@ -29,10 +16,16 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm typecheck
       - run: pnpm test
-      - name: Add pgTAP to the database and psql to the runner
+      - name: Start Postgres with PostGIS and pgTAP for the database tests
+        # Uses whichever Postgres version this Ubuntu ships with pgTAP, so it keeps working when GitHub
+        # moves to a newer Ubuntu. (Locally the tests run on Postgres 16; the migrations are the same.)
         run: |
-          docker exec ${{ job.services.postgres.id }} sh -c "apt-get update -q && apt-get install -y -q postgresql-16-pgtap"
-          command -v psql || (sudo apt-get update -q && sudo apt-get install -y -q postgresql-client)
+          sudo apt-get update -q
+          PGV=$(apt-cache search --names-only '^postgresql-[0-9]+-pgtap$' | sed -E 's/^postgresql-([0-9]+)-pgtap.*/\1/' | sort -n | tail -1)
+          echo "Using Postgres $PGV"
+          sudo apt-get install -y -q "postgresql-$PGV" "postgresql-$PGV-postgis-3" "postgresql-$PGV-pgtap"
+          sudo -u postgres "/usr/lib/postgresql/$PGV/bin/initdb" -D /tmp/pg -A trust -U postgres
+          sudo -u postgres "/usr/lib/postgresql/$PGV/bin/pg_ctl" -D /tmp/pg -o "-p 54329 -k /tmp" -l /tmp/pg.log -w start
       - run: pnpm test:db
         env:
           DATABASE_URL: postgres://postgres@localhost:54329/postgres
