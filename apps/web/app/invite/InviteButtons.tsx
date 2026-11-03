@@ -8,8 +8,8 @@ import { useEffect, useState } from 'react';
 
 const PLAY_URL = 'https://play.google.com/store/apps/details?id=pk.pohnch.parent';
 
-const button = (bg: string, fg: string) =>
-  ({ display: 'block', textAlign: 'center', background: bg, color: fg, fontWeight: 700, fontSize: 18, padding: '16px 20px', borderRadius: 14, textDecoration: 'none' }) as const;
+const button = (bg: string, fg: string, lip?: string) =>
+  ({ display: 'block', textAlign: 'center', background: bg, color: fg, fontWeight: 700, fontSize: 18, padding: '18px 20px', borderRadius: 18, textDecoration: 'none', boxShadow: lip ? `0 4px 0 ${lip}` : `inset 0 0 0 2px ${colors.line}` }) as const;
 
 export function InviteButtons() {
   const [token, setToken] = useState<string | null | undefined>(undefined);
@@ -29,16 +29,16 @@ export function InviteButtons() {
   }
   return (
     <div style={{ display: 'grid', gap: 12 }}>
-      <a data-testid="open-parent" href={`pohnch://i/${token}`} style={button(colors.neel, colors.ghee)}>
-        {t('ur', 'web.invite.openParent')} · <span style={{ fontFamily: 'var(--font-latin), sans-serif' }}>{t('en', 'web.invite.openParent')}</span>
+      <a className="pohnch-btn" data-testid="open-parent" href={`pohnch://i/${token}`} style={button(colors.neel, colors.ghee, colors.neelDeep)}>
+        <span lang="ur" dir="rtl" style={{ display: 'block' }}>{t('ur', 'web.invite.openParent')}</span><span lang="en" dir="ltr" style={{ display: 'block', fontFamily: 'var(--font-latin), sans-serif', fontSize: 15, opacity: 0.85 }}>{t('en', 'web.invite.openParent')}</span>
       </a>
-      <a data-testid="open-driver" href={`pohnch-driver://i/${token}`} style={button(colors.white, colors.siyahi)}>
-        {t('ur', 'web.invite.openDriver')} · <span style={{ fontFamily: 'var(--font-latin), sans-serif' }}>{t('en', 'web.invite.openDriver')}</span>
+      <a className="pohnch-btn" data-testid="open-driver" href={`pohnch-driver://i/${token}`} style={button(colors.white, colors.siyahi)}>
+        <span lang="ur" dir="rtl" style={{ display: 'block' }}>{t('ur', 'web.invite.openDriver')}</span><span lang="en" dir="ltr" style={{ display: 'block', fontFamily: 'var(--font-latin), sans-serif', fontSize: 15, opacity: 0.85 }}>{t('en', 'web.invite.openDriver')}</span>
       </a>
-      <p style={{ margin: '12px 0 0', fontWeight: 700 }}>{t('ur', 'web.invite.noApp')} · {t('en', 'web.invite.noApp')}</p>
-      <a href={PLAY_URL} rel="noreferrer" style={button(colors.zamurrad, colors.white)}>{t('ur', 'web.invite.android')} · {t('en', 'web.invite.android')}</a>
-      <a href={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} rel="noreferrer" style={button(colors.kesarTint, colors.siyahi)}>{t('ur', 'web.invite.iphone')} · {t('en', 'web.invite.iphone')}</a>
-      <p style={{ margin: '8px 0 0', fontSize: 15, color: colors.ink2 }}>{t('ur', 'web.invite.private')} · {t('en', 'web.invite.private')}</p>
+      <p style={{ margin: '14px 0 0', fontWeight: 700, textAlign: 'center' }}>{t('ur', 'web.invite.noApp')} · {t('en', 'web.invite.noApp')}</p>
+      <a className="pohnch-btn" href={PLAY_URL} rel="noreferrer" style={button(colors.zamurrad, colors.white, colors.zamurradDeep)}><span lang="ur" dir="rtl" style={{ display: 'block' }}>{t('ur', 'web.invite.android')}</span><span lang="en" dir="ltr" style={{ display: 'block', fontFamily: 'var(--font-latin), sans-serif', fontSize: 15, opacity: 0.85 }}>{t('en', 'web.invite.android')}</span></a>
+      <a className="pohnch-btn" href={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} rel="noreferrer" style={button(colors.kesarTint, colors.siyahi)}><span lang="ur" dir="rtl" style={{ display: 'block' }}>{t('ur', 'web.invite.iphone')}</span><span lang="en" dir="ltr" style={{ display: 'block', fontFamily: 'var(--font-latin), sans-serif', fontSize: 15, opacity: 0.85 }}>{t('en', 'web.invite.iphone')}</span></a>
+      <p style={{ margin: '10px 0 0', fontSize: 15, color: colors.ink2, textAlign: 'center' }}>{t('ur', 'web.invite.private')} · {t('en', 'web.invite.private')}</p>
     </div>
   );
 }

@@ -439,5 +439,8 @@
   "driver.done.back": "Back to today",
   "driver.stops.reorder": "Change order",
   "driver.stops.reorderDone": "Done",
-  "driver.stops.dragHint": "Press and hold a stop, then drag it to its place."
+  "driver.stops.dragHint": "Press and hold a stop, then drag it to its place.",
+  "web.map.van": "Your van",
+  "web.how.lead": "Three steps, no phone calls.",
+  "web.drivers.cta": "Drivers: message us"
 }

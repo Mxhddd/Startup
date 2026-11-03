@@ -4,7 +4,7 @@
 // this page isn't seen at all.
 import type { Metadata } from 'next';
 import { t } from '@pohnch/messages';
-import { colors } from '@pohnch/ui/theme';
+import { colors, shadow } from '@pohnch/ui/theme';
 import { InviteButtons } from './InviteButtons';
 
 export const metadata: Metadata = {
@@ -16,17 +16,29 @@ export const metadata: Metadata = {
 export default function Invite() {
   return (
     <main style={{ minHeight: '100vh', background: colors.ghee, color: colors.siyahi, fontFamily: 'var(--font-urdu), var(--font-latin), sans-serif' }}>
-      <div style={{ maxWidth: 560, margin: '0 auto', padding: '32px 16px 48px', display: 'grid', gap: 24 }}>
-        <img src="/pohnch-lockup.svg" alt="Pohnch" width={220} height={63} style={{ height: 'auto', justifySelf: 'center' }} />
-        <section lang="ur" dir="rtl" style={{ display: 'grid', gap: 8, lineHeight: 1.8 }}>
-          <h1 style={{ fontSize: 28, margin: 0 }}>{t('ur', 'web.invite.title')}</h1>
-          <p style={{ margin: 0, fontSize: 18, color: colors.ink2 }}>{t('ur', 'web.invite.body')}</p>
-        </section>
-        <section lang="en" dir="ltr" style={{ display: 'grid', gap: 6, lineHeight: 1.5, fontFamily: 'var(--font-latin), sans-serif' }}>
-          <h2 style={{ fontSize: 22, margin: 0 }}>{t('en', 'web.invite.title')}</h2>
-          <p style={{ margin: 0, fontSize: 17, color: colors.ink2 }}>{t('en', 'web.invite.body')}</p>
-        </section>
-        <InviteButtons />
+      <div style={{ maxWidth: 520, margin: '0 auto', padding: '28px 16px 48px', display: 'grid', gap: 20 }}>
+        <img src="/pohnch-lockup.svg" alt="Pohnch" width={180} height={51} style={{ height: 'auto', justifySelf: 'center' }} />
+        {/* The invitation itself, as one card: a neel top with the headline, then the buttons. */}
+        <article className="pohnch-rise" style={{ background: colors.white, borderRadius: 32, overflow: 'hidden', boxShadow: shadow.raised }}>
+          <header style={{ background: colors.neel, backgroundImage: `linear-gradient(160deg, ${colors.neelRaised}, ${colors.neel})`, color: colors.ghee, padding: '28px 24px 26px', display: 'grid', gap: 14 }}>
+            <svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" style={{ justifySelf: 'center' }}>
+              <rect x="5" y="5" width="14" height="14" fill={colors.kesar} />
+              <rect x="5" y="5" width="14" height="14" fill={colors.kesar} transform="rotate(45 12 12)" />
+              <circle cx="12" cy="12" r="3.4" fill={colors.neel} />
+            </svg>
+            <section lang="ur" dir="rtl" style={{ display: 'grid', gap: 6, lineHeight: 1.8, textAlign: 'center' }}>
+              <h1 style={{ fontSize: 34, margin: 0, fontFamily: 'var(--font-display), var(--font-urdu), serif', fontWeight: 400, lineHeight: 1.7 }}>{t('ur', 'web.invite.title')}</h1>
+              <p style={{ margin: 0, fontSize: 18, color: colors.mutedOnDark }}>{t('ur', 'web.invite.body')}</p>
+            </section>
+            <section lang="en" dir="ltr" style={{ display: 'grid', gap: 4, lineHeight: 1.5, fontFamily: 'var(--font-latin), sans-serif', textAlign: 'center', paddingTop: 12, borderTop: '1px solid rgba(250,246,238,.16)' }}>
+              <h2 style={{ fontSize: 20, margin: 0 }}>{t('en', 'web.invite.title')}</h2>
+              <p style={{ margin: 0, fontSize: 16, color: colors.mutedOnDark }}>{t('en', 'web.invite.body')}</p>
+            </section>
+          </header>
+          <div style={{ padding: 20 }}>
+            <InviteButtons />
+          </div>
+        </article>
       </div>
     </main>
   );

@@ -285,3 +285,10 @@ Live: migration `20261103000400_pilot_gaps.sql` is applied and the `app` functio
 | Accessibility | `AppText`, `TextField`, `theme.test.ts` | Text follows the phone's size up to 130%. Reanimated's animations follow the phone's Reduce Motion setting by default (they jump to the end). Contrast tests now cover every text-on-ground pair used. |
 
 Not done in this phase: true shared-element transitions (still experimental in Reanimated 4); the child's page instead opens with the same kesar initial growing in.
+
+## v8 phase D: the website in the same language (3 November 2026)
+
+- **Landing** (`apps/web/app/Landing.tsx`, `LivingMap.tsx`): the headline in Gulzar beside a living map: the route's dashes flow toward a home pin while the drawn van drives it (pure SVG `animateMotion` and CSS, no JavaScript); a frosted "6 min" card. Three steps joined by route dots, and a neel band for drivers and the privacy promise.
+- **Invite** (`apps/web/app/invite`): one card: a neel top with the star and the invitation in Urdu (Gulzar) and English, then the buttons, each with its Urdu line over its English line. The token rules are unchanged (read in the browser only, no referrer).
+- **Admin** (`apps/web/app/admin/AdminApp.tsx`): the driver app's neel header, borderless cards with soft shadows, big neel numbers.
+- **Motion and access** (`apps/web/app/globals.css`): gentle rise-in, button press, focus ring in kesar; everything stops for people who ask for reduced motion (the van parks).

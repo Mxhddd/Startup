@@ -1,6 +1,6 @@
 // The frame around every public page: logo, language switch, and the footer.
 import { dirOf, t, otherLang, type Lang } from '@pohnch/messages';
-import { colors } from '@pohnch/ui/theme';
+import { colors, shadow } from '@pohnch/ui/theme';
 import type { ReactNode } from 'react';
 
 export function Shell({ lang, children, otherHref }: { lang: Lang; children: ReactNode; otherHref: string }) {
@@ -17,12 +17,12 @@ export function Shell({ lang, children, otherHref }: { lang: Lang; children: Rea
         lineHeight: lang === 'ur' ? 1.8 : 1.5,
       }}
     >
-      <div style={{ maxWidth: 960, margin: '0 auto', padding: '24px 16px 48px' }}>
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 16px 48px' }}>
         <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 16 }}>
           <a href={lang === 'ur' ? '/' : '/en'} aria-label={t(lang, 'app.parent.name')}>
-            <img src="/pohnch-lockup.svg" alt={t(lang, 'app.parent.name')} width={200} height={57} style={{ height: 'auto', display: 'block' }} />
+            <img src="/pohnch-lockup.svg" alt={t(lang, 'app.parent.name')} width={170} height={48} style={{ height: 'auto', display: 'block' }} />
           </a>
-          <a href={otherHref} hrefLang={other} style={{ color: colors.neel, fontWeight: 700, fontSize: 16, padding: '10px 16px', border: `1px solid ${colors.line}`, borderRadius: 999, textDecoration: 'none', background: colors.white }}>
+          <a className="pohnch-btn" href={otherHref} hrefLang={other} style={{ color: colors.neel, fontWeight: 700, fontSize: 16, padding: '10px 18px', borderRadius: 999, textDecoration: 'none', background: colors.white, boxShadow: shadow.card }}>
             {t(lang, 'lang.switch')}
           </a>
         </header>

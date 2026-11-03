@@ -3,7 +3,7 @@
 // check queue, all vans (switch off / on) and today's trips. Refreshes every 30 seconds.
 import { ageParts, createAppApi, displayPkMobile, normalisePkMobile } from '@pohnch/core';
 import { dirOf, t as tr, type Lang, type MessageKey, type Vars } from '@pohnch/messages';
-import { colors } from '@pohnch/ui/theme';
+import { colors, shadow } from '@pohnch/ui/theme';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 
@@ -11,8 +11,9 @@ type Stats = { days: number; trips: number; tripsTracked: number; familiesActive
 type VanRow = { van_id: string; van_name: string; school_name: string; plate: string | null; driver_name: string; driver_phone: string | null; verified_at: string | null; switched_off_at: string | null; riders: number; waiting: number };
 type TripRow = { trip_id: string; van_name: string; driver_name: string; kind: 'morning' | 'afternoon'; status: 'running' | 'ended' | 'cancelled'; started_at: string; last_position_at: string | null; riders: number; done: number };
 
-const card: CSSProperties = { background: colors.white, border: `1px solid ${colors.line}`, borderRadius: 16, padding: 16 };
-const btn = (bg: string, fg: string): CSSProperties => ({ background: bg, color: fg, border: 'none', borderRadius: 12, padding: '12px 16px', fontWeight: 700, fontSize: 16, cursor: 'pointer', minHeight: 44 });
+// v8: the apps' surfaces: white cards with a soft shadow and continuous corners, no borders.
+const card: CSSProperties = { background: colors.white, borderRadius: 22, padding: 18, boxShadow: shadow.card };
+const btn = (bg: string, fg: string): CSSProperties => ({ background: bg, color: fg, border: 'none', borderRadius: 14, padding: '12px 18px', fontWeight: 700, fontSize: 16, cursor: 'pointer', minHeight: 44, boxShadow: bg === colors.white ? shadow.card : 'none', fontFamily: 'inherit' });
 const pct = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 100) : 0);
 
 export function AdminApp({ url, anonKey }: { url: string; anonKey: string }) {
@@ -30,14 +31,24 @@ export function AdminApp({ url, anonKey }: { url: string; anonKey: string }) {
 
   return (
     <main lang={lang} dir={dirOf(lang)} style={{ minHeight: '100vh', background: colors.ghee, color: colors.siyahi, fontFamily: lang === 'ur' ? 'var(--font-urdu), var(--font-latin), sans-serif' : 'var(--font-latin), sans-serif', lineHeight: lang === 'ur' ? 1.7 : 1.45 }}>
-      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '20px 16px 48px', display: 'grid', gap: 20 }}>
-        <header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-          <h1 style={{ margin: 0, fontSize: 28 }}>{t('admin.title')}</h1>
-          <div style={{ display: 'flex', gap: 8 }}>
-            <button type="button" style={btn(colors.white, colors.neel)} onClick={() => setLang(lang === 'ur' ? 'en' : 'ur')}>{t('lang.switch')}</button>
-            {session ? <button type="button" style={btn(colors.white, colors.siyahi)} onClick={() => supabase?.auth.signOut()}>{t('admin.signOut')}</button> : null}
+      {/* The same neel header as the driver app, full width. */}
+      <header style={{ background: colors.neel, backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, color: colors.ghee, boxShadow: shadow.card }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', padding: '18px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <svg aria-hidden="true" width="30" height="30" viewBox="0 0 24 24">
+              <rect x="5" y="5" width="14" height="14" fill={colors.kesar} />
+              <rect x="5" y="5" width="14" height="14" fill={colors.kesar} transform="rotate(45 12 12)" />
+              <circle cx="12" cy="12" r="3.4" fill={colors.neel} />
+            </svg>
+            <h1 style={{ margin: 0, fontSize: 26 }}>{t('admin.title')}</h1>
           </div>
-        </header>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button type="button" style={{ ...btn(colors.glassDark, colors.ghee), border: '1px solid rgba(250,246,238,.18)' }} onClick={() => setLang(lang === 'ur' ? 'en' : 'ur')}>{t('lang.switch')}</button>
+            {session ? <button type="button" style={{ ...btn(colors.glassDark, colors.ghee), border: '1px solid rgba(250,246,238,.18)' }} onClick={() => supabase?.auth.signOut()}>{t('admin.signOut')}</button> : null}
+          </div>
+        </div>
+      </header>
+      <div style={{ maxWidth: 1080, margin: '0 auto', padding: '24px 16px 48px', display: 'grid', gap: 20 }}>
         {!supabase ? (
           <p>{t('admin.notConfigured')}</p>
         ) : session === undefined ? (
@@ -106,7 +117,7 @@ function Stat({ label, value, sub, testId }: { label: string; value: ReactNode; 
   return (
     <div style={{ ...card, display: 'grid', gap: 4 }} data-testid={testId}>
       <span style={{ color: colors.ink2, fontSize: 15 }}>{label}</span>
-      <strong style={{ fontSize: 34, fontFamily: 'var(--font-latin), sans-serif', direction: 'ltr', textAlign: 'start' }}>{value}</strong>
+      <strong style={{ fontSize: 44, lineHeight: 1.1, fontWeight: 800, fontFamily: 'var(--font-latin), sans-serif', direction: 'ltr', textAlign: 'start', color: colors.neel, fontVariantNumeric: 'tabular-nums' }}>{value}</strong>
       {sub ? <span style={{ color: colors.ink2, fontSize: 14 }}>{sub}</span> : null}
     </div>
   );

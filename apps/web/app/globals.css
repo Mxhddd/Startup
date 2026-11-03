@@ -1,0 +1,33 @@
+/* The website's few shared rules (v8): motion for the living map and the buttons, and the calm
+   fallback for people who ask their phone or computer for less motion. Colours come from the theme. */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+a { -webkit-tap-highlight-color: transparent; }
+
+@keyframes pohnch-flow { to { stroke-dashoffset: -28; } }
+@keyframes pohnch-ripple { 0% { transform: scale(.55); opacity: .35; } 100% { transform: scale(1.9); opacity: 0; } }
+@keyframes pohnch-rise { from { transform: translateY(18px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes pohnch-ping { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(2.6); opacity: 0; } }
+
+.pohnch-flow { animation: pohnch-flow 1.4s linear infinite; }
+.pohnch-ripple { transform-box: fill-box; transform-origin: center; animation: pohnch-ripple 2.4s ease-out infinite; }
+.pohnch-ripple.late { animation-delay: 1.2s; }
+.pohnch-rise { animation: pohnch-rise .7s cubic-bezier(.2,.8,.2,1) both; }
+.pohnch-rise.d1 { animation-delay: .08s; } .pohnch-rise.d2 { animation-delay: .16s; } .pohnch-rise.d3 { animation-delay: .24s; }
+.pohnch-ping { transform-box: fill-box; transform-origin: center; animation: pohnch-ping 1.8s ease-out infinite; }
+
+.pohnch-btn { transition: transform .18s cubic-bezier(.2,.8,.2,1), box-shadow .18s; }
+.pohnch-btn:hover { transform: translateY(-1px); }
+.pohnch-btn:active { transform: translateY(3px) scale(.985); }
+.pohnch-btn:focus-visible, a:focus-visible, button:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+
+/* The dots joining the steps only make sense when the steps sit side by side. */
+.pohnch-step-dots { display: none; }
+@media (min-width: 760px) { .pohnch-step-dots { display: block; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pohnch-flow, .pohnch-ripple, .pohnch-rise, .pohnch-ping { animation: none !important; }
+  .pohnch-van { display: none; }
+  .pohnch-van-still { display: inline !important; }
+  .pohnch-btn { transition: none; }
+}

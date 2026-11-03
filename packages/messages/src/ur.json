@@ -439,5 +439,8 @@
   "driver.done.back": "آج کی طرف واپس",
   "driver.stops.reorder": "ترتیب بدلیں",
   "driver.stops.reorderDone": "ہو گیا",
-  "driver.stops.dragHint": "اسٹاپ کو دبائے رکھیں، پھر کھینچ کر اس کی جگہ پر لے جائیں۔"
+  "driver.stops.dragHint": "اسٹاپ کو دبائے رکھیں، پھر کھینچ کر اس کی جگہ پر لے جائیں۔",
+  "web.map.van": "آپ کی وین",
+  "web.how.lead": "تین قدم، کوئی فون کال نہیں۔",
+  "web.drivers.cta": "ڈرائیور: ہمیں میسج کریں"
 }
