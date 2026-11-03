@@ -1,10 +1,25 @@
-// The top of the driver's trip screen: morning or afternoon, how many children are done, and Help.
-// Help is the one red button on the driver's screens.
-import { Pressable, View } from 'react-native';
+// The top of the driver's trip screen (v5): a neel band with the run and progress ("morning · 3/6 ·
+// live"), Help (the one red button on the driver's screens), and below it the next stop in big type
+// with how far it is. The count rolls when a stop is done; the live dot breathes.
+import { useEffect } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useLang } from '../lang';
+import { durations } from '../motion';
 import { colors, radius } from '../theme';
 import { AppText } from './AppText';
 import { Icon } from './icons';
+import { PressableScale } from './PressableScale';
+import { RollingText } from './RollingText';
+
+function LiveDot({ color }: { color: string }) {
+  const v = useSharedValue(0);
+  useEffect(() => {
+    v.value = withRepeat(withTiming(1, { duration: durations.pulse / 2, easing: Easing.inOut(Easing.sin) }), -1, true);
+  }, [v]);
+  const s = useAnimatedStyle(() => ({ opacity: 0.55 + 0.45 * (1 - v.value), transform: [{ scale: 0.85 + 0.25 * v.value }] }));
+  return <Animated.View style={[{ width: 9, height: 9, borderRadius: 5, backgroundColor: color }, s]} />;
+}
 
 export function TripHeader({
   kind,
@@ -12,53 +27,69 @@ export function TripHeader({
   total,
   practice = false,
   onHelp,
+  next,
+  distance,
+  topInset = 0,
 }: {
   kind: 'morning' | 'afternoon';
   done: number;
   total: number;
   practice?: boolean;
   onHelp: () => void;
+  /** The next stop's name, shown big. */
+  next?: string;
+  /** How far the next stop is ("350 m"), when the phone knows where the van is. */
+  distance?: string;
+  topInset?: number;
 }) {
   const { t, dir } = useLang();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   return (
-    <View testID="trip-header" style={{ flexDirection: row, alignItems: 'center', gap: 12, paddingVertical: 8 }}>
-      <View style={{ flex: 1, gap: 2 }}>
-        <View style={{ flexDirection: row, alignItems: 'center', gap: 8 }}>
-          <AppText variant="title">{t(kind === 'morning' ? 'trip.morning' : 'trip.afternoon')}</AppText>
+    <View testID="trip-header" style={{ backgroundColor: colors.neel, paddingTop: topInset + 10, paddingHorizontal: 16, paddingBottom: 16, gap: 6, borderBottomLeftRadius: radius.big, borderBottomRightRadius: radius.big, boxShadow: '0px 8px 24px rgba(14,20,48,0.25)' }}>
+      <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
+        <View style={{ flex: 1, flexDirection: row, alignItems: 'center', gap: 8 }}>
+          <LiveDot color={practice ? colors.kesar : colors.pista} />
+          <AppText bold color={colors.ghee} style={{ fontSize: 15 }}>
+            {t(kind === 'morning' ? 'trip.morning' : 'trip.afternoon')}
+          </AppText>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <RollingText text={`${done}/${total}`} variant="number" color={colors.ghee} style={{ fontSize: 15, lineHeight: 22 }} />
+          </View>
           {practice ? (
-            <View style={{ backgroundColor: colors.kesarTint, borderRadius: radius.pill, paddingHorizontal: 10 }}>
+            <View style={{ backgroundColor: colors.kesar, borderRadius: radius.pill, paddingHorizontal: 10 }}>
               <AppText variant="small" bold color={colors.siyahi}>
                 {t('trip.practice')}
               </AppText>
             </View>
           ) : null}
         </View>
-        <AppText variant="secondary">{t('trip.progress', { done, total })}</AppText>
+        <PressableScale
+          testID="help-button"
+          accessibilityRole="button"
+          accessibilityLabel={t('help.title')}
+          onPress={onHelp}
+          haptic="warn"
+          scaleTo="chip"
+          faceStyle={{ minHeight: 48, minWidth: 64, paddingHorizontal: 14, borderRadius: radius.button, backgroundColor: colors.shingarf, alignItems: 'center', justifyContent: 'center', flexDirection: row, gap: 6 }}
+        >
+          <Icon name="help" size={20} color={colors.white} />
+          <AppText bold color={colors.white}>
+            {t('help.title')}
+          </AppText>
+        </PressableScale>
       </View>
-      <Pressable
-        testID="help-button"
-        accessibilityRole="button"
-        accessibilityLabel={t('help.title')}
-        onPress={onHelp}
-        style={({ pressed }) => ({
-          minHeight: 64,
-          minWidth: 64,
-          paddingHorizontal: 16,
-          borderRadius: radius.button,
-          backgroundColor: colors.shingarf,
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: row,
-          gap: 8,
-          opacity: pressed ? 0.85 : 1,
-        })}
-      >
-        <Icon name="help" size={24} color={colors.white} />
-        <AppText bold color={colors.white}>
-          {t('help.title')}
+      {next ? (
+        <View style={{ flexDirection: row, alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
+          {distance ? <RollingText text={distance} variant="number" color={colors.ghee} style={{ fontSize: 36, lineHeight: 44 }} /> : null}
+          <AppText bold color={colors.ghee} style={{ fontSize: 22 }} numberOfLines={1}>
+            {next}
+          </AppText>
+        </View>
+      ) : (
+        <AppText variant="small" color={colors.mutedOnDark}>
+          {t('trip.progress', { done, total })}
         </AppText>
-      </Pressable>
+      )}
     </View>
   );
 }

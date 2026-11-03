@@ -1,7 +1,8 @@
 // A labelled text box. Latin-only fields (plates, numbers) can be forced left to right.
+import { useState } from 'react';
 import { TextInput, View } from 'react-native';
 import { useLang, uiFont } from '../lang';
-import { colors, fonts, radius, space } from '../theme';
+import { colors, fonts, radius, shadow, space } from '../theme';
 import { AppText } from './AppText';
 
 export function TextField({
@@ -25,8 +26,9 @@ export function TextField({
 }) {
   const { lang, dir } = useLang();
   const d = ltr ? 'ltr' : dir;
+  const [focused, setFocused] = useState(false);
   return (
-    <View style={{ gap: 6 }}>
+    <View style={{ gap: 8 }}>
       <AppText variant="small" bold color={colors.ink2}>
         {label}
       </AppText>
@@ -35,15 +37,21 @@ export function TextField({
         accessibilityLabel={label}
         value={value}
         onChangeText={onChange}
-        onBlur={onBlur}
+        onFocus={() => setFocused(true)}
+        onBlur={() => {
+          setFocused(false);
+          onBlur?.();
+        }}
+        selectionColor={colors.neel}
         placeholder={placeholder}
         placeholderTextColor={colors.ink2}
         maxLength={maxLength}
         style={{
           minHeight: 56,
-          borderRadius: radius.button,
+          borderRadius: radius.card,
           borderWidth: 2,
-          borderColor: colors.siyahi,
+          borderColor: focused ? colors.neel : colors.line,
+          boxShadow: focused ? `0px 0px 0px 4px ${colors.neelTint}` : shadow.card,
           backgroundColor: colors.white,
           paddingHorizontal: space.lg,
           fontSize: 18,

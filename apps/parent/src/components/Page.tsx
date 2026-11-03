@@ -1,9 +1,9 @@
 // A plain page for the parent app's forms: back, title, language switch, then the content.
-import { colors, space, useLang } from '@pohnch/ui';
-import { AppText, Icon, LangSwitch } from '@pohnch/ui/native';
+import { colors, shadow, space, useLang } from '@pohnch/ui';
+import { AppText, Icon, LangSwitch, PressableScale } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import type { ReactNode } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export function Page({ title, children }: { title: string; children: ReactNode }) {
@@ -12,15 +12,15 @@ export function Page({ title, children }: { title: string; children: ReactNode }
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee, paddingTop: insets.top + space.sm }}>
       <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.xl, paddingBottom: space.md }}>
-        <Pressable accessibilityRole="button" accessibilityLabel={t('common.back')} hitSlop={8}
+        <PressableScale accessibilityRole="button" accessibilityLabel={t('common.back')} scaleTo="chip" hitSlop={8}
           onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-          style={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, borderWidth: 1, borderColor: colors.line }}>
+          faceStyle={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, boxShadow: shadow.float }}>
           <View style={{ transform: [{ scaleX: dir === 'rtl' ? 1 : -1 }] }}>
             <Icon name="arrow" size={22} color={colors.siyahi} />
           </View>
-        </Pressable>
+        </PressableScale>
         <View style={{ flex: 1 }}>
-          <AppText variant="title">{title}</AppText>
+          <AppText variant="title" style={{ fontSize: 24 }}>{title}</AppText>
         </View>
         <LangSwitch />
       </View>

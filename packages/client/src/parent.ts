@@ -6,7 +6,7 @@ import { backend } from './backend';
 
 export type Child = { id: string; first_name: string; school_name: string; lat: number | null; lng: number | null };
 export type Membership = { id: string; status: 'pending' | 'approved' | 'declined' | 'left'; van_id: string; stop_id: string | null };
-export type ParentVan = { id: string; name: string; school_name: string; driver_id: string; verified_at: string | null; switched_off_at: string | null };
+export type ParentVan = { id: string; name: string; school_name: string; plate: string | null; driver_id: string; verified_at: string | null; switched_off_at: string | null };
 export type MyStop = { id: string; label: string; lat: number; lng: number; morning_time: string | null; afternoon_time: string | null };
 export type ParentTrip = { id: string; kind: 'morning' | 'afternoon'; status: 'running' | 'ended' | 'cancelled'; started_at: string; ended_at: string | null };
 export type Position = { lat: number; lng: number; heading: number | null; speed: number | null; recorded_at: string };
@@ -56,7 +56,7 @@ export async function membershipOf(childId: string): Promise<Membership | null> 
 }
 
 export async function van(vanId: string): Promise<ParentVan | null> {
-  return check(await db().supabase.from('vans').select('id, name, school_name, driver_id, verified_at, switched_off_at').eq('id', vanId).maybeSingle()) as ParentVan | null;
+  return check(await db().supabase.from('vans').select('id, name, school_name, plate, driver_id, verified_at, switched_off_at').eq('id', vanId).maybeSingle()) as ParentVan | null;
 }
 
 /** The driver's name ("Rafiq bhai"); visible once the family follows the van. */

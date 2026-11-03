@@ -2,10 +2,10 @@
 import { parent } from '@pohnch/client';
 import { ApiError, tokenFromInviteLink } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, TapButton, TextField } from '@pohnch/ui/native';
+import { AppText, ChoiceChip, TapButton, TextField } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { Pressable, View } from 'react-native';
+import { View } from 'react-native';
 import { useParent } from '../state/ParentStore';
 
 export function JoinForm({ initialToken }: { initialToken?: string }) {
@@ -41,10 +41,7 @@ export function JoinForm({ initialToken }: { initialToken?: string }) {
           <AppText variant="small" bold color={colors.ink2}>{t('parent.join.which')}</AppText>
           <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
             {p.children.map((c) => (
-              <Pressable key={c.id} accessibilityRole="radio" accessibilityState={{ selected: c.id === childId }} onPress={() => setChildId(c.id)}
-                style={{ minHeight: 48, paddingHorizontal: 16, borderRadius: radius.pill, justifyContent: 'center', borderWidth: 2, borderColor: colors.siyahi, backgroundColor: c.id === childId ? colors.siyahi : colors.white }}>
-                <AppText bold color={c.id === childId ? colors.ghee : colors.siyahi}>{c.first_name}</AppText>
-              </Pressable>
+              <ChoiceChip key={c.id} label={c.first_name} on={c.id === childId} onPress={() => setChildId(c.id)} />
             ))}
           </View>
         </View>

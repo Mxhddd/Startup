@@ -11,6 +11,21 @@ import * as Location from 'expo-location';
 import * as TaskManager from 'expo-task-manager';
 
 export const LOCATION_TASK = 'pohnch-trip-location';
+
+// The newest fix, kept in memory only, so the open trip screen can show the van and the distance to
+// the next stop. It exists only while the trip's location task runs; nothing is stored or logged.
+export type Fix = { lat: number; lng: number; heading: number | null };
+let lastFix: Fix | null = null;
+const listeners = new Set<(f: Fix | null) => void>();
+export function onTripFix(cb: (f: Fix | null) => void): () => void {
+  listeners.add(cb);
+  cb(lastFix);
+  return () => listeners.delete(cb);
+}
+function setFix(f: Fix | null) {
+  lastFix = f;
+  listeners.forEach((cb) => cb(f));
+}
 const ACTIVE_TRIP = 'pohnch.driver.activeTrip';
 const LAST_SENT = 'pohnch.driver.lastPositionAt';
 
@@ -25,6 +40,7 @@ TaskManager.defineTask<{ locations: Location.LocationObject[] }>(LOCATION_TASK, 
   }
   const latest = data.locations[data.locations.length - 1];
   if (!latest) return;
+  setFix({ lat: latest.coords.latitude, lng: latest.coords.longitude, heading: latest.coords.heading ?? null });
   const lastSent = Number((await AsyncStorage.getItem(LAST_SENT)) ?? '') || null;
   if (!shouldSendPosition(lastSent, Date.now(), latest.coords.speed)) return;
   try {
@@ -64,6 +80,7 @@ export async function startTripLocation(tripId: string, notice: { title: string;
 }
 
 export async function stopTripLocation(): Promise<void> {
+  setFix(null);
   await AsyncStorage.multiRemove([ACTIVE_TRIP, LAST_SENT]);
   try {
     if (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK)) await Location.stopLocationUpdatesAsync(LOCATION_TASK);

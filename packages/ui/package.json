@@ -18,7 +18,8 @@
     "react-native-reanimated": "*",
     "react-native-gesture-handler": "*",
     "react-native-svg": "*",
-    "@maplibre/maplibre-react-native": "*"
+    "@maplibre/maplibre-react-native": "*",
+    "expo-haptics": "*"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

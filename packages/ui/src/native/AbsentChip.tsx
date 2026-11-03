@@ -1,15 +1,20 @@
-// "آج چھٹی": a child who is off today. On the parent side it can be tapped to undo until the van leaves.
-import { Pressable, View } from 'react-native';
+// "آج چھٹی": a child who is off today. With a name it reads "سارا · آج چھٹی".
+// On the parent side it can be tapped to undo until the van leaves.
+import { View } from 'react-native';
+import Animated, { ZoomIn, ZoomOut } from 'react-native-reanimated';
 import { useLang } from '../lang';
+import { springs } from '../motion';
 import { colors, radius } from '../theme';
 import { AppText } from './AppText';
+import { PressableScale } from './PressableScale';
 
-export function AbsentChip({ onUndo }: { onUndo?: () => void }) {
+export function AbsentChip({ onUndo, name }: { onUndo?: () => void; name?: string }) {
   const { t, dir } = useLang();
+  const label = name ? `${name} · ${t('chutti.label')}` : t('chutti.label');
   const body = (
-    <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 8, backgroundColor: colors.absentBg, borderRadius: radius.pill, paddingHorizontal: 14, minHeight: 32, alignSelf: dir === 'rtl' ? 'flex-end' : 'flex-start' }}>
+    <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, backgroundColor: colors.absentBg, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.absentText, paddingHorizontal: 14, minHeight: 34 }}>
       <AppText variant="small" bold color={colors.absentText}>
-        {t('chutti.label')}
+        {label}
       </AppText>
       {onUndo ? (
         <AppText variant="small" bold color={colors.neel}>
@@ -18,10 +23,19 @@ export function AbsentChip({ onUndo }: { onUndo?: () => void }) {
       ) : null}
     </View>
   );
-  if (!onUndo) return body;
+  const enter = ZoomIn.springify().damping(springs.pop.damping).stiffness(springs.pop.stiffness);
+  if (!onUndo) {
+    return (
+      <Animated.View entering={enter} exiting={ZoomOut.duration(160)} style={{ alignSelf: dir === 'rtl' ? 'flex-end' : 'flex-start' }}>
+        {body}
+      </Animated.View>
+    );
+  }
   return (
-    <Pressable accessibilityRole="button" accessibilityLabel={`${t('chutti.label')} · ${t('undo.action')}`} onPress={onUndo} hitSlop={8} style={{ minHeight: 44, justifyContent: 'center', alignSelf: dir === 'rtl' ? 'flex-end' : 'flex-start' }}>
-      {body}
-    </Pressable>
+    <Animated.View entering={enter} exiting={ZoomOut.duration(160)} style={{ alignSelf: dir === 'rtl' ? 'flex-end' : 'flex-start' }}>
+      <PressableScale accessibilityRole="button" accessibilityLabel={`${label} · ${t('undo.action')}`} onPress={onUndo} hitSlop={8} scaleTo="chip" haptic="warn" faceStyle={{ minHeight: 44, justifyContent: 'center' }}>
+        {body}
+      </PressableScale>
+    </Animated.View>
   );
 }

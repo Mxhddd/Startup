@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canUndoChutti, distanceM, etaMinutes, timelineFor, type ParentEvent } from './index';
+import { arrivalClock, canUndoChutti, childPlace, distanceM, etaMinutes, formatDistance, timelineFor, type ParentEvent, type TimelineItem } from './index';
 
 const home = { latitude: 24.9, longitude: 67.1 };
 
@@ -75,5 +75,27 @@ describe('route dots line', () => {
     expect(routeDotsLine(0)).toBe('●●●★◉');
     expect(routeDotsLine(9)).toBe('★○○○◉');
     expect(routeDotsLine(null)).toBe('●●●★◉');
+  });
+});
+
+describe('the parent sheet head', () => {
+  const item = (step: TimelineItem['step'], at: string | null = null): TimelineItem => ({ step, at, by: null });
+  it('says where the child is through the morning and the afternoon', () => {
+    expect(childPlace('morning', [item('left', 'x'), item('picked'), item('reached_school')])).toBe('coming');
+    expect(childPlace('morning', [item('left', 'x'), item('picked', 'x'), item('reached_school')])).toBe('inVan');
+    expect(childPlace('morning', [item('picked', 'x'), item('reached_school', 'x')])).toBe('atSchool');
+    expect(childPlace('afternoon', [item('left_school'), item('dropped')])).toBe('atSchool');
+    expect(childPlace('afternoon', [item('left_school', 'x'), item('dropped')])).toBe('inVan');
+    expect(childPlace('afternoon', [item('left_school', 'x'), item('dropped', 'x')])).toBe('home');
+  });
+  it('shows distances the way people say them', () => {
+    expect(formatDistance(348)).toEqual({ n: '350', unit: 'm' });
+    expect(formatDistance(3)).toEqual({ n: '10', unit: 'm' });
+    expect(formatDistance(1830)).toEqual({ n: '1.8', unit: 'km' });
+    expect(formatDistance(12_400)).toEqual({ n: '12', unit: 'km' });
+  });
+  it('gives the arrival time in Karachi', () => {
+    // 02:09 UTC is 7:09 in Karachi; 6 minutes later is 7:15.
+    expect(arrivalClock(Date.parse('2026-11-03T02:09:00Z'), 6)).toBe('7:15');
   });
 });

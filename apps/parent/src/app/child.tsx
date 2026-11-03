@@ -1,6 +1,6 @@
 // Add a child: first name, school, and the home pin placed by hand on the map.
 import { parent } from '@pohnch/client';
-import { colors, space, useLang } from '@pohnch/ui';
+import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
 import { AppText, TapButton, TextField } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -39,7 +39,7 @@ export default function AddChild() {
       <TextField label={t('parent.child.school')} value={school} onChange={setSchool} maxLength={80} testID="child-school" />
       <View style={{ gap: 6 }}>
         <AppText variant="small" bold color={colors.ink2}>{t('parent.child.pin')}</AppText>
-        <View style={{ height: 280, borderRadius: 16, overflow: 'hidden', borderWidth: 2, borderColor: colors.siyahi }}>
+        <View style={{ height: 300, borderRadius: radius.big, overflow: 'hidden', boxShadow: shadow.card }}>
           <BrandMap accessibilityLabel={t('parent.child.pin')} home={pin} onPress={setPin} style={{ flex: 1 }} />
         </View>
         <AppText variant="small" color={colors.ink2}>{t('parent.child.pinHint')}</AppText>

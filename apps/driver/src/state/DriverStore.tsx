@@ -24,9 +24,10 @@ type State = {
   trips: Trip[];
   events: EventRow[];
   dayOff: boolean;
+  name: string | null;
 };
 
-const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false };
+const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, name: null };
 
 function useDriverState() {
   const [s, setS] = useState<State>(empty);
@@ -56,10 +57,10 @@ function useDriverState() {
 
   const refresh = useCallback(async () => {
     try {
-      const van = await driver.myVan();
+      const [van, name] = await Promise.all([driver.myVan(), driver.myName().catch(() => null)]);
       if (!van) {
         await stopTripLocation();
-        setS({ ...empty, loading: false });
+        setS({ ...empty, loading: false, name });
         return;
       }
       const today = karachiDate(new Date());
@@ -80,7 +81,7 @@ function useDriverState() {
         await stopTripLocation();
         setLocation('off');
       }
-      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff });
+      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, name });
     } catch (e) {
       setS((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }
@@ -121,12 +122,15 @@ function useDriverState() {
       await refresh();
     },
 
-    /** One tap for the children at one stop: shown at once, queued, sent when there is signal. */
-    async tapStop(group: StopGroup, text: string) {
+    /**
+     * One tap for the children at one stop (or only some of them, when one sibling isn't there):
+     * shown at once, queued, sent when there is signal.
+     */
+    async tapStop(group: StopGroup, text: string, only?: string[]) {
       if (!running) return;
       const clientId = randomUUID();
       const step = running.kind === 'morning' ? 'picked' : 'dropped';
-      const childIds = group.children.filter((c) => c.state === 'waiting').map((c) => c.childId);
+      const childIds = group.children.filter((c) => c.state === 'waiting' && (!only || only.includes(c.childId))).map((c) => c.childId);
       if (childIds.length === 0) return;
       setS((old) => ({ ...old, events: [...old.events, ...childIds.map((childId) => ({ childId, step, undone: false }))] }));
       setUndo({ clientId, text, at: Date.now() });

@@ -3,12 +3,15 @@
 import { displayPkMobile, normalisePkMobile } from '@pohnch/core';
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
+import Animated, { FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 import type { MessageKey } from '@pohnch/messages';
 import { useLang, uiFont } from '../lang';
-import { colors, fonts, radius, space } from '../theme';
+import { springs } from '../motion';
+import { colors, fonts, radius, shadow, space } from '../theme';
 import { AppText } from './AppText';
 import { LangSwitch } from './LangSwitch';
-import { StarIcon } from './icons';
+import { haptic } from './haptics';
+import { Logo } from './Logo';
 import { TapButton } from './TapButton';
 
 export type LoginError = 'phone' | 'code' | 'name' | 'offline' | 'tooMany' | 'notConfigured' | 'generic';
@@ -26,11 +29,12 @@ export type PhoneLoginProps = {
 
 const RESEND_S = 30;
 
-function Field({ label, value, onChange, kind, testID }: { label: string; value: string; onChange: (v: string) => void; kind: 'phone' | 'code' | 'name'; testID: string }) {
+function Field({ label, value, onChange, kind, testID }: { label: string; value: string; onChange: (v: string) => void; kind: 'phone' | 'name'; testID: string }) {
   const { lang, dir } = useLang();
-  const digits = kind !== 'name';
+  const digits = kind === 'phone';
+  const [focused, setFocused] = useState(false);
   return (
-    <View style={{ gap: 6 }}>
+    <View style={{ gap: 8 }}>
       <AppText variant="small" bold color={colors.ink2}>
         {label}
       </AppText>
@@ -39,21 +43,25 @@ function Field({ label, value, onChange, kind, testID }: { label: string; value:
         accessibilityLabel={label}
         value={value}
         onChangeText={onChange}
-        keyboardType={kind === 'phone' ? 'phone-pad' : kind === 'code' ? 'number-pad' : 'default'}
-        textContentType={kind === 'phone' ? 'telephoneNumber' : kind === 'code' ? 'oneTimeCode' : 'name'}
-        autoComplete={kind === 'phone' ? 'tel' : kind === 'code' ? 'sms-otp' : 'name'}
-        maxLength={kind === 'code' ? 6 : kind === 'phone' ? 16 : 40}
-        placeholder={kind === 'phone' ? '03xx xxxxxxx' : kind === 'code' ? '······' : undefined}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        autoFocus
+        keyboardType={kind === 'phone' ? 'phone-pad' : 'default'}
+        textContentType={kind === 'phone' ? 'telephoneNumber' : 'name'}
+        autoComplete={kind === 'phone' ? 'tel' : 'name'}
+        maxLength={kind === 'phone' ? 16 : 40}
+        placeholder={kind === 'phone' ? '03xx xxxxxxx' : undefined}
         placeholderTextColor={colors.ink2}
+        selectionColor={colors.neel}
         style={{
-          minHeight: 56,
-          borderRadius: radius.button,
+          minHeight: 60,
+          borderRadius: radius.card,
           borderWidth: 2,
-          borderColor: colors.siyahi,
+          borderColor: focused ? colors.neel : colors.line,
           backgroundColor: colors.white,
+          boxShadow: focused ? `0px 0px 0px 4px ${colors.neelTint}` : shadow.card,
           paddingHorizontal: space.lg,
-          fontSize: kind === 'code' ? 26 : 20,
-          letterSpacing: kind === 'code' ? 8 : 0,
+          fontSize: 22,
           color: colors.siyahi,
           // Numbers are typed and read left to right, even in Urdu.
           fontFamily: digits ? fonts.latin.bold : uiFont(lang, 'regular'),
@@ -61,6 +69,74 @@ function Field({ label, value, onChange, kind, testID }: { label: string; value:
           writingDirection: digits ? 'ltr' : dir,
         }}
       />
+    </View>
+  );
+}
+
+/** One box per digit of the code. Each box pops as its digit arrives; the box waiting for the next digit glows. */
+function CodeCell({ digit, active }: { digit: string | undefined; active: boolean }) {
+  const pop = useSharedValue(1);
+  useEffect(() => {
+    if (digit) {
+      pop.value = 0.86;
+      pop.value = withSpring(1, springs.pop);
+    }
+  }, [digit, pop]);
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: pop.value }] }));
+  return (
+    <Animated.View
+      style={[
+        {
+          flex: 1,
+          maxWidth: 52,
+          height: 60,
+          borderRadius: radius.button,
+          backgroundColor: colors.white,
+          borderWidth: 2,
+          borderColor: active ? colors.neel : digit ? colors.siyahi : colors.line,
+          boxShadow: active ? `0px 0px 0px 4px ${colors.neelTint}` : undefined,
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        style,
+      ]}
+    >
+      <AppText variant="number" style={{ fontSize: 26, lineHeight: 32 }}>
+        {digit ?? ''}
+      </AppText>
+    </Animated.View>
+  );
+}
+
+function CodeField({ label, value, onChange, testID }: { label: string; value: string; onChange: (v: string) => void; testID: string }) {
+  const [focused, setFocused] = useState(true);
+  const cells = Array.from({ length: 6 }, (_, i) => value[i]);
+  return (
+    <View style={{ gap: 8 }}>
+      <AppText variant="small" bold color={colors.ink2}>
+        {label}
+      </AppText>
+      {/* Digits always run left to right, even in Urdu. */}
+      <View style={{ flexDirection: 'row', gap: 8, justifyContent: 'center' }}>
+        {cells.map((d, i) => (
+          <CodeCell key={i} digit={d} active={focused && i === Math.min(value.length, 5)} />
+        ))}
+        <TextInput
+          testID={testID}
+          accessibilityLabel={label}
+          value={value}
+          onChangeText={onChange}
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          autoFocus
+          keyboardType="number-pad"
+          textContentType="oneTimeCode"
+          autoComplete="sms-otp"
+          maxLength={6}
+          caretHidden
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, opacity: 0.02, color: 'transparent', fontSize: 1 }}
+        />
+      </View>
     </View>
   );
 }
@@ -82,6 +158,10 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
     return () => clearTimeout(id);
   }, [resendIn]);
 
+  // A wrong number or code gives the message a short sideways shake, like a refused passcode on iOS.
+  const shake = useSharedValue(0);
+  const shakeStyle = useAnimatedStyle(() => ({ transform: [{ translateX: shake.value }] }));
+
   const run = async (fn: () => Promise<void>) => {
     setBusy(true);
     setError(null);
@@ -89,6 +169,8 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
       await fn();
     } catch (e) {
       setError(toError(e));
+      haptic.warn();
+      shake.value = withSequence(withTiming(-10, { duration: 50 }), withRepeat(withTiming(10, { duration: 80 }), 3, true), withSpring(0, springs.release));
     } finally {
       setBusy(false);
     }
@@ -125,11 +207,17 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
 
   return (
     <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.ghee }}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, padding: space.xl, paddingTop: 72, gap: space.xl }}>
-        <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <StarIcon size={44} color={colors.kesar} />
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, padding: space.xl, paddingTop: 56, gap: space.xl }}>
+        <View style={{ flexDirection: dir === 'rtl' ? 'row' : 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
           <LangSwitch />
         </View>
+        <View style={{ alignItems: 'center', paddingVertical: space.lg }}>
+          <Logo width={128} animated />
+          <AppText variant="small" bold color={colors.ink2} align="center" style={{ marginTop: space.md }}>
+            {role === 'driver' ? t('app.driver.name') : t('brand.tagline')}
+          </AppText>
+        </View>
+        <Animated.View key={step} entering={FadeInDown.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)} exiting={FadeOut.duration(120)} style={{ gap: space.xl }}>
         <View style={{ gap: space.sm }}>
           <AppText variant="title" testID="login-title">{t(titleKey)}</AppText>
           <AppText variant="secondary">
@@ -138,13 +226,13 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
         </View>
 
         {step === 'phone' ? <Field kind="phone" label={t('login.phone.label')} value={phoneInput} onChange={setPhoneInput} testID="phone-input" /> : null}
-        {step === 'code' ? <Field kind="code" label={t('login.code.label')} value={code} onChange={(v) => setCode(v.replace(/\D/g, ''))} testID="code-input" /> : null}
+        {step === 'code' ? <CodeField label={t('login.code.label')} value={code} onChange={(v) => setCode(v.replace(/\D/g, '').slice(0, 6))} testID="code-input" /> : null}
         {step === 'name' ? <Field kind="name" label={t('login.name.label')} value={name} onChange={setName} testID="name-input" /> : null}
 
         {error ? (
-          <View accessibilityRole="alert" testID="login-error" style={{ backgroundColor: colors.dangerBg, borderRadius: radius.card, padding: space.md }}>
-            <AppText color={colors.dangerText}>{t(`error.${error}`)}</AppText>
-          </View>
+          <Animated.View accessibilityRole="alert" testID="login-error" entering={FadeInDown.springify().damping(springs.pop.damping)} style={[{ backgroundColor: colors.dangerBg, borderRadius: radius.card, padding: space.md }, shakeStyle]}>
+            <AppText bold color={colors.dangerText}>{t(`error.${error}`)}</AppText>
+          </Animated.View>
         ) : null}
 
         <TapButton
@@ -170,6 +258,7 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
             </Pressable>
           </View>
         ) : null}
+        </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>
   );

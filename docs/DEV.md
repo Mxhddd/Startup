@@ -189,3 +189,29 @@ The 30-day position cleanup is now tested (`070`), and a whole school day runs a
 - Expo: parent app = `@pohonch/pohonch`, driver app = `@pohonch/pohnch-driver`; the Supabase URL and anon key are EAS environment variables (development, preview, production).
 - Android builds: `cd apps/driver && pnpm dlx eas-cli build -p android --profile preview` (and the same in `apps/parent`); the build page gives an install link.
 - Pilot operations: `docs/PILOT.md`. Store texts: `docs/STORE.md`.
+
+## Design pass: the v5 look and motion (3 November 2026)
+
+Both apps now follow the canvas page "v5 · Map-first app (current)". Where the pieces live:
+
+| File | What it is for |
+| --- | --- |
+| `packages/ui/src/theme.ts` | new tokens: `sand`, `hairline`, the dark "lip" colours under big buttons, `shadow` (float, sheet, card), bigger radii |
+| `packages/ui/src/motion.ts` | the motion spec: one set of springs (press, release, sheet, pop, layout, number) and timings every animation uses; rubber band and fling snapping for the sheet (tested) |
+| `packages/ui/src/native/haptics.ts` | the taps you feel: tap, press, tick, success, warn (expo-haptics; skipped where a phone has none) |
+| `packages/ui/src/native/PressableScale.tsx` | every button: sinks on a spring, springs back with a small overshoot, presses into its lip |
+| `packages/ui/src/native/Logo.tsx` | the پہنچ mark from `design/logo`; on the login screen the star drops onto the ن |
+| `RollingText`, `ChoiceChip` | minutes and counts that roll to a new value; pick-one pills |
+
+How each action moves:
+
+- **Driver taps a stop:** the button presses into its lip, a success haptic, the next stop's button rises into place, the undo bar slides up with a ring emptying over 5 s, the done row draws its tick.
+- **Hold (start trip, reached school):** the fill sweeps from the reading start with a tick at each quarter; let go early and it springs back.
+- **Parent sheet:** drag or flick; it coasts to the snap you were heading for and stretches a little past the ends. "Trip" opens it to the timeline, whose steps come in one after another; the step happening now breathes.
+- **Map:** the van glides between positions at an even speed and its halo breathes; it goes grey and still when the signal drops. Pins drop in. The camera eases.
+- **Screens:** the iOS push, from the left in Urdu and the right in English.
+- **Login:** a wrong number or code shakes the message; each code digit pops into its box.
+
+Phones with "reduce motion" switched on get the calmer version automatically (Reanimated follows the system setting).
+
+**Browser preview:** the web build draws a sketch map (no MapLibre on the web) so screens can be checked without a phone; real phones use the real map.

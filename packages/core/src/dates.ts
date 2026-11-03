@@ -33,3 +33,9 @@ export function karachiHour(at: Date): number {
 export function defaultRunKind(at: Date): 'morning' | 'afternoon' {
   return karachiHour(at) < 11 ? 'morning' : 'afternoon';
 }
+
+/** Today's weekday (0 = Sunday), date and month (1-12) in Karachi, for "جمعرات 29 اکتوبر". */
+export function karachiDayParts(at: Date): { weekday: number; date: number; month: number } {
+  const [y, m, d] = karachiDate(at).split('-').map(Number) as [number, number, number];
+  return { weekday: new Date(Date.UTC(y, m - 1, d)).getUTCDay(), date: d, month: m };
+}

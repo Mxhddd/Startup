@@ -1,14 +1,22 @@
 // A family asking to join the van. The driver approves each one; nobody sees the van before that.
 import { View } from 'react-native';
+import Animated, { FadeInDown, FadeOutUp, LinearTransition } from 'react-native-reanimated';
+import { springs } from '../motion';
 import { useLang } from '../lang';
-import { colors, radius, space } from '../theme';
+import { colors, radius, shadow, space } from '../theme';
 import { AppText } from './AppText';
 import { TapButton } from './TapButton';
 
 export function ApprovalCard({ child, stop, onApprove, onDecline }: { child: string; stop: string; onApprove: () => void; onDecline: () => void }) {
   const { t, dir } = useLang();
   return (
-    <View testID="approval-card" style={{ backgroundColor: colors.white, borderRadius: radius.card, borderWidth: 1, borderColor: colors.line, padding: space.lg, gap: space.md }}>
+    <Animated.View
+      testID="approval-card"
+      entering={FadeInDown.springify().damping(springs.layout.damping)}
+      exiting={FadeOutUp.duration(200)}
+      layout={LinearTransition.springify().damping(springs.layout.damping)}
+      style={{ backgroundColor: colors.white, borderRadius: radius.big, boxShadow: shadow.card, padding: space.lg, gap: space.md }}
+    >
       <View style={{ gap: 2 }}>
         <AppText variant="small" bold color={colors.ink2}>
           {t('approval.title')}
@@ -23,6 +31,6 @@ export function ApprovalCard({ child, stop, onApprove, onDecline }: { child: str
           <TapButton label={t('approval.decline')} onConfirm={onDecline} testID="decline" />
         </View>
       </View>
-    </View>
+    </Animated.View>
   );
 }

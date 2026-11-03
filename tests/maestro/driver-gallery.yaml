@@ -1,4 +1,5 @@
 # Opens the hidden component gallery in the driver app and checks the hold-to-confirm button.
+# Development builds only: in preview and store builds the long press does nothing.
 appId: pk.pohnch.driver
 ---
 - launchApp

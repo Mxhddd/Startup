@@ -15,10 +15,12 @@ Everything for running the pilot day to day: installing, the first practice run 
 
 ### Test logins (code `123456`, valid until 30 June 2027)
 
-| Number | Is |
+| Number | Use it as |
 | --- | --- |
-| 0300 0000001 | Demo driver: "Demo van", verified, 3 stops |
-| 0300 0000002 | Demo parent: child "Ali", approved at Block 13 |
+| 0300 0000001 | a driver: log in to the driver app and set up a van from scratch |
+| 0300 0000002 | a parent: log in to the parent app, add a child, open the driver's link |
+
+Both start empty (3 November 2026: the earlier demo van and child were deleted), so everything you see is what you made through the real screens. To try a whole trip: set up the van as 0300 0000001, share its link, join as 0300 0000002, approve, then mark the van verified (below).
 
 Test numbers have a fixed code, so they must never be a team admin and must be removed before real families join (Supabase > Authentication > Sign In / Providers > Phone > test numbers).
 

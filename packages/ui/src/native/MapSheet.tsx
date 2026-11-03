@@ -1,29 +1,68 @@
-// The parent's bottom sheet over the map. Drag the grab bar between two heights: peek and open.
-// It snaps to the nearer one when let go.
-import type { ReactNode } from 'react';
+// The parent's bottom sheet over the map (v5): white, rounded, lifted by a soft shadow.
+// Drag the grab bar between two heights, peek and open. Let go and it coasts to the snap it was heading
+// for on the sheet spring, carrying the speed of your flick, like an iOS sheet. Past either end it
+// stretches a little (rubber band) instead of stopping dead.
+import { useEffect, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { useLang } from '../lang';
-import { colors, radius, space } from '../theme';
+import { pickSnap, rubberBand, springs } from '../motion';
+import { colors, radius, shadow, space } from '../theme';
+import { haptic } from './haptics';
 
-export function MapSheet({ children, peek = 220, open = 520, bottomInset = 0 }: { children: ReactNode; peek?: number; open?: number; bottomInset?: number }) {
+export function MapSheet({
+  children,
+  peek = 220,
+  open = 520,
+  bottomInset = 0,
+  expanded,
+  onExpandedChange,
+}: {
+  children: ReactNode;
+  peek?: number;
+  open?: number;
+  bottomInset?: number;
+  /** Open or close it from outside (for example the "Trip" button). */
+  expanded?: boolean;
+  onExpandedChange?: (open: boolean) => void;
+}) {
   const { t } = useLang();
   const hidden = open - peek; // how far down the sheet sits when peeking
   const y = useSharedValue(hidden);
   const startY = useSharedValue(hidden);
+
+  useEffect(() => {
+    if (expanded === undefined) return;
+    y.value = withSpring(expanded ? 0 : hidden, springs.sheet);
+  }, [expanded, hidden, y]);
+
+  const settled = (isOpen: boolean) => {
+    haptic.tick();
+    onExpandedChange?.(isOpen);
+  };
 
   const pan = Gesture.Pan()
     .onBegin(() => {
       startY.value = y.value;
     })
     .onUpdate((e) => {
-      y.value = Math.min(hidden, Math.max(0, startY.value + e.translationY));
+      const raw = startY.value + e.translationY;
+      // Inside the range it follows the finger; past it, it stretches.
+      y.value = raw < 0 ? rubberBand(raw, open) : raw > hidden ? hidden + rubberBand(raw - hidden, open) : raw;
     })
     .onEnd((e) => {
-      const goOpen = e.velocityY < -300 || (e.velocityY < 300 && y.value < hidden / 2);
-      y.value = withSpring(goOpen ? 0 : hidden, { damping: 22, stiffness: 220 });
+      const to = pickSnap(y.value, e.velocityY, [0, hidden]);
+      const wasOpen = startY.value < hidden / 2;
+      y.value = withSpring(to, { ...springs.sheet, velocity: e.velocityY });
+      if ((to === 0) !== wasOpen) runOnJS(settled)(to === 0);
     });
+
+  const tapHandle = Gesture.Tap().onEnd(() => {
+    const goOpen = y.value > hidden / 2;
+    y.value = withSpring(goOpen ? 0 : hidden, springs.sheet);
+    runOnJS(settled)(goOpen);
+  });
 
   const style = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
 
@@ -35,21 +74,20 @@ export function MapSheet({ children, peek = 220, open = 520, bottomInset = 0 }: 
           position: 'absolute',
           left: 0,
           right: 0,
-          bottom: 0,
-          height: open + bottomInset,
-          backgroundColor: colors.ghee,
+          bottom: -open, // room underneath for the stretch
+          height: open * 2 + bottomInset,
+          backgroundColor: colors.white,
           borderTopLeftRadius: radius.sheet,
           borderTopRightRadius: radius.sheet,
-          paddingHorizontal: space.xl,
-          paddingBottom: bottomInset,
-          borderTopWidth: 1,
-          borderColor: colors.line,
+          paddingHorizontal: space.lg + 2,
+          paddingBottom: open + bottomInset,
+          boxShadow: shadow.sheet,
         },
         style,
       ]}
     >
-      <GestureDetector gesture={pan}>
-        <View accessibilityRole="adjustable" accessibilityLabel={t('sheet.handle')} style={{ height: 32, alignItems: 'center', justifyContent: 'center' }}>
+      <GestureDetector gesture={Gesture.Exclusive(pan, tapHandle)}>
+        <View accessibilityRole="adjustable" accessibilityLabel={t('sheet.handle')} style={{ height: 28, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: 44, height: 5, borderRadius: 3, backgroundColor: colors.line }} />
         </View>
       </GestureDetector>

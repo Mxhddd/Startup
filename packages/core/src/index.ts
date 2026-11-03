@@ -1,4 +1,4 @@
-export { KARACHI_TZ, karachiDate, karachiClock, karachiHour, defaultRunKind } from './dates';
+export { KARACHI_TZ, karachiDate, karachiClock, karachiHour, defaultRunKind, karachiDayParts } from './dates';
 export { PILOT_WHATSAPP } from './contact';
 export { HOLD_MS, UNDO_MS, holdProgress, undoSecondsLeft } from './taps';
 export { STALE_AFTER_S, signalState, ageParts, type Signal } from './signal';
@@ -11,5 +11,5 @@ export { chunkedStorage, type KeyStore } from './chunkedStorage';
 export { createQueue, retryDelayMs, type Queue, type QueueItem, type QueueStore, type Dropped } from './queue';
 export { shouldSendPosition, toPositionBody, MOVING_EVERY_MS, STOPPED_EVERY_MS, MOVING_SPEED_MS, type GpsReading } from './cadence';
 export { buildRun, runProgress, type StopGroup, type StopRow, type RiderRow, type EventRow } from './today';
-export { distanceM, etaMinutes, timelineFor, canUndoChutti, routeDotsLine, AT_DOOR_M, type ParentEvent, type TimelineItem, type TripStep } from './parent';
+export { distanceM, etaMinutes, timelineFor, canUndoChutti, routeDotsLine, childPlace, formatDistance, arrivalClock, AT_DOOR_M, type ChildPlace, type ParentEvent, type TimelineItem, type TripStep } from './parent';
 export { tokenFromInviteLink } from './invite';

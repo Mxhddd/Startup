@@ -21,6 +21,16 @@ export const colors = {
   absentBg: '#EEE9DF',
   dangerText: '#9E2A1F',
   dangerBg: '#F9E3DF',
+  // From the v5 screens: quiet surfaces and the darker "lip" under the big buttons.
+  sand: '#F3EEE3', // secondary action tiles
+  hairline: '#F0EBE0', // dividers inside a white card
+  neelDeep: '#0E1430', // the lip under a neel button
+  zamurradDeep: '#0B4A3D', // the lip under a zamurrad button
+  kesarDeep: '#B9802A', // the lip under a kesar button
+  shingarfDeep: '#7A1E14', // the lip under a red button; also help text on shingarfTint
+  mutedOnDark: '#BFC4D6', // secondary text on siyahi or neel
+  gold: '#C9A24A', // the thin ring round the driver's initial
+  scrim: 'rgba(20,26,51,0.45)', // behind a sheet that opens over the screen
 } as const;
 
 export type Step = 'left' | 'picked' | 'reachedSchool' | 'leftSchool' | 'dropped';
@@ -36,7 +46,19 @@ export const stepColors: Record<Step, { fill: string; text: string }> = {
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32 } as const;
 
-export const radius = { card: 16, button: 14, sheet: 24, pill: 999 } as const;
+export const radius = { card: 16, button: 14, tile: 18, big: 22, sheet: 26, pill: 999 } as const;
+
+/**
+ * Elevation, as CSS box-shadow strings (React Native 0.76+ and the web both read them).
+ * float: chips over the map. sheet: the bottom sheet. card: a white card on ghee.
+ * lip(): the solid edge under a big button, which the press pushes down into.
+ */
+export const shadow = {
+  float: '0px 4px 14px rgba(20,26,51,0.14)',
+  sheet: '0px -10px 30px rgba(20,26,51,0.16)',
+  card: '0px 1px 2px rgba(20,26,51,0.05), 0px 8px 24px rgba(20,26,51,0.06)',
+  lip: (color: string, depth = 5) => `0px ${depth}px 0px ${color}`,
+} as const;
 
 /** Driver tap targets: every tap at least 64 px, the next expected tap 104 px. */
 export const tap = { min: 64, next: 104 } as const;

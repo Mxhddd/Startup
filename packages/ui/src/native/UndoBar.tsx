@@ -1,11 +1,20 @@
-// After every tap: what was marked, a 5-second countdown, and Undo. The bar shrinks as time runs out.
+// After every tap: what was marked, a 5-second ring that empties, and Undo.
+// It rises from the bottom on the sheet spring and sinks away when the time is up (or after Undo).
 import { UNDO_MS, createUndoCountdown, undoSecondsLeft } from '@pohnch/core';
 import { useEffect, useState } from 'react';
-import { Pressable, View } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { View } from 'react-native';
+import Animated, { Easing, FadeOutDown, SlideInDown, useAnimatedProps, useSharedValue, withTiming } from 'react-native-reanimated';
+import Svg, { Circle } from 'react-native-svg';
 import { useLang } from '../lang';
-import { colors, radius, tap } from '../theme';
+import { springs } from '../motion';
+import { colors, radius, shadow, tap } from '../theme';
 import { AppText } from './AppText';
+import { haptic } from './haptics';
+import { PressableScale } from './PressableScale';
+
+const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+const R = 15;
+const C = 2 * Math.PI * R;
 
 export function UndoBar({
   text,
@@ -31,33 +40,45 @@ export function UndoBar({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tappedAt]);
 
-  const bar = useAnimatedStyle(() => ({ width: `${remaining.value * 100}%` }));
+  const ring = useAnimatedProps(() => ({ strokeDashoffset: C * (1 - remaining.value) }));
   if (left === 0) return null;
 
   return (
-    <View testID="undo-bar" accessibilityLiveRegion="polite" style={{ backgroundColor: colors.siyahi, borderRadius: radius.card, overflow: 'hidden' }}>
-      <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, minHeight: tap.min }}>
+    <Animated.View
+      testID="undo-bar"
+      accessibilityLiveRegion="polite"
+      entering={SlideInDown.springify().damping(springs.sheet.damping).stiffness(springs.sheet.stiffness).mass(0.8)}
+      exiting={FadeOutDown.duration(220)}
+      style={{ backgroundColor: colors.siyahi, borderRadius: radius.tile, boxShadow: shadow.float }}
+    >
+      <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, minHeight: tap.min + 8 }}>
+        <View style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+          <Svg width={40} height={40} viewBox="0 0 40 40" style={{ position: 'absolute', transform: [{ rotate: '-90deg' }] }}>
+            <Circle cx="20" cy="20" r={R} stroke="rgba(250,246,238,0.18)" strokeWidth={3} fill="none" />
+            <AnimatedCircle cx="20" cy="20" r={R} stroke={colors.kesar} strokeWidth={3} fill="none" strokeLinecap="round" strokeDasharray={`${C} ${C}`} animatedProps={ring} />
+          </Svg>
+          <AppText variant="number" color={colors.kesar} style={{ fontSize: 16, lineHeight: 20 }}>
+            {String(left)}
+          </AppText>
+        </View>
         <View style={{ flex: 1 }}>
           <AppText bold color={colors.ghee} numberOfLines={2}>
             {text}
           </AppText>
         </View>
-        <AppText variant="number" color={colors.kesar} style={{ fontSize: 22, lineHeight: 28 }}>
-          {String(left)}
-        </AppText>
-        <Pressable
+        <PressableScale
           testID="undo-button"
           accessibilityRole="button"
           accessibilityLabel={t('undo.action')}
+          haptic="warn"
           onPress={onUndo}
-          style={{ minHeight: 48, minWidth: 88, paddingHorizontal: 16, borderRadius: radius.button, backgroundColor: colors.ghee, alignItems: 'center', justifyContent: 'center' }}
+          faceStyle={{ minHeight: 48, minWidth: 88, paddingHorizontal: 18, borderRadius: radius.button, backgroundColor: colors.ghee, alignItems: 'center', justifyContent: 'center' }}
         >
           <AppText bold color={colors.siyahi}>
             {t('undo.action')}
           </AppText>
-        </Pressable>
+        </PressableScale>
       </View>
-      <Animated.View style={[{ height: 4, backgroundColor: colors.kesar }, dir === 'rtl' ? { alignSelf: 'flex-end' } : { alignSelf: 'flex-start' }, bar]} />
-    </View>
+    </Animated.View>
   );
 }

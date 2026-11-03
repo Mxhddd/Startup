@@ -4,7 +4,8 @@ import { Gulzar_400Regular } from '@expo-google-fonts/gulzar';
 import { Manrope_500Medium, Manrope_800ExtraBold } from '@expo-google-fonts/manrope';
 import { NotoSansArabic_500Medium, NotoSansArabic_700Bold } from '@expo-google-fonts/noto-sans-arabic';
 import { useSession } from '@pohnch/client';
-import { LangProvider, colors } from '@pohnch/ui';
+import { LangProvider } from '@pohnch/ui';
+import { useScreenOptions } from '@pohnch/ui/native';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -28,6 +29,12 @@ function AuthGate({ ready, signedIn, configured }: { ready: boolean; signedIn: b
     if (signedIn && here === 'login') router.replace('/');
   }, [ready, signedIn, configured, segments]);
   return null;
+}
+
+// The screens, with the push animation that follows the reading direction.
+function Screens() {
+  const options = useScreenOptions();
+  return <Stack screenOptions={options} />;
 }
 
 export default function RootLayout() {
@@ -55,7 +62,7 @@ export default function RootLayout() {
         <LangProvider>
           <StatusBar style="dark" />
           <DriverProvider key={session?.user.id ?? 'out'}>
-            <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.ghee } }} />
+            <Screens />
           </DriverProvider>
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
         </LangProvider>

@@ -1,29 +1,38 @@
-// Pins on the map: an ordinary stop (white dot, neel ring), your stop (a zamurrad home pin),
-// and the school (a kesar pin with the star). Parents only ever see their own stop and the school.
+// Pins on the map, as on the v5 screens: an ordinary stop (white dot, neel ring), your stop or home
+// (a zamurrad dot with a soft halo), and the school (a kesar disc with the house glyph in siyahi).
+// Each one drops in on a spring when it first appears.
 import { View } from 'react-native';
+import Animated, { ZoomIn } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { springs } from '../motion';
 import { colors } from '../theme';
-import { Icon, StarIcon } from './icons';
 
-const PIN = 'M20 50 C20 50 4 31 4 19 a16 16 0 0 1 32 0 C36 31 20 50 20 50 Z';
+const enter = ZoomIn.springify().damping(springs.pop.damping).stiffness(springs.pop.stiffness);
 
 export function StopPin({ kind }: { kind: 'stop' | 'home' | 'school' }) {
   if (kind === 'stop') {
     return (
-      <Svg width={22} height={22} viewBox="0 0 22 22" testID="stop-pin">
-        <Circle cx="11" cy="11" r="8" fill={colors.white} stroke={colors.neel} strokeWidth={4} />
-      </Svg>
+      <Animated.View entering={enter} testID="stop-pin">
+        <Svg width={24} height={24} viewBox="0 0 24 24">
+          <Circle cx="12" cy="12" r="8" fill={colors.white} stroke={colors.neel} strokeWidth={4} />
+        </Svg>
+      </Animated.View>
     );
   }
-  const fill = kind === 'home' ? colors.zamurrad : colors.kesar;
+  if (kind === 'home') {
+    return (
+      <Animated.View entering={enter} testID="home-pin" style={{ width: 52, height: 52, alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ position: 'absolute', width: 52, height: 52, borderRadius: 26, backgroundColor: colors.zamurrad, opacity: 0.18 }} />
+        <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.zamurrad, borderWidth: 4.5, borderColor: colors.white, boxShadow: '0px 2px 6px rgba(20,26,51,0.25)' }} />
+      </Animated.View>
+    );
+  }
   return (
-    <View style={{ width: 40, height: 52 }} testID={`${kind}-pin`}>
-      <Svg width={40} height={52} viewBox="0 0 40 52" style={{ position: 'absolute' }}>
-        <Path d={PIN} fill={fill} stroke={colors.white} strokeWidth={2.5} />
+    <Animated.View entering={enter} testID="school-pin" style={{ width: 44, height: 44, boxShadow: '0px 3px 8px rgba(20,26,51,0.25)', borderRadius: 22 }}>
+      <Svg width={44} height={44} viewBox="0 0 44 44">
+        <Circle cx="22" cy="22" r="19" fill={colors.kesar} stroke={colors.white} strokeWidth={4} />
+        <Path d="M14 28 V19.5 l8 -5.5 8 5.5 V28 Z" fill={colors.siyahi} />
       </Svg>
-      <View style={{ position: 'absolute', top: 8, left: 9, width: 22, height: 22, alignItems: 'center', justifyContent: 'center' }}>
-        {kind === 'home' ? <Icon name="home" size={20} color={colors.white} strokeWidth={2.6} /> : <StarIcon size={22} color={colors.siyahi} />}
-      </View>
-    </View>
+    </Animated.View>
   );
 }

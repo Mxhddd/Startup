@@ -1,9 +1,9 @@
 // Families: share the van's invite link, and approve each request with the child's stop.
 import { driver } from '@pohnch/client';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ApprovalCard, InviteCard, TapButton } from '@pohnch/ui/native';
+import { AppText, ApprovalCard, ChoiceChip, InviteCard, TapButton } from '@pohnch/ui/native';
 import { useState } from 'react';
-import { Pressable, Share, View } from 'react-native';
+import { Share, View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { useDriver } from '../state/DriverStore';
 
@@ -60,10 +60,7 @@ export default function Families() {
             {d.stops.map((s) => {
               const on = stopFor[r.membershipId] === s.id;
               return (
-                <Pressable key={s.id} accessibilityRole="radio" accessibilityState={{ selected: on }} onPress={() => setStopFor((m) => ({ ...m, [r.membershipId]: s.id }))}
-                  style={{ minHeight: 48, paddingHorizontal: 14, borderRadius: radius.pill, justifyContent: 'center', borderWidth: 2, borderColor: colors.siyahi, backgroundColor: on ? colors.siyahi : colors.white }}>
-                  <AppText bold color={on ? colors.ghee : colors.siyahi}>{`${s.position}. ${s.label}`}</AppText>
-                </Pressable>
+                <ChoiceChip key={s.id} label={`${s.position}. ${s.label}`} on={on} onPress={() => setStopFor((m) => ({ ...m, [r.membershipId]: s.id }))} />
               );
             })}
           </View>

@@ -1,25 +1,38 @@
-// Driver "Today": what to do now. No van yet -> set it up. A trip running -> back to it.
-// Otherwise: today's list and the hold-to-start button for the next run.
-// Long-press the title to open the hidden component gallery.
+// Driver "Today" (v5): a neel header with the greeting, the date and the van; today's route as a
+// still map; the children in stop order in one white card; and the one big hold-to-start button.
+// No van yet -> set it up. A trip running -> straight back to it.
+// In development builds, a long press on the greeting opens the component gallery.
 import { useSession } from '@pohnch/client';
-import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ChildRow, LangSwitch, TapButton, VanBadge } from '@pohnch/ui/native';
-import { Redirect, router } from 'expo-router';
-import { Pressable, ScrollView, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { karachiDayParts } from '@pohnch/core';
+import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { AppText, ChildRow, Icon, LangSwitch, PohnchMap, PressableScale, TapButton, VanBadge, type IconName } from '@pohnch/ui/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Redirect, router } from 'expo-router';
 import { useState } from 'react';
+import { Pressable, ScrollView, View } from 'react-native';
+import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationDisclosure } from '../components/LocationDisclosure';
 import { useDriver } from '../state/DriverStore';
 
 const DISCLOSED = 'pohnch.driver.locationDisclosed.v1';
+type Href = '/stops' | '/families' | '/setup' | '/practice';
 
-function NavButton({ label, href, badge }: { label: string; href: '/stops' | '/families' | '/setup' | '/practice'; badge?: number }) {
+function NavTile({ label, href, icon, badge }: { label: string; href: Href; icon: IconName; badge?: number }) {
+  const { dir } = useLang();
   return (
-    <Pressable accessibilityRole="button" onPress={() => router.push(href)} testID={`nav-${href.slice(1)}`}
-      style={{ flex: 1, minHeight: 64, borderRadius: radius.button, borderWidth: 2, borderColor: colors.siyahi, backgroundColor: colors.white, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 8 }}>
-      <AppText bold align="center">{badge ? `${label} · ${badge}` : label}</AppText>
-    </Pressable>
+    <PressableScale accessibilityRole="button" accessibilityLabel={label} onPress={() => router.push(href)} testID={`nav-${href.slice(1)}`} style={{ flex: 1 }}
+      faceStyle={{ minHeight: 72, borderRadius: radius.card, backgroundColor: colors.white, boxShadow: shadow.card, alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 6 }}>
+      <View>
+        <Icon name={icon} size={22} color={colors.neel} />
+        {badge ? (
+          <Animated.View entering={FadeIn} style={{ position: 'absolute', top: -8, [dir === 'rtl' ? 'left' : 'right']: -14, minWidth: 22, height: 22, borderRadius: 11, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 }}>
+            <AppText variant="number" style={{ fontSize: 14, lineHeight: 18 }}>{String(badge)}</AppText>
+          </Animated.View>
+        ) : null}
+      </View>
+      <AppText bold align="center" style={{ fontSize: 15 }}>{label}</AppText>
+    </PressableScale>
   );
 }
 
@@ -41,73 +54,125 @@ export default function DriverToday() {
   if (configured && d.running) return <Redirect href="/trip" />;
 
   const nextKind = d.nextKind;
+  const day = karachiDayParts(new Date());
+  const dateText = t('date.long', { day: t(`day.${day.weekday}` as 'day.0'), date: day.date, month: t(`month.${day.month}` as 'month.1') });
+  const childCount = d.riders.length;
+  const offCount = d.run.groups.reduce((n, g) => n + g.children.filter((c) => c.state === 'absent').length, 0);
+  const stopById = new Map(d.stops.map((s) => [s.id, s]));
+  const canStart = configured && d.van && d.van.verified_at && !d.dayOff && childCount > 0;
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.ghee, paddingTop: insets.top + space.lg }}>
-      <View style={{ flexDirection: row, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.xl, marginBottom: space.lg }}>
-        <Pressable onLongPress={() => router.push('/gallery')} accessibilityHint={t('gallery.open')}>
-          <AppText variant="display" testID="today-title">{t('driver.today.title')}</AppText>
-        </Pressable>
-        <LangSwitch tone="dark" />
-      </View>
+    <View style={{ flex: 1, backgroundColor: colors.ghee }}>
+      {/* Header */}
+      <Animated.View entering={FadeInUp.springify().damping(22)} style={{ backgroundColor: colors.neel, paddingTop: insets.top + 14, paddingHorizontal: space.lg, paddingBottom: 16, gap: 10 }}>
+        <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
+          <Pressable style={{ flex: 1 }} onLongPress={__DEV__ ? () => router.push('/gallery') : undefined}>
+            <AppText bold color={colors.ghee} style={{ fontSize: 20 }} testID="today-title" numberOfLines={2}>
+              {d.name ? t('driver.hello', { name: d.name }) : t('driver.hello.plain')}
+            </AppText>
+          </Pressable>
+          <LangSwitch tone="dark" />
+        </View>
+        <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
+          <AppText color={colors.mutedOnDark} style={{ flex: 1, fontSize: 15 }} numberOfLines={1}>
+            {[dateText, d.van?.name].filter(Boolean).join(' · ')}
+          </AppText>
+          {d.requests.length > 0 ? (
+            <PressableScale accessibilityRole="button" onPress={() => router.push('/families')} scaleTo="chip" testID="requests-pill"
+              faceStyle={{ height: 40, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.kesar, justifyContent: 'center' }}>
+              <AppText bold color={colors.siyahi} style={{ fontSize: 15 }}>{t('driver.requests.new', { n: d.requests.length })}</AppText>
+            </PressableScale>
+          ) : null}
+        </View>
+      </Animated.View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: space.xl, paddingBottom: insets.bottom + 160, gap: space.lg }}>
-        {!configured ? (
-          <View testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius.card, borderWidth: 1, borderColor: colors.line, padding: space.xl, gap: space.sm }}>
-            <AppText bold>{t('app.driver.name')}</AppText>
-            <AppText variant="secondary">{t('common.notConnected')}</AppText>
-            <TapButton tone="left" label={t('driver.nav.practice')} onConfirm={() => router.push('/practice')} testID="nav-practice" />
-          </View>
-        ) : d.loading ? (
-          <AppText variant="secondary">{t('common.loading')}</AppText>
-        ) : d.error ? (
-          <View style={{ gap: space.md }}>
-            <AppText color={colors.dangerText}>{t(d.error === 'offline' ? 'error.offline' : 'error.generic')}</AppText>
-            <TapButton label={t('common.retry')} onConfirm={d.actions.refresh} />
-          </View>
-        ) : !d.van ? (
-          <View testID="today-empty" style={{ gap: space.md }}>
-            <AppText variant="secondary">{t('driver.setup.hint')}</AppText>
-            <TapButton size="next" tone="left" label={t('driver.today.setup')} onConfirm={() => router.push('/setup')} testID="setup-van" />
-          </View>
-        ) : (
-          <>
-            <View style={{ flexDirection: row, alignItems: 'center', gap: space.md, flexWrap: 'wrap' }}>
-              <AppText bold>{d.van.name}</AppText>
-              <VanBadge status={d.van.switched_off_at ? 'off' : d.van.verified_at ? 'verified' : 'waiting'} />
+      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 190 }}>
+        {configured && d.van && d.stops.length > 0 ? (
+          <Animated.View entering={FadeIn.duration(400)} style={{ height: 210 }}>
+            <PohnchMap
+              testID="today-map"
+              accessibilityLabel={t('driver.nav.stops')}
+              interactive={false}
+              pins={d.stops.map((s) => ({ id: s.id, kind: 'number' as const, n: s.position, lat: s.lat, lng: s.lng }))}
+              style={{ flex: 1 }}
+            />
+          </Animated.View>
+        ) : null}
+
+        <View style={{ padding: space.lg, gap: space.md }}>
+          {!configured ? (
+            <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius.big, boxShadow: shadow.card, padding: space.xl, gap: space.md }}>
+              <AppText bold>{t('app.driver.name')}</AppText>
+              <AppText variant="secondary">{t('common.notConnected')}</AppText>
+              <TapButton tone="left" label={t('driver.nav.practice')} onConfirm={() => router.push('/practice')} testID="nav-practice" />
+            </Animated.View>
+          ) : d.loading ? (
+            <View style={{ gap: space.md }} accessibilityLabel={t('common.loading')}>
+              {[0.5, 1, 1, 1].map((w, i) => (
+                <Animated.View key={i} entering={FadeIn.delay(i * 80)} style={{ height: i === 0 ? 18 : 52, width: `${w * 100}%`, borderRadius: 12, backgroundColor: colors.sand }} />
+              ))}
             </View>
-            {!d.van.verified_at ? <AppText variant="secondary">{t('driver.check.pending')}</AppText> : null}
-
-            <View style={{ flexDirection: row, gap: space.sm }}>
-              <NavButton label={t('driver.nav.stops')} href="/stops" />
-              <NavButton label={t('driver.nav.families')} href="/families" badge={d.requests.length} />
-              <NavButton label={t('driver.nav.practice')} href="/practice" />
-            </View>
-
-            {d.dayOff ? (
-              <AppText bold>{t('driver.today.dayOffOn')}</AppText>
-            ) : d.riders.length === 0 ? (
-              <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>
-            ) : (
-              d.run.groups.map((g, i) => (
-                <ChildRow key={g.stopId ?? i} names={g.children.map((c) => c.firstName)} stop={g.label} step={d.run.kind === 'morning' ? 'picked' : 'dropped'}
-                  state={g.state === 'absent' ? 'absent' : 'waiting'} readOnly onTap={() => undefined} />
-              ))
-            )}
-          </>
-        )}
-      </ScrollView>
-
-      {configured && d.van && d.van.verified_at && !d.dayOff && d.riders.length > 0 ? (
-        <View style={{ position: 'absolute', left: space.xl, right: space.xl, bottom: insets.bottom + space.lg }}>
-          {nextKind ? (
-            <TapButton size="next" tone="left" icon="left" hold testID="start-trip"
-              label={t(nextKind === 'morning' ? 'driver.today.startMorning' : 'driver.today.startAfternoon')}
-              onConfirm={() => start(nextKind)} />
+          ) : d.error ? (
+            <Animated.View entering={FadeInDown.springify()} style={{ gap: space.md }}>
+              <AppText bold color={colors.dangerText}>{t(d.error === 'offline' ? 'error.offline' : 'error.generic')}</AppText>
+              <TapButton tone="quiet" label={t('common.retry')} onConfirm={d.actions.refresh} />
+            </Animated.View>
+          ) : !d.van ? (
+            <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ gap: space.md, paddingTop: space.lg }}>
+              <AppText variant="title" style={{ fontSize: 26 }}>{t('driver.today.setup')}</AppText>
+              <AppText variant="secondary">{t('driver.setup.hint')}</AppText>
+              <TapButton size="next" tone="left" icon="van" label={t('driver.today.setup')} onConfirm={() => router.push('/setup')} testID="setup-van" />
+            </Animated.View>
           ) : (
-            <AppText bold align="center">{t('driver.today.done')}</AppText>
+            <>
+              <View style={{ flexDirection: row, alignItems: 'center', gap: space.md, flexWrap: 'wrap' }}>
+                <AppText bold color={colors.ink2} style={{ flex: 1, fontSize: 15 }}>
+                  {d.dayOff ? t('driver.today.dayOffOn') : offCount > 0 ? t('driver.today.count', { n: childCount, off: offCount }) : t('driver.today.countNone', { n: childCount })}
+                </AppText>
+                <VanBadge status={d.van.switched_off_at ? 'off' : d.van.verified_at ? 'verified' : 'waiting'} />
+              </View>
+              {!d.van.verified_at ? <AppText variant="secondary">{t('driver.check.pending')}</AppText> : null}
+
+              {!d.dayOff && childCount === 0 ? (
+                <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>
+              ) : !d.dayOff ? (
+                <View style={{ backgroundColor: colors.white, borderRadius: radius.card, boxShadow: shadow.card, paddingHorizontal: 14, paddingVertical: 4 }}>
+                  {d.run.groups.map((g, i) => {
+                    const s = g.stopId ? stopById.get(g.stopId) : undefined;
+                    const time = (d.run.kind === 'morning' ? s?.morning_time : s?.afternoon_time)?.slice(0, 5).replace(/^0/, '');
+                    return (
+                      <View key={g.stopId ?? i} style={{ borderBottomWidth: i < d.run.groups.length - 1 ? 1 : 0, borderColor: colors.hairline }}>
+                        <ChildRow index={i} readOnly names={g.children.map((c) => c.firstName)} stop={g.label} order={s?.position} time={time}
+                          step={d.run.kind === 'morning' ? 'picked' : 'dropped'} state={g.state === 'absent' ? 'absent' : 'waiting'} onTap={() => undefined} />
+                      </View>
+                    );
+                  })}
+                </View>
+              ) : null}
+
+              <View style={{ flexDirection: row, gap: space.sm, marginTop: space.sm }}>
+                <NavTile label={t('driver.nav.stops')} href="/stops" icon="pin" />
+                <NavTile label={t('driver.nav.families')} href="/families" icon="family" badge={d.requests.length} />
+                <NavTile label={t('driver.nav.practice')} href="/practice" icon="route" />
+              </View>
+            </>
           )}
         </View>
+      </ScrollView>
+
+      {canStart ? (
+        <Animated.View entering={FadeInDown.delay(200).springify().damping(20)} style={{ position: 'absolute', left: space.lg, right: space.lg, bottom: insets.bottom + space.lg }}>
+          {nextKind ? (
+            <TapButton size="next" tone="left" icon="van" hold testID="start-trip"
+              label={t(nextKind === 'morning' ? 'driver.today.startMorning' : 'driver.today.startAfternoon')}
+              sublabel={t('driver.today.startSub')}
+              onConfirm={() => start(nextKind)} />
+          ) : (
+            <View style={{ backgroundColor: colors.zamurradTint, borderRadius: radius.big, padding: space.lg }}>
+              <AppText bold align="center" color={colors.zamurradOnTint}>{t('driver.today.done')}</AppText>
+            </View>
+          )}
+        </Animated.View>
       ) : null}
       <LocationDisclosure
         visible={askFor !== null}

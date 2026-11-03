@@ -22,6 +22,12 @@ export type PohnchMapProps = {
   testID?: string;
   /** Space the sheet covers at the bottom, so framing keeps pins in view. */
   bottomInset?: number;
+  /** Space a header covers at the top. */
+  topInset?: number;
+  /** false for a still picture of the route (inside a scrolling screen). */
+  interactive?: boolean;
+  /** Keep the van in view as it moves (the driver's trip screen). */
+  follow?: boolean;
 };
 
 // Fetched once per app run and shared by every map.
@@ -40,7 +46,7 @@ async function loadStyle(): Promise<MapStyleJson | string> {
 function PinView({ pin }: { pin: MapPin }) {
   if (pin.kind === 'number') {
     return (
-      <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.neel, borderWidth: 3, borderColor: colors.white, alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: colors.neel, borderWidth: 3, borderColor: colors.white, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 2px 6px rgba(20,26,51,0.25)' }}>
         <AppText variant="small" bold color={colors.white}>{String(pin.n)}</AppText>
       </View>
     );
@@ -48,7 +54,7 @@ function PinView({ pin }: { pin: MapPin }) {
   return <StopPin kind={pin.kind} />;
 }
 
-export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0 }: PohnchMapProps) {
+export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false }: PohnchMapProps) {
   const [mapStyle, setMapStyle] = useState<MapStyleJson | string | null>(cachedStyle);
   const camera = useRef<CameraRef>(null);
   const framed = useRef(false);
@@ -63,16 +69,22 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
     if (framed.current || pts.length === 0) return;
     framed.current = true;
     if (pts.length === 1) {
-      camera.current?.flyTo({ center: pts[0] as [number, number], zoom: 15, duration: 600 });
+      camera.current?.flyTo({ center: pts[0] as [number, number], zoom: 15, duration: 1100 });
     } else {
       const lngs = pts.map((p) => p[0]);
       const lats = pts.map((p) => p[1]);
       camera.current?.fitBounds([Math.min(...lngs), Math.min(...lats), Math.max(...lngs), Math.max(...lats)], {
-        padding: { top: 120, bottom: 80 + bottomInset, left: 60, right: 60 },
-        duration: 600,
+        padding: { top: 80 + topInset, bottom: 60 + bottomInset, left: 50, right: 50 },
+        duration: 1100,
       });
     }
-  }, [pins, van, bottomInset]);
+  }, [pins, van, bottomInset, topInset]);
+
+  // Following: ease the camera to the van each time it moves, keeping the zoom.
+  useEffect(() => {
+    if (!follow || !van || !framed.current) return;
+    camera.current?.easeTo({ center: [van.lng, van.lat], duration: 1200, padding: { top: topInset, bottom: bottomInset, left: 0, right: 0 } });
+  }, [follow, van?.lat, van?.lng, topInset, bottomInset]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!mapStyle) return <View testID={testID} style={[StyleSheet.absoluteFill, { backgroundColor: colors.ghee }, style]} />;
 
@@ -88,6 +100,9 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       compass={false}
       touchRotate={false}
       touchPitch={false}
+      dragPan={interactive}
+      touchZoom={interactive}
+      doubleTapZoom={interactive}
       onPress={onPress ? (e) => onPress({ lng: e.nativeEvent.lngLat[0], lat: e.nativeEvent.lngLat[1] }) : undefined}
     >
       <Camera ref={camera} initialViewState={{ center: [karachiRegion.longitude, karachiRegion.latitude], zoom: 11 }} />

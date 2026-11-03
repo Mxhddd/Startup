@@ -2,7 +2,7 @@
 // The link itself is never printed on screen or logged; the share sheet carries it.
 import { View } from 'react-native';
 import { useLang } from '../lang';
-import { colors, radius, space } from '../theme';
+import { colors, radius, shadow, space } from '../theme';
 import { AppText } from './AppText';
 import { StarIcon } from './icons';
 import { TapButton } from './TapButton';
@@ -10,7 +10,7 @@ import { TapButton } from './TapButton';
 export function InviteCard({ onShare }: { onShare: () => void }) {
   const { t, dir } = useLang();
   return (
-    <View testID="invite-card" style={{ backgroundColor: colors.neel, borderRadius: radius.card, padding: space.xl, gap: space.md }}>
+    <View testID="invite-card" style={{ backgroundColor: colors.neel, borderRadius: radius.big, padding: space.xl, gap: space.md, boxShadow: shadow.card }}>
       <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }}>
         <StarIcon size={28} color={colors.kesar} />
         <AppText variant="title" color={colors.ghee}>

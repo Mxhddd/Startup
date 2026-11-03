@@ -1,5 +1,6 @@
 // The parent app's sums: how far, how many minutes, and what today's timeline shows.
 import type { LatLng } from './motion';
+import { karachiClock } from './dates';
 
 /** Straight-line distance in metres (haversine). */
 export function distanceM(a: LatLng, b: LatLng): number {
@@ -87,4 +88,27 @@ export function routeDotsLine(stopsAhead: number | null, slots = 5): string {
   const ahead = Math.max(0, Math.min(slots - 2, stopsAhead ?? 0));
   const done = slots - 2 - ahead;
   return ['●'.repeat(done), '★', '○'.repeat(ahead), '◉'].join('');
+}
+
+/**
+ * Where the child is in today's run, for the small line at the top of the parent's sheet:
+ * morning: coming (to pick up) -> inVan -> atSchool; afternoon: atSchool (waiting) -> inVan -> home.
+ */
+export type ChildPlace = 'coming' | 'inVan' | 'atSchool' | 'home';
+export function childPlace(kind: 'morning' | 'afternoon', items: TimelineItem[]): ChildPlace {
+  const at = (s: TimelineItem['step']) => items.find((i) => i.step === s)?.at != null;
+  if (kind === 'morning') return at('reached_school') ? 'atSchool' : at('picked') ? 'inVan' : 'coming';
+  return at('dropped') ? 'home' : at('picked') || at('left_school') ? 'inVan' : 'atSchool';
+}
+
+/** Distance for people: "350 m" under a kilometre, "1.8 km" up to 10 km, then whole kilometres. */
+export function formatDistance(m: number): { n: string; unit: 'm' | 'km' } {
+  if (m < 1000) return { n: String(Math.max(10, Math.round(m / 10) * 10)), unit: 'm' };
+  if (m < 10_000) return { n: (Math.round(m / 100) / 10).toFixed(1), unit: 'km' };
+  return { n: String(Math.round(m / 1000)), unit: 'km' };
+}
+
+/** The clock time the van should arrive, "7:15", from now and the minutes left (Asia/Karachi). */
+export function arrivalClock(nowMs: number, minutes: number): string {
+  return karachiClock(new Date(nowMs + minutes * 60_000));
 }

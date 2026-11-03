@@ -19,6 +19,15 @@ function check<T>(r: { data: T; error: { message: string } | null }): T {
   return r.data;
 }
 
+/** The name this driver chose at first login ("Rafiq bhai"), for the greeting. */
+export async function myName(): Promise<string | null> {
+  const { supabase } = db();
+  const uid = (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return null;
+  const row = check(await supabase.from('profiles').select('display_name').eq('id', uid).maybeSingle()) as { display_name: string } | null;
+  return row?.display_name ?? null;
+}
+
 export async function myVan(): Promise<Van | null> {
   const { supabase } = db();
   const uid = (await supabase.auth.getUser()).data.user?.id;

@@ -31,10 +31,10 @@ export default function Family() {
       <AppText variant="secondary">{t('parent.family.body')}</AppText>
       <TextField label={t('parent.family.phone')} value={phone} onChange={setPhone} ltr maxLength={16} placeholder="03xx xxxxxxx" testID="family-phone" />
       {msg ? <AppText color={msg.ok ? colors.zamurradOnTint : colors.dangerText}>{msg.text}</AppText> : null}
-      <TapButton tone="left" label={t('parent.family.add')} onConfirm={add} testID="family-add" />
+      <TapButton tone="left" icon="family" label={t('parent.family.add')} onConfirm={add} testID="family-add" />
       <AppText variant="title" style={{ marginTop: space.lg }}>{t('parent.menu')}</AppText>
-      <TapButton label={t('parent.addChild')} onConfirm={() => router.push('/child')} />
-      <TapButton label={t('parent.join')} onConfirm={() => router.push('/join')} />
+      <TapButton icon="plus" label={t('parent.addChild')} onConfirm={() => router.push('/child')} />
+      <TapButton icon="route" label={t('parent.join')} onConfirm={() => router.push('/join')} />
       {p.child && p.membership ? (
         <>
           <TapButton hold label={t('parent.family.leave', { name: p.child.first_name })} testID="leave-van"

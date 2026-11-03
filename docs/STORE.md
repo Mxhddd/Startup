@@ -73,4 +73,4 @@ Pohnch Driver is a free app for school van drivers. Start the trip, tap one big 
 5. Hold "Reached school": the notification disappears, location stops.
 6. Open Pohnch on a second phone (demo parent 0300 0000002) and show the van on the map and the timeline.
 
-**Reviewer login (App Store "Sign-in information"):** demo driver 0300 0000001 / 123456, demo parent 0300 0000002 / 123456.
+**Reviewer login (App Store "Sign-in information"):** driver 0300 0000001 / 123456, parent 0300 0000002 / 123456. Before submitting, set up a review van with them through the real screens (see docs/PILOT.md), so reviewers see a van with stops and a child.
