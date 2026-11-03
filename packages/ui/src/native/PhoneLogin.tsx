@@ -77,12 +77,12 @@ function Field({ label, value, onChange, kind, testID }: { label: string; value:
         maxLength={kind === 'phone' ? 16 : 40}
         placeholder={kind === 'phone' ? '03xx xxxxxxx' : undefined}
         placeholderTextColor={colors.ink2}
-        selectionColor={colors.neel}
+        selectionColor={colors.link}
         style={{
           minHeight: 64,
           borderRadius: 20, borderCurve: 'continuous',
           borderWidth: 2,
-          borderColor: focused ? colors.neel : colors.line,
+          borderColor: focused ? colors.link : colors.line,
           backgroundColor: colors.white,
           boxShadow: focused ? `0px 0px 0px 4px ${colors.neelTint}` : shadow.card,
           paddingHorizontal: space.lg,
@@ -118,7 +118,7 @@ function CodeCell({ digit, active }: { digit: string | undefined; active: boolea
           borderRadius: radius.button, borderCurve: 'continuous',
           backgroundColor: colors.white,
           borderWidth: 2,
-          borderColor: active ? colors.neel : digit ? colors.siyahi : colors.line,
+          borderColor: active ? colors.link : digit ? colors.siyahi : colors.line,
           boxShadow: active ? `0px 0px 0px 4px ${colors.neelTint}` : undefined,
           alignItems: 'center',
           justifyContent: 'center',
@@ -239,7 +239,7 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
         </View>
         <View style={{ alignItems: 'center', paddingTop: space.lg, paddingBottom: space.xxl + 8, gap: space.md }}>
           <Logo width={140} tone="white" animated />
-          <AppText bold color={colors.neelTint} align="center" style={{ fontSize: 17 }}>
+          <AppText bold color={colors.mutedOnDark} align="center" style={{ fontSize: 17 }}>
             {role === 'driver' ? t('app.driver.name') : t('brand.tagline')}
           </AppText>
         </View>
@@ -280,11 +280,11 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
               <AppText variant="secondary" align="center">{t('login.resendIn', { s: resendIn })}</AppText>
             ) : (
               <Pressable accessibilityRole="button" onPress={() => run(async () => { await sendCode(phone); setResendIn(RESEND_S); })} style={{ minHeight: 48, justifyContent: 'center' }}>
-                <AppText bold color={colors.neel}>{t('login.resend')}</AppText>
+                <AppText bold color={colors.link}>{t('login.resend')}</AppText>
               </Pressable>
             )}
             <Pressable accessibilityRole="button" onPress={() => { setStep('phone'); setError(null); }} style={{ minHeight: 48, justifyContent: 'center' }}>
-              <AppText bold color={colors.neel}>{t('login.changeNumber')}</AppText>
+              <AppText bold color={colors.link}>{t('login.changeNumber')}</AppText>
             </Pressable>
           </View>
         ) : null}

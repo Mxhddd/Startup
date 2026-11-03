@@ -9,7 +9,7 @@ import { springs } from '../motion';
 import { colors } from '../theme';
 
 function Dash({ solid, dark }: { solid: boolean; dark: boolean }) {
-  const c = dark ? colors.ghee : colors.neel;
+  const c = dark ? colors.onBrand : colors.link;
   if (solid) return <View style={{ flex: 1, height: 4, borderRadius: 2, borderCurve: 'continuous', backgroundColor: c }} />;
   return (
     <View style={{ flex: 1, height: 4, flexDirection: 'row', gap: 5, overflow: 'hidden' }}>
@@ -23,7 +23,7 @@ function Dash({ solid, dark }: { solid: boolean; dark: boolean }) {
 export function RouteDots({ total, done, tone = 'light' }: { total: number; done: number; tone?: 'light' | 'dark' }) {
   const { dir } = useLang();
   const dark = tone === 'dark';
-  const main = dark ? colors.ghee : colors.neel;
+  const main = dark ? colors.onBrand : colors.link;
   const n = Math.max(1, total);
   const at = Math.min(Math.max(0, done), n); // the van sits after the last stop passed
   const parts: ReactNode[] = [];

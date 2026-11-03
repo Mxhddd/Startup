@@ -38,7 +38,7 @@ export function MomentBanner({ step, title, sub, onDone }: { step: MomentStep; t
   const { dir } = useLang();
   const m = MOMENTS[step];
   const fill = TONE[m.tone];
-  const ink = m.tone === 'kesar' ? colors.siyahi : colors.white;
+  const ink = m.tone === 'kesar' ? colors.onKesar : colors.onFill;
   const t = useSharedValue(0);
   const ring = useSharedValue(0);
 

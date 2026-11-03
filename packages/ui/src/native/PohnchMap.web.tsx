@@ -4,7 +4,10 @@
 import { useEffect, useState } from 'react';
 import { Pressable, View, type LayoutChangeEvent } from 'react-native';
 import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
-import { colors, karachiRegion, mapColors } from '../theme';
+import { colorScheme, colors, karachiRegion, mapMoods } from '../theme';
+
+// The sketch follows the same palette as the real map: night when the app is dark.
+const palette = () => mapMoods[colorScheme() === 'dark' ? 'night' : 'day'];
 import { AppText } from './AppText';
 import { StopPin } from './StopPin';
 import { VanMarker } from './VanMarker';
@@ -13,6 +16,7 @@ import type { PohnchMapProps } from './PohnchMap';
 export type { MapPin, PohnchMapProps } from './PohnchMap';
 
 function Streets() {
+  const mapColors = palette();
   return (
     <Svg width="100%" height="100%" viewBox="0 0 390 844" preserveAspectRatio="xMidYMid slice" style={{ position: 'absolute' }}>
       <Rect width="390" height="844" fill={mapColors.land} />
@@ -76,7 +80,7 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
             }
           : undefined
       }
-      style={[style ?? { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, { backgroundColor: mapColors.land, overflow: 'hidden' }]}
+      style={[style ?? { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, { backgroundColor: palette().land, overflow: 'hidden' }]}
     >
       <Streets />
       <Svg width={box.w} height={box.h} style={{ position: 'absolute' }} pointerEvents="none">
@@ -100,7 +104,7 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
           <View key={p.id} pointerEvents="none" style={{ position: 'absolute', left: at.x - size / 2, top: at.y - size / 2 }}>
             {p.kind === 'number' ? (
               <View style={{ width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: colors.neel, borderWidth: 3, borderColor: colors.white, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 2px 6px rgba(20,26,51,0.25)' }}>
-                <AppText variant="small" bold color={colors.white}>{String(p.n)}</AppText>
+                <AppText variant="small" bold color={colors.onFill}>{String(p.n)}</AppText>
               </View>
             ) : (
               <StopPin kind={p.kind} />

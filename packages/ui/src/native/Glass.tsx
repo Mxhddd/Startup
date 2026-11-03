@@ -4,10 +4,11 @@
 import { BlurView } from 'expo-blur';
 import type { ReactNode } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
-import { colors, shadow } from '../theme';
+import { colorScheme, colors, shadow } from '../theme';
 
 export function Glass({ children, style, tone = 'light', radius = 999 }: { children?: ReactNode; style?: StyleProp<ViewStyle>; tone?: 'light' | 'dark'; radius?: number }) {
-  const dark = tone === 'dark';
+  // At night (the parent app following a dark phone) all glass is the dark kind.
+  const dark = tone === 'dark' || colorScheme() === 'dark';
   return (
     <View style={[{ borderRadius: radius, borderCurve: 'continuous', boxShadow: dark ? undefined : shadow.float }, style]}>
       <View style={[StyleSheet.absoluteFill, { borderRadius: radius, borderCurve: 'continuous', overflow: 'hidden' }]} pointerEvents="none">

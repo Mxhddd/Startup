@@ -14,7 +14,7 @@ const VB = { x: -41, y: -1541, w: 1584, h: 1972 };
 
 export function Logo({ width = 120, tone = 'neel', animated = false }: { width?: number; tone?: 'neel' | 'white'; animated?: boolean }) {
   const height = (width * VB.h) / VB.w;
-  const ink = tone === 'white' ? colors.ghee : colors.neel;
+  const ink = tone === 'white' ? colors.onBrand : colors.link;
   // Star placement in screen points.
   const starSpan = (MARK_STAR.size / VB.w) * width; // tip to tip
   const iconSize = (starSpan * 64) / 56; // StarIcon draws its star 56/64 of its box

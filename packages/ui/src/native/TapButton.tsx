@@ -50,7 +50,7 @@ const glows: Record<Step, string> = {
 };
 
 function look(tone: Tone) {
-  if (tone === 'neutral') return { fill: colors.white, text: colors.neel, border: colors.neel, lip: null, glow: null };
+  if (tone === 'neutral') return { fill: colors.white, text: colors.link, border: colors.link, lip: null, glow: null };
   if (tone === 'quiet') return { fill: colors.sand, text: colors.siyahi, border: null, lip: null, glow: null };
   if (tone === 'help') return { fill: colors.shingarf, text: colors.white, border: null, lip: lips.help, glow: null };
   return { ...stepColors[tone], border: null, lip: lips[tone], glow: glows[tone] };
@@ -215,7 +215,7 @@ export function TapButton({
         <View style={{ flexDirection: row, alignItems: 'center', gap: 16, paddingHorizontal: big ? 20 : 16 }}>
           {icon ? (
             big ? (
-              <View style={{ width: 72, height: 72, borderRadius: 24, borderCurve: 'continuous', backgroundColor: tone === 'reachedSchool' ? colors.siyahi : colors.ghee, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 72, height: 72, borderRadius: 24, borderCurve: 'continuous', backgroundColor: tone === 'reachedSchool' ? colors.night : colors.ghee, alignItems: 'center', justifyContent: 'center' }}>
                 <Icon name={icon} size={38} color={disabled ? colors.absentText : tone === 'reachedSchool' ? colors.kesar : c.fill} strokeWidth={2.3} />
               </View>
             ) : (

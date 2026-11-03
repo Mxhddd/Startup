@@ -18,7 +18,7 @@ export function ChoiceChip({ label, on, onPress, testID }: { label: string; on: 
   return (
     <PressableScale accessibilityRole="radio" accessibilityState={{ selected: on }} accessibilityLabel={label} onPress={onPress} scaleTo="chip" haptic="tick" testID={testID}>
       <Animated.View style={[{ minHeight: 48, paddingHorizontal: 16, borderRadius: radius.pill, borderCurve: 'continuous', justifyContent: 'center', borderWidth: 2 }, face]}>
-        <AppText bold color={on ? colors.ghee : colors.siyahi}>
+        <AppText bold color={on ? colors.onBrand : colors.siyahi}>
           {label}
         </AppText>
       </Animated.View>

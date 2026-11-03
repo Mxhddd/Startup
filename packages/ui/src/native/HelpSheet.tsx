@@ -64,18 +64,18 @@ export function HelpSheet({ visible, onClose, onReason }: { visible: boolean; on
                 style={{ flex: 1 }}
                 faceStyle={{ minHeight: 64, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: colors.shingarf, alignItems: 'center', justifyContent: 'center', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', gap: 10 }}
               >
-                <Icon name="phone" size={22} color={colors.white} />
-                <AppText variant="number" color={colors.white} style={{ fontSize: 24, lineHeight: 30 }}>
+                <Icon name="phone" size={22} color={colors.onFill} />
+                <AppText variant="number" color={colors.onFill} style={{ fontSize: 24, lineHeight: 30 }}>
                   {c.n}
                 </AppText>
-                <AppText bold color={colors.white}>
+                <AppText bold color={colors.onFill}>
                   {c.label}
                 </AppText>
               </PressableScale>
             ))}
           </View>
           <PressableScale accessibilityRole="button" onPress={onClose} faceStyle={{ minHeight: 56, alignItems: 'center', justifyContent: 'center' }}>
-            <AppText bold color={colors.neel}>
+            <AppText bold color={colors.link}>
               {t('help.close')}
             </AppText>
           </PressableScale>

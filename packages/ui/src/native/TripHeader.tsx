@@ -64,15 +64,15 @@ export function TripHeader({
       <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
         <View style={{ flex: 1, flexDirection: row, alignItems: 'center', gap: 8 }}>
           <LiveDot color={practice ? colors.kesar : colors.pista} />
-          <AppText bold color={colors.ghee} style={{ fontSize: 15 }}>
+          <AppText bold color={colors.onBrand} style={{ fontSize: 15 }}>
             {t(kind === 'morning' ? 'trip.morning' : 'trip.afternoon')}
           </AppText>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <RollingText text={`${done}/${total}`} variant="number" color={colors.ghee} style={{ fontSize: 15, lineHeight: 22 }} />
+            <RollingText text={`${done}/${total}`} variant="number" color={colors.onBrand} style={{ fontSize: 15, lineHeight: 22 }} />
           </View>
           {practice ? (
             <View style={{ backgroundColor: colors.kesar, borderRadius: radius.pill, borderCurve: 'continuous', paddingHorizontal: 10 }}>
-              <AppText variant="small" bold color={colors.siyahi}>
+              <AppText variant="small" bold color={colors.onKesar}>
                 {t('trip.practice')}
               </AppText>
             </View>
@@ -87,16 +87,16 @@ export function TripHeader({
           scaleTo="chip"
           faceStyle={{ minHeight: 48, minWidth: 64, paddingHorizontal: 14, borderRadius: radius.button, borderCurve: 'continuous', backgroundColor: colors.shingarf, alignItems: 'center', justifyContent: 'center', flexDirection: row, gap: 6 }}
         >
-          <Icon name="help" size={20} color={colors.white} />
-          <AppText bold color={colors.white}>
+          <Icon name="help" size={20} color={colors.onFill} />
+          <AppText bold color={colors.onFill}>
             {t('help.title')}
           </AppText>
         </PressableScale>
       </View>
       {next ? (
         <View style={{ flexDirection: row, alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-          {distance ? <RollingText text={distance} variant="number" color={colors.ghee} style={{ fontSize: 44, lineHeight: 52, letterSpacing: -1.2 }} /> : null}
-          <AppText bold color={colors.ghee} style={{ fontSize: 22 }} numberOfLines={1}>
+          {distance ? <RollingText text={distance} variant="number" color={colors.onBrand} style={{ fontSize: 44, lineHeight: 52, letterSpacing: -1.2 }} /> : null}
+          <AppText bold color={colors.onBrand} style={{ fontSize: 22 }} numberOfLines={1}>
             {next}
           </AppText>
         </View>

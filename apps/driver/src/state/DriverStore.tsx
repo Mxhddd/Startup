@@ -3,7 +3,7 @@
 // - Taps show on screen at once, are saved in the offline queue, and are sent in order in the background.
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { driver, driverApiQueueSend, type JoinRequest, type Stop, type Trip, type Van } from './data';
-import { ApiError, buildRun, createQueue, defaultRunKind, karachiDate, runProgress, type EventRow, type QueueItem, type RiderRow, type StopGroup } from '@pohnch/core';
+import { addDays, ApiError, buildRun, createQueue, defaultRunKind, karachiDate, runProgress, type EventRow, type QueueItem, type RiderRow, type StopGroup } from '@pohnch/core';
 import { randomUUID } from 'expo-crypto';
 import { useLang } from '@pohnch/ui';
 import { startTripLocation, stopTripLocation, type LocationStart } from '../location/tripLocation';
@@ -30,9 +30,11 @@ type State = {
   /** v8: the school pin, and children whose family said "we're ready" on the running trip. */
   school: { lat: number; lng: number } | null;
   ready: string[];
+  /** v8: the last 7 days' trips, and how many were tracked start to finish. */
+  week: { done: number; tracked: number } | null;
 };
 
-const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, daysOff: [], name: null, school: null, ready: [] };
+const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, daysOff: [], name: null, school: null, ready: [], week: null };
 
 function useDriverState() {
   const [s, setS] = useState<State>(empty);
@@ -78,10 +80,11 @@ function useDriverState() {
       ]);
       const dayOff = daysOff.includes(today);
       const running = trips.find((x) => x.status === 'running');
-      const [events, school, ready] = await Promise.all([
+      const [events, school, ready, week] = await Promise.all([
         running ? driver.eventsOf(running.id) : Promise.resolve([]),
         driver.schoolPoint(van.id).catch(() => null),
         running && !running.is_practice ? driver.readyOn(running.id).catch(() => []) : Promise.resolve([]),
+        driver.weekTrips(van.id, addDays(today, -6)).catch(() => null),
       ]);
       // Location follows the trip: on while one runs (also after the app restarts mid-trip), off otherwise.
       // Practice trips never share location.
@@ -91,7 +94,7 @@ function useDriverState() {
         await stopTripLocation();
         setLocation('off');
       }
-      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, daysOff, name, school, ready });
+      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, daysOff, name, school, ready, week });
     } catch (e) {
       setS((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }

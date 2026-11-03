@@ -13,11 +13,11 @@ export function InviteCard({ onShare }: { onShare: () => void }) {
     <View testID="invite-card" style={{ backgroundColor: colors.neel, borderRadius: radius.big, borderCurve: 'continuous', padding: space.xl, gap: space.md, boxShadow: shadow.card }}>
       <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }}>
         <StarIcon size={28} color={colors.kesar} />
-        <AppText variant="title" color={colors.ghee}>
+        <AppText variant="title" color={colors.onBrand}>
           {t('invite.title')}
         </AppText>
       </View>
-      <AppText color={colors.neelTint}>{t('invite.body')}</AppText>
+      <AppText color={colors.mutedOnDark}>{t('invite.body')}</AppText>
       <TapButton tone="reachedSchool" label={t('invite.share')} onConfirm={onShare} testID="invite-share" />
     </View>
   );

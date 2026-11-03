@@ -33,7 +33,7 @@ function Mark({ icon }: { icon: IconName }) {
       <Animated.View style={[{ position: 'absolute', width: 132, height: 132, borderRadius: 66, backgroundColor: colors.neelTint }, ripple]} />
       <View style={{ width: 112, height: 112, borderRadius: 56, backgroundColor: colors.neelTint, alignItems: 'center', justifyContent: 'center' }}>
         <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 10px 24px ${colors.neelGlow}` }}>
-          <Icon name={icon} size={32} color={colors.ghee} strokeWidth={2.4} />
+          <Icon name={icon} size={32} color={colors.onBrand} strokeWidth={2.4} />
         </View>
       </View>
     </View>

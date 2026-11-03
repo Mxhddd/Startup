@@ -29,7 +29,7 @@ export function LangSwitch({ tone = 'light' }: { tone?: 'light' | 'dark' | 'floa
         boxShadow: tone === 'float' ? shadow.float : undefined,
       }}
     >
-      <Text style={{ fontFamily: uiFont(other, 'bold'), fontSize: 15, color: dark ? colors.ghee : colors.neel }}>{t('lang.switch')}</Text>
+      <Text style={{ fontFamily: uiFont(other, 'bold'), fontSize: 15, color: dark ? colors.onBrand : colors.link }}>{t('lang.switch')}</Text>
     </PressableScale>
   );
 }

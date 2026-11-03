@@ -86,6 +86,13 @@ export async function myStop(stopId: string): Promise<MyStop | null> {
   return check(await db().supabase.from('stop_points').select('id, label, lat, lng, morning_time, afternoon_time').eq('id', stopId).maybeSingle()) as MyStop | null;
 }
 
+/** The van's real trips on one school day (YYYY-MM-DD), for the week's history. */
+export async function tripsOn(vanId: string, date: string): Promise<ParentTrip[]> {
+  return check(
+    await db().supabase.from('trips').select('id, kind, status, started_at, ended_at').eq('van_id', vanId).eq('service_date', date).eq('is_practice', false).order('started_at'),
+  ) as ParentTrip[];
+}
+
 export async function tripsToday(vanId: string): Promise<ParentTrip[]> {
   return check(
     await db().supabase.from('trips').select('id, kind, status, started_at, ended_at').eq('van_id', vanId).eq('service_date', karachiDate(new Date())).eq('is_practice', false).order('started_at'),

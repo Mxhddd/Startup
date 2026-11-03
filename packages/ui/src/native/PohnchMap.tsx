@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { brandMapStyle, type MapStyleJson } from '../mapStyle';
 import { karachiHour } from '@pohnch/core';
-import { BASE_MAP_STYLE_URL, colors, karachiRegion, mapMoodAt, type MapMood } from '../theme';
+import { BASE_MAP_STYLE_URL, colorScheme, colors, karachiRegion, mapMoodAt, type MapMood } from '../theme';
 import { AppText } from './AppText';
 import { StopPin } from './StopPin';
 import { VanMarker } from './VanMarker';
@@ -93,7 +93,7 @@ function PinView({ pin }: { pin: MapPin }) {
   if (pin.kind === 'number') {
     return (
       <View style={{ width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: colors.neel, borderWidth: 3, borderColor: colors.white, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 2px 6px rgba(20,26,51,0.25)' }}>
-        <AppText variant="small" bold color={colors.white}>{String(pin.n)}</AppText>
+        <AppText variant="small" bold color={colors.onFill}>{String(pin.n)}</AppText>
       </View>
     );
   }
@@ -101,7 +101,8 @@ function PinView({ pin }: { pin: MapPin }) {
 }
 
 export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false, onFollowChange, recenterKey = 0, trail, ahead, mood: fixedMood }: PohnchMapProps) {
-  const mood = useMood(fixedMood);
+  // At night (a dark phone, parent app) the map is the night mood; otherwise it follows the clock.
+  const mood = useMood(fixedMood ?? (colorScheme() === 'dark' ? 'night' : undefined));
   const [mapStyle, setMapStyle] = useState<MapStyleJson | string | null>(styled[mood] ?? null);
   const camera = useRef<CameraRef>(null);
   const framed = useRef(false);

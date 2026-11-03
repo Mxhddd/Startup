@@ -476,5 +476,13 @@
   "parent.ready.sent": "{who} can see you're ready",
   "parent.story.title": "{name}'s day",
   "parent.story.morning": "Home to school, every step",
-  "parent.story.afternoon": "School to home, every step"
+  "parent.story.afternoon": "School to home, every step",
+  "history.title": "{name}'s week",
+  "history.today": "Today",
+  "history.yesterday": "Yesterday",
+  "history.none": "Join a van to see its trips here.",
+  "history.noTrips": "No trips this day.",
+  "history.minutes": "{n} min ride",
+  "history.link": "This week",
+  "driver.week": "This week: {tracked} of {done} trips tracked start to finish"
 }

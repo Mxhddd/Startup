@@ -126,7 +126,7 @@ export function ChildRow({
       }}
     >
       {done ? (
-        <DrawnCheck fill={stepColors[step].fill} color={colors.white} />
+        <DrawnCheck fill={stepColors[step].fill} color={colors.onFill} />
       ) : (
         <View style={{ width: 32, height: 32, borderRadius: 16, borderCurve: 'continuous', borderWidth: 2, borderColor: state === 'absent' ? colors.line : colors.neel }} />
       )}

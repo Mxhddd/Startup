@@ -47,7 +47,7 @@ export default function ParentHome() {
         recenterKey={recenter}
       />
       </Animated.View>
-      <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.siyahi }, dimStyle]} />
+      <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.night }, dimStyle]} />
       <Animated.View pointerEvents="box-none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, barStyle]}>
 
       <TopBar
@@ -62,7 +62,7 @@ export default function ParentHome() {
         <Animated.View entering={ZoomIn.springify().damping(16)} exiting={ZoomOut.duration(150)} style={{ position: 'absolute', bottom: peek + insets.bottom + 16, [dir === 'rtl' ? 'left' : 'right']: space.gutter }}>
           <PressableScale accessibilityRole="button" accessibilityLabel={t('parent.recenter')} onPress={() => setRecenter((n) => n + 1)} scaleTo="chip" haptic="tick" testID="recenter">
             <Glass style={{ width: 52, height: 52, alignItems: 'center', justifyContent: 'center' }}>
-              <Icon name="navigate" size={22} color={colors.neel} strokeWidth={2.3} />
+              <Icon name="navigate" size={22} color={colors.link} strokeWidth={2.3} />
             </Glass>
           </PressableScale>
         </Animated.View>

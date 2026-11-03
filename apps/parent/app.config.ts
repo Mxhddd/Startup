@@ -13,7 +13,8 @@ const config: ExpoConfig = {
   runtimeVersion: { policy: 'appVersion' },
   updates: { url: 'https://u.expo.dev/db3b3849-7d63-4270-bd90-56aafac77e94', checkAutomatically: 'ON_LOAD', fallbackToCacheTimeout: 0 },
   icon: './assets/icon.png',
-  userInterfaceStyle: 'light',
+  // v8: follows the phone's light or dark setting (the driver app stays light).
+  userInterfaceStyle: 'automatic',
   ios: {
     bundleIdentifier: 'pk.pohnch.parent',
     supportsTablet: false,

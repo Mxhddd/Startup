@@ -81,7 +81,7 @@ export function VanMarker({ heading = 0, stale = false, speed = 0, size = 80 }: 
       <Animated.View style={[{ position: 'absolute', width: size, height: size }, turn]}>
         <Animated.View style={[{ position: 'absolute', width: size, height: size }, shade]}>
           <Svg width={size} height={size} viewBox="0 0 80 80">
-            <Ellipse cx="40" cy="42" rx="14" ry="23" fill={colors.siyahi} />
+            <Ellipse cx="40" cy="42" rx="14" ry="23" fill={colors.night} />
           </Svg>
         </Animated.View>
         <Svg width={size} height={size} viewBox="0 0 80 80" style={{ position: 'absolute' }}>

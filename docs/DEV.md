@@ -292,3 +292,19 @@ Not done in this phase: true shared-element transitions (still experimental in R
 - **Invite** (`apps/web/app/invite`): one card: a neel top with the star and the invitation in Urdu (Gulzar) and English, then the buttons, each with its Urdu line over its English line. The token rules are unchanged (read in the browser only, no referrer).
 - **Admin** (`apps/web/app/admin/AdminApp.tsx`): the driver app's neel header, borderless cards with soft shadows, big neel numbers.
 - **Motion and access** (`apps/web/app/globals.css`): gentle rise-in, button press, focus ring in kesar; everything stops for people who ask for reduced motion (the van parks).
+
+## v8 phase E: the extras (3 November 2026)
+
+| Extra | Where | How it works |
+| --- | --- | --- |
+| Over-the-air updates | `app.config.ts` (`updates`, `runtimeVersion`), `eas.json` (`channel` per profile) | `eas update --channel preview` sends JavaScript and design fixes to installed preview builds; builds take only updates for their own app version. |
+| Crash reports | `apps/*/src/crash.ts`, `packages/core/src/scrub.ts` | Sentry, off unless `EXPO_PUBLIC_SENTRY_DSN` is set and never in development. `scrubEvent` drops the user, request and extras, keeps only screen-change breadcrumbs (bare paths) and replaces phone numbers, tokens and coordinates. `check-leaks.mjs` refuses a `Sentry.init` without the scrub and with screenshots on. |
+| Planned chutti | `apps/parent/src/app/chutti.tsx`, `packages/core/src/calendar.ts` | A month calendar per child; Save sends only the changed days. The server refuses dates more than 60 days ahead (`date_too_far`). |
+| "Off today" from the alert or widget | `push.ts` (`trip-left` category, child ids in the data), `setup.ts`, `TripNotifications.tsx`, `NextTripWidget.tsx` (a `Link`) | Both open `/chutti?quick=today` with today already chosen: one tap on Save. No token or name is ever inside the notification. Android's widget has no button yet. |
+| School pin and ETA | Driver: Setup > School on the map; parent sheet | `set_school_pin` / `school_point` (driver, families, team only). After pick-up the parent sees "School in N min". |
+| Driver nudges and voice | `packages/core/src/nudges.ts`, `RunScreen.tsx`, `apps/driver/src/voice.ts` | Stopped within 60 m of the next stop: one bump and the button breathes. Within 250 m: the next stop is spoken (expo-speech, Urdu or English; a switch on the trip screen). Near the school with everyone in: "reached school" breathes. Every step is still the driver's own tap. |
+| Van at the door, "We're ready" | `TripSheet.tsx`, `ready_signals` table | When the van is at the door (or 3 minutes away) the parent sees the wait counting up and can say "We're ready"; the driver sees a green note by that child. Row-level security: only that child's family can say it, only on a running trip. |
+| Today's story and the week | `TripSheet.tsx`, `apps/parent/src/app/history.tsx`, `packages/core/src/story.ts` | When a run ends the sheet tells it in brand type with the ride's minutes; "This week" shows the last 7 days of timelines. Drivers see "this week: N of M trips tracked start to finish" on Today. |
+| Dark mode (parent) | `nightColors`, `applyColorScheme` in `theme.ts`; `apps/parent/src/app/_layout.tsx` | Follows the phone. The palette switches in place and the screens are redrawn when the phone switches; the map uses the night mood; glass turns dark. New roles (`onBrand`, `onFill`, `onKesar`, `night`, `link`) keep text readable on both; contrast tests cover the night pairs. The driver app stays light. |
+
+Live: migration `20261103000500_extras.sql` applied; the `app` function redeployed.

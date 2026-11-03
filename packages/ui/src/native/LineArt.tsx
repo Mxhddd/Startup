@@ -25,8 +25,8 @@ export function LineArt({ width = 200 }: { width?: number }) {
   return (
     <View style={{ width, height: h }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Svg width={width} height={h} viewBox="0 0 200 120">
-        <AnimatedPath d={ROUTE} stroke={colors.neel} strokeWidth={5} strokeLinecap="round" strokeDasharray={`2 12`} fill="none" opacity={0.35} />
-        <AnimatedPath d={ROUTE} stroke={colors.neel} strokeWidth={5} strokeLinecap="round" fill="none" strokeDasharray={`${LEN} ${LEN}`} animatedProps={props} />
+        <AnimatedPath d={ROUTE} stroke={colors.link} strokeWidth={5} strokeLinecap="round" strokeDasharray={`2 12`} fill="none" opacity={0.35} />
+        <AnimatedPath d={ROUTE} stroke={colors.link} strokeWidth={5} strokeLinecap="round" fill="none" strokeDasharray={`${LEN} ${LEN}`} animatedProps={props} />
       </Svg>
       <Animated.View style={[{ position: 'absolute', left: (150 / 200) * width - 22, top: (30 / 120) * h - 22 }, starStyle]}>
         <StarIcon size={44} color={colors.kesar} />

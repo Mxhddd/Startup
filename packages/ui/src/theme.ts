@@ -40,7 +40,47 @@ export const colors = {
   glass: 'rgba(255,255,255,0.72)', // frosted chips over the map
   glassEdge: 'rgba(255,255,255,0.75)',
   glassDark: 'rgba(250,246,238,0.12)', // a frosted pill on neel
-} as const;
+  // v8 roles that stay the same in the night palette (text on a coloured fill, the dark chip).
+  onBrand: '#FAF6EE', // text and icons on neel, zamurrad, shingarf and other dark fills
+  onFill: '#FFFFFF', // white marks on zamurrad and shingarf
+  onKesar: '#141A33', // text on kesar
+  night: '#141A33', // a dark chip or panel (offline banner, the undo bar's ground)
+  link: '#1F2A5C', // neel used as text or an icon on a light surface
+};
+
+export type ColorName = keyof typeof colors;
+
+/** The day palette as defined above, kept so the night palette can be undone. */
+export const dayColors: Readonly<Record<ColorName, string>> = { ...colors };
+
+/**
+ * v8 night palette (the parent app follows the phone; the driver app always stays in day).
+ * Matches the dark theme of the Pohnch Design System. Only what changes is listed.
+ */
+export const nightColors: Partial<Record<ColorName, string>> = {
+  ghee: '#0E1430', white: '#182044', siyahi: '#F3EEE3', ink2: '#BFC4D6', line: '#2C3766', hairline: '#232C55', sand: '#1F2750',
+  neel: '#3A4C9E', neelHover: '#4357AE', neelRaised: '#4357AE', neelDeep: '#0A0F26', neelTint: '#1F2A5C',
+  kesarTint: '#3A2F1A', kesarDeep: '#8C5E18', kesarText: '#F0C27A',
+  zamurrad: '#197A62', zamurradTint: '#12382F', zamurradOnTint: '#9FD9C3',
+  shingarf: '#C2452F', shingarfTint: '#3A1A16', dangerText: '#F2A79B', dangerBg: '#3A1A16',
+  absentText: '#C9C3B8', absentBg: '#262B40', link: '#AEBBF2',
+  scrim: 'rgba(0,0,0,0.55)', glass: 'rgba(24,32,68,0.72)', glassEdge: 'rgba(255,255,255,0.10)',
+  neelGlow: 'rgba(0,0,0,0.35)', zamurradGlow: 'rgba(0,0,0,0.35)', kesarGlow: 'rgba(0,0,0,0.30)',
+};
+
+let scheme: 'light' | 'dark' = 'light';
+/** Which palette is in use now. */
+export function colorScheme(): 'light' | 'dark' {
+  return scheme;
+}
+/**
+ * Switches every colour in place (components read colors.* when they draw, so the next render uses
+ * the new palette). The parent app calls this before drawing and again when the phone switches.
+ */
+export function applyColorScheme(next: 'light' | 'dark') {
+  scheme = next;
+  Object.assign(colors, dayColors, next === 'dark' ? nightColors : {});
+}
 
 export type Step = 'left' | 'picked' | 'reachedSchool' | 'leftSchool' | 'dropped';
 

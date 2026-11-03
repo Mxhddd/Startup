@@ -111,6 +111,21 @@ export async function daysOffFrom(vanId: string, date: string): Promise<string[]
   return rows.map((r) => r.service_date);
 }
 
+/**
+ * The van's last 7 days: real trips that ended, and how many were tracked start to finish
+ * (the morning reached school; the afternoon dropped every child it set out with).
+ */
+export async function weekTrips(vanId: string, from: string): Promise<{ done: number; tracked: number }> {
+  const rows = check(
+    await db().supabase.from('trips').select('id, kind, status, trip_events(step, undone_at)').eq('van_id', vanId).eq('is_practice', false).eq('status', 'ended').gte('service_date', from),
+  ) as { kind: 'morning' | 'afternoon'; trip_events: { step: string; undone_at: string | null }[] }[];
+  const tracked = rows.filter((r) => {
+    const steps = new Set(r.trip_events.filter((e) => !e.undone_at).map((e) => e.step));
+    return r.kind === 'morning' ? steps.has('left') && steps.has('reached_school') : steps.has('left_school') && steps.has('dropped');
+  }).length;
+  return { done: rows.length, tracked };
+}
+
 /** The van's school on the map (placed by the driver), or null. */
 export async function schoolPoint(vanId: string): Promise<{ lat: number; lng: number } | null> {
   const rows = check(await db().supabase.rpc('school_point', { p_van: vanId })) as { lat: number; lng: number }[] | null;

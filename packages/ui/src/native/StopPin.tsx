@@ -14,7 +14,7 @@ export function StopPin({ kind }: { kind: 'stop' | 'home' | 'school' }) {
     return (
       <Animated.View entering={enter} testID="stop-pin">
         <Svg width={24} height={24} viewBox="0 0 24 24">
-          <Circle cx="12" cy="12" r="8" fill={colors.white} stroke={colors.neel} strokeWidth={4} />
+          <Circle cx="12" cy="12" r="8" fill={colors.white} stroke={colors.link} strokeWidth={4} />
         </Svg>
       </Animated.View>
     );

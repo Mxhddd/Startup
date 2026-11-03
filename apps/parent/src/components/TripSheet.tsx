@@ -172,8 +172,8 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
   return (
     <View testID="trip-sheet" style={{ gap: space.lg }}>
       {offline ? (
-        <Animated.View entering={FadeInDown} accessibilityRole="alert" style={{ backgroundColor: colors.siyahi, borderRadius: radius.card, borderCurve: 'continuous', padding: space.md }}>
-          <AppText color={colors.ghee}>{t('parent.offline')}</AppText>
+        <Animated.View entering={FadeInDown} accessibilityRole="alert" style={{ backgroundColor: colors.night, borderRadius: radius.card, borderCurve: 'continuous', padding: space.md }}>
+          <AppText color={colors.onBrand}>{t('parent.offline')}</AppText>
         </Animated.View>
       ) : null}
 
@@ -219,7 +219,7 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
       {/* One quiet row: who drives, the plate, and the round actions. */}
       <Animated.View layout={layout} style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
         <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 0px 0px 2.5px ${colors.white}, 0px 0px 0px 4px ${colors.gold}` }}>
-          <AppText bold color={colors.siyahi} style={{ fontSize: 17 }}>{(p.driverName ?? p.van?.name ?? '').slice(0, 1)}</AppText>
+          <AppText bold color={colors.onKesar} style={{ fontSize: 17 }}>{(p.driverName ?? p.van?.name ?? '').slice(0, 1)}</AppText>
         </View>
         <View style={{ flex: 1 }}>
           <AppText bold numberOfLines={1} style={{ fontSize: 15 }}>{p.driverName ?? p.van?.name ?? ''}</AppText>
@@ -244,6 +244,12 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
             faceStyle={{ minHeight: 44, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.kesarTint, flexDirection: row, alignItems: 'center', gap: 8 }}>
             <Icon name="calendar" size={18} color={colors.kesarText} />
             <AppText bold color={colors.kesarText} style={{ fontSize: 15 }}>{t('parent.chutti.plan')}</AppText>
+          </PressableScale>
+          <View style={{ width: 8 }} />
+          <PressableScale accessibilityRole="button" onPress={() => router.push('/history')} scaleTo="chip" testID="open-history"
+            faceStyle={{ minHeight: 44, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.neelTint, flexDirection: row, alignItems: 'center', gap: 8 }}>
+            <Icon name="pulse" size={18} color={colors.link} />
+            <AppText bold color={colors.link} style={{ fontSize: 15 }}>{t('history.link')}</AppText>
           </PressableScale>
         </Animated.View>
       ) : null}
@@ -271,7 +277,7 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
               </View>
               {p.story.minutes ? (
                 <View style={{ alignItems: 'center' }}>
-                  <AppText variant="number" color={colors.neel} style={{ fontSize: 36, lineHeight: 42 }}>{String(p.story.minutes)}</AppText>
+                  <AppText variant="number" color={colors.link} style={{ fontSize: 36, lineHeight: 42 }}>{String(p.story.minutes)}</AppText>
                   <AppText bold color={colors.ink2} style={{ fontSize: 14 }}>{t('min.short')}</AppText>
                 </View>
               ) : null}

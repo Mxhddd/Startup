@@ -139,6 +139,9 @@ export default function DriverToday() {
                 <VanBadge status={d.van.switched_off_at ? 'off' : d.van.verified_at ? 'verified' : 'waiting'} />
               </View>
               {!d.van.verified_at ? <AppText variant="secondary">{t('driver.check.pending')}</AppText> : null}
+              {d.week && d.week.done > 0 ? (
+                <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 15 }} testID="week-line">{t('driver.week', { tracked: d.week.tracked, done: d.week.done })}</AppText>
+              ) : null}
 
               {!d.dayOff && childCount === 0 ? (
                 <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>

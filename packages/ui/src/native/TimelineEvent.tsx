@@ -81,7 +81,7 @@ export function TimelineEvent({
           <Animated.View style={[{ position: 'absolute', width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: colors.neel }, haloStyle]} />
           <View style={{ position: 'absolute', width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: colors.white, borderWidth: current ? 4 : 2.5, borderColor: current ? colors.neel : step === 'reachedSchool' ? colors.kesar : colors.line }} />
           <Animated.View style={[{ position: 'absolute', width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: c.fill }, fillStyle]} />
-          <Icon name={step} size={18} color={pending ? (current ? colors.neel : colors.ink2) : c.text} strokeWidth={2.4} />
+          <Icon name={step} size={18} color={pending ? (current ? colors.link : colors.ink2) : c.text} strokeWidth={2.4} />
         </View>
         {!last ? <Animated.View style={[{ flex: 1, width: 3, borderRadius: 2, borderCurve: 'continuous', backgroundColor: pending ? colors.line : c.fill, marginVertical: 5, transformOrigin: 'top' }, lineStyle]} /> : null}
       </View>

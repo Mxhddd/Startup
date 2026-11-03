@@ -65,8 +65,8 @@ export default function Settings() {
         <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: colors.kesarTint }}>
           <AppText bold style={{ flex: 1 }}>{t('settings.off')}</AppText>
           <PressableScale accessibilityRole="button" testID="alerts-allow"
-            onPress={() => (undecided ? askForAlerts().then((ok) => { setAllowed(ok); setUndecided(false); if (ok) registerForPush().catch(() => undefined); }) : Linking.openSettings())} faceStyle={{ height: 44, paddingHorizontal: 16, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.siyahi, justifyContent: 'center' }}>
-            <AppText bold color={colors.ghee}>{undecided ? t('welcome.allow') : t('settings.open')}</AppText>
+            onPress={() => (undecided ? askForAlerts().then((ok) => { setAllowed(ok); setUndecided(false); if (ok) registerForPush().catch(() => undefined); }) : Linking.openSettings())} faceStyle={{ height: 44, paddingHorizontal: 16, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.night, justifyContent: 'center' }}>
+            <AppText bold color={colors.onBrand}>{undecided ? t('welcome.allow') : t('settings.open')}</AppText>
           </PressableScale>
         </Animated.View>
       ) : null}
@@ -102,7 +102,7 @@ export default function Settings() {
           {(['chime', 'pohnch'] as const).map((k) => (
             <PressableScale key={k} accessibilityRole="button" onPress={() => previewSound(k, t(k === 'chime' ? 'settings.sound.chime' : 'settings.sound.pohnch')).catch(() => undefined)} style={{ flex: 1 }}
               faceStyle={{ height: 48, borderRadius: radius.pill, backgroundColor: colors.neelTint, alignItems: 'center', justifyContent: 'center' }} testID={`hear-${k}`}>
-              <AppText bold color={colors.neel}>{t(k === 'chime' ? 'settings.sound.chime' : 'settings.sound.pohnch')}</AppText>
+              <AppText bold color={colors.link}>{t(k === 'chime' ? 'settings.sound.chime' : 'settings.sound.pohnch')}</AppText>
             </PressableScale>
           ))}
         </Row>

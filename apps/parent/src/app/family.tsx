@@ -38,7 +38,7 @@ function MenuRow({ mark, icon, title, line, end, onPress, last = false, testID }
   const body = (
     <View style={{ flexDirection: row, alignItems: 'center', gap: 14, minHeight: 64, paddingVertical: 8, borderBottomWidth: last ? 0 : 1, borderColor: colors.hairline }}>
       <View style={{ width: 40, height: 40, borderRadius: 20, borderCurve: 'continuous', backgroundColor: mark ? colors.kesar : colors.neelTint, alignItems: 'center', justifyContent: 'center' }}>
-        {mark ? <AppText bold color={colors.siyahi} style={{ fontSize: 17 }}>{mark}</AppText> : icon ? <Icon name={icon} size={20} color={colors.neel} /> : null}
+        {mark ? <AppText bold color={colors.onKesar} style={{ fontSize: 17 }}>{mark}</AppText> : icon ? <Icon name={icon} size={20} color={colors.link} /> : null}
       </View>
       <View style={{ flex: 1 }}>
         <AppText bold style={{ fontSize: 17 }} numberOfLines={1}>{title}</AppText>

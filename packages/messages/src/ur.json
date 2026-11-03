@@ -476,5 +476,13 @@
   "parent.ready.sent": "{who} کو آپ کا «تیار» نظر آ گیا",
   "parent.story.title": "{name} کا آج کا سفر",
   "parent.story.morning": "گھر سے اسکول، ہر قدم",
-  "parent.story.afternoon": "اسکول سے گھر، ہر قدم"
+  "parent.story.afternoon": "اسکول سے گھر، ہر قدم",
+  "history.title": "{name} کا ہفتہ",
+  "history.today": "آج",
+  "history.yesterday": "کل",
+  "history.none": "وین میں شامل ہوں تو یہاں سفر نظر آئیں گے۔",
+  "history.noTrips": "اس دن کوئی سفر نہیں۔",
+  "history.minutes": "{n} منٹ کا سفر",
+  "history.link": "یہ ہفتہ",
+  "driver.week": "اس ہفتے: {done} میں سے {tracked} سفر شروع سے آخر تک"
 }

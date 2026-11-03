@@ -55,3 +55,34 @@ describe('theme', () => {
     expect(uiFont('en', 'bold')).toMatch(/Manrope/);
   });
 });
+
+import { applyColorScheme, colorScheme, dayColors, nightColors } from './theme';
+describe('the night palette (v8 dark mode)', () => {
+  const n = { ...dayColors, ...nightColors } as Record<string, string>;
+  const c = (fg: string, bg: string) => {
+    const lum = (hex: string) => {
+      const v = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((x) => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
+      return 0.2126 * (v[0] as number) + 0.7152 * (v[1] as number) + 0.0722 * (v[2] as number);
+    };
+    const [a, b] = [lum(fg), lum(bg)].sort((x, y) => y - x) as [number, number];
+    return (a + 0.05) / (b + 0.05);
+  };
+  it('keeps every text-on-ground pair at 4.5:1 or more', () => {
+    const pairs: [string, string, string][] = [
+      ['text on ground', 'siyahi', 'ghee'], ['text on cards', 'siyahi', 'white'], ['secondary on ground', 'ink2', 'ghee'], ['secondary on cards', 'ink2', 'white'],
+      ['links on cards', 'link', 'white'], ['links on ground', 'link', 'ghee'], ['links on neel tint', 'link', 'neelTint'], ['text on sand', 'siyahi', 'sand'],
+      ['on brand', 'onBrand', 'neel'], ['on zamurrad', 'onFill', 'zamurrad'], ['on shingarf', 'onFill', 'shingarf'], ['on kesar', 'onKesar', 'kesar'],
+      ['danger on ground', 'dangerText', 'ghee'], ['danger on cards', 'dangerText', 'white'], ['green note', 'zamurradOnTint', 'zamurradTint'],
+      ['kesar text', 'kesarText', 'white'], ['kesar text on tint', 'kesarText', 'kesarTint'], ['absent', 'absentText', 'absentBg'], ['on the dark chip', 'onBrand', 'night'],
+    ];
+    for (const [name, fg, bg] of pairs) expect(c(n[fg] as string, n[bg] as string), name).toBeGreaterThanOrEqual(4.5);
+  });
+  it('switches every colour in place, and back', () => {
+    applyColorScheme('dark');
+    expect(colorScheme()).toBe('dark');
+    expect(colors.ghee).toBe(nightColors.ghee);
+    expect(colors.onBrand).toBe(dayColors.onBrand);
+    applyColorScheme('light');
+    expect(colors.ghee).toBe(dayColors.ghee);
+  });
+});

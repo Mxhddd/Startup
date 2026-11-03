@@ -23,7 +23,7 @@ function DayCell({ date, chosen, enabled, today, onPress }: { date: string; chos
       onPress={onPress} disabled={!enabled} haptic="tick" scaleTo="chip" style={{ flex: 1, alignItems: 'center' }} testID={`day-${date}`}>
       <View style={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', borderWidth: today && !chosen ? 2 : 0, borderColor: colors.neel }}>
         {chosen ? <Animated.View entering={ZoomIn.springify().damping(14).stiffness(260)} style={{ position: 'absolute', width: 44, height: 44, borderRadius: 22, backgroundColor: colors.kesar }} /> : null}
-        <AppText variant="number" color={!enabled ? colors.line : colors.siyahi} style={{ fontSize: 17, lineHeight: 22 }}>{String(n)}</AppText>
+        <AppText variant="number" color={!enabled ? colors.line : chosen ? colors.onKesar : colors.siyahi} style={{ fontSize: 17, lineHeight: 22 }}>{String(n)}</AppText>
       </View>
     </PressableScale>
   );
@@ -87,7 +87,7 @@ export default function Chutti() {
     <Page title={t('parent.chutti.title', { name })}>
       <AppText variant="secondary">{t('parent.chutti.hint', { who: p.driverName ?? t('parent.chutti.theDriver') })}</AppText>
 
-      <View style={{ backgroundColor: colors.white, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.md, gap: space.sm }}>
+      <View style={{ backgroundColor: colors.white, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.sm, paddingVertical: space.md, gap: space.sm }}>
         <View style={{ flexDirection: row, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.sm }}>
           <PressableScale accessibilityRole="button" accessibilityLabel={t('parent.chutti.prev')} disabled={page === 0} onPress={() => setPage((x) => x - 1)} scaleTo="chip"
             faceStyle={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', opacity: page === 0 ? 0.3 : 1 }}>
@@ -103,7 +103,7 @@ export default function Chutti() {
         </View>
         <View style={{ flexDirection: row }}>
           {[0, 1, 2, 3, 4, 5, 6].map((w) => (
-            <AppText key={w} variant="small" bold color={colors.ink2} align="center" style={{ flex: 1 }} numberOfLines={1}>{t(`dayShort.${w}` as 'dayShort.0')}</AppText>
+            <AppText key={w} variant="small" bold color={colors.ink2} align="center" style={{ flex: 1, marginHorizontal: -2 }}>{t(`dayShort.${w}` as 'dayShort.0')}</AppText>
           ))}
         </View>
         <Animated.View key={`g-${year}-${month}`} entering={FadeIn.duration(220)} style={{ gap: 4 }}>

@@ -51,7 +51,7 @@ export function TextField({
     transform: [{ translateY: interpolate(up.value, [0, 1], [0, -15]) }, { scale: interpolate(up.value, [0, 1], [1, typeScale.caption / typeScale.body]) }],
   }));
   const box = useAnimatedStyle(() => ({ transform: [{ translateX: shake.value }] }));
-  const edge = error ? colors.dangerText : focused ? colors.neel : colors.line;
+  const edge = error ? colors.dangerText : focused ? colors.link : colors.line;
 
   return (
     <View style={{ gap: 6 }}>
@@ -72,7 +72,7 @@ export function TextField({
         ]}
       >
         <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: space.lg, right: space.lg, top: 0, bottom: 0, justifyContent: 'center', transformOrigin: d === 'rtl' ? 'right' : 'left' }, labelStyle]}>
-          <AppText bold={floating} color={error ? colors.dangerText : floating && focused ? colors.neel : colors.ink2} numberOfLines={1} style={{ fontSize: typeScale.body, lineHeight: 24 }}>
+          <AppText bold={floating} color={error ? colors.dangerText : floating && focused ? colors.link : colors.ink2} numberOfLines={1} style={{ fontSize: typeScale.body, lineHeight: 24 }}>
             {label}
           </AppText>
         </Animated.View>
@@ -87,7 +87,7 @@ export function TextField({
             setFocused(false);
             onBlur?.();
           }}
-          selectionColor={colors.neel}
+          selectionColor={colors.link}
           placeholder={focused && !value ? placeholder : undefined}
           placeholderTextColor={colors.ink2}
           maxLength={maxLength}

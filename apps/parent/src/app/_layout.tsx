@@ -4,13 +4,14 @@ import { Gulzar_400Regular } from '@expo-google-fonts/gulzar';
 import { Manrope_500Medium, Manrope_800ExtraBold } from '@expo-google-fonts/manrope';
 import { NotoSansArabic_500Medium, NotoSansArabic_700Bold } from '@expo-google-fonts/noto-sans-arabic';
 import { useSession } from '@pohnch/client';
-import { LangProvider } from '@pohnch/ui';
+import { LangProvider, applyColorScheme, colorScheme } from '@pohnch/ui';
 import { LaunchReveal, useScreenOptions } from '@pohnch/ui/native';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { Fragment, useEffect } from 'react';
+import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ParentProvider } from '../state/ParentStore';
@@ -56,6 +57,11 @@ function RootLayout() {
   });
 
   const { ready, session, configured } = useSession();
+  // v8: follow the phone's light or dark setting. The palette switches in place before drawing; the
+  // screens are drawn afresh when the phone switches (so every colour updates at once).
+  const phoneScheme = useColorScheme();
+  const scheme = phoneScheme === 'dark' ? 'dark' : 'light';
+  if (colorScheme() !== scheme) applyColorScheme(scheme);
   const fontsDone = loaded || !!error;
 
   useEffect(() => {
@@ -69,9 +75,11 @@ function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <LangProvider>
-          <StatusBar style="dark" />
+          <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
           <ParentProvider key={session?.user.id ?? 'out'} enabled={configured && !!session}>
-            <Screens />
+            <Fragment key={scheme}>
+              <Screens />
+            </Fragment>
             <TripNotifications signedIn={configured && !!session} />
           </ParentProvider>
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />

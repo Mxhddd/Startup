@@ -17,7 +17,7 @@ export function AbsentChip({ onUndo, name }: { onUndo?: () => void; name?: strin
         {label}
       </AppText>
       {onUndo ? (
-        <AppText variant="small" bold color={colors.neel}>
+        <AppText variant="small" bold color={colors.link}>
           {t('undo.action')}
         </AppText>
       ) : null}
