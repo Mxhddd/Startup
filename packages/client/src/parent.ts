@@ -144,3 +144,27 @@ export const parentApi = {
   addFamilyMember: (phone: string) => db().api('family.add', { phone }),
   leaveVan: (childId: string) => db().api('van.leave', { childId }),
 };
+
+export type NotificationPrefs = { offSteps: string[]; sound: boolean };
+
+/** This person's alert settings (defaults when they never changed anything). */
+export async function notificationPrefs(): Promise<NotificationPrefs> {
+  const { supabase } = db();
+  const row = check(await supabase.from('notification_prefs').select('off_steps, sound').maybeSingle()) as { off_steps: string[]; sound: boolean } | null;
+  return { offSteps: row?.off_steps ?? [], sound: row?.sound ?? true };
+}
+
+export async function saveNotificationPrefs(p: NotificationPrefs): Promise<void> {
+  const { supabase } = db();
+  const uid = (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return;
+  check(await supabase.from('notification_prefs').upsert({ user_id: uid, off_steps: p.offSteps, sound: p.sound, updated_at: new Date().toISOString() }));
+}
+
+/** The language pushes are written in (and the app's own language, which the caller switches). */
+export async function setAlertLanguage(lang: 'ur' | 'en'): Promise<void> {
+  const { supabase } = db();
+  const uid = (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return;
+  check(await supabase.from('profiles').update({ lang }).eq('id', uid));
+}

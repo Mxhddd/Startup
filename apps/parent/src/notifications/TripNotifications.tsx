@@ -18,7 +18,7 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
   useEffect(() => {
     if (!signedIn || registered.current) return;
     registered.current = true;
-    setupChannels({ trip: t('notify.channel.trip'), live: t('notify.channel.live') })
+    setupChannels({ trip: t('notify.channel.trip'), live: t('notify.channel.live'), arrive: t('notify.channel.arrive'), quiet: t('notify.channel.quiet'), open: t('notify.action.open') })
       .then(registerForPush)
       .catch(() => {
         registered.current = false; // try again next time

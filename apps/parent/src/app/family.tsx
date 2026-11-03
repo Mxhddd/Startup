@@ -33,6 +33,7 @@ export default function Family() {
       {msg ? <AppText color={msg.ok ? colors.zamurradOnTint : colors.dangerText}>{msg.text}</AppText> : null}
       <TapButton tone="left" icon="family" label={t('parent.family.add')} onConfirm={add} testID="family-add" />
       <AppText variant="title" style={{ marginTop: space.lg }}>{t('parent.menu')}</AppText>
+      <TapButton icon="bell" label={t('parent.notifications')} onConfirm={() => router.push('/settings')} testID="open-settings" />
       <TapButton icon="plus" label={t('parent.addChild')} onConfirm={() => router.push('/child')} />
       <TapButton icon="route" label={t('parent.join')} onConfirm={() => router.push('/join')} />
       {p.child && p.membership ? (

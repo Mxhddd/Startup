@@ -3,17 +3,32 @@
 // Logs carry counts only: never tokens, phone numbers or children's names.
 import text from './pushText.json' with { type: 'json' };
 
-export type Recipient = { child_id: string; first_name: string; token: string; platform: string; lang: string; driver_name: string };
+export type Recipient = { child_id: string; first_name: string; token: string; platform: string; lang: string; driver_name: string; sound?: boolean };
 export type PushStep = 'left' | 'picked' | 'arriving' | 'reached_school' | 'left_school' | 'dropped' | 'late';
+/** Android channels (one per sound, since Android fixes a channel's sound when it is made). */
+export type AlertChannel = 'step-chime' | 'step-pohnch' | 'step-quiet';
+
 export type ExpoMessage = {
   to: string;
   title: string;
   body: string;
-  sound: 'default';
+  /** iPhone: our sound file, or null for a quiet alert. Android takes the channel's sound. */
+  sound: 'chime.wav' | 'pohnch.wav' | null;
   priority: 'high';
-  channelId: 'trip';
+  channelId: AlertChannel;
+  /** iPhone: "arriving" and "late" may show through Focus; the rest are ordinary. */
+  interruptionLevel: 'time-sensitive' | 'active';
+  /** The notification's buttons ("Open trip"), registered by the app. */
+  categoryId: 'trip';
   data: { kind: 'trip'; step: PushStep };
 };
+
+// The same table the apps use (packages/core/src/moments.ts), copied by value: Edge Functions can't
+// import the app workspace. push.test.ts checks the two stay in step.
+export const STEP_SOUND: Record<PushStep, 'chime' | 'pohnch'> = {
+  left: 'chime', picked: 'chime', arriving: 'chime', reached_school: 'pohnch', left_school: 'chime', dropped: 'pohnch', late: 'chime',
+};
+export const TIME_SENSITIVE: PushStep[] = ['arriving', 'late'];
 
 type Lang = 'ur' | 'en';
 type Key = keyof (typeof text)['en'];
@@ -39,7 +54,19 @@ export function buildPushes(step: PushStep, recipients: Recipient[], reason?: st
       const r = (['traffic', 'breakdown', 'roadClosed'].includes(reason ?? '') ? reason : 'traffic') as 'traffic' | 'breakdown' | 'roadClosed';
       body = T(lang, 'parent.late', { reason: T(lang, `help.reason.${r}`) });
     } else body = `${T(lang, STEP_KEY[step])} · ${T(lang, 'timeline.by', { who: first.driver_name })}`;
-    out.push({ to: token, title: names, body, sound: 'default', priority: 'high', channelId: 'trip', data: { kind: 'trip', step } });
+    const quiet = first.sound === false;
+    const tone = STEP_SOUND[step];
+    out.push({
+      to: token,
+      title: names,
+      body,
+      sound: quiet ? null : tone === 'pohnch' ? 'pohnch.wav' : 'chime.wav',
+      priority: 'high',
+      channelId: quiet ? 'step-quiet' : tone === 'pohnch' ? 'step-pohnch' : 'step-chime',
+      interruptionLevel: TIME_SENSITIVE.includes(step) ? 'time-sensitive' : 'active',
+      categoryId: 'trip',
+      data: { kind: 'trip', step },
+    });
   }
   return out;
 }

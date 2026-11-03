@@ -13,7 +13,7 @@ export type NotifyDeps = {
 
 export async function notifyTrip(job: NotifyJob, deps: NotifyDeps): Promise<void> {
   try {
-    const { data, error } = await deps.rpc('push_recipients', { p_trip: job.tripId, p_children: job.children });
+    const { data, error } = await deps.rpc('push_recipients', { p_trip: job.tripId, p_children: job.children, p_step: job.step });
     if (error) throw new Error('recipients');
     const recipients = (data ?? []) as Recipient[];
     if (recipients.length === 0) return;

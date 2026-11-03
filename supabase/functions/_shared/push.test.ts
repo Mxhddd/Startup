@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { buildPushes, sendExpoPushes, type Recipient } from './push.ts';
 import { notifyTrip } from './notify.ts';
+import { STEP_SOUND, TIME_SENSITIVE } from './push.ts';
+import { MOMENTS } from '../../../packages/core/src/moments.ts';
 import pushText from './pushText.json' with { type: 'json' };
 // @ts-expect-error plain .mjs script without types
 import { pushText as fromMessages } from '../../../scripts/gen-push-text.mjs';
@@ -12,7 +14,7 @@ const r = (over: Partial<Recipient>): Recipient => ({
 describe('push messages', () => {
   it('say what happened and who marked it, in Urdu', () => {
     const [m] = buildPushes('picked', [r({})]);
-    expect(m).toMatchObject({ to: 'ExponentPushToken[a]', title: 'علی', body: 'وین میں بیٹھ گئے · رفیق بھائی نے مارک کیا', channelId: 'trip' });
+    expect(m).toMatchObject({ to: 'ExponentPushToken[a]', title: 'علی', body: 'وین میں بیٹھ گئے · رفیق بھائی نے مارک کیا', channelId: 'step-chime', sound: 'chime.wav', categoryId: 'trip' });
   });
 
   it("use each phone's own language", () => {
@@ -64,5 +66,36 @@ describe('sending', () => {
     const rpc = vi.fn(async () => ({ data: null, error: { message: 'boom' } }));
     await expect(notifyTrip({ tripId: 't', step: 'left', children: null }, { rpc, fetch: vi.fn() as unknown as typeof fetch, log: (l) => logs.push(l) })).resolves.toBeUndefined();
     expect(logs).toEqual(['push left failed']);
+  });
+});
+
+describe('alert sounds, urgency and settings (v7)', () => {
+  it('arrivals get the two-note sound, other steps the chime', () => {
+    expect(buildPushes('reached_school', [r({})])[0]).toMatchObject({ sound: 'pohnch.wav', channelId: 'step-pohnch' });
+    expect(buildPushes('dropped', [r({})])[0]).toMatchObject({ sound: 'pohnch.wav', channelId: 'step-pohnch' });
+    expect(buildPushes('left', [r({})])[0]).toMatchObject({ sound: 'chime.wav', channelId: 'step-chime' });
+  });
+
+  it('only "arriving" and "late" break through Focus', () => {
+    expect(buildPushes('arriving', [r({})])[0]?.interruptionLevel).toBe('time-sensitive');
+    expect(buildPushes('late', [r({})], 'traffic')[0]?.interruptionLevel).toBe('time-sensitive');
+    expect(buildPushes('picked', [r({})])[0]?.interruptionLevel).toBe('active');
+  });
+
+  it('a parent who chose quiet alerts gets no sound', () => {
+    expect(buildPushes('reached_school', [r({ sound: false })])[0]).toMatchObject({ sound: null, channelId: 'step-quiet' });
+  });
+
+  it('asks the database for this step, so switched-off alerts are left out', async () => {
+    const rpc = vi.fn(async () => ({ data: [], error: null }));
+    await notifyTrip({ tripId: 't1', step: 'left', children: null }, { rpc, fetch: vi.fn() as unknown as typeof fetch, log: () => undefined });
+    expect(rpc).toHaveBeenCalledWith('push_recipients', { p_trip: 't1', p_children: null, p_step: 'left' });
+  });
+
+  it('uses the same sounds and urgency as the apps (packages/core moments)', () => {
+    for (const [step, m] of Object.entries(MOMENTS)) {
+      expect(STEP_SOUND[step as keyof typeof STEP_SOUND], step).toBe(m.sound);
+      expect(TIME_SENSITIVE.includes(step as never), step).toBe(m.timeSensitive);
+    }
   });
 });
