@@ -70,7 +70,7 @@ export default function DriverToday() {
       <Animated.View entering={FadeInUp.springify().damping(22)} style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 58 : 22, gap: 10 }}>
         <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
           <Pressable style={{ flex: 1 }} onLongPress={__DEV__ ? () => router.push('/gallery') : undefined}>
-            <AppText bold color={colors.ghee} style={{ fontSize: 26, lineHeight: 40 }} testID="today-title" numberOfLines={2}>
+            <AppText variant="display" color={colors.ghee} style={{ fontSize: 30 }} testID="today-title" numberOfLines={2}>
               {d.name ? t('driver.hello', { name: d.name }) : t('driver.hello.plain')}
             </AppText>
           </Pressable>

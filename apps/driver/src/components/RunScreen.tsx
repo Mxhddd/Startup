@@ -56,7 +56,7 @@ export type RunScreenProps = {
   /** Where the stops are, for the map. */
   stops?: { id: string; lat: number; lng: number; position: number }[];
   /** The van's newest position on this phone (only while the trip's location runs). */
-  fix?: { lat: number; lng: number; heading: number | null } | null;
+  fix?: { lat: number; lng: number; heading: number | null; speed?: number | null } | null;
 };
 
 /** Once, when the last child is in: a zamurrad wash sweeps across the sheet from the reading start. */
@@ -107,7 +107,7 @@ export function RunScreen(p: RunScreenProps) {
         testID="trip-map"
         accessibilityLabel={t('driver.nav.stops')}
         pins={pins}
-        van={p.fix ? { lat: p.fix.lat, lng: p.fix.lng, heading: p.fix.heading, stale: false } : null}
+        van={p.fix ? { lat: p.fix.lat, lng: p.fix.lng, heading: p.fix.heading, stale: false, speed: p.fix.speed } : null}
         follow
         topInset={insets.top + 120}
         bottomInset={Math.min(sheetMax, 360)}

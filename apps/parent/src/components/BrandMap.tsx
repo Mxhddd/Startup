@@ -7,7 +7,7 @@ import { useGlide } from '../hooks/useGlide';
 
 export type MapProps = {
   accessibilityLabel: string;
-  van?: { lat: number; lng: number; heading: number | null; stale: boolean } | null;
+  van?: { lat: number; lng: number; heading: number | null; stale: boolean; speed?: number | null } | null;
   stop?: { lat: number; lng: number } | null;
   home?: { lat: number; lng: number } | null;
   onPress?: (p: { lat: number; lng: number }) => void;
@@ -30,7 +30,7 @@ export function BrandMap({ accessibilityLabel, van, stop, home, onPress, style, 
       testID="parent-map"
       accessibilityLabel={accessibilityLabel}
       pins={pins}
-      van={van && vanAt ? { lat: vanAt.latitude, lng: vanAt.longitude, heading: van.heading, stale: van.stale } : null}
+      van={van && vanAt ? { lat: vanAt.latitude, lng: vanAt.longitude, heading: van.heading, stale: van.stale, speed: van.speed } : null}
       onPress={onPress}
       style={style}
       bottomInset={bottomInset}

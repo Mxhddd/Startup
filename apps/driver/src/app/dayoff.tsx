@@ -23,7 +23,7 @@ function DayCard({ title, date, on, off, onPress, testID }: { title: string; dat
   return (
     <PressableScale accessibilityRole="radio" accessibilityState={{ selected: on }} accessibilityLabel={`${title} ${date}`} onPress={onPress} haptic="tick" testID={testID} style={{ flex: 1 }}>
       <Animated.View style={[{ minHeight: 120, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.lg, gap: 6, justifyContent: 'center' }, face]}>
-        <AppText bold color={on ? colors.ghee : colors.siyahi} style={{ fontSize: 26, lineHeight: 40 }}>{title}</AppText>
+        <AppText variant="display" color={on ? colors.ghee : colors.siyahi} style={{ fontSize: 30 }}>{title}</AppText>
         <AppText bold color={on ? colors.mutedOnDark : colors.ink2} style={{ fontSize: 15 }}>{date}</AppText>
         {off ? (
           <Animated.View entering={FadeIn} style={{ alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 2, borderRadius: radius.pill, backgroundColor: colors.kesar }}>

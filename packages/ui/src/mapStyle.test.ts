@@ -49,3 +49,25 @@ describe('the Pohnch map style', () => {
     expect(brandMapStyle(style).layers.some((l) => l.id === 'pohnch-3d-buildings')).toBe(false);
   });
 });
+
+import { mapMoodAt, mapMoods } from './theme';
+describe('time-of-day map moods (v8)', () => {
+  it('picks morning for the school run, day at noon, dusk late in the afternoon', () => {
+    expect(mapMoodAt(7)).toBe('morning');
+    expect(mapMoodAt(12)).toBe('day');
+    expect(mapMoodAt(17)).toBe('dusk');
+    expect(mapMoodAt(2)).toBe('dusk');
+  });
+
+  it('recolours land, water and labels for each mood, and keeps one 3D layer when switching', () => {
+    const withSource = { ...style, sources: { openmaptiles: { type: 'vector' } } };
+    const morning = brandMapStyle(withSource, 'morning');
+    expect(morning.layers.find((l) => l.id === 'background')?.paint?.['background-color']).toBe(mapMoods.morning.land);
+    const night = brandMapStyle(morning, 'night');
+    expect(night.layers.find((l) => l.id === 'water')?.paint?.['fill-color']).toBe(mapMoods.night.water);
+    expect(night.layers.find((l) => l.id === 'label_city')?.paint?.['text-halo-color']).toBe(mapMoods.night.halo);
+    const extrusions = night.layers.filter((l) => l.id === 'pohnch-3d-buildings');
+    expect(extrusions).toHaveLength(1);
+    expect(extrusions[0]?.paint?.['fill-extrusion-color']).toBe(mapMoods.night.building);
+  });
+});

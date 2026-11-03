@@ -1,32 +1,54 @@
-// Families: share the van's invite link, and approve each request with the child's stop.
+// Families (v8): requests first (the thing to act on), each with the stop to pick and approve or
+// decline; then the van's invite link; then the children riding, in stop order, in one quiet list.
+// Removing a child from the van opens a sheet with a hold, so it never happens by accident.
+// Data: memberships via the "app" Edge Function (membership.decide, rider.remove); the invite link
+// goes straight to the share sheet and is never shown or logged.
 import { driver } from '@pohnch/client';
-import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ApprovalCard, ChoiceChip, InviteCard, TapButton } from '@pohnch/ui/native';
+import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { AppText, ApprovalCard, ChoiceChip, EditSheet, InviteCard, PressableScale, TapButton } from '@pohnch/ui/native';
 import { useState } from 'react';
 import { Share, View } from 'react-native';
+import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { Screen } from '../components/Screen';
 import { useDriver } from '../state/DriverStore';
+
+const layout = LinearTransition.springify().damping(24).stiffness(200);
 
 export default function Families() {
   const { t, dir } = useLang();
   const d = useDriver();
   const [stopFor, setStopFor] = useState<Record<string, string>>({});
   const [error, setError] = useState(false);
+  const [removing, setRemoving] = useState<{ membershipId: string; name: string } | null>(null);
   if (!d.van) return null;
   const van = d.van;
+  const row = dir === 'rtl' ? 'row-reverse' : 'row';
+  const position = (stopId: string | null) => d.stops.find((s) => s.id === stopId)?.position ?? 999;
+  const riders = [...d.riders].sort((a, b) => position(a.stopId) - position(b.stopId) || a.firstName.localeCompare(b.firstName));
 
   const share = async () => {
     try {
       const { url } = await driver.driverApi.inviteLink(van.id);
-      // The link goes straight to the share sheet; it is never shown or logged.
       await Share.share({ message: `${van.name} · ${t('app.parent.name')}\n${url}` });
     } catch {
       setError(true);
     }
   };
   const decide = async (membershipId: string, approve: boolean) => {
+    setError(false);
     try {
       await driver.driverApi.decide(membershipId, approve, approve ? stopFor[membershipId] ?? null : null);
+      await d.actions.refresh();
+    } catch {
+      setError(true);
+    }
+  };
+  const remove = async () => {
+    if (!removing) return;
+    const { membershipId } = removing;
+    setRemoving(null);
+    try {
+      await driver.driverApi.removeRider(membershipId);
       await d.actions.refresh();
     } catch {
       setError(true);
@@ -35,39 +57,61 @@ export default function Families() {
 
   return (
     <Screen title={t('driver.families.title')}>
+      {error ? <AppText bold color={colors.dangerText}>{t('error.generic')}</AppText> : null}
+
+      {d.requests.length > 0 ? (
+        <Animated.View layout={layout} style={{ gap: space.md }}>
+          <AppText variant="headline">{t('driver.families.requests')} · {String(d.requests.length)}</AppText>
+          {d.requests.map((r) => (
+            <Animated.View key={r.membershipId} entering={FadeInDown.springify().damping(22)} layout={layout} style={{ gap: space.sm }}>
+              <AppText variant="small" bold color={colors.ink2}>{t('driver.families.pickStop')}</AppText>
+              <View style={{ flexDirection: row, flexWrap: 'wrap', gap: 8 }}>
+                {d.stops.map((s) => (
+                  <ChoiceChip key={s.id} label={`${s.position}. ${s.label}`} on={stopFor[r.membershipId] === s.id} onPress={() => setStopFor((m) => ({ ...m, [r.membershipId]: s.id }))} />
+                ))}
+              </View>
+              <ApprovalCard child={r.firstName} stop={d.stops.find((s) => s.id === stopFor[r.membershipId])?.label ?? '—'}
+                onApprove={() => decide(r.membershipId, true)} onDecline={() => decide(r.membershipId, false)} />
+            </Animated.View>
+          ))}
+        </Animated.View>
+      ) : null}
+
       {van.verified_at ? <InviteCard onShare={share} /> : <AppText variant="secondary">{t('driver.families.needsCheck')}</AppText>}
-      {error ? <AppText color={colors.dangerText}>{t('error.generic')}</AppText> : null}
-      <AppText variant="secondary">{t('driver.families.riders', { n: d.riders.length })}</AppText>
-      {d.riders.length > 0 ? <AppText variant="title">{t('driver.families.ridersTitle')}</AppText> : null}
-      {d.riders.map((r) => (
-        <View key={r.childId} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', borderWidth: 1, borderColor: colors.line, padding: space.md }}>
-          <View style={{ flex: 1 }}>
-            <AppText bold>{r.firstName}</AppText>
-            <AppText variant="small" color={colors.ink2}>{d.stops.find((s) => s.id === r.stopId)?.label ?? '—'}</AppText>
-          </View>
-          <View style={{ width: 170 }}>
-            {/* Hold to confirm: removing a child is not something to do by accident. */}
-            <TapButton hold label={t('driver.families.remove')} onConfirm={() => r.membershipId && driver.driverApi.removeRider(r.membershipId).then(d.actions.refresh).catch(() => setError(true))} />
-          </View>
-        </View>
-      ))}
-      <AppText variant="title">{t('driver.families.requests')}</AppText>
       {d.requests.length === 0 ? <AppText variant="secondary">{t('driver.families.none')}</AppText> : null}
-      {d.requests.map((r) => (
-        <View key={r.membershipId} style={{ gap: space.sm }}>
-          <AppText variant="small" bold color={colors.ink2}>{t('driver.families.pickStop')}</AppText>
-          <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
-            {d.stops.map((s) => {
-              const on = stopFor[r.membershipId] === s.id;
+
+      <Animated.View layout={layout} style={{ gap: space.sm }}>
+        <AppText variant="headline">{t('driver.families.riders', { n: riders.length })}</AppText>
+        {riders.length > 0 ? (
+          <View style={{ backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', boxShadow: shadow.card, paddingHorizontal: space.lg }}>
+            {riders.map((r, i) => {
+              const stop = d.stops.find((s) => s.id === r.stopId);
               return (
-                <ChoiceChip key={s.id} label={`${s.position}. ${s.label}`} on={on} onPress={() => setStopFor((m) => ({ ...m, [r.membershipId]: s.id }))} />
+                <Animated.View key={r.childId} entering={FadeInDown.delay(i * 30).springify().damping(22)} layout={layout}
+                  style={{ flexDirection: row, alignItems: 'center', gap: space.md, minHeight: 72, borderBottomWidth: i < riders.length - 1 ? 1 : 0, borderColor: colors.hairline }}>
+                  <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>
+                    <AppText variant="number" color={colors.white} style={{ fontSize: 15, lineHeight: 20 }}>{stop ? String(stop.position) : '—'}</AppText>
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <AppText bold style={{ fontSize: 18 }}>{r.firstName}</AppText>
+                    <AppText variant="small" color={colors.ink2}>{stop?.label ?? '—'}</AppText>
+                  </View>
+                  <PressableScale accessibilityRole="button" accessibilityLabel={`${t('driver.families.remove')} ${r.firstName}`} scaleTo="chip"
+                    onPress={() => r.membershipId && setRemoving({ membershipId: r.membershipId, name: r.firstName })} testID={`rider-remove-${i}`}
+                    faceStyle={{ minHeight: 64, paddingHorizontal: 14, justifyContent: 'center' }}>
+                    <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{t('parent.menu.remove')}</AppText>
+                  </PressableScale>
+                </Animated.View>
               );
             })}
           </View>
-          <ApprovalCard child={r.firstName} stop={d.stops.find((s) => s.id === stopFor[r.membershipId])?.label ?? '—'}
-            onApprove={() => decide(r.membershipId, true)} onDecline={() => decide(r.membershipId, false)} />
-        </View>
-      ))}
+        ) : null}
+      </Animated.View>
+
+      <EditSheet visible={removing !== null} title={removing ? t('driver.families.removeTitle', { name: removing.name }) : ''} onClose={() => setRemoving(null)} testID="rider-remove-sheet">
+        <AppText variant="secondary">{t('driver.families.removeBody')}</AppText>
+        <TapButton hold tone="quiet" label={t('driver.families.remove')} onConfirm={remove} testID="rider-remove-confirm" />
+      </EditSheet>
     </Screen>
   );
 }

@@ -2,16 +2,18 @@
 // Inside Urdu, digits and Latin words ("7:12", "0300 1478729") switch to Manrope and stay left to right.
 import { isolateLtr, splitRuns } from '@pohnch/core';
 import type { ReactNode } from 'react';
-import { Text, type StyleProp, type TextStyle } from 'react-native';
+import { StyleSheet, Text, type StyleProp, type TextStyle } from 'react-native';
 import { useLang, uiFont } from '../lang';
 import { colors, fonts, type } from '../theme';
 
-export type TextVariant = 'body' | 'secondary' | 'small' | 'title' | 'display' | 'number';
+export type TextVariant = 'body' | 'secondary' | 'small' | 'caption' | 'headline' | 'title' | 'display' | 'number';
 
 const sizes: Record<TextVariant, number> = {
   body: type.body,
   secondary: type.body,
-  small: type.minSize,
+  small: type.caption,
+  caption: type.caption,
+  headline: type.headline,
   title: type.title,
   display: type.display,
   number: 28,
@@ -37,12 +39,14 @@ export function AppText({
   numberOfLines?: number;
 }) {
   const { lang, dir } = useLang();
-  const size = Math.max(sizes[variant], type.minSize);
-  const weight = bold || variant === 'title' || variant === 'number' ? 'bold' : 'regular';
-  // Gulzar is for display text in Urdu only, and never under 26 px.
-  const urduDisplay = variant === 'display' && lang === 'ur';
-  const family = variant === 'number' ? fonts.latin.bold : urduDisplay ? fonts.display : uiFont(lang, weight);
-  const lineHeight = Math.round(size * (urduDisplay ? 1.9 : lang === 'ur' ? type.urduLineHeight : type.latinLineHeight));
+  // A size given in style wins, and the line height follows it (unless style sets one too).
+  const flat = StyleSheet.flatten(style) ?? {};
+  const size = Math.max(typeof flat.fontSize === 'number' ? flat.fontSize : sizes[variant], type.minSize);
+  const weight = bold || variant === 'title' || variant === 'headline' || variant === 'number' ? 'bold' : 'regular';
+  // Gulzar (Nastaliq) is for brand moments in Urdu only, and never under 26 px.
+  const urduDisplay = variant === 'display' && lang === 'ur' && size >= 26;
+  const family = variant === 'number' ? fonts.latin.bold : urduDisplay ? fonts.display : uiFont(lang, variant === 'display' ? 'bold' : weight);
+  const lineHeight = Math.round(size * (urduDisplay ? type.nastaliqLineHeight : lang === 'ur' ? type.urduLineHeight : type.latinLineHeight));
 
   // In Urdu, split strings so Latin and digit runs get Manrope and an isolate mark.
   const content =
@@ -62,13 +66,16 @@ export function AppText({
     <Text
       testID={testID}
       numberOfLines={numberOfLines}
+      // Follows the phone's text size up to 130%: bigger for those who need it, without breaking layouts.
+      maxFontSizeMultiplier={1.3}
       style={[
         {
           fontFamily: family,
           fontSize: size,
           lineHeight,
           color: color ?? (variant === 'secondary' ? colors.ink2 : colors.siyahi),
-          writingDirection: dir,
+          // Numbers (times, minutes, +5) always read left to right, also inside Urdu.
+          writingDirection: variant === 'number' ? 'ltr' : dir,
           textAlign: align === 'center' ? 'center' : dir === 'rtl' ? 'right' : 'left',
         },
         style,

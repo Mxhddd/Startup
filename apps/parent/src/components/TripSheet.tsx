@@ -31,7 +31,7 @@ function Onboard({ title, body, children }: { title: string; body?: string; chil
     <Animated.View testID="trip-sheet" entering={FadeInDown.springify().damping(22)} style={{ gap: space.lg }}>
       <LineArt width={150} />
       <View style={{ gap: 6 }}>
-        <AppText variant="title" style={{ fontSize: 28, lineHeight: 42 }}>{title}</AppText>
+        <AppText variant="display" style={{ fontSize: 32 }}>{title}</AppText>
         {body ? <AppText variant="secondary">{body}</AppText> : null}
       </View>
       {children}

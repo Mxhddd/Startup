@@ -4,7 +4,8 @@ import { Camera, GeoJSONSource, Layer, Map, Marker, type CameraRef, type StyleSp
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { brandMapStyle, type MapStyleJson } from '../mapStyle';
-import { BASE_MAP_STYLE_URL, colors, karachiRegion } from '../theme';
+import { karachiHour } from '@pohnch/core';
+import { BASE_MAP_STYLE_URL, colors, karachiRegion, mapMoodAt, type MapMood } from '../theme';
 import { AppText } from './AppText';
 import { StopPin } from './StopPin';
 import { VanMarker } from './VanMarker';
@@ -16,7 +17,7 @@ export type MapPin =
 export type PohnchMapProps = {
   accessibilityLabel: string;
   pins?: MapPin[];
-  van?: { lat: number; lng: number; heading: number | null; stale: boolean } | null;
+  van?: { lat: number; lng: number; heading: number | null; stale: boolean; speed?: number | null } | null;
   onPress?: (p: { lat: number; lng: number }) => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
@@ -36,6 +37,8 @@ export type PohnchMapProps = {
   trail?: { lat: number; lng: number }[];
   /** The road still ahead (van -> your stop): drawn dashed, the dashes flowing forward. */
   ahead?: { lat: number; lng: number }[];
+  /** Force one map mood (dark mode uses 'night'); otherwise it follows the time of day in Karachi. */
+  mood?: MapMood;
 };
 
 // The flowing dashes: the same dash pattern shifted a little each frame (the MapLibre way to animate a line).
@@ -60,17 +63,30 @@ const line = (pts: { lat: number; lng: number }[]) => ({
   geometry: { type: 'LineString' as const, coordinates: pts.map((p) => [p.lng, p.lat]) },
 });
 
-// Fetched once per app run and shared by every map.
-let cachedStyle: MapStyleJson | null = null;
-async function loadStyle(): Promise<MapStyleJson | string> {
-  if (cachedStyle) return cachedStyle;
+// The base style is fetched once per app run and shared by every map; each mood is coloured from it once.
+let baseStyle: MapStyleJson | null = null;
+const styled: Partial<Record<MapMood, MapStyleJson>> = {};
+async function loadStyle(mood: MapMood): Promise<MapStyleJson | string> {
+  if (styled[mood]) return styled[mood] as MapStyleJson;
   try {
-    const res = await fetch(BASE_MAP_STYLE_URL);
-    cachedStyle = brandMapStyle((await res.json()) as MapStyleJson);
-    return cachedStyle;
+    if (!baseStyle) baseStyle = (await (await fetch(BASE_MAP_STYLE_URL)).json()) as MapStyleJson;
+    const out = brandMapStyle(baseStyle, mood);
+    styled[mood] = out;
+    return out;
   } catch {
     return BASE_MAP_STYLE_URL; // no signal: the plain style still works (and caches tiles)
   }
+}
+
+/** The mood for now in Karachi, checked every 10 minutes (morning, day, dusk). */
+function useMood(fixed?: MapMood): MapMood {
+  const [mood, setMood] = useState<MapMood>(() => fixed ?? mapMoodAt(karachiHour(new Date())));
+  useEffect(() => {
+    if (fixed) return setMood(fixed);
+    const id = setInterval(() => setMood(mapMoodAt(karachiHour(new Date()))), 10 * 60_000);
+    return () => clearInterval(id);
+  }, [fixed]);
+  return mood;
 }
 
 function PinView({ pin }: { pin: MapPin }) {
@@ -84,14 +100,19 @@ function PinView({ pin }: { pin: MapPin }) {
   return <StopPin kind={pin.kind} />;
 }
 
-export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false, onFollowChange, recenterKey = 0, trail, ahead }: PohnchMapProps) {
-  const [mapStyle, setMapStyle] = useState<MapStyleJson | string | null>(cachedStyle);
+export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false, onFollowChange, recenterKey = 0, trail, ahead, mood: fixedMood }: PohnchMapProps) {
+  const mood = useMood(fixedMood);
+  const [mapStyle, setMapStyle] = useState<MapStyleJson | string | null>(styled[mood] ?? null);
   const camera = useRef<CameraRef>(null);
   const framed = useRef(false);
 
   useEffect(() => {
-    if (!mapStyle) loadStyle().then(setMapStyle);
-  }, [mapStyle]);
+    let live = true;
+    loadStyle(mood).then((st) => live && setMapStyle(st));
+    return () => {
+      live = false;
+    };
+  }, [mood]);
 
   // Frame what matters once it first appears: the van, your stop and your home.
   useEffect(() => {
@@ -113,6 +134,9 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
   // Following: the camera eases after the van, tilted 35° and turned to its heading, so the road ahead
   // is "up" like in a car. A pan by the person stops it; recenterKey starts it again.
   const [following, setFollowing] = useState(follow);
+  // Which way the map itself is turned. The van marker stands on the screen, so it turns by the van's
+  // heading minus the map's: while following, the map turns with the van and the van points straight up.
+  const [mapBearing, setMapBearing] = useState(0);
   useEffect(() => {
     setFollowing(follow);
     if (follow) onFollowChange?.(true);
@@ -127,6 +151,7 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       duration: 1400,
       padding: { top: topInset, bottom: bottomInset, left: 0, right: 0 },
     });
+    setMapBearing(van.heading ?? 0);
   }, [following, van?.lat, van?.lng, van?.heading, topInset, bottomInset]); // eslint-disable-line react-hooks/exhaustive-deps
   const dash = useDashStep(!!ahead && ahead.length > 1);
 
@@ -181,7 +206,7 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       ))}
       {van ? (
         <Marker id="van" lngLat={[van.lng, van.lat]} anchor="center">
-          <VanMarker heading={van.heading ?? 0} stale={van.stale} />
+          <VanMarker heading={(van.heading ?? 0) - mapBearing} stale={van.stale} speed={van.speed} />
         </Marker>
       ) : null}
     </Map>

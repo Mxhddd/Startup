@@ -29,7 +29,7 @@ function AuthGate({ ready, signedIn, configured }: { ready: boolean; signedIn: b
     const here = segments[0] as string | undefined;
     const linkToken = (segments as string[])[1];
     if (!signedIn && here === 'i' && typeof linkToken === 'string') rememberInvite(linkToken);
-    if (!signedIn && here !== 'login' && here !== 'gallery') router.replace('/login');
+    if (!signedIn && here !== 'login' && here !== 'welcome' && here !== 'gallery') router.replace('/login');
     if (signedIn && here === 'login') {
       const token = takeInvite();
       router.replace(token ? { pathname: '/i/[token]', params: { token } } : '/');

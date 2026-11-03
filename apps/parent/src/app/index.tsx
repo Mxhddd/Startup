@@ -37,7 +37,7 @@ export default function ParentHome() {
       <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, transformOrigin: 'top' }, mapStyle]}>
       <BrandMap
         accessibilityLabel={t('parent.map.label')}
-        van={live && p.position ? { lat: p.position.lat, lng: p.position.lng, heading: p.position.heading, stale: p.signal?.stale ?? false } : null}
+        van={live && p.position ? { lat: p.position.lat, lng: p.position.lng, heading: p.position.heading, stale: p.signal?.stale ?? false, speed: p.position.speed } : null}
         stop={p.stop ? { lat: p.stop.lat, lng: p.stop.lng } : null}
         home={p.child?.lat != null && p.child.lng != null ? { lat: p.child.lat, lng: p.child.lng } : null}
         bottomInset={peek}

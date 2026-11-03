@@ -80,11 +80,16 @@ export const tap = { min: 64, next: 104 } as const;
 export const type = {
   /** The one huge number on a screen (minutes to your door). */
   hero: 64,
+  /** v8 strict scale: Display 34 (Gulzar in Urdu, brand moments only), Title 24, Headline 20, Body 17, Caption 14. */
+  display: 34,
+  title: 24,
+  headline: 20,
+  body: 17,
+  caption: 14,
   minSize: 14,
-  body: 16,
-  title: 22,
-  display: 30,
   urduLineHeight: 1.6,
+  /** Gulzar (Nastaliq) climbs and falls far more than Naskh: it needs the extra room. */
+  nastaliqLineHeight: 1.9,
   latinLineHeight: 1.35,
 } as const;
 
@@ -110,6 +115,29 @@ export const mapColors = {
   rail: '#D6CDBB',
   boundary: '#C9C0AE',
 } as const;
+
+/**
+ * v8 time-of-day map moods, all from the same brand style: a warm morning (the school run), the
+ * bright day of the base palette, a cooler dusk for late afternoons, and night for dark mode.
+ */
+export type MapMood = 'morning' | 'day' | 'dusk' | 'night';
+export type MapPalette = { [K in keyof typeof mapColors]: string } & { halo: string };
+export const mapMoods: Record<MapMood, MapPalette> = {
+  morning: { ...mapColors, land: '#F2E7D3', residential: '#ECE0CA', building: '#E6D8BF', parks: '#DCE8C2', water: '#CCD9E2', roadCasing: '#E0D2B8', halo: colors.ghee },
+  day: { ...mapColors, halo: colors.ghee },
+  dusk: { ...mapColors, land: '#E7E1D8', residential: '#E0D9CE', building: '#D8D0C3', parks: '#D3E0C6', water: '#BFCCDC', roadCasing: '#D2C9BA', road: '#FBF9F5', halo: '#F3EFE8' },
+  night: {
+    land: '#161C35', residential: '#1A2140', building: '#222A4D', parks: '#1C2B33', water: '#0E1430', road: '#2B3560', roadCasing: '#1F2747',
+    labels: '#BFC4D6', rail: '#2A3254', boundary: '#343C60', halo: '#141A33',
+  },
+};
+
+/** The map mood for a Karachi hour (0-23): morning until 10, day until 16, then dusk. */
+export function mapMoodAt(hour: number): Exclude<MapMood, 'night'> {
+  if (hour >= 5 && hour < 10) return 'morning';
+  if (hour >= 10 && hour < 16) return 'day';
+  return 'dusk';
+}
 
 /** The free, key-less base map (OpenFreeMap, built on OpenStreetMap). We recolour it with brandMapStyle. */
 export const BASE_MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';

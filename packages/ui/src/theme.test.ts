@@ -26,6 +26,22 @@ describe('theme', () => {
     expect(contrast(colors.siyahi, colors.ghee)).toBeGreaterThanOrEqual(4.5);
     expect(contrast(colors.ink2, colors.ghee)).toBeGreaterThanOrEqual(4.5);
     for (const ground of [colors.white, colors.ghee, colors.kesarTint]) expect(contrast(colors.kesarText, ground)).toBeGreaterThanOrEqual(4.5);
+    // v8 audit: every text-on-ground pair the screens use.
+    const pairs: [string, string, string][] = [
+      ['ghee on neel (driver headers)', colors.ghee, colors.neel],
+      ['muted on neel (header lines)', colors.mutedOnDark, colors.neel],
+      ['muted on siyahi', colors.mutedOnDark, colors.siyahi],
+      ['ink2 on white', colors.ink2, colors.white],
+      ['ink2 on sand (quiet buttons)', colors.ink2, colors.sand],
+      ['siyahi on sand', colors.siyahi, colors.sand],
+      ['neel on neelTint', colors.neel, colors.neelTint],
+      ['zamurradOnTint on zamurradTint', colors.zamurradOnTint, colors.zamurradTint],
+      ['danger on white', colors.dangerText, colors.white],
+      ['danger on ghee', colors.dangerText, colors.ghee],
+      ['siyahi on kesar', colors.siyahi, colors.kesar],
+      ['absent text on absent ground', colors.absentText, colors.absentBg],
+    ];
+    for (const [name, fg, bg] of pairs) expect(contrast(fg, bg), name).toBeGreaterThanOrEqual(4.5);
   });
 
   it('keeps the size rules: taps at least 64 px, next tap 104 px, no text under 14 px', () => {

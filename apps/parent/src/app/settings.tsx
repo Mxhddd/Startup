@@ -15,7 +15,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Linking, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Page } from '../components/Page';
-import { previewSound } from '../notifications/setup';
+import { alertsUndecided, askForAlerts, previewSound, registerForPush } from '../notifications/setup';
 
 const TONE = { neel: colors.neel, zamurrad: colors.zamurrad, kesar: colors.kesar, shingarf: colors.shingarf } as const;
 
@@ -28,11 +28,13 @@ export default function Settings() {
   const { t, lang, toggle } = useLang();
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
   const [allowed, setAllowed] = useState(true);
+  const [undecided, setUndecided] = useState(false);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     parent.notificationPrefs().then(setPrefs).catch(() => setPrefs({ offSteps: [], sound: true }));
     Notifications.getPermissionsAsync().then((p) => setAllowed(p.status === 'granted')).catch(() => undefined);
+    alertsUndecided().then(setUndecided).catch(() => undefined);
   }, []);
 
   // Save shortly after the last change, so flicking several switches sends one write.
@@ -62,8 +64,9 @@ export default function Settings() {
       {!allowed ? (
         <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: colors.kesarTint }}>
           <AppText bold style={{ flex: 1 }}>{t('settings.off')}</AppText>
-          <PressableScale accessibilityRole="button" onPress={() => Linking.openSettings()} faceStyle={{ height: 44, paddingHorizontal: 16, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.siyahi, justifyContent: 'center' }}>
-            <AppText bold color={colors.ghee}>{t('settings.open')}</AppText>
+          <PressableScale accessibilityRole="button" testID="alerts-allow"
+            onPress={() => (undecided ? askForAlerts().then((ok) => { setAllowed(ok); setUndecided(false); if (ok) registerForPush().catch(() => undefined); }) : Linking.openSettings())} faceStyle={{ height: 44, paddingHorizontal: 16, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.siyahi, justifyContent: 'center' }}>
+            <AppText bold color={colors.ghee}>{undecided ? t('welcome.allow') : t('settings.open')}</AppText>
           </PressableScale>
         </Animated.View>
       ) : null}

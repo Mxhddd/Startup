@@ -51,11 +51,30 @@ export async function setupChannels(names: { trip: string; live: string; arrive:
   });
 }
 
-/** Returns 'registered', 'denied', or 'skipped' (simulator, or no server yet). */
+/**
+ * Asks the phone for permission to show alerts. Only called after explaining why (the welcome
+ * screens, or the notification settings): a prompt with no reason is the one people say no to.
+ */
+export async function askForAlerts(): Promise<boolean> {
+  const now = await Notifications.getPermissionsAsync();
+  if (now.status === 'granted') return true;
+  if (!now.canAskAgain) return false;
+  return (await Notifications.requestPermissionsAsync()).status === 'granted';
+}
+
+/** Whether the phone has never been asked yet (so the app can explain first, then ask). */
+export async function alertsUndecided(): Promise<boolean> {
+  const now = await Notifications.getPermissionsAsync();
+  return now.status === 'undetermined' && now.canAskAgain;
+}
+
+/**
+ * Registers this phone for pushes when alerts are allowed. Never shows the system prompt itself:
+ * returns 'denied' if alerts aren't allowed (yet), 'skipped' on a simulator or with no server yet.
+ */
 export async function registerForPush(): Promise<'registered' | 'denied' | 'skipped'> {
   if (!backend || !Device.isDevice) return 'skipped';
-  let { status } = await Notifications.getPermissionsAsync();
-  if (status !== 'granted') status = (await Notifications.requestPermissionsAsync()).status;
+  const { status } = await Notifications.getPermissionsAsync();
   if (status !== 'granted') return 'denied';
   const projectId = Constants.expoConfig?.extra?.eas?.projectId as string | undefined;
   if (!projectId) return 'skipped';

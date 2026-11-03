@@ -73,7 +73,7 @@ export function MomentBanner({ step, title, sub, onDone }: { step: MomentStep; t
         ) : null}
       </View>
       <View style={{ flex: 1 }}>
-        <AppText bold style={{ fontSize: 22, lineHeight: 34 }} color={step === 'late' ? colors.dangerText : colors.siyahi}>
+        <AppText variant={step === 'late' ? 'headline' : 'display'} style={{ fontSize: step === 'late' ? 22 : 28 }} color={step === 'late' ? colors.dangerText : colors.siyahi}>
           {title}
         </AppText>
         {sub ? <AppText variant="small" bold color={colors.ink2}>{sub}</AppText> : null}

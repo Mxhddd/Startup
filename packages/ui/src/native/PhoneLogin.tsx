@@ -250,7 +250,7 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
         >
         <Animated.View key={step} entering={FadeInDown.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)} exiting={FadeOut.duration(120)} style={{ gap: space.xl }}>
         <View style={{ gap: space.sm }}>
-          <AppText variant="title" testID="login-title" style={{ fontSize: 28 }}>{t(titleKey)}</AppText>
+          <AppText variant="display" testID="login-title" style={{ fontSize: 32 }}>{t(titleKey)}</AppText>
           <AppText variant="secondary">
             {step === 'phone' ? t('login.phone.hint') : step === 'code' ? t('login.code.hint', { phone: displayPkMobile(phone) }) : t(role === 'driver' ? 'login.name.hint.driver' : 'login.name.hint.parent')}
           </AppText>

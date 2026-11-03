@@ -10,7 +10,7 @@ import { AppText, TapButton, TextField } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
-import Animated, { FadeInDown } from 'react-native-reanimated';
+import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { BrandMap } from '../components/BrandMap';
 import { Page } from '../components/Page';
 import { useParent } from '../state/ParentStore';
@@ -69,6 +69,12 @@ export default function ChildPage() {
 
   return (
     <Page title={existing ? existing.first_name : t('parent.addChild')}>
+      {existing ? (
+        // The same kesar initial as the child's row in the menu, grown big: the row "opens" into the page.
+        <Animated.View entering={ZoomIn.springify().damping(16).stiffness(220)} style={{ alignSelf: 'center', width: 88, height: 88, borderRadius: 44, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 0px 0px 4px ${colors.white}, 0px 0px 0px 6px ${colors.gold}, ${shadow.card}` }}>
+          <AppText bold color={colors.siyahi} style={{ fontSize: 36, lineHeight: 52 }}>{(name || existing.first_name).slice(0, 1)}</AppText>
+        </Animated.View>
+      ) : null}
       <TextField label={t('parent.child.firstName')} value={name} onChange={setName} maxLength={30} testID="child-name" />
       <TextField label={t('parent.child.school')} value={school} onChange={setSchool} maxLength={80} testID="child-school" />
       <View style={{ gap: 6 }}>

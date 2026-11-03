@@ -1,6 +1,6 @@
 // The running trip. Taps go through the offline queue; positions are sent by the trip-only location task.
 import { useLang } from '@pohnch/ui';
-import { Redirect } from 'expo-router';
+import { Redirect, router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { onTripFix, type Fix } from '../location/tripLocation';
 import { clearTripLive, showTripLive } from '../notifications/tripLive';
@@ -46,7 +46,13 @@ export default function Trip() {
       onUndoExpire={() => d.actions.clearUndo()}
       onLate={(r) => d.actions.late(r)}
       onFinish={async (text) => {
+        const trip = d.running;
         if (kind === 'morning') await d.actions.reachedSchool(text);
+        // The numbers for the "Trip complete" moment, taken before the trip closes.
+        const minutes = trip ? Math.max(1, Math.round((Date.now() - Date.parse(trip.started_at)) / 60_000)) : null;
+        const delivered = d.progress.done;
+        // Go to the moment first, so Today never flashes in between; the trip ends behind it.
+        if (trip && !trip.is_practice) router.replace({ pathname: '/done', params: { kind, children: String(delivered), ...(minutes ? { minutes: String(minutes) } : {}) } });
         await d.actions.endTrip();
       }}
       banner={d.running.is_practice ? t('driver.practice.note') : d.location === 'denied' || d.location === 'failed' ? t('location.off') : undefined}

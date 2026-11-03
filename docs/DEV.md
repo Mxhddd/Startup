@@ -270,3 +270,18 @@ New shared pieces: `EditSheet` (a sheet for a small edit, rises on the sheet spr
 
 Live: migration `20261103000400_pilot_gaps.sql` is applied and the `app` function is deployed. Deleting an account was checked on the live database with a throwaway user (rolled back).
 
+
+## v8 phase C: the design in the apps (3 November 2026)
+
+| What | Where | Notes |
+| --- | --- | --- |
+| Strict type scale | `type` in `packages/ui/src/theme.ts`, `AppText` | Display 34, Title 24, Headline 20, Body 17, Caption 14. `AppText` gained `headline` and `caption`; a size set in `style` now brings its own line height. |
+| Gulzar for brand moments | `variant="display"` | Nastaliq (Urdu only, 26 px and up, line height 1.9): the driver's greeting, welcome screens, login title, step moments, the day-off cards, "Trip complete". English falls back to bold Manrope. |
+| The drawn van | `VanMarker.tsx` | Our van from above (neel body, windscreen, kesar roof stripe, mirrors, nose arrow). It turns with its heading minus the map's turn (so it points up while the map follows it), and its shadow stretches with speed (`shadowStretch`). Grey and still when stale. |
+| Time-of-day map | `mapMoods`, `mapMoodAt` in `theme.ts`; `brandMapStyle(style, mood)` | Morning (warm, 5-10), day (10-16), dusk (from 16). Checked every 10 minutes; each mood is coloured once from the same base style. A `night` palette is ready for dark mode. The switch is a style swap, not a cross-fade. |
+| Welcome + alert priming | `apps/parent/src/app/welcome.tsx` | Three screens before the first login (what Pohnch does, the privacy promise, alerts). The system prompt is asked only on the last one; "Not now" skips it, and Settings offers "Allow alerts" later. `registerForPush` never prompts by itself any more. |
+| Floating labels | `TextField.tsx` | The label sits in the box, then glides up on focus; `error` turns the border red, shakes once and shows the message. |
+| Driver screens | `apps/driver/src/components/Screen.tsx`, `families.tsx`, `stops.tsx`, `done.tsx` | Every driver screen has Today's neel header. Families: requests first, riders in one list, remove through a hold sheet. Stops: "Change order" opens a press-hold-drag list (`DragList`, `moveId` in core) with a tick at each new place. Trip complete: a full-screen moment with minutes taken and children taken. |
+| Accessibility | `AppText`, `TextField`, `theme.test.ts` | Text follows the phone's size up to 130%. Reanimated's animations follow the phone's Reduce Motion setting by default (they jump to the end). Contrast tests now cover every text-on-ground pair used. |
+
+Not done in this phase: true shared-element transitions (still experimental in Reanimated 4); the child's page instead opens with the same kesar initial growing in.

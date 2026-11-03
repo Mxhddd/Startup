@@ -1,14 +1,15 @@
 // Turns the free OpenFreeMap "positron" style into the Pohnch map (design/BRAND.md, Map): warm land,
 // soft green parks, blue-grey water, white roads with a light casing, few labels in ink-2.
 // Works on the style JSON, so it needs no map key and no Google account.
-import { colors, mapColors } from './theme';
+import { mapMoods, type MapMood } from './theme';
 
 type Layer = { id: string; type: string; paint?: Record<string, unknown>; layout?: Record<string, unknown>; [k: string]: unknown };
 export type MapStyleJson = { layers: Layer[]; [k: string]: unknown };
 
 const has = (id: string, ...parts: string[]) => parts.some((p) => id.includes(p));
 
-export function brandMapStyle<T extends MapStyleJson>(style: T): T {
+export function brandMapStyle<T extends MapStyleJson>(style: T, mood: MapMood = 'day'): T {
+  const mapColors = mapMoods[mood];
   const layers: Layer[] = style.layers
     // Road number shields add clutter and aren't used in Karachi.
     .filter((l) => !has(l.id, 'shield'))
@@ -30,7 +31,7 @@ export function brandMapStyle<T extends MapStyleJson>(style: T): T {
         else if (has(id, 'boundary')) paint['line-color'] = mapColors.boundary;
       } else if (l.type === 'symbol') {
         paint['text-color'] = mapColors.labels;
-        paint['text-halo-color'] = colors.ghee;
+        paint['text-halo-color'] = mapColors.halo;
         paint['text-halo-width'] = 1.2;
       }
       return { ...l, paint, layout };
@@ -39,7 +40,12 @@ export function brandMapStyle<T extends MapStyleJson>(style: T): T {
   // (the parent's follow mode), and fade in from zoom 15 so the city view stays flat and calm.
   const sources = ((style as unknown as { sources?: Record<string, { type?: string }> }).sources ?? {}) as Record<string, { type?: string }>;
   const vector = Object.keys(sources).find((k) => sources[k]?.type === 'vector');
-  if (vector && !layers.some((l) => l.id === 'pohnch-3d-buildings')) {
+  const existing = layers.findIndex((l) => l.id === 'pohnch-3d-buildings');
+  if (existing >= 0) {
+    // Already styled once (another mood): only recolour it.
+    const l = layers[existing] as Layer;
+    layers[existing] = { ...l, paint: { ...(l.paint ?? {}), 'fill-extrusion-color': mapColors.building } };
+  } else if (vector) {
     const firstLabel = layers.findIndex((l) => l.type === 'symbol');
     const building: Layer = {
       id: 'pohnch-3d-buildings',

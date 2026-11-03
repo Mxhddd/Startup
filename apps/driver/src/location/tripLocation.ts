@@ -14,7 +14,7 @@ export const LOCATION_TASK = 'pohnch-trip-location';
 
 // The newest fix, kept in memory only, so the open trip screen can show the van and the distance to
 // the next stop. It exists only while the trip's location task runs; nothing is stored or logged.
-export type Fix = { lat: number; lng: number; heading: number | null };
+export type Fix = { lat: number; lng: number; heading: number | null; speed?: number | null };
 let lastFix: Fix | null = null;
 const listeners = new Set<(f: Fix | null) => void>();
 export function onTripFix(cb: (f: Fix | null) => void): () => void {
@@ -40,7 +40,7 @@ TaskManager.defineTask<{ locations: Location.LocationObject[] }>(LOCATION_TASK, 
   }
   const latest = data.locations[data.locations.length - 1];
   if (!latest) return;
-  setFix({ lat: latest.coords.latitude, lng: latest.coords.longitude, heading: latest.coords.heading ?? null });
+  setFix({ lat: latest.coords.latitude, lng: latest.coords.longitude, heading: latest.coords.heading ?? null, speed: latest.coords.speed ?? null });
   const lastSent = Number((await AsyncStorage.getItem(LAST_SENT)) ?? '') || null;
   if (!shouldSendPosition(lastSent, Date.now(), latest.coords.speed)) return;
   try {

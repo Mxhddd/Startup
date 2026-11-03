@@ -1,0 +1,22 @@
+# Parent app (v8): the three welcome screens on a fresh install, then the login screen.
+# Needs a build connected to the server (a fresh install shows the welcome before login).
+# "Not now" skips the alert prompt, so the flow never depends on the phone's permission dialog.
+# Run: maestro test tests/maestro/parent-welcome.yaml
+appId: pk.pohnch.parent
+---
+- launchApp:
+    clearState: true
+- assertVisible:
+    id: "welcome-title-map"
+- tapOn:
+    id: "welcome-next"
+- assertVisible:
+    id: "welcome-title-privacy"
+- tapOn:
+    id: "welcome-next"
+- assertVisible:
+    id: "welcome-title-alerts"
+- tapOn:
+    id: "welcome-notnow"
+- assertVisible:
+    id: "login-title"
