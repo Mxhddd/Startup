@@ -60,7 +60,7 @@ function Row({ item, order, onDrop }: { item: DragItem; order: SharedValue<strin
 
   return (
     <GestureDetector gesture={pan}>
-      <Animated.View accessibilityLabel={`${n}. ${item.label}. ${t('driver.stops.dragHint')}`}
+      <Animated.View testID={`drag-${item.id}`} accessibilityLabel={`${n}. ${item.label}. ${t('driver.stops.dragHint')}`}
         style={[{ position: 'absolute', left: 0, right: 0, height: H - 8, boxShadow: shadow.card, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: colors.white, flexDirection: row, alignItems: 'center', gap: space.md, paddingHorizontal: space.md }, style]}>
         <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>
           <AppText variant="number" color={colors.white} style={{ fontSize: 16, lineHeight: 20 }}>{String(n)}</AppText>
