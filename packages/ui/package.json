@@ -20,8 +20,7 @@
     "react-native-svg": "*",
     "@maplibre/maplibre-react-native": "*",
     "expo-haptics": "*",
-    "expo-blur": "*",
-    "react-native-safe-area-context": "*"
+    "expo-blur": "*"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",
