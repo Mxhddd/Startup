@@ -22,7 +22,7 @@ export function LangSwitch({ tone = 'light' }: { tone?: 'light' | 'dark' | 'floa
         minHeight: 44,
         paddingHorizontal: 16,
         justifyContent: 'center',
-        borderRadius: radius.pill,
+        borderRadius: radius.pill, borderCurve: 'continuous',
         backgroundColor: dark ? 'rgba(250,246,238,0.14)' : colors.white,
         borderWidth: tone === 'light' ? 1 : 0,
         borderColor: colors.line,

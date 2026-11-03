@@ -31,7 +31,7 @@ export function DrawnCheck({ color, size = 32, fill }: { color: string; size?: n
   const props = useAnimatedProps(() => ({ strokeDashoffset: TICK_LEN * (1 - drawn.value) }));
   const circle = useAnimatedStyle(() => ({ transform: [{ scale: scale.value }] }));
   return (
-    <Animated.View style={[{ width: size, height: size, borderRadius: size / 2, backgroundColor: fill, alignItems: 'center', justifyContent: 'center' }, circle]}>
+    <Animated.View style={[{ width: size, height: size, borderRadius: size / 2, borderCurve: 'continuous', backgroundColor: fill, alignItems: 'center', justifyContent: 'center' }, circle]}>
       <Svg width={size * 0.7} height={size * 0.7} viewBox="0 0 24 24" fill="none">
         <AnimatedPath d={TICK} stroke={color} strokeWidth={3} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={`${TICK_LEN} ${TICK_LEN}`} animatedProps={props} />
       </Svg>
@@ -93,7 +93,7 @@ export function ChildRow({
           <AbsentChip name={joined} />
         ) : (
           <>
-            <View style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 2, borderColor: colors.siyahi, alignItems: 'center', justifyContent: 'center' }}>
+            <View style={{ width: 30, height: 30, borderRadius: 15, borderCurve: 'continuous', borderWidth: 2, borderColor: colors.siyahi, alignItems: 'center', justifyContent: 'center' }}>
               <AppText variant="number" style={{ fontSize: 14, lineHeight: 18 }}>{String(order ?? index + 1)}</AppText>
             </View>
             <View style={{ flex: 1 }}>
@@ -120,7 +120,7 @@ export function ChildRow({
         minHeight: tap.min + 8,
         paddingHorizontal: 14,
         paddingVertical: 8,
-        borderRadius: radius.card,
+        borderRadius: radius.card, borderCurve: 'continuous',
         backgroundColor: done ? colors.zamurradTint : colors.white,
         boxShadow: done ? undefined : shadow.card,
       }}
@@ -128,7 +128,7 @@ export function ChildRow({
       {done ? (
         <DrawnCheck fill={stepColors[step].fill} color={colors.white} />
       ) : (
-        <View style={{ width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: state === 'absent' ? colors.line : colors.neel }} />
+        <View style={{ width: 32, height: 32, borderRadius: 16, borderCurve: 'continuous', borderWidth: 2, borderColor: state === 'absent' ? colors.line : colors.neel }} />
       )}
       <View style={{ flex: 1 }}>
         <AppText bold color={state === 'absent' ? colors.absentText : done ? colors.zamurradOnTint : colors.siyahi}>

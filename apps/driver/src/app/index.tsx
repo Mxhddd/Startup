@@ -5,12 +5,12 @@
 import { useSession } from '@pohnch/client';
 import { karachiDayParts } from '@pohnch/core';
 import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, ChildRow, Icon, LangSwitch, PohnchMap, PressableScale, TapButton, VanBadge, type IconName } from '@pohnch/ui/native';
+import { AppText, ChildRow, Icon, LangSwitch, PohnchMap, PressableScale, Shimmer, TapButton, VanBadge, type IconName } from '@pohnch/ui/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Redirect, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { Pressable, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationDisclosure } from '../components/LocationDisclosure';
@@ -23,11 +23,11 @@ function NavTile({ label, href, icon, badge }: { label: string; href: Href; icon
   const { dir } = useLang();
   return (
     <PressableScale accessibilityRole="button" accessibilityLabel={label} onPress={() => router.push(href)} testID={`nav-${href.slice(1)}`} style={{ flex: 1 }}
-      faceStyle={{ minHeight: 80, borderRadius: radius.card, backgroundColor: colors.white, boxShadow: shadow.card, alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 6 }}>
+      faceStyle={{ minHeight: 80, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: colors.white, boxShadow: shadow.card, alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 6 }}>
       <View>
         <Icon name={icon} size={22} color={colors.neel} />
         {badge ? (
-          <Animated.View entering={FadeIn} style={{ position: 'absolute', top: -8, [dir === 'rtl' ? 'left' : 'right']: -14, minWidth: 22, height: 22, borderRadius: 11, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 }}>
+          <Animated.View entering={FadeIn} style={{ position: 'absolute', top: -8, [dir === 'rtl' ? 'left' : 'right']: -14, minWidth: 22, height: 22, borderRadius: 11, borderCurve: 'continuous', backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 }}>
             <AppText variant="number" style={{ fontSize: 14, lineHeight: 18 }}>{String(badge)}</AppText>
           </Animated.View>
         ) : null}
@@ -82,8 +82,8 @@ export default function DriverToday() {
           </AppText>
           {d.requests.length > 0 ? (
             <PressableScale accessibilityRole="button" onPress={() => router.push('/families')} scaleTo="chip" testID="requests-pill"
-              faceStyle={{ height: 40, paddingHorizontal: 12, borderRadius: 14, backgroundColor: colors.kesar, flexDirection: row, alignItems: 'center', gap: 8 }}>
-              <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: colors.siyahi, alignItems: 'center', justifyContent: 'center' }}>
+              faceStyle={{ height: 40, paddingHorizontal: 12, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.kesar, flexDirection: row, alignItems: 'center', gap: 8 }}>
+              <View style={{ width: 22, height: 22, borderRadius: 11, borderCurve: 'continuous', backgroundColor: colors.siyahi, alignItems: 'center', justifyContent: 'center' }}>
                 <AppText variant="number" color={colors.kesar} style={{ fontSize: 14, lineHeight: 18 }}>{String(d.requests.length)}</AppText>
               </View>
               <AppText bold color={colors.siyahi} style={{ fontSize: 15 }}>{t('driver.requests.label')}</AppText>
@@ -92,10 +92,13 @@ export default function DriverToday() {
         </View>
       </Animated.View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 210 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: insets.bottom + 210 }}
+        refreshControl={configured ? <RefreshControl refreshing={false} onRefresh={d.actions.refresh} tintColor={colors.kesar} colors={[colors.neel, colors.kesar]} /> : undefined}
+      >
         {hasMap ? (
           // The route as a raised card that overlaps the header, so the screen has depth.
-          <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ height: 196, marginTop: -38, marginHorizontal: space.gutter, borderRadius: 26, overflow: 'hidden', boxShadow: shadow.raised, backgroundColor: colors.white }}>
+          <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ height: 196, marginTop: -38, marginHorizontal: space.gutter, borderRadius: 26, borderCurve: 'continuous', overflow: 'hidden', boxShadow: shadow.raised, backgroundColor: colors.white }}>
             <PohnchMap
               testID="today-map"
               accessibilityLabel={t('driver.nav.stops')}
@@ -108,17 +111,13 @@ export default function DriverToday() {
 
         <View style={{ paddingHorizontal: space.gutter, paddingTop: space.xl, gap: space.lg }}>
           {!configured ? (
-            <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius.big, boxShadow: shadow.card, padding: space.xl, gap: space.md }}>
+            <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.xl, gap: space.md }}>
               <AppText bold>{t('app.driver.name')}</AppText>
               <AppText variant="secondary">{t('common.notConnected')}</AppText>
               <TapButton tone="left" label={t('driver.nav.practice')} onConfirm={() => router.push('/practice')} testID="nav-practice" />
             </Animated.View>
           ) : d.loading ? (
-            <View style={{ gap: space.md }} accessibilityLabel={t('common.loading')}>
-              {[0.5, 1, 1, 1].map((w, i) => (
-                <Animated.View key={i} entering={FadeIn.delay(i * 80)} style={{ height: i === 0 ? 18 : 52, width: `${w * 100}%`, borderRadius: 12, backgroundColor: colors.sand }} />
-              ))}
-            </View>
+            <Shimmer lines={[{ w: '50%', h: 18 }, { w: '100%', h: 62 }, { w: '100%', h: 62 }, { w: '100%', h: 62 }]} />
           ) : d.error ? (
             <Animated.View entering={FadeInDown.springify()} style={{ gap: space.md }}>
               <AppText bold color={colors.dangerText}>{t(d.error === 'offline' ? 'error.offline' : 'error.generic')}</AppText>
@@ -143,7 +142,7 @@ export default function DriverToday() {
               {!d.dayOff && childCount === 0 ? (
                 <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>
               ) : !d.dayOff ? (
-                <View style={{ backgroundColor: colors.white, borderRadius: radius.card, boxShadow: shadow.card, paddingHorizontal: 18, paddingVertical: 4 }}>
+                <View style={{ backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', boxShadow: shadow.card, paddingHorizontal: 18, paddingVertical: 4 }}>
                   {d.run.groups.map((g, i) => {
                     const s = g.stopId ? stopById.get(g.stopId) : undefined;
                     const time = (d.run.kind === 'morning' ? s?.morning_time : s?.afternoon_time)?.slice(0, 5).replace(/^0/, '');
@@ -175,7 +174,7 @@ export default function DriverToday() {
               sublabel={t('driver.today.startSub')}
               onConfirm={() => start(nextKind)} />
           ) : (
-            <View style={{ backgroundColor: colors.zamurradTint, borderRadius: radius.big, padding: space.lg }}>
+            <View style={{ backgroundColor: colors.zamurradTint, borderRadius: radius.big, borderCurve: 'continuous', padding: space.lg }}>
               <AppText bold align="center" color={colors.zamurradOnTint}>{t('driver.today.done')}</AppText>
             </View>
           )}

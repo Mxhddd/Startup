@@ -16,7 +16,7 @@ export function Screen({ title, children, back = true, scroll = true, footer }: 
       <View style={{ flexDirection: row, alignItems: 'center', gap: space.md, paddingHorizontal: space.xl, paddingBottom: space.md }}>
         {back ? (
           <PressableScale accessibilityRole="button" accessibilityLabel={t('common.back')} scaleTo="chip" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} hitSlop={8}
-            faceStyle={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, boxShadow: shadow.float }}>
+            faceStyle={{ width: 48, height: 48, borderRadius: 24, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, boxShadow: shadow.float }}>
             <View style={{ transform: [{ scaleX: dir === 'rtl' ? 1 : -1 }] }}>
               <Icon name="arrow" size={22} color={colors.siyahi} />
             </View>

@@ -15,7 +15,7 @@ const RIPPLE_MS = 2400;
 /** One ring that grows out of the van and fades, like a ripple on water. */
 function Ripple({ v, size }: { v: SharedValue<number>; size: number }) {
   const style = useAnimatedStyle(() => ({ opacity: 0.32 * (1 - v.value), transform: [{ scale: 0.55 + v.value * 0.95 }] }));
-  return <Animated.View pointerEvents="none" style={[{ position: 'absolute', width: size, height: size, borderRadius: size / 2, backgroundColor: colors.neel }, style]} />;
+  return <Animated.View pointerEvents="none" style={[{ position: 'absolute', width: size, height: size, borderRadius: size / 2, borderCurve: 'continuous', backgroundColor: colors.neel }, style]} />;
 }
 
 export function VanMarker({ heading = 0, stale = false, size = 64 }: { heading?: number; stale?: boolean; size?: number }) {
@@ -67,7 +67,7 @@ export function VanMarker({ heading = 0, stale = false, size = 64 }: { heading?:
           </Svg>
         </Animated.View>
       ) : null}
-      <Animated.View style={[{ width: size * 0.56, height: size * 0.56, boxShadow: '0px 3px 8px rgba(20,26,51,0.28)', borderRadius: size }, body]}>
+      <Animated.View style={[{ width: size * 0.56, height: size * 0.56, boxShadow: '0px 3px 8px rgba(20,26,51,0.28)', borderRadius: size, borderCurve: 'continuous' }, body]}>
         <Svg width="100%" height="100%" viewBox="0 0 36 36">
           <Circle cx="18" cy="18" r="16" fill={fill} stroke={colors.white} strokeWidth={3.5} />
           {/* the van glyph, as on the v5 map */}

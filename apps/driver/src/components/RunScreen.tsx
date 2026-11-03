@@ -8,9 +8,10 @@
 import { distanceM, formatDistance, type StopGroup } from '@pohnch/core';
 import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
 import { AppText, ChildRow, DrawnCheck, HelpSheet, OfflineBanner, PohnchMap, TapButton, TripHeader, UndoBar, type LateReason, type MapPin } from '@pohnch/ui/native';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
-import Animated, { FadeInDown, FadeOutUp, LinearTransition, SlideInDown } from 'react-native-reanimated';
+import Animated, { Easing, FadeInDown, FadeOutUp, LinearTransition, SlideInDown, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import { haptic } from '@pohnch/ui/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const layout = LinearTransition.springify().damping(24).stiffness(200);
@@ -24,9 +25,9 @@ function MarkedPanel({ text }: { text: string }) {
       exiting={FadeOutUp.duration(220)}
       layout={layout}
       testID="marked-panel"
-      style={{ minHeight: 112, borderRadius: radius.big, backgroundColor: colors.zamurradTint, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 16, paddingHorizontal: 20, paddingVertical: 14 }}
+      style={{ minHeight: 112, borderRadius: radius.big, borderCurve: 'continuous', backgroundColor: colors.zamurradTint, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 16, paddingHorizontal: 20, paddingVertical: 14 }}
     >
-      <View style={{ borderRadius: 40, boxShadow: '0px 0px 0px 8px rgba(23,112,90,0.14)' }}>
+      <View style={{ borderRadius: 40, borderCurve: 'continuous', boxShadow: '0px 0px 0px 8px rgba(23,112,90,0.14)' }}>
         <DrawnCheck fill={colors.zamurrad} color={colors.white} size={64} />
       </View>
       <View style={{ flex: 1, gap: 2 }}>
@@ -57,6 +58,23 @@ export type RunScreenProps = {
   /** The van's newest position on this phone (only while the trip's location runs). */
   fix?: { lat: number; lng: number; heading: number | null } | null;
 };
+
+/** Once, when the last child is in: a zamurrad wash sweeps across the sheet from the reading start. */
+function AllDoneSweep({ show }: { show: boolean }) {
+  const { dir } = useLang();
+  const v = useSharedValue(0);
+  const was = useRef(show);
+  useEffect(() => {
+    if (show && !was.current) {
+      haptic.success();
+      v.value = 0;
+      v.value = withSequence(withTiming(1, { duration: 650, easing: Easing.out(Easing.cubic) }), withTiming(2, { duration: 500 }));
+    }
+    was.current = show;
+  }, [show, v]);
+  const style = useAnimatedStyle(() => ({ width: `${Math.min(1, v.value) * 100}%`, opacity: v.value === 0 ? 0 : v.value <= 1 ? 0.22 : 0.22 * (2 - v.value) }));
+  return <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, bottom: 0, backgroundColor: colors.zamurrad }, dir === 'rtl' ? { right: 0 } : { left: 0 }, style]} />;
+}
 
 export function RunScreen(p: RunScreenProps) {
   const { t, lang, dir } = useLang();
@@ -108,7 +126,7 @@ export function RunScreen(p: RunScreenProps) {
         />
         <View style={{ paddingHorizontal: space.lg, paddingTop: space.sm, gap: space.sm }}>
           {p.banner ? (
-            <Animated.View entering={FadeInDown.springify()} style={{ backgroundColor: colors.kesarTint, borderRadius: 14, padding: space.md, boxShadow: shadow.float }}>
+            <Animated.View entering={FadeInDown.springify()} style={{ backgroundColor: colors.kesarTint, borderRadius: 14, borderCurve: 'continuous', padding: space.md, boxShadow: shadow.float }}>
               <AppText variant="small" bold>{p.banner}</AppText>
             </Animated.View>
           ) : null}
@@ -116,7 +134,8 @@ export function RunScreen(p: RunScreenProps) {
         </View>
       </View>
 
-      <Animated.View entering={SlideInDown.springify().damping(26).stiffness(220)} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxHeight: sheetMax, backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, boxShadow: shadow.sheet, paddingTop: 22, paddingHorizontal: space.gutter, paddingBottom: insets.bottom + 20, gap: 14 }}>
+      <Animated.View entering={SlideInDown.springify().damping(26).stiffness(220)} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxHeight: sheetMax, overflow: 'hidden', backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, boxShadow: shadow.sheet, paddingTop: 22, paddingHorizontal: space.gutter, paddingBottom: insets.bottom + 20, gap: 14 }}>
+        <AllDoneSweep show={allDone && p.groups.length > 0} />
         {p.undo ? <MarkedPanel key={`m${p.undo.at}`} text={p.undo.text} /> : null}
         {p.undo ? <UndoBar key={p.undo.at} text={t('undo.prompt')} tappedAt={p.undo.at} onUndo={p.onUndo} onExpire={p.onUndoExpire} /> : null}
 

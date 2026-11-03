@@ -18,9 +18,9 @@ function ChildChip({ name, on, i, onPress }: { name: string; on: boolean; i: num
   const dark = useAnimatedStyle(() => ({ opacity: v.value }));
   return (
     <PressableScale accessibilityRole="tab" accessibilityState={{ selected: on }} accessibilityLabel={name} onPress={onPress} scaleTo="chip" haptic="tick" testID={`child-chip-${i}`}>
-      <Glass style={{ height: 44, paddingHorizontal: 8, paddingStart: dir === 'rtl' ? 8 : 8, borderRadius: radius.pill, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }}>
-        <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: radius.pill, backgroundColor: colors.siyahi }, dark]} />
-        <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: dots[i % dots.length], alignItems: 'center', justifyContent: 'center' }}>
+      <Glass style={{ height: 44, paddingHorizontal: 8, paddingStart: dir === 'rtl' ? 8 : 8, borderRadius: radius.pill, borderCurve: 'continuous', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10 }}>
+        <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, borderRadius: radius.pill, borderCurve: 'continuous', backgroundColor: colors.siyahi }, dark]} />
+        <View style={{ width: 30, height: 30, borderRadius: 15, borderCurve: 'continuous', backgroundColor: dots[i % dots.length], alignItems: 'center', justifyContent: 'center' }}>
           <AppText bold color={i % dots.length === 2 ? colors.siyahi : colors.white} style={{ fontSize: 14, lineHeight: 18 }}>
             {name.slice(0, 1)}
           </AppText>

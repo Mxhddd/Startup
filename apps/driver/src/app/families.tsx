@@ -40,7 +40,7 @@ export default function Families() {
       <AppText variant="secondary">{t('driver.families.riders', { n: d.riders.length })}</AppText>
       {d.riders.length > 0 ? <AppText variant="title">{t('driver.families.ridersTitle')}</AppText> : null}
       {d.riders.map((r) => (
-        <View key={r.childId} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.white, borderRadius: radius.card, borderWidth: 1, borderColor: colors.line, padding: space.md }}>
+        <View key={r.childId} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', borderWidth: 1, borderColor: colors.line, padding: space.md }}>
           <View style={{ flex: 1 }}>
             <AppText bold>{r.firstName}</AppText>
             <AppText variant="small" color={colors.ink2}>{d.stops.find((s) => s.id === r.stopId)?.label ?? '—'}</AppText>

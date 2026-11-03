@@ -314,5 +314,16 @@
   "eta.unit.school": "min to school",
   "driver.requests.label": "new requests",
   "driver.trip.told": "Their families have been told",
-  "undo.prompt": "A mistake? You can take it back"
+  "undo.prompt": "A mistake? You can take it back",
+  "moment.left": "The van has left",
+  "moment.picked": "{name} is in the van",
+  "moment.arriving": "The van is close · get ready",
+  "moment.reached_school": "{name} reached school",
+  "moment.left_school": "{name} left school",
+  "moment.dropped": "{name} is home",
+  "moment.late": "The van is running late",
+  "parent.compact.van": "{name}'s van",
+  "parent.compact.ahead": "{n} stops before you",
+  "parent.compact.next": "Your stop is next",
+  "min.short": "min"
 }

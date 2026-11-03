@@ -76,13 +76,13 @@ export function PressableScale({
       {glow && !disabled ? (
         <Animated.View
           pointerEvents="none"
-          style={[{ position: 'absolute', left: 6, right: 6, top: 10, bottom: 0, borderRadius: radiusOf(faceStyle), boxShadow: `0px 16px 30px ${glow}` }, bloom]}
+          style={[{ position: 'absolute', left: 6, right: 6, top: 10, bottom: 0, borderRadius: radiusOf(faceStyle), borderCurve: 'continuous', boxShadow: `0px 16px 30px ${glow}` }, bloom]}
         />
       ) : null}
       {lip ? (
         <View
           pointerEvents="none"
-          style={{ position: 'absolute', left: 0, right: 0, top: depth, bottom: 0, borderRadius: radiusOf(faceStyle), backgroundColor: disabled ? 'transparent' : lip.color }}
+          style={{ position: 'absolute', left: 0, right: 0, top: depth, bottom: 0, borderRadius: radiusOf(faceStyle), borderCurve: 'continuous', backgroundColor: disabled ? 'transparent' : lip.color }}
         />
       ) : null}
       <Animated.View style={[faceStyle, face]}>{children}</Animated.View>

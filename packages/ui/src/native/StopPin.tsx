@@ -22,13 +22,13 @@ export function StopPin({ kind }: { kind: 'stop' | 'home' | 'school' }) {
   if (kind === 'home') {
     return (
       <Animated.View entering={enter} testID="home-pin" style={{ width: 52, height: 52, alignItems: 'center', justifyContent: 'center' }}>
-        <View style={{ position: 'absolute', width: 52, height: 52, borderRadius: 26, backgroundColor: colors.zamurrad, opacity: 0.18 }} />
-        <View style={{ width: 28, height: 28, borderRadius: 14, backgroundColor: colors.zamurrad, borderWidth: 4.5, borderColor: colors.white, boxShadow: '0px 2px 6px rgba(20,26,51,0.25)' }} />
+        <View style={{ position: 'absolute', width: 52, height: 52, borderRadius: 26, borderCurve: 'continuous', backgroundColor: colors.zamurrad, opacity: 0.18 }} />
+        <View style={{ width: 28, height: 28, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.zamurrad, borderWidth: 4.5, borderColor: colors.white, boxShadow: '0px 2px 6px rgba(20,26,51,0.25)' }} />
       </Animated.View>
     );
   }
   return (
-    <Animated.View entering={enter} testID="school-pin" style={{ width: 44, height: 44, boxShadow: '0px 3px 8px rgba(20,26,51,0.25)', borderRadius: 22 }}>
+    <Animated.View entering={enter} testID="school-pin" style={{ width: 44, height: 44, boxShadow: '0px 3px 8px rgba(20,26,51,0.25)', borderRadius: 22, borderCurve: 'continuous' }}>
       <Svg width={44} height={44} viewBox="0 0 44 44">
         <Circle cx="22" cy="22" r="19" fill={colors.kesar} stroke={colors.white} strokeWidth={4} />
         <Path d="M14 28 V19.5 l8 -5.5 8 5.5 V28 Z" fill={colors.siyahi} />

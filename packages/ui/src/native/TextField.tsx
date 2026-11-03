@@ -48,7 +48,7 @@ export function TextField({
         maxLength={maxLength}
         style={{
           minHeight: 56,
-          borderRadius: radius.card,
+          borderRadius: radius.card, borderCurve: 'continuous',
           borderWidth: 2,
           borderColor: focused ? colors.neel : colors.line,
           boxShadow: focused ? `0px 0px 0px 4px ${colors.neelTint}` : shadow.card,

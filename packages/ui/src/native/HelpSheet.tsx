@@ -42,7 +42,7 @@ export function HelpSheet({ visible, onClose, onReason }: { visible: boolean; on
           <Pressable accessibilityRole="button" accessibilityLabel={t('help.close')} style={{ flex: 1 }} onPress={onClose} />
         </Animated.View>
         <Animated.View testID="help-sheet" style={[{ backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, padding: space.xl, paddingTop: space.md, gap: space.md }, sheet]}>
-          <View style={{ alignSelf: 'center', width: 44, height: 5, borderRadius: 3, backgroundColor: colors.line, marginBottom: space.sm }} />
+          <View style={{ alignSelf: 'center', width: 44, height: 5, borderRadius: 3, borderCurve: 'continuous', backgroundColor: colors.line, marginBottom: space.sm }} />
           <AppText variant="title">{t('help.late')}</AppText>
           {reasons.map((r) => (
             <TapButton key={r} label={t(`help.reason.${r}`)} onConfirm={() => onReason(r)} testID={`help-${r}`} />
@@ -62,7 +62,7 @@ export function HelpSheet({ visible, onClose, onReason }: { visible: boolean; on
                 haptic="press"
                 lip={{ color: colors.shingarfDeep, depth: 4 }}
                 style={{ flex: 1 }}
-                faceStyle={{ minHeight: 64, borderRadius: radius.card, backgroundColor: colors.shingarf, alignItems: 'center', justifyContent: 'center', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', gap: 10 }}
+                faceStyle={{ minHeight: 64, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: colors.shingarf, alignItems: 'center', justifyContent: 'center', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', gap: 10 }}
               >
                 <Icon name="phone" size={22} color={colors.white} />
                 <AppText variant="number" color={colors.white} style={{ fontSize: 24, lineHeight: 30 }}>

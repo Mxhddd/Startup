@@ -8,7 +8,7 @@ export type StopPinData = { id: string; lat: number; lng: number; n: number };
 
 export function DriverMap({ pins, onPress, height = 300 }: { pins: StopPinData[]; onPress: (p: { lat: number; lng: number }) => void; height?: number }) {
   return (
-    <View style={{ height, borderRadius: radius.big, overflow: 'hidden', boxShadow: shadow.card }}>
+    <View style={{ height, borderRadius: radius.big, borderCurve: 'continuous', overflow: 'hidden', boxShadow: shadow.card }}>
       <PohnchMap testID="stops-map" accessibilityLabel="stops map" pins={pins.map((p) => ({ ...p, kind: 'number' as const }))} onPress={onPress} style={{ flex: 1 }} />
     </View>
   );

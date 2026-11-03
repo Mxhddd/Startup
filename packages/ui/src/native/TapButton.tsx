@@ -193,7 +193,7 @@ export function TapButton({
         onPressOut={cancel}
         faceStyle={{
           minHeight: big ? Math.max(tap.next, 120) : tap.min,
-          borderRadius: big ? radius.big : radius.button,
+          borderRadius: big ? radius.big : radius.button, borderCurve: 'continuous',
           backgroundColor: fill,
           borderWidth: c.border && !disabled ? 2 : 0,
           borderColor: c.border ?? undefined,
@@ -215,7 +215,7 @@ export function TapButton({
         <View style={{ flexDirection: row, alignItems: 'center', gap: 16, paddingHorizontal: big ? 20 : 16 }}>
           {icon ? (
             big ? (
-              <View style={{ width: 72, height: 72, borderRadius: 24, backgroundColor: tone === 'reachedSchool' ? colors.siyahi : colors.ghee, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ width: 72, height: 72, borderRadius: 24, borderCurve: 'continuous', backgroundColor: tone === 'reachedSchool' ? colors.siyahi : colors.ghee, alignItems: 'center', justifyContent: 'center' }}>
                 <Icon name={icon} size={38} color={disabled ? colors.absentText : tone === 'reachedSchool' ? colors.kesar : c.fill} strokeWidth={2.3} />
               </View>
             ) : (

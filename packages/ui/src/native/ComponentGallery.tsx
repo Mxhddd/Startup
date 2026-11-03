@@ -35,7 +35,7 @@ function Section({ name, children, dark = false }: { name: string; children: Rea
   return (
     <View style={{ gap: space.md }}>
       <Text style={{ fontFamily: fonts.latin.bold, fontSize: 14, color: colors.ink2, letterSpacing: 1 }}>{name}</Text>
-      <View style={{ gap: space.md, padding: dark ? space.lg : 0, backgroundColor: dark ? colors.siyahi : 'transparent', borderRadius: radius.card }}>{children}</View>
+      <View style={{ gap: space.md, padding: dark ? space.lg : 0, backgroundColor: dark ? colors.siyahi : 'transparent', borderRadius: radius.card, borderCurve: 'continuous' }}>{children}</View>
     </View>
   );
 }
@@ -107,7 +107,7 @@ export function ComponentGallery() {
       </Section>
 
       <Section name="VanMarker · StopPin">
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.xl, backgroundColor: mapColors.land, borderRadius: radius.card, padding: space.lg, flexWrap: 'wrap' }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.xl, backgroundColor: mapColors.land, borderRadius: radius.card, borderCurve: 'continuous', padding: space.lg, flexWrap: 'wrap' }}>
           <VanMarker heading={heading} />
           <VanMarker heading={heading} stale />
           <StopPin kind="stop" />
@@ -150,7 +150,7 @@ export function ComponentGallery() {
       </Section>
 
       <Section name="MapSheet">
-        <View style={{ height: 460, borderRadius: radius.card, overflow: 'hidden', backgroundColor: mapColors.land }}>
+        <View style={{ height: 460, borderRadius: radius.card, borderCurve: 'continuous', overflow: 'hidden', backgroundColor: mapColors.land }}>
           <View style={{ position: 'absolute', top: 60, left: 40 }}>
             <VanMarker heading={heading} />
           </View>

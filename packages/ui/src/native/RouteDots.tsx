@@ -10,11 +10,11 @@ import { colors } from '../theme';
 
 function Dash({ solid, dark }: { solid: boolean; dark: boolean }) {
   const c = dark ? colors.ghee : colors.neel;
-  if (solid) return <View style={{ flex: 1, height: 4, borderRadius: 2, backgroundColor: c }} />;
+  if (solid) return <View style={{ flex: 1, height: 4, borderRadius: 2, borderCurve: 'continuous', backgroundColor: c }} />;
   return (
     <View style={{ flex: 1, height: 4, flexDirection: 'row', gap: 5, overflow: 'hidden' }}>
       {Array.from({ length: 8 }, (_, i) => (
-        <View key={i} style={{ width: 6, height: 4, borderRadius: 2, backgroundColor: c, opacity: dark ? 0.5 : 0.8 }} />
+        <View key={i} style={{ width: 6, height: 4, borderRadius: 2, borderCurve: 'continuous', backgroundColor: c, opacity: dark ? 0.5 : 0.8 }} />
       ))}
     </View>
   );
@@ -31,15 +31,15 @@ export function RouteDots({ total, done, tone = 'light' }: { total: number; done
     const isEnd = i === n;
     const isVan = i === at && !isEnd;
     if (isEnd) {
-      parts.push(<View key="end" style={{ width: 18, height: 18, borderRadius: 9, backgroundColor: colors.zamurrad, boxShadow: `0px 0px 0px 4px ${dark ? 'rgba(167,212,126,0.45)' : colors.zamurradTint}` }} />);
+      parts.push(<View key="end" style={{ width: 18, height: 18, borderRadius: 9, borderCurve: 'continuous', backgroundColor: colors.zamurrad, boxShadow: `0px 0px 0px 4px ${dark ? 'rgba(167,212,126,0.45)' : colors.zamurradTint}` }} />);
     } else if (isVan) {
       parts.push(
-        <Animated.View key="van" layout={LinearTransition.springify().damping(springs.layout.damping)} style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: dark ? colors.kesar : colors.neel, boxShadow: `0px 0px 0px 5px ${dark ? 'rgba(232,163,61,0.3)' : colors.neelTint}` }} />,
+        <Animated.View key="van" layout={LinearTransition.springify().damping(springs.layout.damping)} style={{ width: 22, height: 22, borderRadius: 11, borderCurve: 'continuous', backgroundColor: dark ? colors.kesar : colors.neel, boxShadow: `0px 0px 0px 5px ${dark ? 'rgba(232,163,61,0.3)' : colors.neelTint}` }} />,
       );
     } else if (i < at) {
-      parts.push(<View key={i} style={{ width: 14, height: 14, borderRadius: 7, backgroundColor: main }} />);
+      parts.push(<View key={i} style={{ width: 14, height: 14, borderRadius: 7, borderCurve: 'continuous', backgroundColor: main }} />);
     } else {
-      parts.push(<View key={i} style={{ width: 14, height: 14, borderRadius: 7, borderWidth: 3, borderColor: main, opacity: dark ? 0.6 : 1 }} />);
+      parts.push(<View key={i} style={{ width: 14, height: 14, borderRadius: 7, borderCurve: 'continuous', borderWidth: 3, borderColor: main, opacity: dark ? 0.6 : 1 }} />);
     }
     if (!isEnd) parts.push(<Dash key={`d${i}`} solid={i < at} dark={dark} />);
   }

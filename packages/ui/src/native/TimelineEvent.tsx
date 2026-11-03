@@ -78,12 +78,12 @@ export function TimelineEvent({
     >
       <View style={{ alignItems: 'center', width: 34 }}>
         <View style={{ width: 34, height: 34, alignItems: 'center', justifyContent: 'center' }}>
-          <Animated.View style={[{ position: 'absolute', width: 34, height: 34, borderRadius: 17, backgroundColor: colors.neel }, haloStyle]} />
-          <View style={{ position: 'absolute', width: 34, height: 34, borderRadius: 17, backgroundColor: colors.white, borderWidth: current ? 4 : 2.5, borderColor: current ? colors.neel : step === 'reachedSchool' ? colors.kesar : colors.line }} />
-          <Animated.View style={[{ position: 'absolute', width: 34, height: 34, borderRadius: 17, backgroundColor: c.fill }, fillStyle]} />
+          <Animated.View style={[{ position: 'absolute', width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: colors.neel }, haloStyle]} />
+          <View style={{ position: 'absolute', width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: colors.white, borderWidth: current ? 4 : 2.5, borderColor: current ? colors.neel : step === 'reachedSchool' ? colors.kesar : colors.line }} />
+          <Animated.View style={[{ position: 'absolute', width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: c.fill }, fillStyle]} />
           <Icon name={step} size={18} color={pending ? (current ? colors.neel : colors.ink2) : c.text} strokeWidth={2.4} />
         </View>
-        {!last ? <Animated.View style={[{ flex: 1, width: 3, borderRadius: 2, backgroundColor: pending ? colors.line : c.fill, marginVertical: 5, transformOrigin: 'top' }, lineStyle]} /> : null}
+        {!last ? <Animated.View style={[{ flex: 1, width: 3, borderRadius: 2, borderCurve: 'continuous', backgroundColor: pending ? colors.line : c.fill, marginVertical: 5, transformOrigin: 'top' }, lineStyle]} /> : null}
       </View>
       <View style={{ flex: 1, paddingBottom: 12, paddingTop: 2 }}>
         <AppText bold color={pending && !current ? colors.ink2 : colors.siyahi}>

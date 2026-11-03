@@ -15,7 +15,7 @@ export function VanBadge({ status }: { status: keyof typeof looks }) {
   const { t, dir } = useLang();
   const l = looks[status];
   return (
-    <View testID={`van-badge-${status}`} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, alignSelf: dir === 'rtl' ? 'flex-end' : 'flex-start', backgroundColor: l.bg, borderRadius: radius.pill, paddingHorizontal: 12, minHeight: 32 }}>
+    <View testID={`van-badge-${status}`} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, alignSelf: dir === 'rtl' ? 'flex-end' : 'flex-start', backgroundColor: l.bg, borderRadius: radius.pill, borderCurve: 'continuous', paddingHorizontal: 12, minHeight: 32 }}>
       <StarIcon size={16} color={status === 'verified' ? colors.zamurrad : l.fg} />
       <AppText variant="small" bold color={l.fg}>
         {t(l.key)}

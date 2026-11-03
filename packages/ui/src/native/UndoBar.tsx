@@ -49,7 +49,7 @@ export function UndoBar({
       accessibilityLiveRegion="polite"
       entering={SlideInDown.springify().damping(springs.sheet.damping).stiffness(springs.sheet.stiffness).mass(0.8)}
       exiting={FadeOutDown.duration(220)}
-      style={{ backgroundColor: colors.siyahi, borderRadius: radius.tile, boxShadow: shadow.float }}
+      style={{ backgroundColor: colors.siyahi, borderRadius: radius.tile, borderCurve: 'continuous', boxShadow: shadow.float }}
     >
       <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, paddingHorizontal: 14, minHeight: tap.min + 8 }}>
         <View style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
@@ -72,7 +72,7 @@ export function UndoBar({
           accessibilityLabel={t('undo.action')}
           haptic="warn"
           onPress={onUndo}
-          faceStyle={{ minHeight: 48, minWidth: 88, paddingHorizontal: 18, borderRadius: radius.button, backgroundColor: colors.ghee, alignItems: 'center', justifyContent: 'center' }}
+          faceStyle={{ minHeight: 48, minWidth: 88, paddingHorizontal: 18, borderRadius: radius.button, borderCurve: 'continuous', backgroundColor: colors.ghee, alignItems: 'center', justifyContent: 'center' }}
         >
           <AppText bold color={colors.siyahi}>
             {t('undo.action')}

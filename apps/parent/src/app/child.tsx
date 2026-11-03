@@ -39,7 +39,7 @@ export default function AddChild() {
       <TextField label={t('parent.child.school')} value={school} onChange={setSchool} maxLength={80} testID="child-school" />
       <View style={{ gap: 6 }}>
         <AppText variant="small" bold color={colors.ink2}>{t('parent.child.pin')}</AppText>
-        <View style={{ height: 300, borderRadius: radius.big, overflow: 'hidden', boxShadow: shadow.card }}>
+        <View style={{ height: 300, borderRadius: radius.big, borderCurve: 'continuous', overflow: 'hidden', boxShadow: shadow.card }}>
           <BrandMap accessibilityLabel={t('parent.child.pin')} home={pin} onPress={setPin} style={{ flex: 1 }} />
         </View>
         <AppText variant="small" color={colors.ink2}>{t('parent.child.pinHint')}</AppText>

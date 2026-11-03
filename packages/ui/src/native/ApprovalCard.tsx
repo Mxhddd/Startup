@@ -15,7 +15,7 @@ export function ApprovalCard({ child, stop, onApprove, onDecline }: { child: str
       entering={FadeInDown.springify().damping(springs.layout.damping)}
       exiting={FadeOutUp.duration(200)}
       layout={LinearTransition.springify().damping(springs.layout.damping)}
-      style={{ backgroundColor: colors.white, borderRadius: radius.big, boxShadow: shadow.card, padding: space.lg, gap: space.md }}
+      style={{ backgroundColor: colors.white, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.lg, gap: space.md }}
     >
       <View style={{ gap: 2 }}>
         <AppText variant="small" bold color={colors.ink2}>

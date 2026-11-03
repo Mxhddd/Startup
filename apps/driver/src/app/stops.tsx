@@ -11,7 +11,7 @@ import { useDriver } from '../state/DriverStore';
 function SmallButton({ icon, label, onPress, disabled }: { icon: IconName; label: string; onPress: () => void; disabled?: boolean }) {
   return (
     <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={disabled} hitSlop={4}
-      style={{ width: 48, height: 48, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.ghee, opacity: disabled ? 0.35 : 1 }}>
+      style={{ width: 48, height: 48, borderRadius: 12, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.ghee, opacity: disabled ? 0.35 : 1 }}>
       <Icon name={icon} size={22} color={colors.siyahi} />
     </Pressable>
   );
@@ -49,8 +49,8 @@ export default function Stops() {
       {failed ? <AppText color={colors.dangerText}>{t('error.offline')}</AppText> : null}
       {d.stops.length === 0 ? <AppText variant="secondary">{t('driver.stops.empty')}</AppText> : null}
       {d.stops.map((s, i) => (
-        <View key={s.id} testID={`stop-row-${i}`} style={{ flexDirection: row, alignItems: 'center', gap: 8, minHeight: 64, backgroundColor: colors.white, borderRadius: radius.card, borderWidth: 1, borderColor: colors.line, paddingHorizontal: 10 }}>
-          <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>
+        <View key={s.id} testID={`stop-row-${i}`} style={{ flexDirection: row, alignItems: 'center', gap: 8, minHeight: 64, backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', borderWidth: 1, borderColor: colors.line, paddingHorizontal: 10 }}>
+          <View style={{ width: 32, height: 32, borderRadius: 16, borderCurve: 'continuous', backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>
             <AppText variant="small" bold color={colors.white}>{String(s.position)}</AppText>
           </View>
           <TextInput

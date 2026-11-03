@@ -80,7 +80,7 @@ function Field({ label, value, onChange, kind, testID }: { label: string; value:
         selectionColor={colors.neel}
         style={{
           minHeight: 64,
-          borderRadius: 20,
+          borderRadius: 20, borderCurve: 'continuous',
           borderWidth: 2,
           borderColor: focused ? colors.neel : colors.line,
           backgroundColor: colors.white,
@@ -115,7 +115,7 @@ function CodeCell({ digit, active }: { digit: string | undefined; active: boolea
           flex: 1,
           maxWidth: 52,
           height: 64,
-          borderRadius: radius.button,
+          borderRadius: radius.button, borderCurve: 'continuous',
           backgroundColor: colors.white,
           borderWidth: 2,
           borderColor: active ? colors.neel : digit ? colors.siyahi : colors.line,
@@ -261,7 +261,7 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
         {step === 'name' ? <Field kind="name" label={t('login.name.label')} value={name} onChange={setName} testID="name-input" /> : null}
 
         {error ? (
-          <Animated.View accessibilityRole="alert" testID="login-error" entering={FadeInDown.springify().damping(springs.pop.damping)} style={[{ backgroundColor: colors.dangerBg, borderRadius: radius.card, padding: space.md }, shakeStyle]}>
+          <Animated.View accessibilityRole="alert" testID="login-error" entering={FadeInDown.springify().damping(springs.pop.damping)} style={[{ backgroundColor: colors.dangerBg, borderRadius: radius.card, borderCurve: 'continuous', padding: space.md }, shakeStyle]}>
             <AppText bold color={colors.dangerText}>{t(`error.${error}`)}</AppText>
           </Animated.View>
         ) : null}

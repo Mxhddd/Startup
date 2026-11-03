@@ -26,10 +26,10 @@ export function LivePill({ top, clock, staleSeconds }: { top: number; clock: str
       testID="live-pill"
       style={{ position: 'absolute', top: top + space.md + 58, [dir === 'rtl' ? 'right' : 'left']: space.gutter }}
     >
-      <Glass tone={stale ? 'dark' : 'light'} style={{ height: 36, paddingHorizontal: 14, borderRadius: radius.pill, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, backgroundColor: stale ? colors.siyahi : undefined }}>
+      <Glass tone={stale ? 'dark' : 'light'} style={{ height: 36, paddingHorizontal: 14, borderRadius: radius.pill, borderCurve: 'continuous', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, backgroundColor: stale ? colors.siyahi : undefined }}>
         <Animated.View style={{ width: 10, height: 10 }}>
-          {!stale ? <Animated.View style={[{ position: 'absolute', width: 10, height: 10, borderRadius: 5, backgroundColor: colors.zamurrad }, ping]} /> : null}
-          <Animated.View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: stale ? colors.kesar : colors.zamurrad }} />
+          {!stale ? <Animated.View style={[{ position: 'absolute', width: 10, height: 10, borderRadius: 5, borderCurve: 'continuous', backgroundColor: colors.zamurrad }, ping]} /> : null}
+          <Animated.View style={{ width: 10, height: 10, borderRadius: 5, borderCurve: 'continuous', backgroundColor: stale ? colors.kesar : colors.zamurrad }} />
         </Animated.View>
         <AppText bold color={stale ? colors.ghee : colors.zamurradOnTint} style={{ fontSize: 14 }}>
           {text}

@@ -14,7 +14,7 @@ export function Page({ title, children }: { title: string; children: ReactNode }
       <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, paddingHorizontal: space.xl, paddingBottom: space.md }}>
         <PressableScale accessibilityRole="button" accessibilityLabel={t('common.back')} scaleTo="chip" hitSlop={8}
           onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}
-          faceStyle={{ width: 48, height: 48, borderRadius: 24, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, boxShadow: shadow.float }}>
+          faceStyle={{ width: 48, height: 48, borderRadius: 24, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, boxShadow: shadow.float }}>
           <View style={{ transform: [{ scaleX: dir === 'rtl' ? 1 : -1 }] }}>
             <Icon name="arrow" size={22} color={colors.siyahi} />
           </View>

@@ -22,9 +22,9 @@ export function OfflineBanner(props: { side: 'driver'; queued: number } | { side
       accessibilityRole="alert"
       entering={FadeInUp.springify().damping(springs.layout.damping)}
       exiting={FadeOutUp.duration(180)}
-      style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, backgroundColor: colors.siyahi, borderRadius: radius.card, paddingHorizontal: 14, paddingVertical: 12, boxShadow: shadow.float }}
+      style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, backgroundColor: colors.siyahi, borderRadius: radius.card, borderCurve: 'continuous', paddingHorizontal: 14, paddingVertical: 12, boxShadow: shadow.float }}
     >
-      <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(232,163,61,0.16)', alignItems: 'center', justifyContent: 'center' }}>
+      <View style={{ width: 36, height: 36, borderRadius: 18, borderCurve: 'continuous', backgroundColor: 'rgba(232,163,61,0.16)', alignItems: 'center', justifyContent: 'center' }}>
         <Icon name="signal" size={20} color={colors.kesar} />
       </View>
       <View style={{ flex: 1 }}>

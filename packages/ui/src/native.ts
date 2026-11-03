@@ -31,3 +31,8 @@ export { useScreenOptions } from './native/screenMotion';
 export { ChoiceChip } from './native/ChoiceChip';
 export { Glass } from './native/Glass';
 export { RollingNumber } from './native/RollingNumber';
+export { MomentBanner } from './native/MomentBanner';
+export { Shimmer } from './native/Shimmer';
+export { LineArt } from './native/LineArt';
+export { CircleAction } from './native/CircleAction';
+export { LaunchReveal } from './native/LaunchReveal';

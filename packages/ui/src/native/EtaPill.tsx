@@ -52,7 +52,7 @@ export function EtaPill({
           </View>
         )}
         {clock ? (
-          <Animated.View entering={FadeIn.delay(250)} style={{ height: 34, paddingHorizontal: 12, borderRadius: radius.pill, backgroundColor: stale ? colors.absentBg : colors.kesarTint, justifyContent: 'center', marginBottom: 12 }}>
+          <Animated.View entering={FadeIn.delay(250)} style={{ height: 34, paddingHorizontal: 12, borderRadius: radius.pill, borderCurve: 'continuous', backgroundColor: stale ? colors.absentBg : colors.kesarTint, justifyContent: 'center', marginBottom: 12 }}>
             <AppText variant="number" color={colors.siyahi} style={{ fontSize: 14, lineHeight: 20 }}>
               {t('eta.clock', { time: clock })}
             </AppText>

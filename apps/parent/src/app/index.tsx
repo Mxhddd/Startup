@@ -28,7 +28,7 @@ export default function ParentHome() {
   const barStyle = useAnimatedStyle(() => ({ opacity: 1 - 0.5 * Math.min(1, sheet.value) }));
   const live = p.phase === 'live';
   const onboarding = p.phase !== 'live' && p.phase !== 'idle';
-  const peek = onboarding ? 320 : live ? 404 : 352;
+  const peek = onboarding ? 360 : 196;
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, transformOrigin: 'top' }, mapStyle]}>
@@ -54,8 +54,8 @@ export default function ParentHome() {
       {live ? <LivePill top={insets.top} clock={karachiClock(new Date(p.now))} staleSeconds={p.signal?.stale ? p.signal.secondsAgo : null} /> : null}
       </Animated.View>
 
-      <MapSheet peek={peek} open={onboarding ? 320 : 660} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen} progress={sheet}>
-        <TripSheet expanded={open} onOpenTrip={() => setOpen((o) => !o)} />
+      <MapSheet peek={peek} open={onboarding ? 360 : 640} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen} progress={sheet}>
+        <TripSheet expanded={open} onOpenTrip={() => setOpen((o) => !o)} progress={sheet} />
       </MapSheet>
     </View>
   );

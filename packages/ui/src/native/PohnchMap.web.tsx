@@ -82,7 +82,7 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
         return (
           <View key={p.id} pointerEvents="none" style={{ position: 'absolute', left: at.x - size / 2, top: at.y - size / 2 }}>
             {p.kind === 'number' ? (
-              <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: colors.neel, borderWidth: 3, borderColor: colors.white, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 2px 6px rgba(20,26,51,0.25)' }}>
+              <View style={{ width: 34, height: 34, borderRadius: 17, borderCurve: 'continuous', backgroundColor: colors.neel, borderWidth: 3, borderColor: colors.white, alignItems: 'center', justifyContent: 'center', boxShadow: '0px 2px 6px rgba(20,26,51,0.25)' }}>
                 <AppText variant="small" bold color={colors.white}>{String(p.n)}</AppText>
               </View>
             ) : (

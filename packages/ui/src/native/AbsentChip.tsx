@@ -12,7 +12,7 @@ export function AbsentChip({ onUndo, name }: { onUndo?: () => void; name?: strin
   const { t, dir } = useLang();
   const label = name ? `${name} · ${t('chutti.label')}` : t('chutti.label');
   const body = (
-    <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, backgroundColor: colors.absentBg, borderRadius: radius.pill, borderWidth: 1.5, borderColor: colors.absentText, paddingHorizontal: 14, minHeight: 34 }}>
+    <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, backgroundColor: colors.absentBg, borderRadius: radius.pill, borderCurve: 'continuous', borderWidth: 1.5, borderColor: colors.absentText, paddingHorizontal: 14, minHeight: 34 }}>
       <AppText variant="small" bold color={colors.absentText}>
         {label}
       </AppText>

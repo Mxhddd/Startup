@@ -314,5 +314,16 @@
   "eta.unit.school": "منٹ میں اسکول",
   "driver.requests.label": "نئی درخواستیں",
   "driver.trip.told": "گھر والوں کو خبر چلی گئی",
-  "undo.prompt": "غلطی ہوئی؟ واپس لے سکتے ہیں"
+  "undo.prompt": "غلطی ہوئی؟ واپس لے سکتے ہیں",
+  "moment.left": "وین نکل گئی",
+  "moment.picked": "{name} وین میں بیٹھ گئے",
+  "moment.arriving": "وین قریب ہے · تیار رہیں",
+  "moment.reached_school": "{name} اسکول پہنچ گئے",
+  "moment.left_school": "{name} اسکول سے نکلے",
+  "moment.dropped": "{name} گھر پہنچ گئے",
+  "moment.late": "وین کو دیر ہو رہی ہے",
+  "parent.compact.van": "{name} کی وین",
+  "parent.compact.ahead": "{n} اسٹاپ پہلے",
+  "parent.compact.next": "اگلا آپ کا اسٹاپ",
+  "min.short": "منٹ"
 }

@@ -18,7 +18,7 @@ function LiveDot({ color }: { color: string }) {
     v.value = withRepeat(withTiming(1, { duration: durations.pulse / 2, easing: Easing.inOut(Easing.sin) }), -1, true);
   }, [v]);
   const s = useAnimatedStyle(() => ({ opacity: 0.55 + 0.45 * (1 - v.value), transform: [{ scale: 0.85 + 0.25 * v.value }] }));
-  return <Animated.View style={[{ width: 9, height: 9, borderRadius: 5, backgroundColor: color }, s]} />;
+  return <Animated.View style={[{ width: 9, height: 9, borderRadius: 5, borderCurve: 'continuous', backgroundColor: color }, s]} />;
 }
 
 export function TripHeader({
@@ -57,7 +57,7 @@ export function TripHeader({
         paddingHorizontal: 18,
         paddingBottom: 18,
         gap: 6,
-        borderRadius: radius.big,
+        borderRadius: radius.big, borderCurve: 'continuous',
         boxShadow: '0px 16px 40px rgba(14,20,48,0.35)',
       }}
     >
@@ -71,7 +71,7 @@ export function TripHeader({
             <RollingText text={`${done}/${total}`} variant="number" color={colors.ghee} style={{ fontSize: 15, lineHeight: 22 }} />
           </View>
           {practice ? (
-            <View style={{ backgroundColor: colors.kesar, borderRadius: radius.pill, paddingHorizontal: 10 }}>
+            <View style={{ backgroundColor: colors.kesar, borderRadius: radius.pill, borderCurve: 'continuous', paddingHorizontal: 10 }}>
               <AppText variant="small" bold color={colors.siyahi}>
                 {t('trip.practice')}
               </AppText>
@@ -85,7 +85,7 @@ export function TripHeader({
           onPress={onHelp}
           haptic="warn"
           scaleTo="chip"
-          faceStyle={{ minHeight: 48, minWidth: 64, paddingHorizontal: 14, borderRadius: radius.button, backgroundColor: colors.shingarf, alignItems: 'center', justifyContent: 'center', flexDirection: row, gap: 6 }}
+          faceStyle={{ minHeight: 48, minWidth: 64, paddingHorizontal: 14, borderRadius: radius.button, borderCurve: 'continuous', backgroundColor: colors.shingarf, alignItems: 'center', justifyContent: 'center', flexDirection: row, gap: 6 }}
         >
           <Icon name="help" size={20} color={colors.white} />
           <AppText bold color={colors.white}>

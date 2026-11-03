@@ -5,7 +5,7 @@ import { Manrope_500Medium, Manrope_800ExtraBold } from '@expo-google-fonts/manr
 import { NotoSansArabic_500Medium, NotoSansArabic_700Bold } from '@expo-google-fonts/noto-sans-arabic';
 import { useSession } from '@pohnch/client';
 import { LangProvider } from '@pohnch/ui';
-import { useScreenOptions } from '@pohnch/ui/native';
+import { LaunchReveal, useScreenOptions } from '@pohnch/ui/native';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -72,6 +72,7 @@ export default function RootLayout() {
             <TripNotifications signedIn={configured && !!session} />
           </ParentProvider>
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
+          <LaunchReveal />
         </LangProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
