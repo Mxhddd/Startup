@@ -3,12 +3,12 @@
 // "Trip" opens the sheet to the full timeline. In development builds, a long press on the menu opens
 // the component gallery.
 import { karachiClock } from '@pohnch/core';
-import { colors, useLang } from '@pohnch/ui';
-import { MapSheet } from '@pohnch/ui/native';
+import { colors, space, useLang } from '@pohnch/ui';
+import { Glass, Icon, MapSheet, PressableScale } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
-import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
+import Animated, { ZoomIn, ZoomOut, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandMap } from '../components/BrandMap';
 import { LivePill } from '../components/LivePill';
@@ -17,10 +17,13 @@ import { TripSheet } from '../components/TripSheet';
 import { useParent } from '../state/ParentStore';
 
 export default function ParentHome() {
-  const { t } = useLang();
+  const { t, dir } = useLang();
   const insets = useSafeAreaInsets();
   const p = useParent();
   const [open, setOpen] = useState(false);
+  // Follow mode: on while the van moves; a pan stops it and shows the recentre button.
+  const [following, setFollowing] = useState(true);
+  const [recenter, setRecenter] = useState(0);
   // 0 when the sheet peeks, 1 when it's open: the map sinks 3% and dims, so the sheet feels lifted off it.
   const sheet = useSharedValue(0);
   const mapStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 - 0.03 * Math.min(1, sheet.value) }] }));
@@ -38,6 +41,10 @@ export default function ParentHome() {
         stop={p.stop ? { lat: p.stop.lat, lng: p.stop.lng } : null}
         home={p.child?.lat != null && p.child.lng != null ? { lat: p.child.lat, lng: p.child.lng } : null}
         bottomInset={peek}
+        trail={live ? p.trail : undefined}
+        follow={live}
+        onFollowChange={setFollowing}
+        recenterKey={recenter}
       />
       </Animated.View>
       <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.siyahi }, dimStyle]} />
@@ -51,6 +58,15 @@ export default function ParentHome() {
         onMenu={() => router.push('/family')}
         onMenuLong={__DEV__ ? () => router.push('/gallery') : undefined}
       />
+      {live && !following ? (
+        <Animated.View entering={ZoomIn.springify().damping(16)} exiting={ZoomOut.duration(150)} style={{ position: 'absolute', bottom: peek + insets.bottom + 16, [dir === 'rtl' ? 'left' : 'right']: space.gutter }}>
+          <PressableScale accessibilityRole="button" accessibilityLabel={t('parent.recenter')} onPress={() => setRecenter((n) => n + 1)} scaleTo="chip" haptic="tick" testID="recenter">
+            <Glass style={{ width: 52, height: 52, alignItems: 'center', justifyContent: 'center' }}>
+              <Icon name="navigate" size={22} color={colors.neel} strokeWidth={2.3} />
+            </Glass>
+          </PressableScale>
+        </Animated.View>
+      ) : null}
       {live ? <LivePill top={insets.top} clock={karachiClock(new Date(p.now))} staleSeconds={p.signal?.stale ? p.signal.secondsAgo : null} /> : null}
       </Animated.View>
 

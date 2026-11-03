@@ -38,4 +38,14 @@ describe('the Pohnch map style', () => {
     expect(out.version).toBe(8);
     expect(style.layers[0]?.paint?.['background-color']).toBe('#fff'); // the input is not changed
   });
+
+  it('adds 3D buildings under the labels when the style has a vector source, once', () => {
+    const withSource = { ...style, sources: { openmaptiles: { type: 'vector' } } };
+    const once = brandMapStyle(withSource);
+    const twice = brandMapStyle(once);
+    const ids = twice.layers.map((l) => l.id);
+    expect(ids.filter((i) => i === 'pohnch-3d-buildings')).toHaveLength(1);
+    expect(ids.indexOf('pohnch-3d-buildings')).toBeLessThan(ids.indexOf('label_city'));
+    expect(brandMapStyle(style).layers.some((l) => l.id === 'pohnch-3d-buildings')).toBe(false);
+  });
 });

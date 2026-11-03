@@ -3,13 +3,13 @@
 // Works on the style JSON, so it needs no map key and no Google account.
 import { colors, mapColors } from './theme';
 
-type Layer = { id: string; type: string; paint?: Record<string, unknown>; layout?: Record<string, unknown> };
+type Layer = { id: string; type: string; paint?: Record<string, unknown>; layout?: Record<string, unknown>; [k: string]: unknown };
 export type MapStyleJson = { layers: Layer[]; [k: string]: unknown };
 
 const has = (id: string, ...parts: string[]) => parts.some((p) => id.includes(p));
 
 export function brandMapStyle<T extends MapStyleJson>(style: T): T {
-  const layers = style.layers
+  const layers: Layer[] = style.layers
     // Road number shields add clutter and aren't used in Karachi.
     .filter((l) => !has(l.id, 'shield'))
     .map((l) => {
@@ -35,5 +35,26 @@ export function brandMapStyle<T extends MapStyleJson>(style: T): T {
       }
       return { ...l, paint, layout };
     });
+  // 3D buildings at street zoom, in the warm building colour: they only show when the camera tilts
+  // (the parent's follow mode), and fade in from zoom 15 so the city view stays flat and calm.
+  const sources = ((style as unknown as { sources?: Record<string, { type?: string }> }).sources ?? {}) as Record<string, { type?: string }>;
+  const vector = Object.keys(sources).find((k) => sources[k]?.type === 'vector');
+  if (vector && !layers.some((l) => l.id === 'pohnch-3d-buildings')) {
+    const firstLabel = layers.findIndex((l) => l.type === 'symbol');
+    const building: Layer = {
+      id: 'pohnch-3d-buildings',
+      type: 'fill-extrusion',
+      source: vector,
+      'source-layer': 'building',
+      minzoom: 15,
+      paint: {
+        'fill-extrusion-color': mapColors.building,
+        'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 8],
+        'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
+        'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 15, 0, 16, 0.75],
+      },
+    };
+    layers.splice(firstLabel < 0 ? layers.length : firstLabel, 0, building);
+  }
   return { ...style, layers };
 }

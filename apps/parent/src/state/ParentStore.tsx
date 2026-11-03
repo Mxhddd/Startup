@@ -20,13 +20,14 @@ type Data = {
   events: ParentEvent[];
   position: Position | null;
   speeds: (number | null)[];
+  trail: { lat: number; lng: number }[];
   stopsAhead: number | null;
   absences: string[];
 };
 
 const empty: Data = {
   loading: true, error: null, children: [], membership: null, van: null, driverName: null, stop: null,
-  trips: [], events: [], position: null, speeds: [], stopsAhead: null, absences: [],
+  trips: [], events: [], position: null, speeds: [], trail: [], stopsAhead: null, absences: [],
 };
 
 function useParentState(enabled: boolean) {
@@ -51,14 +52,18 @@ function useParentState(enabled: boolean) {
       ]);
       const running = trips.find((x) => x.status === 'running') ?? null;
       const shown = running ?? trips[trips.length - 1] ?? null;
-      const [events, position, speeds, stopsAhead] = await Promise.all([
+      const [events, position, recent, stopsAhead] = await Promise.all([
         shown && van ? parent.eventsOf(shown.id, { id: van.driver_id, name: driverName }) : Promise.resolve([]),
         running ? parent.latestPosition(running.id) : Promise.resolve(null),
-        running ? parent.recentSpeeds(running.id) : Promise.resolve([]),
+        running ? parent.recentPositions(running.id) : Promise.resolve([]),
         running ? parent.stopsAhead(child.id) : Promise.resolve(null),
       ]);
       setChildId(child.id);
-      setD({ loading: false, error: null, children, membership, van, driverName, stop, trips, events, position, speeds, stopsAhead, absences });
+      const speeds = recent.slice(0, 6).map((r) => r.speed);
+      // The trail: positions from the last 3 minutes, oldest first.
+      const since = Date.now() - 3 * 60_000;
+      const trail = recent.filter((r) => Date.parse(r.recorded_at) >= since).reverse().map((r) => ({ lat: r.lat, lng: r.lng }));
+      setD({ loading: false, error: null, children, membership, van, driverName, stop, trips, events, position, speeds, trail, stopsAhead, absences });
     } catch (e) {
       setD((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }

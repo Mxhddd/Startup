@@ -13,9 +13,13 @@ export type MapProps = {
   onPress?: (p: { lat: number; lng: number }) => void;
   style?: StyleProp<ViewStyle>;
   bottomInset?: number;
+  trail?: { lat: number; lng: number }[];
+  follow?: boolean;
+  onFollowChange?: (following: boolean) => void;
+  recenterKey?: number;
 };
 
-export function BrandMap({ accessibilityLabel, van, stop, home, onPress, style, bottomInset }: MapProps) {
+export function BrandMap({ accessibilityLabel, van, stop, home, onPress, style, bottomInset, trail, follow, onFollowChange, recenterKey }: MapProps) {
   const vanAt = useGlide(van ? { latitude: van.lat, longitude: van.lng } : null);
   const pins: MapPin[] = [
     ...(home ? [{ id: 'home', kind: 'home' as const, lat: home.lat, lng: home.lng }] : []),
@@ -30,6 +34,11 @@ export function BrandMap({ accessibilityLabel, van, stop, home, onPress, style, 
       onPress={onPress}
       style={style}
       bottomInset={bottomInset}
+      trail={trail && vanAt ? [...trail, { lat: vanAt.latitude, lng: vanAt.longitude }] : undefined}
+      ahead={van && vanAt && stop ? [{ lat: vanAt.latitude, lng: vanAt.longitude }, stop] : undefined}
+      follow={follow}
+      onFollowChange={onFollowChange}
+      recenterKey={recenterKey}
     />
   );
 }

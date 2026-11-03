@@ -1,6 +1,6 @@
 // The map in both apps: MapLibre with free OpenFreeMap tiles (OpenStreetMap data), recoloured to the
 // brand. No Google account, map key or billing is needed. It never shows the phone's own location.
-import { Camera, Map, Marker, type CameraRef, type StyleSpecification } from '@maplibre/maplibre-react-native';
+import { Camera, GeoJSONSource, Layer, Map, Marker, type CameraRef, type StyleSpecification } from '@maplibre/maplibre-react-native';
 import { useEffect, useRef, useState } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { brandMapStyle, type MapStyleJson } from '../mapStyle';
@@ -26,9 +26,39 @@ export type PohnchMapProps = {
   topInset?: number;
   /** false for a still picture of the route (inside a scrolling screen). */
   interactive?: boolean;
-  /** Keep the van in view as it moves (the driver's trip screen). */
+  /** Keep the van in view as it moves, tilted and turned with it, until the person pans. */
   follow?: boolean;
+  /** Told when following stops (the person moved the map) or starts again. */
+  onFollowChange?: (following: boolean) => void;
+  /** Change this number to start following again (the "recentre" button). */
+  recenterKey?: number;
+  /** Where the van has been in the last few minutes, oldest first: drawn as a fading trail. */
+  trail?: { lat: number; lng: number }[];
+  /** The road still ahead (van -> your stop): drawn dashed, the dashes flowing forward. */
+  ahead?: { lat: number; lng: number }[];
 };
+
+// The flowing dashes: the same dash pattern shifted a little each frame (the MapLibre way to animate a line).
+const DASH_STEPS: number[][] = [
+  [0, 4, 3], [0.5, 4, 2.5], [1, 4, 2], [1.5, 4, 1.5], [2, 4, 1], [2.5, 4, 0.5], [3, 4, 0],
+  [0, 0.5, 3, 3.5], [0, 1, 3, 3], [0, 1.5, 3, 2.5], [0, 2, 3, 2], [0, 2.5, 3, 1.5], [0, 3, 3, 1], [0, 3.5, 3, 0.5],
+];
+
+function useDashStep(on: boolean) {
+  const [i, setI] = useState(0);
+  useEffect(() => {
+    if (!on) return;
+    const id = setInterval(() => setI((n) => (n + 1) % DASH_STEPS.length), 90);
+    return () => clearInterval(id);
+  }, [on]);
+  return DASH_STEPS[i] as number[];
+}
+
+const line = (pts: { lat: number; lng: number }[]) => ({
+  type: 'Feature' as const,
+  properties: {},
+  geometry: { type: 'LineString' as const, coordinates: pts.map((p) => [p.lng, p.lat]) },
+});
 
 // Fetched once per app run and shared by every map.
 let cachedStyle: MapStyleJson | null = null;
@@ -54,7 +84,7 @@ function PinView({ pin }: { pin: MapPin }) {
   return <StopPin kind={pin.kind} />;
 }
 
-export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false }: PohnchMapProps) {
+export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false, onFollowChange, recenterKey = 0, trail, ahead }: PohnchMapProps) {
   const [mapStyle, setMapStyle] = useState<MapStyleJson | string | null>(cachedStyle);
   const camera = useRef<CameraRef>(null);
   const framed = useRef(false);
@@ -80,11 +110,25 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
     }
   }, [pins, van, bottomInset, topInset]);
 
-  // Following: ease the camera to the van each time it moves, keeping the zoom.
+  // Following: the camera eases after the van, tilted 35° and turned to its heading, so the road ahead
+  // is "up" like in a car. A pan by the person stops it; recenterKey starts it again.
+  const [following, setFollowing] = useState(follow);
   useEffect(() => {
-    if (!follow || !van || !framed.current) return;
-    camera.current?.easeTo({ center: [van.lng, van.lat], duration: 1200, padding: { top: topInset, bottom: bottomInset, left: 0, right: 0 } });
-  }, [follow, van?.lat, van?.lng, topInset, bottomInset]); // eslint-disable-line react-hooks/exhaustive-deps
+    setFollowing(follow);
+    if (follow) onFollowChange?.(true);
+  }, [follow, recenterKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!following || !van || !framed.current) return;
+    camera.current?.easeTo({
+      center: [van.lng, van.lat],
+      zoom: 16,
+      pitch: 35,
+      bearing: van.heading ?? 0,
+      duration: 1400,
+      padding: { top: topInset, bottom: bottomInset, left: 0, right: 0 },
+    });
+  }, [following, van?.lat, van?.lng, van?.heading, topInset, bottomInset]); // eslint-disable-line react-hooks/exhaustive-deps
+  const dash = useDashStep(!!ahead && ahead.length > 1);
 
   if (!mapStyle) return <View testID={testID} style={[StyleSheet.absoluteFill, { backgroundColor: colors.ghee }, style]} />;
 
@@ -104,8 +148,32 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       touchZoom={interactive}
       doubleTapZoom={interactive}
       onPress={onPress ? (e) => onPress({ lng: e.nativeEvent.lngLat[0], lat: e.nativeEvent.lngLat[1] }) : undefined}
+      onRegionWillChange={(e) => {
+        if (following && e.nativeEvent.userInteraction) {
+          setFollowing(false);
+          onFollowChange?.(false);
+        }
+      }}
     >
       <Camera ref={camera} initialViewState={{ center: [karachiRegion.longitude, karachiRegion.latitude], zoom: 11 }} />
+      {trail && trail.length > 1 ? (
+        <GeoJSONSource id="pohnch-trail" data={line(trail)} lineMetrics>
+          <Layer
+            id="pohnch-trail-line"
+            type="line"
+            layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+            paint={{
+              'line-width': 7,
+              'line-gradient': ['interpolate', ['linear'], ['line-progress'], 0, 'rgba(31,42,92,0)', 1, 'rgba(31,42,92,0.85)'],
+            }}
+          />
+        </GeoJSONSource>
+      ) : null}
+      {ahead && ahead.length > 1 ? (
+        <GeoJSONSource id="pohnch-ahead" data={line(ahead)}>
+          <Layer id="pohnch-ahead-line" type="line" layout={{ 'line-cap': 'round', 'line-join': 'round' }} paint={{ 'line-width': 6, 'line-color': colors.neel, 'line-opacity': 0.75, 'line-dasharray': dash }} />
+        </GeoJSONSource>
+      ) : null}
       {pins.map((p) => (
         <Marker key={p.id} id={p.id} lngLat={[p.lng, p.lat]} anchor={p.kind === 'home' || p.kind === 'school' ? 'bottom' : 'center'}>
           <PinView pin={p} />

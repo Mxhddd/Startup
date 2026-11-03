@@ -1,9 +1,9 @@
 // Browser preview stand-in (MapLibre's native map has no web build here). It draws a brand-styled
 // sketch of streets, like the v5 designs, and places the pins and the van by their real coordinates,
 // so previews look like the phone. Clicking places a point where you click.
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, View, type LayoutChangeEvent } from 'react-native';
-import Svg, { Path, Rect } from 'react-native-svg';
+import Svg, { Defs, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { colors, karachiRegion, mapColors } from '../theme';
 import { AppText } from './AppText';
 import { StopPin } from './StopPin';
@@ -30,9 +30,15 @@ function Streets() {
   );
 }
 
-export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0 }: PohnchMapProps) {
+export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, trail, ahead }: PohnchMapProps) {
+  const [dash, setDash] = useState(0);
+  useEffect(() => {
+    if (!ahead || ahead.length < 2) return;
+    const id = setInterval(() => setDash((d) => (d + 1) % 14), 80);
+    return () => clearInterval(id);
+  }, [ahead]);
   const [box, setBox] = useState({ w: 360, h: 780 });
-  const pts = [...pins.map((p) => ({ lat: p.lat, lng: p.lng })), ...(van ? [{ lat: van.lat, lng: van.lng }] : [])];
+  const pts = [...pins.map((p) => ({ lat: p.lat, lng: p.lng })), ...(van ? [{ lat: van.lat, lng: van.lng }] : []), ...(trail ?? [])];
   const lats = pts.map((p) => p.lat);
   const lngs = pts.map((p) => p.lng);
   const span = 0.01;
@@ -49,9 +55,11 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
   });
   const onLayout = (e: LayoutChangeEvent) => setBox({ w: e.nativeEvent.layout.width, h: e.nativeEvent.layout.height });
 
-  // A neel route through the van and the pins, in the order given (dashed ahead of the van).
-  const routePts = [...(van ? [place(van.lat, van.lng)] : []), ...pins.map((p) => place(p.lat, p.lng))];
-  const route = routePts.length > 1 ? routePts.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' ') : null;
+  // The road ahead (given, or through the van and the pins) dashed and flowing; the trail fading behind.
+  const toPath = (list: { x: number; y: number }[]) => (list.length > 1 ? list.map((p, i) => `${i ? 'L' : 'M'}${p.x} ${p.y}`).join(' ') : null);
+  const route = toPath(ahead ? ahead.map((p) => place(p.lat, p.lng)) : [...(van ? [place(van.lat, van.lng)] : []), ...pins.map((p) => place(p.lat, p.lng))]);
+  const trailPts = (trail ?? []).map((p) => place(p.lat, p.lng));
+  const trailPath = toPath(trailPts);
 
   return (
     <Pressable
@@ -71,11 +79,20 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       style={[style ?? { position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, { backgroundColor: mapColors.land, overflow: 'hidden' }]}
     >
       <Streets />
-      {route ? (
-        <Svg width={box.w} height={box.h} style={{ position: 'absolute' }} pointerEvents="none">
-          <Path d={route} stroke={colors.neel} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={van ? '1 12' : undefined} fill="none" opacity={van ? 0.7 : 0.9} />
-        </Svg>
-      ) : null}
+      <Svg width={box.w} height={box.h} style={{ position: 'absolute' }} pointerEvents="none">
+        {trailPath && trailPts.length > 1 ? (
+          <>
+            <Defs>
+              <LinearGradient id="trail" x1={trailPts[0]!.x} y1={trailPts[0]!.y} x2={trailPts[trailPts.length - 1]!.x} y2={trailPts[trailPts.length - 1]!.y} gradientUnits="userSpaceOnUse">
+                <Stop offset="0" stopColor={colors.neel} stopOpacity={0} />
+                <Stop offset="1" stopColor={colors.neel} stopOpacity={0.85} />
+              </LinearGradient>
+            </Defs>
+            <Path d={trailPath} stroke="url(#trail)" strokeWidth={8} strokeLinecap="round" strokeLinejoin="round" fill="none" />
+          </>
+        ) : null}
+        {route ? <Path d={route} stroke={colors.neel} strokeWidth={7} strokeLinecap="round" strokeLinejoin="round" strokeDasharray={van ? '2 12' : undefined} strokeDashoffset={-dash} fill="none" opacity={van ? 0.75 : 0.9} /> : null}
+      </Svg>
       {pins.map((p) => {
         const at = place(p.lat, p.lng);
         const size = p.kind === 'number' ? 34 : p.kind === 'stop' ? 24 : p.kind === 'home' ? 52 : 44;

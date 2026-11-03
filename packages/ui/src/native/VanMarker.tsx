@@ -5,7 +5,7 @@ import { headingDelta } from '@pohnch/core';
 import { useEffect } from 'react';
 import { View } from 'react-native';
 import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSpring, withTiming, type SharedValue } from 'react-native-reanimated';
-import Svg, { Circle, Path } from 'react-native-svg';
+import Svg, { Circle, Defs, Path, RadialGradient, Stop } from 'react-native-svg';
 import { durations, springs } from '../motion';
 import { colors } from '../theme';
 
@@ -63,6 +63,14 @@ export function VanMarker({ heading = 0, stale = false, size = 64 }: { heading?:
       {!stale ? (
         <Animated.View style={[{ position: 'absolute', width: size, height: size }, arrow]}>
           <Svg width={size} height={size} viewBox="0 0 64 64">
+            <Defs>
+              <RadialGradient id="cone" cx="32" cy="32" r="32" gradientUnits="userSpaceOnUse">
+                <Stop offset="0.35" stopColor={colors.neel} stopOpacity={0.32} />
+                <Stop offset="1" stopColor={colors.neel} stopOpacity={0} />
+              </RadialGradient>
+            </Defs>
+            {/* the heading cone: which way the van faces, soft like a torch beam */}
+            <Path d="M32 32 L18 2 A31 31 0 0 1 46 2 Z" fill="url(#cone)" />
             <Path d="M32 5 L39 14 L25 14 Z" fill={colors.neel} stroke={colors.white} strokeWidth={2} strokeLinejoin="round" />
           </Svg>
         </Animated.View>

@@ -325,5 +325,6 @@
   "parent.compact.van": "{name} کی وین",
   "parent.compact.ahead": "{n} اسٹاپ پہلے",
   "parent.compact.next": "اگلا آپ کا اسٹاپ",
-  "min.short": "منٹ"
+  "min.short": "منٹ",
+  "parent.recenter": "وین پر واپس"
 }

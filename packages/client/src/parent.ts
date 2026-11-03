@@ -94,8 +94,16 @@ export async function latestPosition(tripId: string): Promise<Position | null> {
 }
 
 export async function recentSpeeds(tripId: string): Promise<(number | null)[]> {
-  const rows = check(await db().supabase.from('positions').select('speed').eq('trip_id', tripId).order('recorded_at', { ascending: false }).limit(6)) as { speed: number | null }[];
-  return rows.map((r) => r.speed);
+  return (await recentPositions(tripId)).slice(0, 6).map((r) => r.speed);
+}
+
+export type TrailPoint = { lat: number; lng: number; speed: number | null; recorded_at: string };
+
+/** The van's last ~2-3 minutes (newest first): speeds for the ETA, points for the trail on the map. */
+export async function recentPositions(tripId: string, limit = 30): Promise<TrailPoint[]> {
+  return check(
+    await db().supabase.from('positions').select('lat, lng, speed, recorded_at').eq('trip_id', tripId).order('recorded_at', { ascending: false }).limit(limit),
+  ) as TrailPoint[];
 }
 
 export async function stopsAhead(childId: string): Promise<number | null> {

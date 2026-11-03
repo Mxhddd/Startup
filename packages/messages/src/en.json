@@ -325,5 +325,6 @@
   "parent.compact.van": "{name}'s van",
   "parent.compact.ahead": "{n} stops before you",
   "parent.compact.next": "Your stop is next",
-  "min.short": "min"
+  "min.short": "min",
+  "parent.recenter": "Back to the van"
 }
