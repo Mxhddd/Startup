@@ -3,7 +3,8 @@ import type { ExpoConfig } from 'expo/config';
 
 const config: ExpoConfig = {
   name: 'Pohnch',
-  slug: 'pohnch',
+  slug: 'pohonch', // the Expo project's address (expo.dev/@pohonch/pohonch); the name people see stays "Pohnch"
+  owner: 'pohonch',
   scheme: 'pohnch',
   version: '0.1.0',
   orientation: 'portrait',
@@ -61,7 +62,7 @@ const config: ExpoConfig = {
   ],
   experiments: { typedRoutes: true },
   extra: {
-    eas: { projectId: process.env.EAS_PROJECT_ID_PARENT },
+    eas: { projectId: 'db3b3849-7d63-4270-bd90-56aafac77e94' },
   },
 };
 

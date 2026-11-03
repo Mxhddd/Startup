@@ -4,6 +4,7 @@ import type { ExpoConfig } from 'expo/config';
 const config: ExpoConfig = {
   name: 'Pohnch Driver',
   slug: 'pohnch-driver',
+  owner: 'pohonch',
   scheme: 'pohnch-driver',
   version: '0.1.0',
   orientation: 'portrait',
@@ -45,7 +46,7 @@ const config: ExpoConfig = {
   ],
   experiments: { typedRoutes: true },
   extra: {
-    eas: { projectId: process.env.EAS_PROJECT_ID_DRIVER },
+    eas: { projectId: '906c7599-1e80-42a2-bbbc-bf3f414409fd' },
   },
 };
 
