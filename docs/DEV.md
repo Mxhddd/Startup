@@ -252,3 +252,21 @@ Designed first on the canvas page "v7 · World-class (current)": the un-boxed pa
 - Every Android push (alerts, and the quiet live refreshes): a Firebase project, with its key uploaded to Expo (`eas credentials`, Android, FCM V1).
 
 **Android 16 "Live Update" chip in the status bar:** Android only allows it for its standard notification styles, not custom-drawn ones like ours. It would need a small native Kotlin module; not built yet.
+
+## v8 phase B: the missing pilot features (3 November 2026)
+
+These had a server half but no screen (or neither). Each one, and how its data moves:
+
+| Feature | Screen | How the data moves | Tests |
+| --- | --- | --- | --- |
+| Whole-van day off | Driver: Today > Day off (`apps/driver/src/app/dayoff.tsx`) | Pick today or tomorrow, hold. A 5-second undo bar comes first, so a mistake never reaches anyone. Then `dayoff.set` saves it, and the Edge Function sends every family on the van one push (`notifyDayOff` in `notify.ts`, words in `push.ts`). Parents' sheet shows "No van today" (`vanDaysOff` in the parent client). | `110-pilot-gaps.test.sql`, `push.test.ts`, `handler.test.ts`, `tests/maestro/driver-dayoff.yaml` |
+| Stop times | Driver: Stops: each stop has ☀ morning and ◐ afternoon times; tap one to change it in a sheet (`EditSheet`) with -5/-1/+1/+5 | `updateStop` writes `morning_time` / `afternoon_time` straight to `stops` (row-level security: only the van's driver) | `dates.test.ts` (`nudgeTime`, `shortTime`), `tests/maestro/driver-stops.yaml` |
+| Edit or remove a child | Parent: Menu > a child (`child.tsx?id=`) | name and school update `children` directly (only the family may); the pin goes through `set_home_pin`; removing deletes the child and everything about them | `tests/maestro/parent-child.yaml` |
+| Family members | Parent: Menu > Family | `my_family_members()` lists names only (never phone numbers). The owner removes someone, or someone added leaves: `family.removeMember` > `remove_family_member` | `110-pilot-gaps.test.sql` |
+| Delete my account | Parent: Menu > Delete my account; Driver: Help and account | `account.delete` (needs `confirm: true`) > `delete_account`: the person goes; a family they own goes too, unless someone else is in it (then that person becomes the owner); a driver's van goes only when no family is on it (`van_has_families` otherwise) | `110-pilot-gaps.test.sql`, `handler.test.ts`, `tests/maestro/driver-account.yaml` |
+| Help | Parent: Menu > Help; Driver: Help and account | WhatsApp 0300 1478729 (`PILOT_WHATSAPP` in core) and pohnch.pk/privacy | `tests/maestro/parent-family.yaml` |
+
+New shared pieces: `EditSheet` (a sheet for a small edit, rises on the sheet spring and lifts above the keyboard), `colors.kesarText` (kesar-family text that passes 4.5:1 on white, ghee and kesarTint), and `addDays`, `dayPartsOf`, `shortTime`, `nudgeTime` in `packages/core/src/dates.ts`.
+
+Live: migration `20261103000400_pilot_gaps.sql` is applied and the `app` function is deployed. Deleting an account was checked on the live database with a throwaway user (rolled back).
+

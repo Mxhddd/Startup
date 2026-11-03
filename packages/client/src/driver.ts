@@ -103,9 +103,12 @@ export async function eventsOf(tripId: string): Promise<EventRow[]> {
   return rows.map((r) => ({ childId: r.child_id, step: r.step, undone: r.undone_at !== null }));
 }
 
-export async function isDayOff(vanId: string, date: string): Promise<boolean> {
-  const rows = check(await db().supabase.from('van_days_off').select('service_date').eq('van_id', vanId).eq('service_date', date)) as unknown[];
-  return rows.length > 0;
+/** The van's days off from a date onwards (YYYY-MM-DD, soonest first). */
+export async function daysOffFrom(vanId: string, date: string): Promise<string[]> {
+  const rows = check(
+    await db().supabase.from('van_days_off').select('service_date').eq('van_id', vanId).gte('service_date', date).order('service_date'),
+  ) as { service_date: string }[];
+  return rows.map((r) => r.service_date);
 }
 
 // ---- writes through the Edge Function

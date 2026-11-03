@@ -17,7 +17,7 @@ import { LocationDisclosure } from '../components/LocationDisclosure';
 import { useDriver } from '../state/DriverStore';
 
 const DISCLOSED = 'pohnch.driver.locationDisclosed.v1';
-type Href = '/stops' | '/families' | '/setup' | '/practice';
+type Href = '/stops' | '/families' | '/setup' | '/practice' | '/dayoff' | '/account';
 
 function NavTile({ label, href, icon, badge }: { label: string; href: Href; icon: IconName; badge?: number }) {
   const { dir } = useLang();
@@ -128,6 +128,7 @@ export default function DriverToday() {
               <AppText variant="title" style={{ fontSize: 26 }}>{t('driver.today.setup')}</AppText>
               <AppText variant="secondary">{t('driver.setup.hint')}</AppText>
               <TapButton size="next" tone="left" icon="van" label={t('driver.today.setup')} onConfirm={() => router.push('/setup')} testID="setup-van" />
+              <TapButton tone="quiet" icon="help" label={t('driver.account.title')} onConfirm={() => router.push('/account')} testID="nav-account" />
             </Animated.View>
           ) : (
             <>
@@ -160,7 +161,13 @@ export default function DriverToday() {
                 <NavTile label={t('driver.nav.stops')} href="/stops" icon="pin" />
                 <NavTile label={t('driver.nav.families')} href="/families" icon="family" badge={d.requests.length} />
                 <NavTile label={t('driver.nav.practice')} href="/practice" icon="route" />
+                <NavTile label={t('driver.nav.dayOff')} href="/dayoff" icon="calendar" badge={d.daysOff.length || undefined} />
               </View>
+              <PressableScale accessibilityRole="button" onPress={() => router.push('/account')} testID="nav-account"
+                faceStyle={{ minHeight: 64, flexDirection: row, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+                <Icon name="help" size={20} color={colors.neel} />
+                <AppText bold color={colors.neel}>{t('driver.account.title')}</AppText>
+              </PressableScale>
             </>
           )}
         </View>

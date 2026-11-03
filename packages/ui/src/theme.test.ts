@@ -25,6 +25,7 @@ describe('theme', () => {
   it('body and secondary text pass 4.5:1 on the ghee ground', () => {
     expect(contrast(colors.siyahi, colors.ghee)).toBeGreaterThanOrEqual(4.5);
     expect(contrast(colors.ink2, colors.ghee)).toBeGreaterThanOrEqual(4.5);
+    for (const ground of [colors.white, colors.ghee, colors.kesarTint]) expect(contrast(colors.kesarText, ground)).toBeGreaterThanOrEqual(4.5);
   });
 
   it('keeps the size rules: taps at least 64 px, next tap 104 px, no text under 14 px', () => {

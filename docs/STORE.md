@@ -30,7 +30,7 @@ Privacy: only your child and your van. The van's location is shared only during 
 
 **Category:** Parenting (Play) / Education or Lifestyle (App Store). **Content rating:** everyone. **Contact:** WhatsApp 0300 1478729. **Privacy policy:** https://pohnch.pk/privacy
 
-**Data safety (Play):** collects phone number (account), name (app functionality), approximate home location placed by the user (app functionality); not shared with third parties; encrypted in transit; users can ask for deletion. Does not collect the device's location.
+**Data safety (Play):** collects phone number (account), name (app functionality), approximate home location placed by the user (app functionality); not shared with third parties; encrypted in transit; users can delete their account and data inside the app (parents: Menu > Delete my account; drivers: Help and account). Does not collect the device's location.
 
 ## Pohnch Driver · `pk.pohnch.driver`
 

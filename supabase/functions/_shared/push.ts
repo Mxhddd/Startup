@@ -20,7 +20,7 @@ export type ExpoMessage = {
   interruptionLevel: 'time-sensitive' | 'active';
   /** The notification's buttons ("Open trip"), registered by the app. */
   categoryId: 'trip';
-  data: { kind: 'trip'; step: PushStep };
+  data: { kind: 'trip'; step: PushStep } | { kind: 'dayoff'; date: string; off: boolean };
 };
 
 // The same table the apps use (packages/core/src/moments.ts), copied by value: Edge Functions can't
@@ -66,6 +66,44 @@ export function buildPushes(step: PushStep, recipients: Recipient[], reason?: st
       interruptionLevel: TIME_SENSITIVE.includes(step) ? 'time-sensitive' : 'active',
       categoryId: 'trip',
       data: { kind: 'trip', step },
+    });
+  }
+  return out;
+}
+
+export type DayOffRecipient = { first_name: string; token: string; lang: string; driver_name: string; sound?: boolean };
+
+/** "today", "tomorrow" or "on 12/11", in the phone's language. Dates are Karachi school days (YYYY-MM-DD). */
+function whenText(lang: Lang, date: string, today: string): string {
+  if (date === today) return T(lang, 'push.when.today');
+  const next = new Date(`${today}T00:00:00Z`);
+  next.setUTCDate(next.getUTCDate() + 1);
+  if (date === next.toISOString().slice(0, 10)) return T(lang, 'push.when.tomorrow');
+  const [, m, d] = date.split('-');
+  return T(lang, 'push.when.date', { date: `${Number(d)}/${Number(m)}` });
+}
+
+/** The driver gave the whole van a day off (or cancelled it): one message per phone, naming its children. */
+export function buildDayOffPushes(recipients: DayOffRecipient[], job: { date: string; today: string; off: boolean }): ExpoMessage[] {
+  const byToken = new Map<string, DayOffRecipient[]>();
+  for (const r of recipients) byToken.set(r.token, [...(byToken.get(r.token) ?? []), r]);
+  const out: ExpoMessage[] = [];
+  for (const [token, rows] of byToken) {
+    const first = rows[0] as DayOffRecipient;
+    const lang: Lang = first.lang === 'en' ? 'en' : 'ur';
+    const names = [...new Set(rows.map((r) => r.first_name))].join(lang === 'ur' ? '، ' : ', ');
+    const when = whenText(lang, job.date, job.today);
+    const quiet = first.sound === false;
+    out.push({
+      to: token,
+      title: T(lang, job.off ? 'push.dayOff.title' : 'push.dayOn.title', { when }),
+      body: T(lang, job.off ? 'push.dayOff.body' : 'push.dayOn.body', { who: first.driver_name, names }),
+      sound: quiet ? null : 'chime.wav',
+      priority: 'high',
+      channelId: quiet ? 'step-quiet' : 'step-chime',
+      interruptionLevel: 'active',
+      categoryId: 'trip',
+      data: { kind: 'dayoff', date: job.date, off: job.off },
     });
   }
   return out;

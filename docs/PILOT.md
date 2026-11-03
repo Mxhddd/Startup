@@ -62,7 +62,7 @@ When a new build comes out, the same steps install it over the old one; nothing 
 - **Stuck trip** (driver's phone died, trip still "running"): admin page > Today's trips > End trip. It also ends itself after 3 hours with no news, and never blocks the next day.
 - **Switch a van off** (a safety concern, a complaint, a driver who left): admin page > All vans > Switch off. Families stop seeing the van at once, its running trip ends, and no pushes go out. Switch on again the same way.
 - **A family leaves**: they can take their child off the van (parent app > Menu), or the driver can remove them (Families > Remove, hold to confirm).
-- **Delete an account** (promised within 7 days): Supabase > Authentication > Users > the number > Delete. Their family, children and all their steps go with it. A driver's van must be deleted first (Table editor > vans).
+- **Delete an account** (promised within 7 days): people now do it themselves in the app (parents: Menu > Delete my account; drivers: Today > Help and account). If someone asks you instead: Supabase > Authentication > Users > the number > Delete. A driver whose van still has families is asked to remove them first; to hand a van to another driver, change `vans.driver_id` in the Table editor.
 
 ## If something goes wrong
 

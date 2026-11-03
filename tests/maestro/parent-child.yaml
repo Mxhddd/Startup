@@ -1,0 +1,30 @@
+# Parent app (v8): add a child from the menu; saving without a home pin says what's missing.
+# Then, with a test login that has a child (docs/PILOT.md), open the child and change the school.
+# Run: maestro test tests/maestro/parent-child.yaml
+appId: pk.pohnch.parent
+---
+- launchApp
+- tapOn: "مینو"
+- tapOn:
+    id: "menu-add-child"
+- tapOn:
+    id: "child-name"
+- inputText: "Ali"
+- tapOn:
+    id: "child-school"
+- inputText: "Green Valley"
+- tapOn:
+    id: "child-save"
+- assertVisible: "پہلے نقشے پر گھر کی جگہ لگائیں"
+- back
+- runFlow:
+    when:
+      visible:
+        id: "menu-child-0"
+    commands:
+      - tapOn:
+          id: "menu-child-0"
+      - assertVisible:
+          id: "child-remove"
+      - tapOn:
+          id: "child-save"

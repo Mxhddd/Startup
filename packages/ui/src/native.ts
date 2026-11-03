@@ -37,3 +37,4 @@ export { LineArt } from './native/LineArt';
 export { CircleAction } from './native/CircleAction';
 export { LaunchReveal } from './native/LaunchReveal';
 export { Toggle } from './native/Toggle';
+export { EditSheet } from './native/EditSheet';

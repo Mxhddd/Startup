@@ -1,13 +1,19 @@
-# Parent app: the home sheet, then the menu with family members, add a child and join a van.
+# Parent app (v8): the home sheet, then the menu: help, and the delete-account sheet (not confirmed).
+# Works without a server. Run: maestro test tests/maestro/parent-family.yaml
 appId: pk.pohnch.parent
 ---
 - launchApp
 - assertVisible:
     id: "trip-sheet"
 - tapOn: "مینو"
-- assertVisible:
-    id: "family-phone"
-- inputText: "021 345"
+- assertVisible: "بچے"
 - tapOn:
-    id: "family-add"
-- assertVisible: "یہ موبائل نمبر درست نہیں۔ 03 سے شروع ہونے والا نمبر لکھیں۔"
+    id: "menu-help"
+- assertVisible:
+    id: "help-whatsapp"
+- tapOn: "بند کریں"
+- tapOn:
+    id: "menu-delete"
+- assertVisible:
+    id: "delete-confirm"
+- assertVisible: "اکاؤنٹ ختم کریں؟"

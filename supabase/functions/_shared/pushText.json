@@ -24,7 +24,14 @@
     "moment.reached_school": "{name} اسکول پہنچ گئے",
     "moment.left_school": "{name} اسکول سے نکلے",
     "moment.dropped": "{name} گھر پہنچ گئے",
-    "moment.late": "وین کو دیر ہو رہی ہے"
+    "moment.late": "وین کو دیر ہو رہی ہے",
+    "push.when.today": "آج",
+    "push.when.tomorrow": "کل",
+    "push.when.date": "{date} کو",
+    "push.dayOff.title": "{when} وین کی چھٹی",
+    "push.dayOff.body": "{who} نے وین کی چھٹی کی · {names}",
+    "push.dayOn.title": "{when} وین آئے گی",
+    "push.dayOn.body": "{who} نے چھٹی ختم کر دی · {names}"
   },
   "en": {
     "app.parent.name": "Pohnch",
@@ -51,6 +58,13 @@
     "moment.reached_school": "{name} reached school",
     "moment.left_school": "{name} left school",
     "moment.dropped": "{name} is home",
-    "moment.late": "The van is running late"
+    "moment.late": "The van is running late",
+    "push.when.today": "today",
+    "push.when.tomorrow": "tomorrow",
+    "push.when.date": "on {date}",
+    "push.dayOff.title": "No van {when}",
+    "push.dayOff.body": "{who} gave the van a day off · {names}",
+    "push.dayOn.title": "The van is coming {when}",
+    "push.dayOn.body": "{who} cancelled the day off · {names}"
   }
 }

@@ -1,0 +1,18 @@
+# Driver app (v8): change the first stop's morning time by 5 minutes and save it.
+# Needs the test driver login with a van that has at least one stop (docs/PILOT.md).
+# Run: maestro test tests/maestro/driver-stops.yaml
+appId: pk.pohnch.driver
+---
+- launchApp
+- tapOn:
+    id: "nav-stops"
+- tapOn:
+    id: "stop-morning-0"
+- assertVisible:
+    id: "time-sheet"
+- tapOn:
+    id: "time-5"
+- tapOn:
+    id: "time-save"
+- assertNotVisible:
+    id: "time-sheet"

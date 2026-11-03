@@ -203,4 +203,39 @@ describe('leaving a van', () => {
     expect((await post('van.leave', { childId: VAN })).status).toBe(200);
     expect(rpc).toHaveBeenCalledWith('leave_van', { p_actor: DRIVER, p_child: VAN });
   });
+
+  it('tells the families after a day off is saved (v8)', async () => {
+    const { post, rpc, deps } = setup({ data: null });
+    const dayOff = vi.fn(async () => undefined);
+    deps.dayOff = dayOff;
+    expect((await post('dayoff.set', { vanId: VAN, date: '2099-01-02', off: true })).status).toBe(200);
+    expect(rpc).toHaveBeenCalledWith('set_van_day_off', { p_actor: DRIVER, p_van: VAN, p_date: '2099-01-02', p_off: true });
+    expect(dayOff).toHaveBeenCalledWith(expect.objectContaining({ vanId: VAN, date: '2099-01-02', off: true }));
+  });
+
+  it('does not tell anyone when the day off was refused', async () => {
+    const { post, deps } = setup({ error: { message: 'not_your_van' } });
+    const dayOff = vi.fn(async () => undefined);
+    deps.dayOff = dayOff;
+    expect((await post('dayoff.set', { vanId: VAN, date: '2099-01-02', off: true })).status).toBe(403);
+    expect(dayOff).not.toHaveBeenCalled();
+  });
+
+  it('removes a family member through remove_family_member', async () => {
+    const { post, rpc } = setup({ data: null });
+    expect((await post('family.removeMember', { familyId: VAN, memberId: TRIP })).status).toBe(200);
+    expect(rpc).toHaveBeenCalledWith('remove_family_member', { p_actor: DRIVER, p_family: VAN, p_member: TRIP });
+  });
+
+  it('deletes an account only with confirm: true, and says when a van still has families', async () => {
+    const { post, rpc } = setup({ data: null });
+    expect((await post('account.delete', {})).status).toBe(400);
+    expect(rpc).not.toHaveBeenCalledWith('delete_account', expect.anything());
+    expect((await post('account.delete', { confirm: true })).status).toBe(200);
+    expect(rpc).toHaveBeenCalledWith('delete_account', { p_actor: DRIVER });
+    const busy = setup({ error: { message: 'van_has_families' } });
+    const res = await busy.post('account.delete', { confirm: true });
+    expect(res.status).toBe(409);
+    expect(await res.json()).toEqual({ error: 'van_has_families' });
+  });
 });

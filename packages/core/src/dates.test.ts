@@ -37,3 +37,31 @@ describe('karachiDayParts', () => {
     expect(karachiDayParts(new Date('2026-11-03T05:00:00Z'))).toEqual({ weekday: 2, date: 3, month: 11 });
   });
 });
+
+import { addDays, dayPartsOf, nudgeTime, shortTime } from './dates';
+describe('school-day arithmetic (v8)', () => {
+  it('adds days across months and years', () => {
+    expect(addDays('2026-11-03', 1)).toBe('2026-11-04');
+    expect(addDays('2026-11-30', 1)).toBe('2026-12-01');
+    expect(addDays('2026-12-31', 1)).toBe('2027-01-01');
+    expect(addDays('2026-03-01', -1)).toBe('2026-02-28');
+  });
+  it('names the weekday of a date', () => {
+    expect(dayPartsOf('2026-11-04')).toEqual({ weekday: 3, date: 4, month: 11 });
+  });
+});
+
+describe('stop times (v8)', () => {
+  it('shows database times as short 12-hour times', () => {
+    expect(shortTime('07:10:00')).toBe('7:10');
+    expect(shortTime('13:40')).toBe('1:40');
+    expect(shortTime('00:05')).toBe('12:05');
+    expect(shortTime(null)).toBeNull();
+  });
+  it('moves a time by minutes, wrapping round midnight, from a default when empty', () => {
+    expect(nudgeTime('07:10:00', 5, '07:00')).toBe('07:15');
+    expect(nudgeTime(null, -5, '07:00')).toBe('06:55');
+    expect(nudgeTime('23:58', 5, '07:00')).toBe('00:03');
+    expect(nudgeTime('00:02', -5, '07:00')).toBe('23:57');
+  });
+});

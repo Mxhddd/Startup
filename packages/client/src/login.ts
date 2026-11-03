@@ -40,3 +40,15 @@ export function loginActions(role: 'parent' | 'driver', lang: 'ur' | 'en') {
     },
   };
 }
+
+/** Forgets the login on this phone (after the account is deleted, the server already forgot it). */
+export async function signOutHere(): Promise<void> {
+  if (!backend) return;
+  await backend.supabase.auth.signOut({ scope: 'local' }).catch(() => undefined);
+}
+
+/** Deletes this person's account and data on the server, then forgets the login here. */
+export async function deleteMyAccount(): Promise<void> {
+  await need().api('account.delete', { confirm: true });
+  await signOutHere();
+}

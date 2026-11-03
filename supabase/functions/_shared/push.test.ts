@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
-import { buildPushes, sendExpoPushes, type Recipient } from './push.ts';
-import { notifyTrip } from './notify.ts';
+import { buildDayOffPushes, buildPushes, sendExpoPushes, type DayOffRecipient, type Recipient } from './push.ts';
+import { notifyDayOff, notifyTrip } from './notify.ts';
 import { STEP_SOUND, TIME_SENSITIVE } from './push.ts';
 import { MOMENTS } from '../../../packages/core/src/moments.ts';
 import pushText from './pushText.json' with { type: 'json' };
@@ -97,5 +97,42 @@ describe('alert sounds, urgency and settings (v7)', () => {
       expect(STEP_SOUND[step as keyof typeof STEP_SOUND], step).toBe(m.sound);
       expect(TIME_SENSITIVE.includes(step as never), step).toBe(m.timeSensitive);
     }
+  });
+});
+
+describe('whole-van day off (v8)', () => {
+  const d = (over: Partial<DayOffRecipient>): DayOffRecipient => ({ first_name: 'علی', token: 'ExponentPushToken[a]', lang: 'ur', driver_name: 'رفیق بھائی', ...over });
+
+  it('says when, who gave the day off, and whose children, one message per phone', () => {
+    const msgs = buildDayOffPushes(
+      [d({}), d({ first_name: 'سارہ' }), d({ token: 'ExponentPushToken[b]', lang: 'en', first_name: 'Hamza', driver_name: 'Rafiq bhai' })],
+      { date: '2026-11-04', today: '2026-11-03', off: true },
+    );
+    expect(msgs).toHaveLength(2);
+    expect(msgs[0]?.title).toBe('کل وین کی چھٹی');
+    expect(msgs[0]?.body).toBe('رفیق بھائی نے وین کی چھٹی کی · علی، سارہ');
+    expect(msgs[1]?.title).toBe('No van tomorrow');
+    expect(msgs[0]?.data).toEqual({ kind: 'dayoff', date: '2026-11-04', off: true });
+  });
+
+  it('names today, a later date, and a cancelled day off', () => {
+    expect(buildDayOffPushes([d({ lang: 'en' })], { date: '2026-11-03', today: '2026-11-03', off: true })[0]?.title).toBe('No van today');
+    expect(buildDayOffPushes([d({ lang: 'en' })], { date: '2026-11-12', today: '2026-11-03', off: true })[0]?.title).toBe('No van on 12/11');
+    expect(buildDayOffPushes([d({ lang: 'en' })], { date: '2026-12-01', today: '2026-11-30', off: false })[0]?.title).toBe('The van is coming tomorrow');
+  });
+
+  it('keeps a quiet phone quiet', () => {
+    const [m] = buildDayOffPushes([d({ sound: false })], { date: '2026-11-03', today: '2026-11-03', off: true });
+    expect(m?.sound).toBeNull();
+    expect(m?.channelId).toBe('step-quiet');
+  });
+
+  it('notifyDayOff asks for the van\'s families and logs only counts', async () => {
+    const rpc = vi.fn(async (fn: string) => ({ data: fn === 'dayoff_recipients' ? [d({})] : null, error: null }));
+    const logs: string[] = [];
+    const fetch = vi.fn(async () => new Response(JSON.stringify({ data: [{ status: 'ok' }] })));
+    await notifyDayOff({ vanId: 'v', date: '2026-11-03', today: '2026-11-03', off: true }, { rpc, fetch, log: (l) => logs.push(l) });
+    expect(rpc).toHaveBeenCalledWith('dayoff_recipients', { p_van: 'v' });
+    expect(logs).toEqual(['push dayoff sent=1 dead=0']);
   });
 });

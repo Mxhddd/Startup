@@ -39,3 +39,31 @@ export function karachiDayParts(at: Date): { weekday: number; date: number; mont
   const [y, m, d] = karachiDate(at).split('-').map(Number) as [number, number, number];
   return { weekday: new Date(Date.UTC(y, m - 1, d)).getUTCDay(), date: d, month: m };
 }
+
+/** A school day n days after another (both YYYY-MM-DD). Calendar arithmetic only, so no time zone issues. */
+export function addDays(date: string, n: number): string {
+  const [y, m, d] = date.split('-').map(Number) as [number, number, number];
+  return new Date(Date.UTC(y, m - 1, d + n)).toISOString().slice(0, 10);
+}
+
+/** Weekday (0 = Sunday), date and month for a YYYY-MM-DD school day. */
+export function dayPartsOf(date: string): { weekday: number; date: number; month: number } {
+  const [y, m, d] = date.split('-').map(Number) as [number, number, number];
+  return { weekday: new Date(Date.UTC(y, m - 1, d)).getUTCDay(), date: d, month: m };
+}
+
+/** "HH:MM:SS" (Postgres time) or "HH:MM" -> "7:10" (12-hour, Western digits); null stays null. */
+export function shortTime(time: string | null | undefined): string | null {
+  if (!time) return null;
+  const [h, m] = time.split(':').map(Number) as [number, number];
+  if (!Number.isFinite(h) || !Number.isFinite(m)) return null;
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${String(m).padStart(2, '0')}`;
+}
+
+/** Moves a stop time by some minutes, wrapping round the day; returns "HH:MM". Starts at a sensible default. */
+export function nudgeTime(time: string | null | undefined, minutes: number, fallback: string): string {
+  const [h, m] = (time ?? fallback).split(':').map(Number) as [number, number];
+  const total = (((h * 60 + m + minutes) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+}

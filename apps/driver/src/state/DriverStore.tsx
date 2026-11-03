@@ -24,10 +24,12 @@ type State = {
   trips: Trip[];
   events: EventRow[];
   dayOff: boolean;
+  /** Days off from today on (YYYY-MM-DD), for the day-off screen. */
+  daysOff: string[];
   name: string | null;
 };
 
-const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, name: null };
+const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, daysOff: [], name: null };
 
 function useDriverState() {
   const [s, setS] = useState<State>(empty);
@@ -64,13 +66,14 @@ function useDriverState() {
         return;
       }
       const today = karachiDate(new Date());
-      const [stops, rs, absent, trips, dayOff] = await Promise.all([
+      const [stops, rs, absent, trips, daysOff] = await Promise.all([
         driver.stopsOf(van.id),
         driver.ridersOf(van.id),
         driver.absencesOn(today),
         driver.tripsToday(van.id),
-        driver.isDayOff(van.id, today),
+        driver.daysOffFrom(van.id, today),
       ]);
+      const dayOff = daysOff.includes(today);
       const running = trips.find((x) => x.status === 'running');
       const events = running ? await driver.eventsOf(running.id) : [];
       // Location follows the trip: on while one runs (also after the app restarts mid-trip), off otherwise.
@@ -81,7 +84,7 @@ function useDriverState() {
         await stopTripLocation();
         setLocation('off');
       }
-      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, name });
+      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, daysOff, name });
     } catch (e) {
       setS((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }
@@ -161,6 +164,13 @@ function useDriverState() {
       if (!running) return;
       const clientId = randomUUID();
       await queue.add({ id: clientId, action: 'late', body: { tripId: running.id, reason, clientId }, queuedAt: Date.now() });
+    },
+
+    /** The whole van off (or back on) for a day; the server tells every family. */
+    async setDayOff(date: string, off: boolean) {
+      if (!s.van) return;
+      await driver.driverApi.dayOff(s.van.id, date, off);
+      await refresh();
     },
 
     async endTrip() {

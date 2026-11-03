@@ -4,7 +4,7 @@
 // Live updates come from Supabase Realtime; a 30-second refresh catches anything missed.
 import { parent, type Child, type Membership, type MyStop, type ParentTrip, type ParentVan, type Position } from '@pohnch/client';
 import {
-  ApiError, canUndoChutti, defaultRunKind, etaMinutes, karachiDate, signalState, timelineFor, type ParentEvent,
+  addDays, ApiError, canUndoChutti, defaultRunKind, etaMinutes, karachiDate, signalState, timelineFor, type ParentEvent,
 } from '@pohnch/core';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
@@ -23,11 +23,13 @@ type Data = {
   trail: { lat: number; lng: number }[];
   stopsAhead: number | null;
   absences: string[];
+  /** The van's days off from today on (YYYY-MM-DD). */
+  vanDaysOff: string[];
 };
 
 const empty: Data = {
   loading: true, error: null, children: [], membership: null, van: null, driverName: null, stop: null,
-  trips: [], events: [], position: null, speeds: [], trail: [], stopsAhead: null, absences: [],
+  trips: [], events: [], position: null, speeds: [], trail: [], stopsAhead: null, absences: [], vanDaysOff: [],
 };
 
 function useParentState(enabled: boolean) {
@@ -44,11 +46,12 @@ function useParentState(enabled: boolean) {
       const membership = await parent.membershipOf(child.id);
       const approved = membership?.status === 'approved';
       const van = membership ? await parent.van(membership.van_id) : null;
-      const [driverName, stop, trips, absences] = await Promise.all([
+      const [driverName, stop, trips, absences, vanDaysOff] = await Promise.all([
         van && approved ? parent.driverName(van.driver_id) : Promise.resolve(null),
         approved && membership?.stop_id ? parent.myStop(membership.stop_id) : Promise.resolve(null),
         van && approved ? parent.tripsToday(van.id) : Promise.resolve([]),
         parent.absenceDates(child.id),
+        van && approved ? parent.vanDaysOff(van.id, karachiDate(new Date())).catch(() => []) : Promise.resolve([]),
       ]);
       const running = trips.find((x) => x.status === 'running') ?? null;
       const shown = running ?? trips[trips.length - 1] ?? null;
@@ -63,7 +66,7 @@ function useParentState(enabled: boolean) {
       // The trail: positions from the last 3 minutes, oldest first.
       const since = Date.now() - 3 * 60_000;
       const trail = recent.filter((r) => Date.parse(r.recorded_at) >= since).reverse().map((r) => ({ lat: r.lat, lng: r.lng }));
-      setD({ loading: false, error: null, children, membership, van, driverName, stop, trips, events, position, speeds, trail, stopsAhead, absences });
+      setD({ loading: false, error: null, children, membership, van, driverName, stop, trips, events, position, speeds, trail, stopsAhead, absences, vanDaysOff });
     } catch (e) {
       setD((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }
@@ -144,6 +147,8 @@ function useParentState(enabled: boolean) {
   return {
     ...d, child, phase, running, shownTrip, kind, timeline, signal, eta, today, now,
     absentToday: d.absences.includes(today),
+    /** The driver gave the whole van today (or tomorrow) off. */
+    vanOff: d.vanDaysOff.includes(today) ? ('today' as const) : d.vanDaysOff.includes(addDays(today, 1)) ? ('tomorrow' as const) : null,
     canUndoChuttiToday: canUndoChutti(today, today, vanLeftToday),
     actions,
   };

@@ -1,4 +1,4 @@
-export { KARACHI_TZ, karachiDate, karachiClock, karachiHour, defaultRunKind, karachiDayParts } from './dates';
+export { KARACHI_TZ, karachiDate, karachiClock, karachiHour, defaultRunKind, karachiDayParts, addDays, dayPartsOf, shortTime, nudgeTime } from './dates';
 export { PILOT_WHATSAPP } from './contact';
 export { HOLD_MS, UNDO_MS, holdProgress, undoSecondsLeft } from './taps';
 export { STALE_AFTER_S, signalState, ageParts, type Signal } from './signal';

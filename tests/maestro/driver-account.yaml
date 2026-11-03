@@ -1,0 +1,13 @@
+# Driver app (v8): help and account. Opens the delete sheet but never confirms it.
+# Needs the test driver login (docs/PILOT.md). Run: maestro test tests/maestro/driver-account.yaml
+appId: pk.pohnch.driver
+---
+- launchApp
+- tapOn:
+    id: "nav-account"
+- assertVisible:
+    id: "help-whatsapp"
+- tapOn:
+    id: "account-delete"
+- assertVisible:
+    id: "delete-sheet"

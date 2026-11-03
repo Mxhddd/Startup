@@ -9,6 +9,8 @@ export const PUSH_KEYS = [
   // The iPhone Live Activity card, filled by the server while the phone is locked (v7).
   'parent.place.coming', 'parent.place.inVan', 'parent.place.atSchool', 'parent.place.home', 'eta.unit.home',
   'min.short', 'moment.left', 'moment.picked', 'moment.arriving', 'moment.reached_school', 'moment.left_school', 'moment.dropped', 'moment.late',
+  // The driver's whole-van day off (v8).
+  'push.when.today', 'push.when.tomorrow', 'push.when.date', 'push.dayOff.title', 'push.dayOff.body', 'push.dayOn.title', 'push.dayOn.body',
 ];
 
 export function pushText() {

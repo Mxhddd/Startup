@@ -5,7 +5,7 @@
 // Logs say only which action ran and how it ended: never tokens, phone numbers or children's names.
 import { BadInput, bool, date, isoTime, num, oneOf, optionalUuid, phone, uuid, uuids } from './validate.ts';
 import { byteaHex, hashToken, isInviteToken, newInviteToken } from './tokens.ts';
-import type { NotifyJob } from './notify.ts';
+import type { DayOffJob, NotifyJob } from './notify.ts';
 import type { PushStep } from './push.ts';
 
 export type Deps = {
@@ -19,6 +19,8 @@ export type Deps = {
   /** Sends the pushes for a stored step (notify.ts). Optional so tests can leave it out. */
   notify?: (job: NotifyJob) => Promise<void>;
   /** Updates iPhone Live Activities on locked phones (liveActivity.ts). Optional, like notify. */
+  /** Tells the van's families about a whole-van day off (notify.ts). Optional, like notify. */
+  dayOff?: (job: DayOffJob) => Promise<void>;
   live?: (job: { tripId: string; step: PushStep | null; van: { lat: number; lng: number; speed: number | null } | null }) => Promise<void>;
 };
 
@@ -33,7 +35,8 @@ const CHILD_STEPS = ['picked', 'dropped'];
 const KNOWN: Record<string, number> = {
   not_your_van: 403, not_your_child: 403, not_admin: 403, not_family_owner: 403, stop_list_mismatch: 422,
   van_switched_off: 403, van_not_verified: 403,
-  trip_not_found: 404, membership_not_found: 404, user_not_found: 404,
+  trip_not_found: 404, membership_not_found: 404, user_not_found: 404, member_not_found: 404,
+  van_has_families: 409,
   invite_invalid: 410,
   trip_not_running: 409, trip_already_running: 409, trip_already_done: 409, van_day_off: 409,
   already_decided: 409, child_already_on_a_van: 409, van_already_left: 409, family_full: 409,
@@ -42,6 +45,11 @@ const KNOWN: Record<string, number> = {
 };
 
 class DbError extends Error {}
+
+/** Today's date in Karachi (YYYY-MM-DD), for "today" and "tomorrow" in pushes. */
+function karachiToday(now = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Karachi', year: 'numeric', month: '2-digit', day: '2-digit' }).format(now);
+}
 
 async function call(deps: Deps, fn: string, args: Record<string, unknown>): Promise<unknown> {
   const { data, error } = await deps.rpc(fn, args);
@@ -138,7 +146,12 @@ export const actions: Record<string, Action> = {
     return { ok: true };
   },
   'dayoff.set': async ({ actor, body, deps }) => {
-    await call(deps, 'set_van_day_off', { p_actor: actor, p_van: uuid(body, 'vanId'), p_date: date(body, 'date'), p_off: bool(body, 'off') });
+    const vanId = uuid(body, 'vanId');
+    const day = date(body, 'date');
+    const off = bool(body, 'off');
+    await call(deps, 'set_van_day_off', { p_actor: actor, p_van: vanId, p_date: day, p_off: off });
+    // The day off is saved; telling the families never fails the driver's tap.
+    if (deps.dayOff) await deps.dayOff({ vanId, date: day, today: karachiToday(), off });
     return { ok: true };
   },
   'family.add': async ({ actor, body, deps }) => {
@@ -146,6 +159,17 @@ export const actions: Record<string, Action> = {
     // The person must have opened Pohnch once (so they have an account) before they can be added.
     if (!member) throw new DbError('user_not_found');
     await call(deps, 'add_family_member', { p_actor: actor, p_member: member });
+    return { ok: true };
+  },
+  // The family's owner removes someone, or someone who was added leaves (memberId = themselves).
+  'family.removeMember': async ({ actor, body, deps }) => {
+    await call(deps, 'remove_family_member', { p_actor: actor, p_family: uuid(body, 'familyId'), p_member: uuid(body, 'memberId') });
+    return { ok: true };
+  },
+  // Deleting my own account and its data. The app asks for a hold first and sends confirm: true.
+  'account.delete': async ({ actor, body, deps }) => {
+    if (body.confirm !== true) throw new BadInput('confirm');
+    await call(deps, 'delete_account', { p_actor: actor });
     return { ok: true };
   },
   'admin.verify': async ({ actor, body, deps }) => {
@@ -180,7 +204,7 @@ export const LIMITS: Record<string, [max: number, windowS: number]> = {
   'trip.start': [20, HOUR], 'trip.end': [40, HOUR],
   'invite.van': [20, DAY], 'invite.driver': [20, DAY], 'invite.accept': [30, HOUR],
   'membership.decide': [200, HOUR], 'absence.set': [60, HOUR], 'absence.clear': [60, HOUR], 'dayoff.set': [30, DAY],
-  'family.add': [10, DAY], 'van.leave': [20, HOUR], 'rider.remove': [60, HOUR],
+  'family.add': [10, DAY], 'family.removeMember': [20, DAY], 'account.delete': [5, DAY], 'van.leave': [20, HOUR], 'rider.remove': [60, HOUR],
   'admin.verify': [300, HOUR], 'admin.switchOff': [300, HOUR], 'admin.endTrip': [300, HOUR],
 };
 

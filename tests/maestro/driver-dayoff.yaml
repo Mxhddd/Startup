@@ -1,0 +1,19 @@
+# Driver app (v8): give the van tomorrow off, then take it back inside the 5-second undo.
+# Needs the test driver login with a verified van (docs/PILOT.md). Nothing reaches families: the undo
+# comes before the day off is saved. Run: maestro test tests/maestro/driver-dayoff.yaml
+appId: pk.pohnch.driver
+---
+- launchApp
+- tapOn:
+    id: "nav-dayoff"
+- assertVisible: "وین کی چھٹی"
+- tapOn:
+    id: "dayoff-tomorrow"
+- longPressOn:
+    id: "dayoff-give"
+- assertVisible:
+    id: "undo-bar"
+- tapOn:
+    id: "undo-button"
+- assertVisible:
+    id: "dayoff-give"

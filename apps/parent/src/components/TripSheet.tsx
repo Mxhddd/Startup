@@ -125,8 +125,12 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
   const childDone = items.some((i) => i.step === childStep && i.at);
   const ahead = p.stopsAhead ?? 0;
   const counting = live && p.eta !== null && !childDone;
-  const canSetChutti = !p.absentToday && p.kind === 'morning' && !items.some((i) => i.step === 'picked' && i.at);
+  const canSetChutti = p.vanOff !== 'today' && !p.absentToday && p.kind === 'morning' && !items.some((i) => i.step === 'picked' && i.at);
   const canUndo = p.absentToday && p.canUndoChuttiToday;
+  // A whole-van day off from the driver: today replaces the "next van" line; tomorrow is a note under it.
+  const offToday = !live && p.vanOff === 'today';
+  const offBy = t('parent.dayOff.by', { who: p.driverName ?? p.van?.name ?? '' });
+  const offNote = !live && p.vanOff === 'tomorrow' ? t('parent.dayOff.tomorrow') : '';
   const nextLine = nextTime ? t(p.kind === 'morning' ? 'parent.idle.morning' : 'parent.idle.afternoon', { time: nextTime.slice(0, 5).replace(/^0/, '') }) : '';
 
   // The compact line (peek) and the full head (open), for each situation.
@@ -148,8 +152,8 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
     </View>
   ) : (
     <View style={{ height: 56, justifyContent: 'center' }}>
-      <AppText bold style={{ fontSize: 18 }} numberOfLines={1}>{live ? t(`parent.place.${place}`, { name }) : t('parent.idle.title')}</AppText>
-      {!live && nextLine ? <AppText variant="small" bold color={colors.ink2} numberOfLines={1}>{nextLine}</AppText> : null}
+      <AppText bold style={{ fontSize: 18 }} numberOfLines={1} testID={offToday ? 'van-off-today' : undefined}>{live ? t(`parent.place.${place}`, { name }) : offToday ? t('parent.dayOff.today') : t('parent.idle.title')}</AppText>
+      {!live && (offToday || offNote) ? <AppText variant="small" bold color={colors.kesarText} numberOfLines={1}>{offToday ? offBy : offNote}</AppText> : !live && nextLine ? <AppText variant="small" bold color={colors.ink2} numberOfLines={1}>{nextLine}</AppText> : null}
     </View>
   );
   const full = counting ? (
@@ -157,8 +161,9 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
   ) : (
     <View>
       <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{live ? t('parent.timeline.title') : name}</AppText>
-      <AppText bold style={{ fontSize: 32, lineHeight: 50 }}>{live ? t(`parent.place.${place}`, { name }) : t('parent.idle.title')}</AppText>
-      {!live && nextLine ? <AppText variant="secondary">{nextLine}</AppText> : null}
+      <AppText bold style={{ fontSize: 32, lineHeight: 50 }}>{live ? t(`parent.place.${place}`, { name }) : offToday ? t('parent.dayOff.today') : t('parent.idle.title')}</AppText>
+      {!live && offToday ? <AppText bold color={colors.kesarText}>{offBy}</AppText> : !live && nextLine ? <AppText variant="secondary">{nextLine}</AppText> : null}
+      {!live && offNote ? <AppText bold color={colors.kesarText}>{offNote}</AppText> : null}
     </View>
   );
 

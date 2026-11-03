@@ -11,6 +11,7 @@ export const colors = {
   neelTint: '#E6E9F5',
   kesar: '#E8A33D', // the star, "reached school"; text on it is siyahi
   kesarTint: '#FBEBCF',
+  kesarText: '#7A5410', // kesar-family text on white, ghee or kesarTint (v8: "No van tomorrow")
   shingarf: '#A8321F', // help, "van is late", strikes only
   shingarfTint: '#F6DDD6',
   zamurrad: '#17705A', // "picked", "dropped", success

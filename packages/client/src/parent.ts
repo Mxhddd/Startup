@@ -44,6 +44,23 @@ export async function addChild(c: { firstName: string; schoolName: string; lat: 
   return row.id;
 }
 
+/** Renames a child or changes their school (row-level security: only their family can). */
+export async function updateChild(id: string, c: { firstName: string; schoolName: string }): Promise<void> {
+  check(await db().supabase.from('children').update({ first_name: c.firstName, school_name: c.schoolName }).eq('id', id));
+}
+
+/** Removes a child and everything about them (their van place, chutti days and trip steps go too). */
+export async function removeChild(id: string): Promise<void> {
+  check(await db().supabase.from('children').delete().eq('id', id));
+}
+
+export type FamilyMember = { family_id: string; user_id: string; display_name: string; is_owner: boolean; is_me: boolean; added_at: string };
+
+/** The people in my families, by name (never phone numbers): owners first. */
+export async function familyMembers(): Promise<FamilyMember[]> {
+  return (check(await db().supabase.rpc('my_family_members')) ?? []) as FamilyMember[];
+}
+
 export async function setHomePin(childId: string, lat: number, lng: number): Promise<void> {
   check(await db().supabase.rpc('set_home_pin', { p_child: childId, p_lat: lat, p_lng: lng }));
 }
@@ -117,6 +134,14 @@ export async function absenceDates(childId: string): Promise<string[]> {
   return rows.map((r) => r.service_date);
 }
 
+/** The van's whole-van days off from a date on (set by the driver; readable once the family follows the van). */
+export async function vanDaysOff(vanId: string, from: string): Promise<string[]> {
+  const rows = check(
+    await db().supabase.from('van_days_off').select('service_date').eq('van_id', vanId).gte('service_date', from).order('service_date').limit(10),
+  ) as { service_date: string }[];
+  return rows.map((r) => r.service_date);
+}
+
 /**
  * Live updates for one van: calls onChange when a position, a step or the trip itself changes.
  * The app then re-reads what it needs (positions arrive as map data, so re-reading the view is simpler
@@ -143,6 +168,8 @@ export const parentApi = {
   inviteDriver: (childId: string) => db().api<{ url: string }>('invite.driver', { childId }),
   addFamilyMember: (phone: string) => db().api('family.add', { phone }),
   leaveVan: (childId: string) => db().api('van.leave', { childId }),
+  /** The owner removes someone; someone added removes themselves to leave. */
+  removeFamilyMember: (familyId: string, memberId: string) => db().api('family.removeMember', { familyId, memberId }),
 };
 
 export type NotificationPrefs = { offSteps: string[]; sound: boolean };
