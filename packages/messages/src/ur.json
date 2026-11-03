@@ -309,5 +309,10 @@
   "month.10": "اکتوبر",
   "month.11": "نومبر",
   "month.12": "دسمبر",
-  "date.long": "{day} {date} {month}"
+  "date.long": "{day} {date} {month}",
+  "eta.unit.home": "منٹ میں گھر",
+  "eta.unit.school": "منٹ میں اسکول",
+  "driver.requests.label": "نئی درخواستیں",
+  "driver.trip.told": "گھر والوں کو خبر چلی گئی",
+  "undo.prompt": "غلطی ہوئی؟ واپس لے سکتے ہیں"
 }

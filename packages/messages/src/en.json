@@ -309,5 +309,10 @@
   "month.10": "October",
   "month.11": "November",
   "month.12": "December",
-  "date.long": "{day} {date} {month}"
+  "date.long": "{day} {date} {month}",
+  "eta.unit.home": "min to your door",
+  "eta.unit.school": "min to school",
+  "driver.requests.label": "new requests",
+  "driver.trip.told": "Their families have been told",
+  "undo.prompt": "A mistake? You can take it back"
 }

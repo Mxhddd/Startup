@@ -3,7 +3,7 @@
 // with how far it is. The count rolls when a stop is done; the live dot breathes.
 import { useEffect } from 'react';
 import { View } from 'react-native';
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, FadeInUp, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useLang } from '../lang';
 import { durations } from '../motion';
 import { colors, radius } from '../theme';
@@ -45,7 +45,22 @@ export function TripHeader({
   const { t, dir } = useLang();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   return (
-    <View testID="trip-header" style={{ backgroundColor: colors.neel, paddingTop: topInset + 10, paddingHorizontal: 16, paddingBottom: 16, gap: 6, borderBottomLeftRadius: radius.big, borderBottomRightRadius: radius.big, boxShadow: '0px 8px 24px rgba(14,20,48,0.25)' }}>
+    <Animated.View
+      testID="trip-header"
+      entering={FadeInUp.springify().damping(22)}
+      style={{
+        marginTop: topInset + 10,
+        marginHorizontal: 14,
+        backgroundColor: colors.neel,
+        experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`,
+        paddingTop: 14,
+        paddingHorizontal: 18,
+        paddingBottom: 18,
+        gap: 6,
+        borderRadius: radius.big,
+        boxShadow: '0px 16px 40px rgba(14,20,48,0.35)',
+      }}
+    >
       <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
         <View style={{ flex: 1, flexDirection: row, alignItems: 'center', gap: 8 }}>
           <LiveDot color={practice ? colors.kesar : colors.pista} />
@@ -80,7 +95,7 @@ export function TripHeader({
       </View>
       {next ? (
         <View style={{ flexDirection: row, alignItems: 'baseline', gap: 10, flexWrap: 'wrap' }}>
-          {distance ? <RollingText text={distance} variant="number" color={colors.ghee} style={{ fontSize: 36, lineHeight: 44 }} /> : null}
+          {distance ? <RollingText text={distance} variant="number" color={colors.ghee} style={{ fontSize: 44, lineHeight: 52, letterSpacing: -1.2 }} /> : null}
           <AppText bold color={colors.ghee} style={{ fontSize: 22 }} numberOfLines={1}>
             {next}
           </AppText>
@@ -90,6 +105,6 @@ export function TripHeader({
           {t('trip.progress', { done, total })}
         </AppText>
       )}
-    </View>
+    </Animated.View>
   );
 }

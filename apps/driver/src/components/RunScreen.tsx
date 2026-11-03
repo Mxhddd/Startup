@@ -7,13 +7,35 @@
 // the undo bar slides in above it; rows reflow on a spring; the map eases along with the van.
 import { distanceM, formatDistance, type StopGroup } from '@pohnch/core';
 import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, ChildRow, HelpSheet, OfflineBanner, PohnchMap, TapButton, TripHeader, UndoBar, type LateReason, type MapPin } from '@pohnch/ui/native';
+import { AppText, ChildRow, DrawnCheck, HelpSheet, OfflineBanner, PohnchMap, TapButton, TripHeader, UndoBar, type LateReason, type MapPin } from '@pohnch/ui/native';
 import { useState } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
-import Animated, { FadeInDown, FadeOutUp, LinearTransition } from 'react-native-reanimated';
+import Animated, { FadeInDown, FadeOutUp, LinearTransition, SlideInDown } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const layout = LinearTransition.springify().damping(24).stiffness(200);
+
+/** Just marked: a calm green panel, the tick drawing itself, and who was told. Stays for the undo time. */
+function MarkedPanel({ text }: { text: string }) {
+  const { t, dir } = useLang();
+  return (
+    <Animated.View
+      entering={FadeInDown.springify().damping(18).stiffness(240)}
+      exiting={FadeOutUp.duration(220)}
+      layout={layout}
+      testID="marked-panel"
+      style={{ minHeight: 112, borderRadius: radius.big, backgroundColor: colors.zamurradTint, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 16, paddingHorizontal: 20, paddingVertical: 14 }}
+    >
+      <View style={{ borderRadius: 40, boxShadow: '0px 0px 0px 8px rgba(23,112,90,0.14)' }}>
+        <DrawnCheck fill={colors.zamurrad} color={colors.white} size={64} />
+      </View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 20 }}>{text}</AppText>
+        <AppText bold variant="small" color={colors.zamurradOnTint}>{t('driver.trip.told')}</AppText>
+      </View>
+    </Animated.View>
+  );
+}
 
 export type RunScreenProps = {
   kind: 'morning' | 'afternoon';
@@ -59,7 +81,7 @@ export function RunScreen(p: RunScreenProps) {
   const pins: MapPin[] = (p.stops ?? [])
     .filter((s) => p.groups.some((g) => g.stopId === s.id && g.state === 'waiting'))
     .map((s) => ({ id: s.id, kind: 'number' as const, n: s.position, lat: s.lat, lng: s.lng }));
-  const sheetMax = Math.round(height * 0.68);
+  const sheetMax = Math.round(height * 0.7);
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
@@ -94,8 +116,9 @@ export function RunScreen(p: RunScreenProps) {
         </View>
       </View>
 
-      <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxHeight: sheetMax, backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, boxShadow: shadow.sheet, paddingTop: 14, paddingHorizontal: 14, paddingBottom: insets.bottom + 14, gap: 10 }}>
-        {p.undo ? <UndoBar key={p.undo.at} text={p.undo.text} tappedAt={p.undo.at} onUndo={p.onUndo} onExpire={p.onUndoExpire} /> : null}
+      <Animated.View entering={SlideInDown.springify().damping(26).stiffness(220)} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxHeight: sheetMax, backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, boxShadow: shadow.sheet, paddingTop: 22, paddingHorizontal: space.gutter, paddingBottom: insets.bottom + 20, gap: 14 }}>
+        {p.undo ? <MarkedPanel key={`m${p.undo.at}`} text={p.undo.text} /> : null}
+        {p.undo ? <UndoBar key={p.undo.at} text={t('undo.prompt')} tappedAt={p.undo.at} onUndo={p.onUndo} onExpire={p.onUndoExpire} /> : null}
 
         {next ? (
           <Animated.View key={next.stopId ?? 'none'} entering={FadeInDown.springify().damping(20).stiffness(220)} exiting={FadeOutUp.duration(200)} layout={layout} style={{ gap: 10 }} testID={`stop-${p.groups.indexOf(next)}`}>
@@ -103,7 +126,7 @@ export function RunScreen(p: RunScreenProps) {
               {[t('driver.trip.nextHere'), waitingAtNext.length > 1 ? t('driver.trip.sameHome') : next.stopId ? next.label : t('driver.trip.noStop')].join(' · ')}
             </AppText>
             <TapButton
-              size="next"
+              size={p.undo ? 'later' : 'next'}
               tone={step}
               icon={step}
               label={join(waitingAtNext.map((c) => c.firstName))}
@@ -111,7 +134,7 @@ export function RunScreen(p: RunScreenProps) {
               onConfirm={() => tapGroup(next)}
               testID={`stop-${p.groups.indexOf(next)}-tap`}
             />
-            {waitingAtNext.length > 1 ? (
+            {waitingAtNext.length > 1 && !p.undo ? (
               <View style={{ flexDirection: row, gap: 8 }}>
                 {waitingAtNext.map((c) => (
                   <View key={c.childId} style={{ flex: 1 }}>
@@ -152,7 +175,7 @@ export function RunScreen(p: RunScreenProps) {
             onConfirm={() => p.onFinish(p.kind === 'morning' ? t('step.reachedSchool') : t('driver.trip.end'))}
           />
         </Animated.View>
-      </View>
+      </Animated.View>
 
       <HelpSheet visible={help} onClose={() => setHelp(false)} onReason={(r) => { p.onLate(r); setHelp(false); }} />
     </View>

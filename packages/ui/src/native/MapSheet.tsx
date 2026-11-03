@@ -5,7 +5,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
+import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withSpring, type SharedValue } from 'react-native-reanimated';
 import { useLang } from '../lang';
 import { pickSnap, rubberBand, springs } from '../motion';
 import { colors, radius, shadow, space } from '../theme';
@@ -18,6 +18,7 @@ export function MapSheet({
   bottomInset = 0,
   expanded,
   onExpandedChange,
+  progress,
 }: {
   children: ReactNode;
   peek?: number;
@@ -26,6 +27,8 @@ export function MapSheet({
   /** Open or close it from outside (for example the "Trip" button). */
   expanded?: boolean;
   onExpandedChange?: (open: boolean) => void;
+  /** Written every frame: 0 at peek, 1 fully open. The screen uses it to dim and sink the map. */
+  progress?: SharedValue<number>;
 }) {
   const { t } = useLang();
   const hidden = open - peek; // how far down the sheet sits when peeking
@@ -64,7 +67,20 @@ export function MapSheet({
     runOnJS(settled)(goOpen);
   });
 
-  const style = useAnimatedStyle(() => ({ transform: [{ translateY: y.value }] }));
+  useAnimatedReaction(
+    () => (hidden > 0 ? 1 - y.value / hidden : 0),
+    (p) => {
+      if (progress) progress.value = Math.max(0, Math.min(1.1, p));
+    },
+  );
+
+  // The sheet rises from below on the heavy sheet spring when the screen first opens.
+  const enter = useSharedValue(0);
+  useEffect(() => {
+    enter.value = withSpring(1, springs.sheet);
+  }, [enter]);
+
+  const style = useAnimatedStyle(() => ({ transform: [{ translateY: y.value + (1 - enter.value) * (open - hidden + 80) }] }));
 
   return (
     <Animated.View
@@ -79,7 +95,7 @@ export function MapSheet({
           backgroundColor: colors.white,
           borderTopLeftRadius: radius.sheet,
           borderTopRightRadius: radius.sheet,
-          paddingHorizontal: space.lg + 2,
+          paddingHorizontal: space.xl,
           paddingBottom: open + bottomInset,
           boxShadow: shadow.sheet,
         },
@@ -87,11 +103,11 @@ export function MapSheet({
       ]}
     >
       <GestureDetector gesture={Gesture.Exclusive(pan, tapHandle)}>
-        <View accessibilityRole="adjustable" accessibilityLabel={t('sheet.handle')} style={{ height: 28, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ width: 44, height: 5, borderRadius: 3, backgroundColor: colors.line }} />
+        <View accessibilityRole="adjustable" accessibilityLabel={t('sheet.handle')} style={{ height: 30, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ width: 40, height: 5, borderRadius: 3, backgroundColor: colors.line }} />
         </View>
       </GestureDetector>
-      <View style={{ flex: 1, gap: space.md }}>{children}</View>
+      <View style={{ flex: 1, gap: space.lg }}>{children}</View>
     </Animated.View>
   );
 }

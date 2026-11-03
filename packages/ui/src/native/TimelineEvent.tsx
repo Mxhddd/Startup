@@ -10,6 +10,7 @@ import Animated, {
   cancelAnimation,
   useAnimatedStyle,
   useSharedValue,
+  withDelay,
   withRepeat,
   withSpring,
   withTiming,
@@ -51,6 +52,13 @@ export function TimelineEvent({
   }, [pending, filled]);
   const fillStyle = useAnimatedStyle(() => ({ opacity: filled.value, transform: [{ scale: 0.5 + 0.5 * filled.value }] }));
 
+  // The line to the next step draws itself downward, just after this step arrives.
+  const drawn = useSharedValue(0);
+  useEffect(() => {
+    drawn.value = withDelay(staggerDelay(index) + 180, withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) }));
+  }, [drawn, index]);
+  const lineStyle = useAnimatedStyle(() => ({ transform: [{ scaleY: drawn.value }] }));
+
   const halo = useSharedValue(0);
   useEffect(() => {
     if (current) halo.value = withRepeat(withTiming(1, { duration: durations.pulse, easing: Easing.inOut(Easing.sin) }), -1, true);
@@ -66,16 +74,16 @@ export function TimelineEvent({
       testID={`timeline-${step}`}
       entering={FadeInDown.delay(staggerDelay(index)).springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)}
       layout={LinearTransition.springify().damping(springs.layout.damping)}
-      style={{ flexDirection: row, gap: 14, minHeight: 58 }}
+      style={{ flexDirection: row, gap: 16, minHeight: 70 }}
     >
-      <View style={{ alignItems: 'center', width: 30 }}>
-        <View style={{ width: 30, height: 30, alignItems: 'center', justifyContent: 'center' }}>
-          <Animated.View style={[{ position: 'absolute', width: 30, height: 30, borderRadius: 15, backgroundColor: colors.neel }, haloStyle]} />
-          <View style={{ position: 'absolute', width: 30, height: 30, borderRadius: 15, backgroundColor: colors.white, borderWidth: current ? 4 : 2.5, borderColor: current ? colors.neel : step === 'reachedSchool' ? colors.kesar : colors.line }} />
-          <Animated.View style={[{ position: 'absolute', width: 30, height: 30, borderRadius: 15, backgroundColor: c.fill }, fillStyle]} />
-          <Icon name={step} size={16} color={pending ? (current ? colors.neel : colors.ink2) : c.text} strokeWidth={2.4} />
+      <View style={{ alignItems: 'center', width: 34 }}>
+        <View style={{ width: 34, height: 34, alignItems: 'center', justifyContent: 'center' }}>
+          <Animated.View style={[{ position: 'absolute', width: 34, height: 34, borderRadius: 17, backgroundColor: colors.neel }, haloStyle]} />
+          <View style={{ position: 'absolute', width: 34, height: 34, borderRadius: 17, backgroundColor: colors.white, borderWidth: current ? 4 : 2.5, borderColor: current ? colors.neel : step === 'reachedSchool' ? colors.kesar : colors.line }} />
+          <Animated.View style={[{ position: 'absolute', width: 34, height: 34, borderRadius: 17, backgroundColor: c.fill }, fillStyle]} />
+          <Icon name={step} size={18} color={pending ? (current ? colors.neel : colors.ink2) : c.text} strokeWidth={2.4} />
         </View>
-        {!last ? <View style={{ flex: 1, width: 3, borderRadius: 2, backgroundColor: pending ? colors.line : c.fill, marginVertical: 4 }} /> : null}
+        {!last ? <Animated.View style={[{ flex: 1, width: 3, borderRadius: 2, backgroundColor: pending ? colors.line : c.fill, marginVertical: 5, transformOrigin: 'top' }, lineStyle]} /> : null}
       </View>
       <View style={{ flex: 1, paddingBottom: 12, paddingTop: 2 }}>
         <AppText bold color={pending && !current ? colors.ink2 : colors.siyahi}>

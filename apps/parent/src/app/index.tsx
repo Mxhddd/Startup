@@ -8,6 +8,7 @@ import { MapSheet } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
+import Animated, { useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandMap } from '../components/BrandMap';
 import { LivePill } from '../components/LivePill';
@@ -20,11 +21,17 @@ export default function ParentHome() {
   const insets = useSafeAreaInsets();
   const p = useParent();
   const [open, setOpen] = useState(false);
+  // 0 when the sheet peeks, 1 when it's open: the map sinks 3% and dims, so the sheet feels lifted off it.
+  const sheet = useSharedValue(0);
+  const mapStyle = useAnimatedStyle(() => ({ transform: [{ scale: 1 - 0.03 * Math.min(1, sheet.value) }] }));
+  const dimStyle = useAnimatedStyle(() => ({ opacity: 0.24 * Math.min(1, sheet.value) }));
+  const barStyle = useAnimatedStyle(() => ({ opacity: 1 - 0.5 * Math.min(1, sheet.value) }));
   const live = p.phase === 'live';
   const onboarding = p.phase !== 'live' && p.phase !== 'idle';
-  const peek = onboarding ? 300 : live ? 360 : 330;
+  const peek = onboarding ? 320 : live ? 404 : 352;
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
+      <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, transformOrigin: 'top' }, mapStyle]}>
       <BrandMap
         accessibilityLabel={t('parent.map.label')}
         van={live && p.position ? { lat: p.position.lat, lng: p.position.lng, heading: p.position.heading, stale: p.signal?.stale ?? false } : null}
@@ -32,6 +39,9 @@ export default function ParentHome() {
         home={p.child?.lat != null && p.child.lng != null ? { lat: p.child.lat, lng: p.child.lng } : null}
         bottomInset={peek}
       />
+      </Animated.View>
+      <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.siyahi }, dimStyle]} />
+      <Animated.View pointerEvents="box-none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, barStyle]}>
 
       <TopBar
         top={insets.top}
@@ -42,8 +52,9 @@ export default function ParentHome() {
         onMenuLong={__DEV__ ? () => router.push('/gallery') : undefined}
       />
       {live ? <LivePill top={insets.top} clock={karachiClock(new Date(p.now))} staleSeconds={p.signal?.stale ? p.signal.secondsAgo : null} /> : null}
+      </Animated.View>
 
-      <MapSheet peek={peek} open={onboarding ? 300 : 640} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen}>
+      <MapSheet peek={peek} open={onboarding ? 320 : 660} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen} progress={sheet}>
         <TripSheet expanded={open} onOpenTrip={() => setOpen((o) => !o)} />
       </MapSheet>
     </View>

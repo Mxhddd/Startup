@@ -19,7 +19,8 @@
     "react-native-gesture-handler": "*",
     "react-native-svg": "*",
     "@maplibre/maplibre-react-native": "*",
-    "expo-haptics": "*"
+    "expo-haptics": "*",
+    "expo-blur": "*"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

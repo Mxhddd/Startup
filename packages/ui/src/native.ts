@@ -29,3 +29,5 @@ export { DrawnCheck } from './native/ChildRow';
 export { Logo } from './native/Logo';
 export { useScreenOptions } from './native/screenMotion';
 export { ChoiceChip } from './native/ChoiceChip';
+export { Glass } from './native/Glass';
+export { RollingNumber } from './native/RollingNumber';

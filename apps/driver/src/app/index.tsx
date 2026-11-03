@@ -8,6 +8,7 @@ import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
 import { AppText, ChildRow, Icon, LangSwitch, PohnchMap, PressableScale, TapButton, VanBadge, type IconName } from '@pohnch/ui/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Redirect, router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Pressable, ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
@@ -22,7 +23,7 @@ function NavTile({ label, href, icon, badge }: { label: string; href: Href; icon
   const { dir } = useLang();
   return (
     <PressableScale accessibilityRole="button" accessibilityLabel={label} onPress={() => router.push(href)} testID={`nav-${href.slice(1)}`} style={{ flex: 1 }}
-      faceStyle={{ minHeight: 72, borderRadius: radius.card, backgroundColor: colors.white, boxShadow: shadow.card, alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 6 }}>
+      faceStyle={{ minHeight: 80, borderRadius: radius.card, backgroundColor: colors.white, boxShadow: shadow.card, alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 6 }}>
       <View>
         <Icon name={icon} size={22} color={colors.neel} />
         {badge ? (
@@ -59,15 +60,17 @@ export default function DriverToday() {
   const childCount = d.riders.length;
   const offCount = d.run.groups.reduce((n, g) => n + g.children.filter((c) => c.state === 'absent').length, 0);
   const stopById = new Map(d.stops.map((s) => [s.id, s]));
+  const hasMap = !!(configured && d.van && d.stops.length > 0);
   const canStart = configured && d.van && d.van.verified_at && !d.dayOff && childCount > 0;
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       {/* Header */}
-      <Animated.View entering={FadeInUp.springify().damping(22)} style={{ backgroundColor: colors.neel, paddingTop: insets.top + 14, paddingHorizontal: space.lg, paddingBottom: 16, gap: 10 }}>
+      <StatusBar style="light" />
+      <Animated.View entering={FadeInUp.springify().damping(22)} style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 58 : 22, gap: 10 }}>
         <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
           <Pressable style={{ flex: 1 }} onLongPress={__DEV__ ? () => router.push('/gallery') : undefined}>
-            <AppText bold color={colors.ghee} style={{ fontSize: 20 }} testID="today-title" numberOfLines={2}>
+            <AppText bold color={colors.ghee} style={{ fontSize: 26, lineHeight: 40 }} testID="today-title" numberOfLines={2}>
               {d.name ? t('driver.hello', { name: d.name }) : t('driver.hello.plain')}
             </AppText>
           </Pressable>
@@ -79,16 +82,20 @@ export default function DriverToday() {
           </AppText>
           {d.requests.length > 0 ? (
             <PressableScale accessibilityRole="button" onPress={() => router.push('/families')} scaleTo="chip" testID="requests-pill"
-              faceStyle={{ height: 40, paddingHorizontal: 12, borderRadius: 12, backgroundColor: colors.kesar, justifyContent: 'center' }}>
-              <AppText bold color={colors.siyahi} style={{ fontSize: 15 }}>{t('driver.requests.new', { n: d.requests.length })}</AppText>
+              faceStyle={{ height: 40, paddingHorizontal: 12, borderRadius: 14, backgroundColor: colors.kesar, flexDirection: row, alignItems: 'center', gap: 8 }}>
+              <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: colors.siyahi, alignItems: 'center', justifyContent: 'center' }}>
+                <AppText variant="number" color={colors.kesar} style={{ fontSize: 14, lineHeight: 18 }}>{String(d.requests.length)}</AppText>
+              </View>
+              <AppText bold color={colors.siyahi} style={{ fontSize: 15 }}>{t('driver.requests.label')}</AppText>
             </PressableScale>
           ) : null}
         </View>
       </Animated.View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 190 }}>
-        {configured && d.van && d.stops.length > 0 ? (
-          <Animated.View entering={FadeIn.duration(400)} style={{ height: 210 }}>
+      <ScrollView contentContainerStyle={{ paddingBottom: insets.bottom + 210 }}>
+        {hasMap ? (
+          // The route as a raised card that overlaps the header, so the screen has depth.
+          <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ height: 196, marginTop: -38, marginHorizontal: space.gutter, borderRadius: 26, overflow: 'hidden', boxShadow: shadow.raised, backgroundColor: colors.white }}>
             <PohnchMap
               testID="today-map"
               accessibilityLabel={t('driver.nav.stops')}
@@ -99,7 +106,7 @@ export default function DriverToday() {
           </Animated.View>
         ) : null}
 
-        <View style={{ padding: space.lg, gap: space.md }}>
+        <View style={{ paddingHorizontal: space.gutter, paddingTop: space.xl, gap: space.lg }}>
           {!configured ? (
             <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius.big, boxShadow: shadow.card, padding: space.xl, gap: space.md }}>
               <AppText bold>{t('app.driver.name')}</AppText>
@@ -136,7 +143,7 @@ export default function DriverToday() {
               {!d.dayOff && childCount === 0 ? (
                 <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>
               ) : !d.dayOff ? (
-                <View style={{ backgroundColor: colors.white, borderRadius: radius.card, boxShadow: shadow.card, paddingHorizontal: 14, paddingVertical: 4 }}>
+                <View style={{ backgroundColor: colors.white, borderRadius: radius.card, boxShadow: shadow.card, paddingHorizontal: 18, paddingVertical: 4 }}>
                   {d.run.groups.map((g, i) => {
                     const s = g.stopId ? stopById.get(g.stopId) : undefined;
                     const time = (d.run.kind === 'morning' ? s?.morning_time : s?.afternoon_time)?.slice(0, 5).replace(/^0/, '');
@@ -161,7 +168,7 @@ export default function DriverToday() {
       </ScrollView>
 
       {canStart ? (
-        <Animated.View entering={FadeInDown.delay(200).springify().damping(20)} style={{ position: 'absolute', left: space.lg, right: space.lg, bottom: insets.bottom + space.lg }}>
+        <Animated.View entering={FadeInDown.delay(260).springify().damping(20)} style={{ position: 'absolute', left: space.gutter, right: space.gutter, bottom: insets.bottom + space.xl }}>
           {nextKind ? (
             <TapButton size="next" tone="left" icon="van" hold testID="start-trip"
               label={t(nextKind === 'morning' ? 'driver.today.startMorning' : 'driver.today.startAfternoon')}

@@ -19,6 +19,8 @@ export type PressableScaleProps = Omit<PressableProps, 'style' | 'children'> & {
   haptic?: HapticKind;
   /** The solid edge under the button (colour and depth in px). The press pushes the face into it. */
   lip?: { color: string; depth?: number };
+  /** A soft coloured bloom under the button (a shadow colour from the theme); it tightens on press. */
+  glow?: string;
   /** Layout of the whole thing (flex, margins, alignSelf). */
   style?: StyleProp<ViewStyle>;
   /** The visible face (background, radius, padding). */
@@ -30,6 +32,7 @@ export function PressableScale({
   scaleTo = 'small',
   haptic: feel = 'tap',
   lip,
+  glow,
   style,
   faceStyle,
   onPressIn,
@@ -47,6 +50,8 @@ export function PressableScale({
       { scale: 1 - (1 - target) * down.value },
     ],
   }));
+
+  const bloom = useAnimatedStyle(() => ({ opacity: 1 - down.value * 0.55, transform: [{ scaleX: 1 - down.value * 0.04 }] }));
 
   const radiusOf = (s: StyleProp<ViewStyle>) => {
     const flat = (Array.isArray(s) ? Object.assign({}, ...s.filter(Boolean)) : s) as ViewStyle | undefined;
@@ -68,6 +73,12 @@ export function PressableScale({
       }}
       style={[{ paddingBottom: lip ? depth : 0 }, style]}
     >
+      {glow && !disabled ? (
+        <Animated.View
+          pointerEvents="none"
+          style={[{ position: 'absolute', left: 6, right: 6, top: 10, bottom: 0, borderRadius: radiusOf(faceStyle), boxShadow: `0px 16px 30px ${glow}` }, bloom]}
+        />
+      ) : null}
       {lip ? (
         <View
           pointerEvents="none"

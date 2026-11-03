@@ -29,7 +29,7 @@ function Onboard({ title, body, children }: { title: string; body?: string; chil
   return (
     <Animated.View testID="trip-sheet" entering={FadeInDown.springify().damping(22)} style={{ gap: space.md }}>
       <View style={{ gap: 4 }}>
-        <AppText variant="title" style={{ fontSize: 26 }}>{title}</AppText>
+        <AppText variant="title" style={{ fontSize: 28 }}>{title}</AppText>
         {body ? <AppText variant="secondary">{body}</AppText> : null}
       </View>
       {children}
@@ -119,12 +119,12 @@ export function TripSheet({ onOpenTrip, expanded }: { onOpenTrip: () => void; ex
         ) : live ? (
           <View>
             <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{t('parent.timeline.title')}</AppText>
-            <AppText bold style={{ fontSize: 28, lineHeight: 44 }}>{lead}</AppText>
+            <AppText bold style={{ fontSize: 30, lineHeight: 48 }}>{lead}</AppText>
           </View>
         ) : (
           <View>
             <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{name}</AppText>
-            <AppText bold style={{ fontSize: 28, lineHeight: 44 }}>{t('parent.idle.title')}</AppText>
+            <AppText bold style={{ fontSize: 30, lineHeight: 48 }}>{t('parent.idle.title')}</AppText>
             {nextTime ? <AppText variant="secondary">{t(p.kind === 'morning' ? 'parent.idle.morning' : 'parent.idle.afternoon', { time: nextTime.slice(0, 5).replace(/^0/, '') })}</AppText> : null}
           </View>
         )}
@@ -149,6 +149,8 @@ export function TripSheet({ onOpenTrip, expanded }: { onOpenTrip: () => void; ex
           {p.canUndoChuttiToday ? <AbsentChip onUndo={() => p.actions.toggleChutti(p.today)} /> : <AppText variant="small" color={colors.ink2}>{t('parent.chutti.locked')}</AppText>}
         </Animated.View>
       ) : null}
+
+      <Animated.View layout={layout} style={{ height: 1, backgroundColor: colors.hairline }} />
 
       <Animated.View layout={layout}>
         <DriverCard driver={p.driverName} van={p.van?.name ?? null} plate={p.van?.plate ?? null} />

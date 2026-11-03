@@ -3,7 +3,7 @@
 import { displayPkMobile, normalisePkMobile } from '@pohnch/core';
 import { useEffect, useState } from 'react';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, TextInput, View } from 'react-native';
-import Animated, { FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, FadeInDown, FadeOut, SlideInDown, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withSpring, withTiming } from 'react-native-reanimated';
 import type { MessageKey } from '@pohnch/messages';
 import { useLang, uiFont } from '../lang';
 import { springs } from '../motion';
@@ -12,6 +12,7 @@ import { AppText } from './AppText';
 import { LangSwitch } from './LangSwitch';
 import { haptic } from './haptics';
 import { Logo } from './Logo';
+import Svg, { Defs, Path, Pattern, Rect } from 'react-native-svg';
 import { TapButton } from './TapButton';
 
 export type LoginError = 'phone' | 'code' | 'name' | 'offline' | 'tooMany' | 'notConfigured' | 'generic';
@@ -28,6 +29,30 @@ export type PhoneLoginProps = {
 };
 
 const RESEND_S = 30;
+
+const STAR_D =
+  'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z M41.5 32 A9.5 9.5 0 1 0 22.5 32 A9.5 9.5 0 1 0 41.5 32 Z';
+
+/** The brand's star pattern, very faint, drifting slowly behind the logo (a brand moment, so it may move). */
+function StarField() {
+  const drift = useSharedValue(0);
+  useEffect(() => {
+    drift.value = withRepeat(withTiming(1, { duration: 14000, easing: Easing.inOut(Easing.sin) }), -1, true);
+  }, [drift]);
+  const style = useAnimatedStyle(() => ({ transform: [{ translateY: -24 * drift.value }] }));
+  return (
+    <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: -10, left: 0, right: 0, height: 520, opacity: 0.08 }, style]}>
+      <Svg width="100%" height="100%">
+        <Defs>
+          <Pattern id="stars" width="78" height="78" patternUnits="userSpaceOnUse">
+            <Path d={STAR_D} fill={colors.kesar} fillRule="evenodd" transform="translate(23 23) scale(0.5)" />
+          </Pattern>
+        </Defs>
+        <Rect x="0" y="0" width="100%" height="100%" fill="url(#stars)" />
+      </Svg>
+    </Animated.View>
+  );
+}
 
 function Field({ label, value, onChange, kind, testID }: { label: string; value: string; onChange: (v: string) => void; kind: 'phone' | 'name'; testID: string }) {
   const { lang, dir } = useLang();
@@ -54,8 +79,8 @@ function Field({ label, value, onChange, kind, testID }: { label: string; value:
         placeholderTextColor={colors.ink2}
         selectionColor={colors.neel}
         style={{
-          minHeight: 60,
-          borderRadius: radius.card,
+          minHeight: 64,
+          borderRadius: 20,
           borderWidth: 2,
           borderColor: focused ? colors.neel : colors.line,
           backgroundColor: colors.white,
@@ -89,7 +114,7 @@ function CodeCell({ digit, active }: { digit: string | undefined; active: boolea
         {
           flex: 1,
           maxWidth: 52,
-          height: 60,
+          height: 64,
           borderRadius: radius.button,
           backgroundColor: colors.white,
           borderWidth: 2,
@@ -206,20 +231,26 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
   const titleKey: MessageKey = step === 'phone' ? 'login.phone.title' : step === 'code' ? 'login.code.title' : 'login.name.title';
 
   return (
-    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.ghee }}>
-      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, padding: space.xl, paddingTop: 56, gap: space.xl }}>
-        <View style={{ flexDirection: dir === 'rtl' ? 'row' : 'row-reverse', justifyContent: 'space-between', alignItems: 'center' }}>
-          <LangSwitch />
+    <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1, backgroundColor: colors.neel }}>
+      <StarField />
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ flexGrow: 1, paddingTop: 52 }}>
+        <View style={{ flexDirection: dir === 'rtl' ? 'row' : 'row-reverse', paddingHorizontal: space.xl }}>
+          <LangSwitch tone="dark" />
         </View>
-        <View style={{ alignItems: 'center', paddingVertical: space.lg }}>
-          <Logo width={128} animated />
-          <AppText variant="small" bold color={colors.ink2} align="center" style={{ marginTop: space.md }}>
+        <View style={{ alignItems: 'center', paddingTop: space.lg, paddingBottom: space.xxl + 8, gap: space.md }}>
+          <Logo width={140} tone="white" animated />
+          <AppText bold color={colors.neelTint} align="center" style={{ fontSize: 17 }}>
             {role === 'driver' ? t('app.driver.name') : t('brand.tagline')}
           </AppText>
         </View>
+        {/* The cream sheet rises in under the logo, on the heavy sheet spring. */}
+        <Animated.View
+          entering={SlideInDown.delay(250).springify().damping(springs.sheet.damping).stiffness(springs.sheet.stiffness)}
+          style={{ flexGrow: 1, backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, paddingHorizontal: space.xl, paddingTop: space.xxl, paddingBottom: space.xxl, boxShadow: '0px -24px 60px rgba(8,12,32,0.35)' }}
+        >
         <Animated.View key={step} entering={FadeInDown.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)} exiting={FadeOut.duration(120)} style={{ gap: space.xl }}>
         <View style={{ gap: space.sm }}>
-          <AppText variant="title" testID="login-title">{t(titleKey)}</AppText>
+          <AppText variant="title" testID="login-title" style={{ fontSize: 28 }}>{t(titleKey)}</AppText>
           <AppText variant="secondary">
             {step === 'phone' ? t('login.phone.hint') : step === 'code' ? t('login.code.hint', { phone: displayPkMobile(phone) }) : t(role === 'driver' ? 'login.name.hint.driver' : 'login.name.hint.parent')}
           </AppText>
@@ -236,7 +267,6 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
         ) : null}
 
         <TapButton
-          size="next"
           tone="left"
           disabled={busy}
           label={step === 'phone' ? t('login.send') : step === 'code' ? t('login.verify') : t('login.done')}
@@ -258,6 +288,7 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
             </Pressable>
           </View>
         ) : null}
+        </Animated.View>
         </Animated.View>
       </ScrollView>
     </KeyboardAvoidingView>

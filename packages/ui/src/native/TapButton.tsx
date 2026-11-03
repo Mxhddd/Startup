@@ -9,7 +9,8 @@
 // - On confirm the button gives one small "pop" and a success haptic.
 import { HOLD_MS, createHold } from '@pohnch/core';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { View } from 'react-native';
+import { View, type LayoutChangeEvent } from 'react-native';
+import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import Animated, {
   Easing,
   cancelAnimation,
@@ -40,11 +41,43 @@ const lips: Record<Step | 'help', string> = {
   help: colors.shingarfDeep,
 };
 
+const glows: Record<Step, string> = {
+  left: colors.neelGlow,
+  leftSchool: colors.neelGlow,
+  picked: colors.zamurradGlow,
+  dropped: colors.zamurradGlow,
+  reachedSchool: colors.kesarGlow,
+};
+
 function look(tone: Tone) {
-  if (tone === 'neutral') return { fill: colors.white, text: colors.neel, border: colors.neel, lip: null };
-  if (tone === 'quiet') return { fill: colors.sand, text: colors.siyahi, border: null, lip: null };
-  if (tone === 'help') return { fill: colors.shingarf, text: colors.white, border: null, lip: lips.help };
-  return { ...stepColors[tone], border: null, lip: lips[tone] };
+  if (tone === 'neutral') return { fill: colors.white, text: colors.neel, border: colors.neel, lip: null, glow: null };
+  if (tone === 'quiet') return { fill: colors.sand, text: colors.siyahi, border: null, lip: null, glow: null };
+  if (tone === 'help') return { fill: colors.shingarf, text: colors.white, border: null, lip: lips.help, glow: null };
+  return { ...stepColors[tone], border: null, lip: lips[tone], glow: glows[tone] };
+}
+
+/** A soft band of light that sweeps across the button once, when a tap is confirmed. */
+function Sheen({ width, progress, dir }: { width: number; progress: { value: number }; dir: 'rtl' | 'ltr' }) {
+  const band = 90;
+  const style = useAnimatedStyle(() => {
+    const from = dir === 'rtl' ? width : -band;
+    const to = dir === 'rtl' ? -band : width;
+    return { opacity: progress.value > 0 && progress.value < 1 ? 1 : 0, transform: [{ translateX: from + (to - from) * progress.value }, { skewX: '-18deg' }] };
+  });
+  return (
+    <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: -20, bottom: -20, left: 0, width: band }, style]}>
+      <Svg width={band} height="100%">
+        <Defs>
+          <LinearGradient id="sheen" x1="0" y1="0" x2="1" y2="0">
+            <Stop offset="0" stopColor="#FFFFFF" stopOpacity={0} />
+            <Stop offset="0.5" stopColor="#FFFFFF" stopOpacity={0.38} />
+            <Stop offset="1" stopColor="#FFFFFF" stopOpacity={0} />
+          </LinearGradient>
+        </Defs>
+        <Rect x="0" y="0" width={band} height="100%" fill="url(#sheen)" />
+      </Svg>
+    </Animated.View>
+  );
 }
 
 export function TapButton({
@@ -73,6 +106,8 @@ export function TapButton({
   const big = size === 'next';
   const progress = useSharedValue(0);
   const pop = useSharedValue(1);
+  const shine = useSharedValue(0);
+  const [width, setWidth] = useState(0);
   const [holding, setHolding] = useState(false);
   // Keep the latest onConfirm without rebuilding the hold timer.
   const confirmRef = useRef(onConfirm);
@@ -80,7 +115,9 @@ export function TapButton({
 
   const celebrate = () => {
     haptic.success();
-    pop.value = withSequence(withTiming(1.025, { duration: 90 }), withSpring(1, springs.pop));
+    pop.value = withSequence(withTiming(1.03, { duration: 110 }), withSpring(1, springs.pop));
+    shine.value = 0;
+    shine.value = withTiming(1, { duration: 720, easing: Easing.out(Easing.cubic) });
   };
 
   const holdCtl = useMemo(
@@ -141,7 +178,9 @@ export function TapButton({
         disabled={disabled}
         scaleTo={big ? 'big' : 'small'}
         haptic={big || hold ? 'press' : 'tap'}
-        lip={c.lip && !disabled ? { color: c.lip, depth: big ? 5 : 4 } : undefined}
+        lip={c.lip && !disabled ? { color: c.lip, depth: big ? 6 : 4 } : undefined}
+        glow={big && c.glow ? c.glow : undefined}
+        onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}
         onPress={
           hold
             ? undefined
@@ -153,8 +192,8 @@ export function TapButton({
         onPressIn={start}
         onPressOut={cancel}
         faceStyle={{
-          minHeight: big ? Math.max(tap.next, 108) : tap.min,
-          borderRadius: big ? radius.big : radius.card,
+          minHeight: big ? Math.max(tap.next, 120) : tap.min,
+          borderRadius: big ? radius.big : radius.button,
           backgroundColor: fill,
           borderWidth: c.border && !disabled ? 2 : 0,
           borderColor: c.border ?? undefined,
@@ -172,22 +211,23 @@ export function TapButton({
             ]}
           />
         ) : null}
-        <View style={{ flexDirection: row, alignItems: 'center', gap: 14, paddingHorizontal: big ? 18 : 16 }}>
+        {width > 0 ? <Sheen width={width} progress={shine} dir={dir} /> : null}
+        <View style={{ flexDirection: row, alignItems: 'center', gap: 16, paddingHorizontal: big ? 20 : 16 }}>
           {icon ? (
             big ? (
-              <View style={{ width: 64, height: 64, borderRadius: radius.tile, backgroundColor: tone === 'reachedSchool' ? colors.siyahi : colors.ghee, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name={icon} size={36} color={disabled ? colors.absentText : tone === 'reachedSchool' ? colors.kesar : c.fill} strokeWidth={2.3} />
+              <View style={{ width: 72, height: 72, borderRadius: 24, backgroundColor: tone === 'reachedSchool' ? colors.siyahi : colors.ghee, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name={icon} size={38} color={disabled ? colors.absentText : tone === 'reachedSchool' ? colors.kesar : c.fill} strokeWidth={2.3} />
               </View>
             ) : (
               <Icon name={icon} size={24} color={text} />
             )
           ) : null}
-          <View style={{ flex: 1, paddingVertical: big ? 10 : 6 }}>
-            <AppText bold color={text} style={{ fontSize: big ? 22 : 17 }} align={!icon ? 'center' : undefined}>
+          <View style={{ flex: 1, paddingVertical: big ? 12 : 6 }}>
+            <AppText bold color={text} style={{ fontSize: big ? 24 : 17 }} align={!icon ? 'center' : undefined}>
               {holding ? t('tap.holding') : label}
             </AppText>
             {sub ? (
-              <AppText variant={big ? 'body' : 'small'} bold color={text} style={{ opacity: 0.92 }} align={!icon ? 'center' : undefined}>
+              <AppText variant={big ? 'body' : 'small'} bold color={text} style={{ opacity: 0.88, fontSize: big ? 15 : 14 }} align={!icon ? 'center' : undefined}>
                 {sub}
               </AppText>
             ) : null}

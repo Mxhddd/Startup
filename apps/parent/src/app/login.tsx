@@ -3,10 +3,16 @@ import { loginActions, toLoginError } from '@pohnch/client';
 import { useLang } from '@pohnch/ui';
 import { PhoneLogin } from '@pohnch/ui/native';
 import { router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { useMemo } from 'react';
 
 export default function Login() {
   const { lang } = useLang();
   const actions = useMemo(() => loginActions('parent', lang), [lang]);
-  return <PhoneLogin role="parent" {...actions} toError={toLoginError} onDone={() => router.replace('/')} />;
+  return (
+    <>
+      <StatusBar style="light" />
+      <PhoneLogin role="parent" {...actions} toError={toLoginError} onDone={() => router.replace('/')} />
+    </>
+  );
 }

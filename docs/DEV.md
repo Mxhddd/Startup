@@ -215,3 +215,22 @@ How each action moves:
 Phones with "reduce motion" switched on get the calmer version automatically (Reanimated follows the system setting).
 
 **Browser preview:** the web build draws a sketch map (no MapLibre on the web) so screens can be checked without a phone; real phones use the real map.
+
+## v6: polish and motion (3 November 2026)
+
+Designed first on the canvas page "v6 · Polish and motion (current)" (six screens and two motion notes), then built:
+
+| Piece | What changed |
+| --- | --- |
+| `theme.ts` | roomier: radii 22-32, a 20 px side gutter, `shadow.raised`, coloured `glow`s, glass colours, `type.hero` 64 |
+| `Glass.tsx` | frosted glass (expo-blur) for the child chips, menu and live pill over the map |
+| `RollingNumber.tsx` | the minutes roll like an odometer, one wheel per digit |
+| `TapButton` | bigger (120 px next tap, 72 px icon tile), a soft coloured glow under it, and a sheen of light that sweeps across once when a tap is confirmed |
+| `MapSheet` | rises in on open; reports how open it is, so the parent map sinks 3 % and dims as the sheet lifts |
+| `VanMarker` | two rings ripple out of the van, instead of one pulse |
+| `TimelineEvent` | each connecting line draws itself down as its step arrives |
+| Login | neel top with the star pattern drifting slowly, the white mark with the star dropping in, a cream sheet rising underneath |
+| Driver Today | header with a gentle light, the route map as a raised card overlapping it, roomier list |
+| Driver Trip | the header floats as a card over the map; after each tap a green "marked" panel draws its tick, with the undo ring under it, while the next stop waits as a normal button |
+
+The parent's language switch moved from the map's top bar to the menu page, so the bar fits a 320 px phone.

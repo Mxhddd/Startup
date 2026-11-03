@@ -4,16 +4,24 @@
 import { headingDelta } from '@pohnch/core';
 import { useEffect } from 'react';
 import { View } from 'react-native';
-import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withSpring, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, cancelAnimation, useAnimatedStyle, useSharedValue, withDelay, withRepeat, withSpring, withTiming, type SharedValue } from 'react-native-reanimated';
 import Svg, { Circle, Path } from 'react-native-svg';
 import { durations, springs } from '../motion';
 import { colors } from '../theme';
 
 const GREY = '#8A8FA3';
+const RIPPLE_MS = 2400;
+
+/** One ring that grows out of the van and fades, like a ripple on water. */
+function Ripple({ v, size }: { v: SharedValue<number>; size: number }) {
+  const style = useAnimatedStyle(() => ({ opacity: 0.32 * (1 - v.value), transform: [{ scale: 0.55 + v.value * 0.95 }] }));
+  return <Animated.View pointerEvents="none" style={[{ position: 'absolute', width: size, height: size, borderRadius: size / 2, backgroundColor: colors.neel }, style]} />;
+}
 
 export function VanMarker({ heading = 0, stale = false, size = 64 }: { heading?: number; stale?: boolean; size?: number }) {
   const rot = useSharedValue(heading);
-  const breath = useSharedValue(0);
+  const r1 = useSharedValue(0);
+  const r2 = useSharedValue(0);
   const appear = useSharedValue(0);
 
   useEffect(() => {
@@ -27,21 +35,31 @@ export function VanMarker({ heading = 0, stale = false, size = 64 }: { heading?:
 
   useEffect(() => {
     if (stale) {
-      cancelAnimation(breath);
-      breath.value = withTiming(0, { duration: durations.fade });
+      cancelAnimation(r1);
+      cancelAnimation(r2);
+      r1.value = withTiming(1, { duration: durations.fade });
+      r2.value = withTiming(1, { duration: durations.fade });
     } else {
-      breath.value = withRepeat(withTiming(1, { duration: durations.pulse / 2, easing: Easing.inOut(Easing.sin) }), -1, true);
+      const ring = () => withRepeat(withTiming(1, { duration: RIPPLE_MS, easing: Easing.out(Easing.quad) }), -1, false);
+      r1.value = 0;
+      r2.value = 0;
+      r1.value = ring();
+      r2.value = withDelay(RIPPLE_MS / 2, ring());
     }
-  }, [stale, breath]);
+  }, [stale, r1, r2]);
 
   const arrow = useAnimatedStyle(() => ({ transform: [{ rotate: `${rot.value}deg` }] }));
-  const halo = useAnimatedStyle(() => ({ opacity: stale ? 0 : 0.2 - breath.value * 0.1, transform: [{ scale: 0.75 + breath.value * 0.4 }] }));
   const body = useAnimatedStyle(() => ({ transform: [{ scale: appear.value }] }));
   const fill = stale ? GREY : colors.neel;
 
   return (
     <View testID="van-marker" style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Animated.View style={[{ position: 'absolute', width: size, height: size, borderRadius: size / 2, backgroundColor: colors.neel }, halo]} />
+      {!stale ? (
+        <>
+          <Ripple v={r1} size={size} />
+          <Ripple v={r2} size={size} />
+        </>
+      ) : null}
       {!stale ? (
         <Animated.View style={[{ position: 'absolute', width: size, height: size }, arrow]}>
           <Svg width={size} height={size} viewBox="0 0 64 64">
