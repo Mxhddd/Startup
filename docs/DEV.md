@@ -234,3 +234,21 @@ Designed first on the canvas page "v6 · Polish and motion (current)" (six scree
 | Driver Trip | the header floats as a card over the map; after each tap a green "marked" panel draws its tick, with the undo ring under it, while the next stop waits as a normal button |
 
 The parent's language switch moved from the map's top bar to the menu page, so the bar fits a 320 px phone.
+
+## v7: world-class pass (3 November 2026)
+
+Designed first on the canvas page "v7 · World-class (current)": the un-boxed parent home, the step moments, notification settings, the Live Activity, the Dynamic Island, the iPhone widgets, Android's live notification and widget, and the grouped alerts. Then built in six phases.
+
+| Phase | What changed | Main files |
+| --- | --- | --- |
+| Un-boxing and moments | squircle corners everywhere; the parent sheet is one surface (compact line at peek that grows into the big minutes); one row of round actions; step moments (a ring closes, or a star burst at school); shimmer loading; drawn empty states; launch reveal | `packages/core/src/moments.ts`, `packages/ui/src/native/{MomentBanner,Shimmer,LineArt,CircleAction,LaunchReveal}.tsx`, `apps/parent/src/components/TripSheet.tsx` |
+| Living map | follow mode (tilted 35°, turned with the van, "back to the van" button after a pan), a fading trail, flowing dashes to your stop, 3D buildings at street zoom, heading cone | `packages/ui/src/native/PohnchMap.tsx`, `mapStyle.ts`, `parent.recentPositions()` |
+| Alerts and settings | a switch per alert, Pohnch sounds (chime; two-note "pohnch") with hear-it buttons, alert language; "time-sensitive" only for arriving and late; an "Open trip" button | `notification_prefs` table, `push_recipients(p_trip, p_children, p_step)`, `supabase/functions/_shared/push.ts`, `apps/parent/src/app/settings.tsx`, `apps/parent/assets/sounds/` |
+| iPhone lock screen | Live Activity and Island whose minutes count down by themselves; widgets in five sizes; the server updates locked phones once it has Apple's key | `apps/parent/src/widgets/*`, `packages/core/src/liveCard.ts`, `live_activity_tokens`, `supabase/functions/_shared/liveActivity.ts` |
+| Android | our own live trip notification (refreshed by quiet data messages when the app is closed), home-screen widget, driver's live trip notification | `apps/parent/src/notifications/{LiveTripNotification.tsx,ongoing.android.ts,liveTask.ts}`, `NextTripWidget.android.tsx`, `apps/driver/src/notifications/*` |
+
+**What needs an account before it works on a real phone:**
+- iPhone Live Activity updates while the phone is locked: Apple's push key. Add `APNS_KEY_ID`, `APNS_TEAM_ID` and `APNS_PRIVATE_KEY` (the .p8 text) as Edge Function secrets (`supabase secrets set ...`); without them the server skips iPhone cards and the app updates them while open.
+- Every Android push (alerts, and the quiet live refreshes): a Firebase project, with its key uploaded to Expo (`eas credentials`, Android, FCM V1).
+
+**Android 16 "Live Update" chip in the status bar:** Android only allows it for its standard notification styles, not custom-drawn ones like ours. It would need a small native Kotlin module; not built yet.
