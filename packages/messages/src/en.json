@@ -257,5 +257,9 @@
   "parent.family.leave": "Take {name} off this van",
   "parent.family.leaveHint": "Hold to confirm. To rejoin you'll need a new link from the driver.",
   "parent.offline": "No signal: showing the last information",
-  "admin.endTrip": "End trip"
+  "admin.endTrip": "End trip",
+  "location.disclosure.title": "Why location?",
+  "location.disclosure.body": "Pohnch Driver collects the van's location during a trip so that the van's families can see it on a map, even when the app is closed or not in use. Location is collected only from Start trip until End trip, never at other times, and is deleted after 30 days.",
+  "location.disclosure.accept": "I understand, continue",
+  "location.disclosure.decline": "Not now"
 }

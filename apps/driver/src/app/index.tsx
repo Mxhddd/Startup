@@ -7,7 +7,12 @@ import { AppText, ChildRow, LangSwitch, TapButton, VanBadge } from '@pohnch/ui/n
 import { Redirect, router } from 'expo-router';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState } from 'react';
+import { LocationDisclosure } from '../components/LocationDisclosure';
 import { useDriver } from '../state/DriverStore';
+
+const DISCLOSED = 'pohnch.driver.locationDisclosed.v1';
 
 function NavButton({ label, href, badge }: { label: string; href: '/stops' | '/families' | '/setup' | '/practice'; badge?: number }) {
   return (
@@ -24,6 +29,14 @@ export default function DriverToday() {
   const { configured } = useSession();
   const d = useDriver();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
+  const [askFor, setAskFor] = useState<'morning' | 'afternoon' | null>(null);
+
+  // The first real trip shows the location explanation first (Google Play rule); after that, it starts straight away.
+  const start = async (kind: 'morning' | 'afternoon') => {
+    const seen = await AsyncStorage.getItem(DISCLOSED).catch(() => null);
+    if (!seen) return setAskFor(kind);
+    d.actions.startTrip(kind).catch(() => d.actions.refresh());
+  };
 
   if (configured && d.running) return <Redirect href="/trip" />;
 
@@ -90,12 +103,22 @@ export default function DriverToday() {
           {nextKind ? (
             <TapButton size="next" tone="left" icon="left" hold testID="start-trip"
               label={t(nextKind === 'morning' ? 'driver.today.startMorning' : 'driver.today.startAfternoon')}
-              onConfirm={() => d.actions.startTrip(nextKind).catch(() => d.actions.refresh())} />
+              onConfirm={() => start(nextKind)} />
           ) : (
             <AppText bold align="center">{t('driver.today.done')}</AppText>
           )}
         </View>
       ) : null}
+      <LocationDisclosure
+        visible={askFor !== null}
+        onDecline={() => setAskFor(null)}
+        onAccept={async () => {
+          const kind = askFor;
+          setAskFor(null);
+          await AsyncStorage.setItem(DISCLOSED, '1').catch(() => undefined);
+          if (kind) d.actions.startTrip(kind).catch(() => d.actions.refresh());
+        }}
+      />
     </View>
   );
 }

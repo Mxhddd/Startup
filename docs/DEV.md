@@ -4,7 +4,7 @@
 
 1. Install Node.js 22 and run `corepack enable` (this gives you pnpm 10).
 2. In the repo: `pnpm install`.
-3. Copy `.env.example` to `.env` and fill in what you have so far (B1 needs nothing; the map on Android needs `EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_KEY`).
+3. Copy `.env.example` to `.env` and fill in the Supabase URL and anon key (Supabase > Project Settings > API). The map needs no key (MapLibre + OpenFreeMap).
 
 ## What's where
 
@@ -180,3 +180,12 @@ The 30-day position cleanup is now tested (`070`), and a whole school day runs a
 | Parent: Home | add a child / join a van / waiting / no trip now | "Loading…" | "No signal: showing the last information"; van grey with "last seen" | retry |
 | Parent: forms | — | button disabled while saving | message under the form | message under the form |
 | Website: admin | "No drivers waiting", "No trips yet today" | "Loading…" | "Something went wrong. Refresh." | same |
+
+
+## The live project (set up 3 November 2026)
+
+- Supabase project **Pohonch** (`vsyunieszswpreogzolx`). The 9 migrations were applied through Supabase's Management API (this cloud session can't reach the database port directly) and recorded in `supabase_migrations.schema_migrations`, so `supabase db push` from a laptop stays in step. Both Edge Functions are deployed with `--use-api`.
+- Phone login: on, codes through the `send-sms` hook (secret set; no gateway yet), test numbers 0300 0000001 and 0300 0000002 with code 123456. Rate limits as in `config.toml`.
+- Expo: parent app = `@pohonch/pohonch`, driver app = `@pohonch/pohnch-driver`; the Supabase URL and anon key are EAS environment variables (development, preview, production).
+- Android builds: `cd apps/driver && pnpm dlx eas-cli build -p android --profile preview` (and the same in `apps/parent`); the build page gives an install link.
+- Pilot operations: `docs/PILOT.md`. Store texts: `docs/STORE.md`.
