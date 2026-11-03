@@ -6,6 +6,7 @@
 import { BadInput, bool, date, isoTime, num, oneOf, optionalUuid, phone, uuid, uuids } from './validate.ts';
 import { byteaHex, hashToken, isInviteToken, newInviteToken } from './tokens.ts';
 import type { NotifyJob } from './notify.ts';
+import type { PushStep } from './push.ts';
 
 export type Deps = {
   /** Returns the user id for a valid login token, or null. */
@@ -17,6 +18,8 @@ export type Deps = {
   newToken?: () => string;
   /** Sends the pushes for a stored step (notify.ts). Optional so tests can leave it out. */
   notify?: (job: NotifyJob) => Promise<void>;
+  /** Updates iPhone Live Activities on locked phones (liveActivity.ts). Optional, like notify. */
+  live?: (job: { tripId: string; step: PushStep | null; van: { lat: number; lng: number; speed: number | null } | null }) => Promise<void>;
 };
 
 type Body = Record<string, unknown>;
@@ -61,6 +64,7 @@ export const actions: Record<string, Action> = {
     })) as string;
     // "The van has left" / "left school" for every family on the van (none for practice trips).
     await deps.notify?.({ tripId, step: kind === 'morning' ? 'left' : 'left_school', children: null });
+    await deps.live?.({ tripId, step: kind === 'morning' ? 'left' : 'left_school', van: null });
     return { tripId };
   },
   'trip.end': async ({ actor, body, deps }) => {
@@ -76,7 +80,10 @@ export const actions: Record<string, Action> = {
       p_client_id: uuid(body, 'clientId'), p_happened_at: isoTime(body, 'happenedAt'),
     })) as number;
     // Only a newly stored step sends a push: a tap resent by the offline queue stays quiet.
-    if (stored > 0) await deps.notify?.({ tripId, step, children });
+    if (stored > 0) {
+      await deps.notify?.({ tripId, step, children });
+      await deps.live?.({ tripId, step, van: null });
+    }
     return { stored };
   },
   'tap.undo': async ({ actor, body, deps }) => ({ undone: await call(deps, 'undo_tap', { p_actor: actor, p_client_id: uuid(body, 'clientId') }) }),
@@ -98,6 +105,8 @@ export const actions: Record<string, Action> = {
     const arriving = (rows ?? []).map((r) => r.child_id);
     // "The van is at your door" for the families whose stop the van just reached.
     if (arriving.length) await deps.notify?.({ tripId, step: 'arriving', children: arriving });
+    // A fresh arrival time on lock screens (at most about once a minute per card; the database decides).
+    await deps.live?.({ tripId, step: arriving.length ? 'arriving' : null, van: { lat: Number(body.lat), lng: Number(body.lng), speed: typeof body.speed === 'number' ? body.speed : null } });
     return { arriving };
   },
   'invite.van': async ({ actor, body, deps }) => {

@@ -6,6 +6,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 export const PUSH_KEYS = [
   'app.parent.name', 'step.left', 'step.picked', 'step.reachedSchool', 'step.leftSchool', 'step.dropped',
   'eta.door', 'parent.late', 'help.reason.traffic', 'help.reason.breakdown', 'help.reason.roadClosed', 'timeline.by',
+  // The iPhone Live Activity card, filled by the server while the phone is locked (v7).
+  'parent.place.coming', 'parent.place.inVan', 'parent.place.atSchool', 'parent.place.home', 'eta.unit.home',
+  'moment.left', 'moment.picked', 'moment.arriving', 'moment.reached_school', 'moment.left_school', 'moment.dropped', 'moment.late',
 ];
 
 export function pushText() {

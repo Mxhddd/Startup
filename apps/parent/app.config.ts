@@ -48,12 +48,18 @@ const config: ExpoConfig = {
       {
         bundleIdentifier: 'pk.pohnch.parent.widgets',
         groupIdentifier: 'group.pk.pohnch.parent',
+        // The server updates the Live Activity on a locked phone (ActivityKit push), about once a minute.
+        enablePushNotifications: true,
+        frequentUpdates: true,
         widgets: [
           {
             name: 'NextTripWidget',
             displayName: 'Pohnch',
             description: 'Your van at a glance · وین ایک نظر میں',
-            ios: { supportedFamilies: ['systemSmall', 'accessoryRectangular'], initialLayout: 'src/widgets/NextTripWidget.tsx' },
+            ios: {
+              supportedFamilies: ['systemSmall', 'systemMedium', 'accessoryCircular', 'accessoryRectangular', 'accessoryInline'],
+              initialLayout: 'src/widgets/NextTripWidget.tsx',
+            },
           },
         ],
       },

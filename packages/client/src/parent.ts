@@ -168,3 +168,13 @@ export async function setAlertLanguage(lang: 'ur' | 'en'): Promise<void> {
   if (!uid) return;
   check(await supabase.from('profiles').update({ lang }).eq('id', uid));
 }
+
+/** Saves an iPhone Live Activity token so the server can update the card on a locked phone. */
+export async function registerActivityToken(t: { token: string; kind: 'update' | 'start'; tripId?: string; childId?: string }): Promise<void> {
+  const { supabase } = db();
+  check(
+    await supabase
+      .from('live_activity_tokens')
+      .upsert({ token: t.token, kind: t.kind, trip_id: t.tripId ?? null, child_id: t.childId ?? null }, { onConflict: 'token', ignoreDuplicates: true }),
+  );
+}

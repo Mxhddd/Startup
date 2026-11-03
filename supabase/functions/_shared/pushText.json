@@ -11,7 +11,19 @@
     "help.reason.traffic": "ٹریفک",
     "help.reason.breakdown": "گاڑی خراب",
     "help.reason.roadClosed": "سڑک بند",
-    "timeline.by": "{who} نے مارک کیا"
+    "timeline.by": "{who} نے مارک کیا",
+    "parent.place.coming": "{name} کی وین آ رہی ہے",
+    "parent.place.inVan": "{name} وین میں ہے",
+    "parent.place.atSchool": "{name} اسکول میں ہے",
+    "parent.place.home": "{name} گھر پر ہے",
+    "eta.unit.home": "منٹ میں گھر",
+    "moment.left": "وین نکل گئی",
+    "moment.picked": "{name} وین میں بیٹھ گئے",
+    "moment.arriving": "وین قریب ہے · تیار رہیں",
+    "moment.reached_school": "{name} اسکول پہنچ گئے",
+    "moment.left_school": "{name} اسکول سے نکلے",
+    "moment.dropped": "{name} گھر پہنچ گئے",
+    "moment.late": "وین کو دیر ہو رہی ہے"
   },
   "en": {
     "app.parent.name": "Pohnch",
@@ -25,6 +37,18 @@
     "help.reason.traffic": "Traffic",
     "help.reason.breakdown": "Breakdown",
     "help.reason.roadClosed": "Road closed",
-    "timeline.by": "Marked by {who}"
+    "timeline.by": "Marked by {who}",
+    "parent.place.coming": "{name}'s van is on its way",
+    "parent.place.inVan": "{name} is in the van",
+    "parent.place.atSchool": "{name} is at school",
+    "parent.place.home": "{name} is home",
+    "eta.unit.home": "min to your door",
+    "moment.left": "The van has left",
+    "moment.picked": "{name} is in the van",
+    "moment.arriving": "The van is close · get ready",
+    "moment.reached_school": "{name} reached school",
+    "moment.left_school": "{name} left school",
+    "moment.dropped": "{name} is home",
+    "moment.late": "The van is running late"
   }
 }

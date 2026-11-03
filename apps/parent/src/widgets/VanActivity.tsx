@@ -1,52 +1,119 @@
-// The iPhone Live Activity and Dynamic Island for a live trip: siyahi ground, the star at the leading
-// edge, the minutes in bold digits, the route dots from the van to your stop, and the last step.
-// Widget code runs inside iOS, not in the app: it can't import anything (not even our theme), so the
-// brand colours are written out here; they match packages/ui/src/theme.ts.
-import { HStack, Image, Spacer, Text, VStack } from '@expo/ui/swift-ui';
-import { activityBackgroundTint, font, foregroundStyle, padding } from '@expo/ui/swift-ui/modifiers';
+// The iPhone Live Activity (lock screen) and Dynamic Island for a live trip (v7, canvas "Z7-LiveActivity"
+// and "Z7-Island").
+// - The minutes count down by themselves (a system timer to the arrival time), and the bar fills by
+//   itself, so both keep moving with the phone locked; the app (and later the server) only send a new
+//   arrival time.
+// - Each state has its colour: coming neel/kesar, in the van zamurrad, at school kesar.
+// - Our 8-point star is drawn from two squares and a hole, so it matches the logo exactly.
+// Widget code runs inside iOS, not in the app: it can't import our theme, so colours are written here
+// (they match packages/ui/src/theme.ts). Props come from buildLiveCard in @pohnch/core.
+import { Circle, Gauge, HStack, ProgressView, Rectangle, Spacer, Text, VStack, ZStack } from '@expo/ui/swift-ui';
+import {
+  activityBackgroundTint,
+  contentTransition,
+  font,
+  foregroundStyle,
+  frame,
+  gaugeStyle,
+  lineLimit,
+  monospacedDigit,
+  padding,
+  rotationEffect,
+  tint,
+} from '@expo/ui/swift-ui/modifiers';
 import { createLiveActivity, type LiveActivityEnvironment } from 'expo-widgets';
 
 export type VanActivityProps = {
-  /** "6 منٹ میں گھر" or "The van is at your door" */
-  title: string;
-  /** "6", for the small Dynamic Island */
+  state: 'coming' | 'arriving' | 'inVan' | 'atSchool' | 'home' | 'stale';
+  initial: string;
+  lead: string;
+  headline: string;
+  arriveAt: number;
+  startAt: number;
+  progress: number;
   minutes: string;
-  /** "●●★○◉" */
-  dots: string;
-  /** "وین نکل گئی · رفیق بھائی نے مارک کیا" */
-  step: string;
-  /** "Last seen 40 s ago" when the van's signal is stale, else "" */
-  stale: string;
+  ahead: string;
+  footer: string;
 };
 
-const VanActivity = (props: VanActivityProps, environment: LiveActivityEnvironment) => {
+const VanActivity = (p: VanActivityProps, env: LiveActivityEnvironment) => {
   'widget';
-  const kesar = '#E8A33D';
   const ghee = '#FAF6EE';
-  const muted = '#C9CCDA';
-  const accent = props.stale || environment.isStale ? '#8A8FA3' : kesar;
+  const muted = '#BFC4D6';
+  const ground = '#141A33';
+  const stale = p.state === 'stale' || env.isStale;
+  const accent = stale ? '#8A8FA3' : p.state === 'inVan' || p.state === 'home' || p.state === 'arriving' ? '#A7D47E' : '#E8A33D';
+  const bar = stale ? '#8A8FA3' : p.state === 'inVan' || p.state === 'home' ? '#17705A' : '#E8A33D';
+  const counting = p.arriveAt > Date.now() && !stale;
+  const range = { lower: new Date(Math.min(p.startAt, Date.now())), upper: new Date(p.arriveAt) };
+
+  // The brand star: two squares, one turned 45°, with a hole in the ground colour.
+  const star = (size: number, hole: string) => (
+    <ZStack modifiers={[frame({ width: size, height: size })]}>
+      <Rectangle modifiers={[frame({ width: size * 0.7, height: size * 0.7 }), foregroundStyle(accent)]} />
+      <Rectangle modifiers={[frame({ width: size * 0.7, height: size * 0.7 }), rotationEffect(45), foregroundStyle(accent)]} />
+      <Circle modifiers={[frame({ width: size * 0.3, height: size * 0.3 }), foregroundStyle(hole)]} />
+    </ZStack>
+  );
+
+  const minutesBig = (size: number) =>
+    counting ? (
+      <Text timerInterval={range} countsDown modifiers={[font({ weight: 'heavy', size, design: 'rounded' }), monospacedDigit(), foregroundStyle(accent), lineLimit(1)]} />
+    ) : (
+      <Text modifiers={[font({ weight: 'heavy', size: size * 0.6 }), foregroundStyle(ghee), contentTransition('opacity'), lineLimit(2)]}>{p.headline}</Text>
+    );
+
+  const progressBar = counting ? (
+    <ProgressView timerInterval={range} countsDown={false} modifiers={[tint(bar)]} />
+  ) : (
+    <ProgressView value={p.progress} modifiers={[tint(bar)]} />
+  );
+
   return {
     banner: (
-      <VStack modifiers={[padding({ all: 14 }), activityBackgroundTint('#141A33')]}>
-        <HStack>
-          <Image systemName="star.fill" color={accent} />
-          <Text modifiers={[font({ weight: 'bold', size: 22 }), foregroundStyle(ghee)]}>{props.title}</Text>
+      <VStack alignment="leading" spacing={10} modifiers={[padding({ horizontal: 16, vertical: 14 }), activityBackgroundTint(ground)]}>
+        <HStack spacing={10}>
+          {star(26, ground)}
+          <Text modifiers={[font({ weight: 'bold', size: 15 }), foregroundStyle(ghee), lineLimit(1)]}>{p.lead}</Text>
+          <Spacer />
+          <Text modifiers={[font({ weight: 'semibold', size: 13 }), foregroundStyle(muted)]}>Pohnch</Text>
+        </HStack>
+        <HStack alignment="lastTextBaseline" spacing={10}>
+          {minutesBig(42)}
+          {counting ? <Text modifiers={[font({ weight: 'bold', size: 17 }), foregroundStyle(ghee)]}>{p.headline}</Text> : null}
           <Spacer />
         </HStack>
-        <Text modifiers={[font({ size: 20 }), foregroundStyle(accent)]}>{props.dots}</Text>
-        <Text modifiers={[font({ size: 14 }), foregroundStyle(muted)]}>{props.stale || props.step}</Text>
+        {progressBar}
+        <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle(muted), lineLimit(1)]}>{[p.ahead, p.footer].filter(Boolean).join(' · ')}</Text>
       </VStack>
     ),
-    compactLeading: <Image systemName="star.fill" color={accent} />,
-    compactTrailing: <Text modifiers={[font({ weight: 'bold' }), foregroundStyle(ghee)]}>{props.minutes}</Text>,
-    minimal: <Image systemName="star.fill" color={accent} />,
-    expandedLeading: <Image systemName="star.fill" color={accent} />,
-    expandedTrailing: <Text modifiers={[font({ weight: 'bold', size: 22 }), foregroundStyle(ghee)]}>{props.minutes}</Text>,
+    compactLeading: (
+      <HStack spacing={4}>
+        {star(18, '#000000')}
+        <Text modifiers={[font({ weight: 'bold', size: 14 }), foregroundStyle(ghee)]}>{p.initial}</Text>
+      </HStack>
+    ),
+    compactTrailing: counting ? (
+      <Text timerInterval={range} countsDown modifiers={[font({ weight: 'bold', size: 15 }), monospacedDigit(), foregroundStyle(accent), frame({ maxWidth: 52 })]} />
+    ) : (
+      star(18, '#000000')
+    ),
+    minimal: (
+      <Gauge value={p.progress} modifiers={[gaugeStyle('circularCapacity'), tint(accent)]}>
+        <Text modifiers={[font({ weight: 'bold', size: 11 }), foregroundStyle(ghee)]}>{p.initial}</Text>
+      </Gauge>
+    ),
+    expandedLeading: (
+      <VStack alignment="leading" spacing={2} modifiers={[padding({ leading: 6 })]}>
+        {star(32, '#000000')}
+      </VStack>
+    ),
+    expandedTrailing: <VStack modifiers={[padding({ trailing: 6 })]}>{minutesBig(34)}</VStack>,
+    expandedCenter: <Text modifiers={[font({ weight: 'bold', size: 15 }), foregroundStyle(ghee), lineLimit(1)]}>{p.lead}</Text>,
     expandedBottom: (
-      <VStack modifiers={[padding({ all: 8 })]}>
-        <Text modifiers={[font({ weight: 'bold', size: 16 }), foregroundStyle(ghee)]}>{props.title}</Text>
-        <Text modifiers={[font({ size: 18 }), foregroundStyle(accent)]}>{props.dots}</Text>
-        <Text modifiers={[font({ size: 14 }), foregroundStyle(muted)]}>{props.stale || props.step}</Text>
+      <VStack alignment="leading" spacing={8} modifiers={[padding({ horizontal: 6, bottom: 6 })]}>
+        {progressBar}
+        <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle(muted), lineLimit(1)]}>{[p.ahead, p.footer].filter(Boolean).join(' · ')}</Text>
       </VStack>
     ),
   };
