@@ -21,6 +21,7 @@ export default function ParentHome() {
         van={live && p.position ? { lat: p.position.lat, lng: p.position.lng, heading: p.position.heading, stale: p.signal?.stale ?? false } : null}
         stop={p.stop ? { lat: p.stop.lat, lng: p.stop.lng } : null}
         home={p.child?.lat != null && p.child.lng != null ? { lat: p.child.lat, lng: p.child.lng } : null}
+        bottomInset={240}
       />
 
       <View style={{ position: 'absolute', top: insets.top + space.md, left: space.lg, right: space.lg, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between' }}>

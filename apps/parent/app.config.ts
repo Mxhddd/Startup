@@ -31,9 +31,6 @@ const config: ExpoConfig = {
       foregroundImage: './assets/android-icon-foreground.png',
       monochromeImage: './assets/android-icon-monochrome.png',
     },
-    config: {
-      googleMaps: { apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_KEY ?? '' },
-    },
     // The parent app never asks for location (CLAUDE.md): block the permission even if a library adds it.
     blockedPermissions: ['android.permission.ACCESS_FINE_LOCATION', 'android.permission.ACCESS_COARSE_LOCATION', 'android.permission.ACCESS_BACKGROUND_LOCATION'],
   },
@@ -41,6 +38,8 @@ const config: ExpoConfig = {
   plugins: [
     'expo-router',
     'expo-font',
+    // The map: MapLibre with free OpenFreeMap tiles (no Google key needed).
+    '@maplibre/maplibre-react-native',
     ['expo-notifications', { color: '#1F2A5C', defaultChannel: 'trip', icon: './assets/android-icon-monochrome.png' }],
     // iPhone: the trip's Live Activity (src/widgets/VanActivity.tsx) and the home-screen widget.
     [

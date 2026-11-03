@@ -23,14 +23,13 @@ const config: ExpoConfig = {
       foregroundImage: './assets/android-icon-foreground.png',
       monochromeImage: './assets/android-icon-monochrome.png',
     },
-    config: {
-      googleMaps: { apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_ANDROID_KEY ?? '' },
-    },
   },
   web: { favicon: './assets/favicon.png', output: 'single' },
   plugins: [
     'expo-router',
     'expo-font',
+    // The map: MapLibre with free OpenFreeMap tiles (no Google key needed).
+    '@maplibre/maplibre-react-native',
     [
       'expo-location',
       {

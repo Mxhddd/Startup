@@ -21,3 +21,4 @@ export { MapSheet } from './native/MapSheet';
 export { ComponentGallery } from './native/ComponentGallery';
 export { PhoneLogin, LoginInputError, type LoginError, type PhoneLoginProps } from './native/PhoneLogin';
 export { TextField } from './native/TextField';
+export { PohnchMap, type MapPin, type PohnchMapProps } from './native/PohnchMap';

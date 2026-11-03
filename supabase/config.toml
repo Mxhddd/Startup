@@ -19,7 +19,7 @@ token_verifications = 30
 token_refresh = 150
 
 [auth.sms]
-enable_signup = true
+enabled = true
 enable_confirmations = true
 max_frequency = "30s"
 
@@ -27,7 +27,6 @@ max_frequency = "30s"
 [auth.sms.test_otp]
 923000000001 = "123456"
 923000000002 = "123456"
-923000000003 = "123456"
 
 # The real SMS gateway goes through our send-sms Edge Function (switched on in the online project).
 [auth.hook.send_sms]

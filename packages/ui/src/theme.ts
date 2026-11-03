@@ -68,27 +68,14 @@ export const mapColors = {
   road: '#FFFFFF',
   roadCasing: '#DDD4C2',
   labels: colors.ink2,
+  residential: '#E9E2D2',
+  building: '#E3DBCA',
+  rail: '#D6CDBB',
+  boundary: '#C9C0AE',
 } as const;
 
-export type MapStyleRule = { featureType?: string; elementType?: string; stylers: Array<Record<string, string>> };
-
-/** Google Maps style for react-native-maps (customMapStyle): warm land, few labels, no shops or transit. */
-export const googleMapStyle: MapStyleRule[] = [
-  { elementType: 'geometry', stylers: [{ color: mapColors.land }] },
-  { elementType: 'labels.text.fill', stylers: [{ color: mapColors.labels }] },
-  { elementType: 'labels.text.stroke', stylers: [{ color: colors.ghee }] },
-  { featureType: 'poi', stylers: [{ visibility: 'off' }] },
-  { featureType: 'poi.park', stylers: [{ visibility: 'on' }] },
-  { featureType: 'poi.park', elementType: 'geometry', stylers: [{ color: mapColors.parks }] },
-  { featureType: 'poi.park', elementType: 'labels', stylers: [{ visibility: 'off' }] },
-  { featureType: 'poi.school', stylers: [{ visibility: 'on' }] },
-  { featureType: 'transit', stylers: [{ visibility: 'off' }] },
-  { featureType: 'road', elementType: 'geometry.fill', stylers: [{ color: mapColors.road }] },
-  { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: mapColors.roadCasing }] },
-  { featureType: 'road', elementType: 'labels.icon', stylers: [{ visibility: 'off' }] },
-  { featureType: 'water', elementType: 'geometry', stylers: [{ color: mapColors.water }] },
-  { featureType: 'administrative.land_parcel', stylers: [{ visibility: 'off' }] },
-];
+/** The free, key-less base map (OpenFreeMap, built on OpenStreetMap). We recolour it with brandMapStyle. */
+export const BASE_MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
 
 /** Where the map opens before a van is joined: central Karachi. */
 export const karachiRegion = {
