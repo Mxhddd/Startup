@@ -18,6 +18,8 @@ import { TripNotifications } from '../notifications/TripNotifications';
 import { rememberInvite, takeInvite } from '../state/pendingInvite';
 import '../notifications/liveTask'; // defines the Android live-notification task at start-up
 
+import { withCrashReports } from '../crash';
+
 SplashScreen.preventAutoHideAsync();
 
 // Sends a logged-out person to /login and a logged-in one away from it. The gallery stays open for
@@ -44,7 +46,7 @@ function Screens() {
   return <Stack screenOptions={options} />;
 }
 
-export default function RootLayout() {
+function RootLayout() {
   const [loaded, error] = useFonts({
     NotoSansArabic_500Medium,
     NotoSansArabic_700Bold,
@@ -79,3 +81,5 @@ export default function RootLayout() {
     </GestureHandlerRootView>
   );
 }
+
+export default withCrashReports(RootLayout);

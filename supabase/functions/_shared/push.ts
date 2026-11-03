@@ -18,9 +18,13 @@ export type ExpoMessage = {
   channelId: AlertChannel;
   /** iPhone: "arriving" and "late" may show through Focus; the rest are ordinary. */
   interruptionLevel: 'time-sensitive' | 'active';
-  /** The notification's buttons ("Open trip"), registered by the app. */
-  categoryId: 'trip';
-  data: { kind: 'trip'; step: PushStep } | { kind: 'dayoff'; date: string; off: boolean };
+  /**
+   * The notification's buttons, registered by the app: 'trip' has "Open trip"; 'trip-left' (the
+   * morning "van left" alert, before pick-up) also has "Off today", which opens the chutti calendar.
+   */
+  categoryId: 'trip' | 'trip-left';
+  /** children: the ids (never names) of this phone's children in the alert, for "Off today". */
+  data: { kind: 'trip'; step: PushStep; children?: string[] } | { kind: 'dayoff'; date: string; off: boolean };
 };
 
 // The same table the apps use (packages/core/src/moments.ts), copied by value: Edge Functions can't
@@ -64,8 +68,8 @@ export function buildPushes(step: PushStep, recipients: Recipient[], reason?: st
       priority: 'high',
       channelId: quiet ? 'step-quiet' : tone === 'pohnch' ? 'step-pohnch' : 'step-chime',
       interruptionLevel: TIME_SENSITIVE.includes(step) ? 'time-sensitive' : 'active',
-      categoryId: 'trip',
-      data: { kind: 'trip', step },
+      categoryId: step === 'left' ? 'trip-left' : 'trip',
+      data: step === 'left' ? { kind: 'trip', step, children: [...new Set(rows.map((r) => r.child_id))] } : { kind: 'trip', step },
     });
   }
   return out;

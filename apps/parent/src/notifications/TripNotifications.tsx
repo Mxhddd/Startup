@@ -27,7 +27,7 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
   useEffect(() => {
     if (!signedIn || registered.current) return;
     registered.current = true;
-    setupChannels({ trip: t('notify.channel.trip'), live: t('notify.channel.live'), arrive: t('notify.channel.arrive'), quiet: t('notify.channel.quiet'), open: t('notify.action.open') })
+    setupChannels({ trip: t('notify.channel.trip'), live: t('notify.channel.live'), arrive: t('notify.channel.arrive'), quiet: t('notify.channel.quiet'), open: t('notify.action.open'), offToday: t('parent.chutti.offToday') })
       .then(registerForPush)
       .then((r) => {
         if (r === 'registered') registerLiveTask();
@@ -44,9 +44,16 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
     return watchStartToken((token) => parent.registerActivityToken({ token, kind: 'start' }).catch(() => undefined));
   }, [signedIn]);
 
-  // Tapping any Pohnch notification (or its "Open trip" button) opens the map.
+  // Tapping any Pohnch notification (or its "Open trip" button) opens the map; "Off today" opens the
+  // chutti calendar with today already chosen, for the child in the alert.
   useEffect(() => {
-    const sub = Notifications.addNotificationResponseReceivedListener(() => router.navigate('/'));
+    const sub = Notifications.addNotificationResponseReceivedListener((r) => {
+      if (r.actionIdentifier === 'chutti') {
+        const kids = (r.notification.request.content.data as { children?: unknown } | undefined)?.children;
+        const child = Array.isArray(kids) && typeof kids[0] === 'string' ? kids[0] : undefined;
+        router.navigate({ pathname: '/chutti', params: { quick: 'today', ...(child ? { child } : {}) } });
+      } else router.navigate('/');
+    });
     return () => sub.remove();
   }, []);
 
@@ -131,6 +138,7 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
         progress: card.progress,
         minutes: card.minutes,
         unit: t('min.short'),
+        offLabel: '',
       }
     : {
         mode: 'idle' as const,
@@ -143,6 +151,8 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
         progress: 0,
         minutes: '',
         unit: t('min.short'),
+        // "Off today" on the widget, before the morning van has left.
+        offLabel: p.phase === 'idle' && p.kind === 'morning' && !p.absentToday && p.vanOff !== 'today' ? t('parent.chutti.offToday') : '',
       };
   const widgetKey = JSON.stringify(widget);
   useEffect(() => {

@@ -2,7 +2,7 @@
 // - Android channels: one per alert sound (Android fixes a channel's sound when it is made), so the
 //   server can pick "chime", the two-note "pohnch", or quiet; plus "Van on the way", the silent ongoing
 //   notification with the minutes, updated in place.
-// - The "trip" category gives every step alert an "Open trip" button.
+// - The "trip" category gives every step alert an "Open trip" button; "trip-left" adds "Off today".
 // - After login: ask permission once, get this phone's Expo push token and save it for this parent
 //   (register_push_token in the database). The server then sends a push for every step.
 import { backend } from '@pohnch/client';
@@ -20,9 +20,14 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }),
 });
 
-export async function setupChannels(names: { trip: string; live: string; arrive: string; quiet: string; open: string }) {
+export async function setupChannels(names: { trip: string; live: string; arrive: string; quiet: string; open: string; offToday: string }) {
   // The button on every step alert, on both platforms.
   await Notifications.setNotificationCategoryAsync('trip', [{ identifier: 'open', buttonTitle: names.open, options: { opensAppToForeground: true } }]).catch(() => undefined);
+  // The morning "van left" alert also offers "Off today" (v8): it opens the chutti calendar with today chosen.
+  await Notifications.setNotificationCategoryAsync('trip-left', [
+    { identifier: 'open', buttonTitle: names.open, options: { opensAppToForeground: true } },
+    { identifier: 'chutti', buttonTitle: names.offToday, options: { opensAppToForeground: true } },
+  ]).catch(() => undefined);
   if (Platform.OS !== 'android') return;
   await Notifications.setNotificationChannelAsync(ALERT_CHANNELS.chime, {
     name: names.trip,

@@ -36,7 +36,7 @@ const KNOWN: Record<string, number> = {
   not_your_van: 403, not_your_child: 403, not_admin: 403, not_family_owner: 403, stop_list_mismatch: 422,
   van_switched_off: 403, van_not_verified: 403,
   trip_not_found: 404, membership_not_found: 404, user_not_found: 404, member_not_found: 404,
-  van_has_families: 409,
+  van_has_families: 409, date_too_far: 422,
   invite_invalid: 410,
   trip_not_running: 409, trip_already_running: 409, trip_already_done: 409, van_day_off: 409,
   already_decided: 409, child_already_on_a_van: 409, van_already_left: 409, family_full: 409,

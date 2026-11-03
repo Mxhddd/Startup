@@ -134,6 +134,25 @@ export async function absenceDates(childId: string): Promise<string[]> {
   return rows.map((r) => r.service_date);
 }
 
+/** The van's school on the map (placed by the driver), or null. */
+export async function schoolPoint(vanId: string): Promise<{ lat: number; lng: number } | null> {
+  const rows = check(await db().supabase.rpc('school_point', { p_van: vanId })) as { lat: number; lng: number }[] | null;
+  return rows?.[0] ?? null;
+}
+
+/** "We're ready": tells the driver this child is at the door (once per trip; a repeat changes nothing). */
+export async function sayReady(tripId: string, childId: string): Promise<void> {
+  const { supabase } = db();
+  const uid = (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return;
+  check(await supabase.from('ready_signals').upsert({ trip_id: tripId, child_id: childId, created_by: uid }, { onConflict: 'trip_id,child_id', ignoreDuplicates: true }));
+}
+
+export async function isReady(tripId: string, childId: string): Promise<boolean> {
+  const rows = check(await db().supabase.from('ready_signals').select('child_id').eq('trip_id', tripId).eq('child_id', childId)) as unknown[];
+  return rows.length > 0;
+}
+
 /** The van's whole-van days off from a date on (set by the driver; readable once the family follows the van). */
 export async function vanDaysOff(vanId: string, from: string): Promise<string[]> {
   const rows = check(

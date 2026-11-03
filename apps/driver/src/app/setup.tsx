@@ -1,9 +1,10 @@
 // Van details: name, school, plate. Parents see these. Verification is done by the Pohnch team, not here.
 import { driver } from '@pohnch/client';
-import { colors, space, useLang } from '@pohnch/ui';
-import { AppText, TapButton, TextField } from '@pohnch/ui/native';
+import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { AppText, PohnchMap, TapButton, TextField } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useState } from 'react';
+import { View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { useDriver } from '../state/DriverStore';
 
@@ -40,6 +41,19 @@ export default function Setup() {
       <TextField label={t('driver.van.plate')} value={plate} onChange={(v) => setPlate(v.toUpperCase())} ltr maxLength={16} testID="van-plate" />
       {error ? <AppText color={colors.dangerText}>{t('error.generic')}</AppText> : null}
       <TapButton size="next" tone="left" label={t('driver.save')} disabled={busy} onConfirm={save} testID="van-save" />
+      {d.van ? (
+        // v8: the school on the map. Families then see "school in 24 min" after pick-up, and the trip
+        // screen points at "reached school" when the van gets there.
+        <View style={{ gap: space.sm, marginTop: space.lg }}>
+          <AppText variant="headline">{t('driver.school.title')}</AppText>
+          <AppText variant="secondary">{d.school ? t('driver.school.placed') : t('driver.school.hint')}</AppText>
+          <View style={{ height: 280, borderRadius: radius.big, borderCurve: 'continuous', overflow: 'hidden', boxShadow: shadow.card }}>
+            <PohnchMap testID="school-map" accessibilityLabel={t('driver.school.title')}
+              pins={d.school ? [{ id: 'school', kind: 'school', lat: d.school.lat, lng: d.school.lng }] : d.stops.map((x) => ({ id: x.id, kind: 'number' as const, n: x.position, lat: x.lat, lng: x.lng }))}
+              onPress={({ lat, lng }) => driver.setSchoolPin(d.van!.id, lat, lng).then(d.actions.refresh).catch(() => setError(true))} style={{ flex: 1 }} />
+          </View>
+        </View>
+      ) : null}
     </Screen>
   );
 }

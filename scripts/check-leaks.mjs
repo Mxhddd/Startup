@@ -4,7 +4,8 @@
 //   node scripts/check-leaks.mjs apps/web/.next/static apps/parent/dist ...   also scan built bundles
 //
 // 1. Source: no console.* outside the two Edge Function entry points; every server log line may only
-//    print an allowed field (the action, the HTTP status, the push step and counts).
+//    print an allowed field (the action, the HTTP status, the push step and counts); every crash
+//    report setup (Sentry.init) scrubs reports and attaches no screenshots or personal data.
 // 2. Git: no .env file is committed (only .env.example).
 // 3. Bundles: no service-role key or other server secret, no private key, and no phone number except
 //    the public pilot WhatsApp number. (Children's names never reach a bundle: they come from the
@@ -53,6 +54,16 @@ for (const file of SOURCE_DIRS.flatMap((d) => walk(d, isCode))) {
   }
 }
 
+// Crash reports: every Sentry.init must scrub reports and send nothing personal (v8).
+for (const file of SOURCE_DIRS.flatMap((d) => walk(d, isCode))) {
+  const src = readFileSync(file, 'utf8');
+  if (!/Sentry\.init\(/.test(src)) continue;
+  const rel = relative(root, file);
+  for (const need of [/sendDefaultPii:\s*false/, /beforeSend:[^\n]*scrubEvent\(/, /attachScreenshot:\s*false/, /attachViewHierarchy:\s*false/]) {
+    if (!need.test(src)) problems.push(`${rel}: Sentry.init without ${need.source.replace(/\\s\*|\\/g, '')}`);
+  }
+}
+
 // ---------------------------------------------------------------- 2. git
 const tracked = execFileSync('git', ['ls-files'], { cwd: root, encoding: 'utf8' }).split('\n');
 for (const f of tracked) {
@@ -63,7 +74,8 @@ for (const f of tracked) {
 const SECRET_PATTERNS = [
   [/service_role/, 'the words service_role'],
   [/c2VydmljZV9yb2xl/, 'a service-role JWT (base64 of "service_role")'],
-  [/SUPABASE_SERVICE_ROLE_KEY|SMS_GATEWAY_KEY|SEND_SMS_HOOK_SECRET|EXPO_ACCESS_TOKEN|EAS_TOKEN/, 'a server-only setting name'],
+  [/SUPABASE_SERVICE_ROLE_KEY|SMS_GATEWAY_KEY|SEND_SMS_HOOK_SECRET|EXPO_ACCESS_TOKEN|EAS_TOKEN|SENTRY_AUTH_TOKEN|APNS_PRIVATE_KEY/, 'a server-only setting name'],
+  [/sntrys_[A-Za-z0-9_+/=]{20,}/, 'a Sentry auth token'],
   [/-----BEGIN [A-Z ]*PRIVATE KEY-----/, 'a private key'],
   [/whsec_[A-Za-z0-9+/=]{16,}/, 'a webhook secret'],
 ];

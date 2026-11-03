@@ -136,3 +136,15 @@ describe('whole-van day off (v8)', () => {
     expect(logs).toEqual(['push dayoff sent=1 dead=0']);
   });
 });
+
+describe('"Off today" on the van-left alert (v8)', () => {
+  it('gives the van-left alert the chutti button and the children\'s ids, never their names', () => {
+    const [m] = buildPushes('left', [r({}), r({ child_id: 'c-sara', first_name: 'سارہ' })]);
+    expect(m?.categoryId).toBe('trip-left');
+    expect(m?.data).toEqual({ kind: 'trip', step: 'left', children: ['c-ali', 'c-sara'] });
+    const [p] = buildPushes('picked', [r({})]);
+    expect(p?.categoryId).toBe('trip');
+    expect(p?.data).toEqual({ kind: 'trip', step: 'picked' });
+  });
+});
+

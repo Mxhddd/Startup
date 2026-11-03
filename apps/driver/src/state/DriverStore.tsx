@@ -27,9 +27,12 @@ type State = {
   /** Days off from today on (YYYY-MM-DD), for the day-off screen. */
   daysOff: string[];
   name: string | null;
+  /** v8: the school pin, and children whose family said "we're ready" on the running trip. */
+  school: { lat: number; lng: number } | null;
+  ready: string[];
 };
 
-const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, daysOff: [], name: null };
+const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, daysOff: [], name: null, school: null, ready: [] };
 
 function useDriverState() {
   const [s, setS] = useState<State>(empty);
@@ -75,7 +78,11 @@ function useDriverState() {
       ]);
       const dayOff = daysOff.includes(today);
       const running = trips.find((x) => x.status === 'running');
-      const events = running ? await driver.eventsOf(running.id) : [];
+      const [events, school, ready] = await Promise.all([
+        running ? driver.eventsOf(running.id) : Promise.resolve([]),
+        driver.schoolPoint(van.id).catch(() => null),
+        running && !running.is_practice ? driver.readyOn(running.id).catch(() => []) : Promise.resolve([]),
+      ]);
       // Location follows the trip: on while one runs (also after the app restarts mid-trip), off otherwise.
       // Practice trips never share location.
       if (running && !running.is_practice) {
@@ -84,7 +91,7 @@ function useDriverState() {
         await stopTripLocation();
         setLocation('off');
       }
-      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, daysOff, name });
+      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, daysOff, name, school, ready });
     } catch (e) {
       setS((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }
@@ -107,6 +114,15 @@ function useDriverState() {
   useEffect(() => () => { if (retry.current) clearInterval(retry.current); }, []);
 
   const running = s.trips.find((t) => t.status === 'running') ?? null;
+
+  // During a real trip, look for "we're ready" from families every 15 s.
+  useEffect(() => {
+    if (!running || running.is_practice) return;
+    const id = setInterval(() => {
+      driver.readyOn(running.id).then((ready) => setS((old) => (old.ready.join() === ready.join() ? old : { ...old, ready }))).catch(() => undefined);
+    }, 15_000);
+    return () => clearInterval(id);
+  }, [running?.id, running?.is_practice]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // The run to show: the running one, else the next one not done today (morning first), else by the clock.
   const doneKinds = new Set(s.trips.filter((x) => !x.is_practice && x.status !== 'cancelled').map((x) => x.kind));

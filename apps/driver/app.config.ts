@@ -8,6 +8,10 @@ const config: ExpoConfig = {
   scheme: 'pohnch-driver',
   version: '0.1.0',
   orientation: 'portrait',
+  // Over-the-air updates (v8): JavaScript and design fixes reach installed phones without a new build.
+  // Builds only take updates made for the same app version; each EAS build profile has its own channel.
+  runtimeVersion: { policy: 'appVersion' },
+  updates: { url: 'https://u.expo.dev/906c7599-1e80-42a2-bbbc-bf3f414409fd', checkAutomatically: 'ON_LOAD', fallbackToCacheTimeout: 0 },
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
   ios: {

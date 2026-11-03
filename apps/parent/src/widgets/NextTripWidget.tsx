@@ -2,7 +2,7 @@
 // rectangular and inline on the lock screen. During a trip the minutes count down by themselves
 // (system timer to the arrival time); otherwise the widget shows where the child is or the next trip.
 // Like the Live Activity, this runs inside iOS and can't import the theme; colours match theme.ts.
-import { Circle, Gauge, HStack, ProgressView, Rectangle, Spacer, Text, VStack, ZStack } from '@expo/ui/swift-ui';
+import { Circle, Gauge, HStack, Link, ProgressView, Rectangle, Spacer, Text, VStack, ZStack } from '@expo/ui/swift-ui';
 import { containerBackground, font, foregroundStyle, frame, gaugeStyle, lineLimit, monospacedDigit, padding, rotationEffect, tint, widgetURL } from '@expo/ui/swift-ui/modifiers';
 import { createWidget, type WidgetEnvironment } from 'expo-widgets';
 
@@ -22,6 +22,8 @@ export type NextTripProps = {
   minutes: string;
   /** "min" in the phone's language. */
   unit: string;
+  /** "Off today" before the morning van leaves (a link into the chutti calendar), else empty. */
+  offLabel?: string;
 };
 
 const NextTripWidget = (p: NextTripProps, env: WidgetEnvironment) => {
@@ -77,7 +79,11 @@ const NextTripWidget = (p: NextTripProps, env: WidgetEnvironment) => {
           {live ? timer(32, kesar) : <Text modifiers={[font({ weight: 'bold', size: 18 }), foregroundStyle(kesar)]}>{p.title}</Text>}
         </HStack>
         {live ? <ProgressView timerInterval={range} countsDown={false} modifiers={[tint(kesar)]} /> : <ProgressView value={p.progress} modifiers={[tint(kesar)]} />}
-        <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle('#E6E9F5'), lineLimit(1)]}>{live ? `${p.title} · ${p.line}` : p.line}</Text>
+        <HStack>
+          <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle('#E6E9F5'), lineLimit(1)]}>{live ? `${p.title} · ${p.line}` : p.line}</Text>
+          <Spacer />
+          {p.offLabel ? <Link label={p.offLabel} destination="pohnch://chutti?quick=today" modifiers={[font({ weight: 'bold', size: 14 }), foregroundStyle(kesar)]} /> : null}
+        </HStack>
       </VStack>
     );
   }
@@ -114,4 +120,5 @@ export default createWidget('NextTripWidget', NextTripWidget, {
   progress: 0,
   minutes: '',
   unit: 'منٹ',
+  offLabel: '',
 });

@@ -111,6 +111,22 @@ export async function daysOffFrom(vanId: string, date: string): Promise<string[]
   return rows.map((r) => r.service_date);
 }
 
+/** The van's school on the map (placed by the driver), or null. */
+export async function schoolPoint(vanId: string): Promise<{ lat: number; lng: number } | null> {
+  const rows = check(await db().supabase.rpc('school_point', { p_van: vanId })) as { lat: number; lng: number }[] | null;
+  return rows?.[0] ?? null;
+}
+
+export async function setSchoolPin(vanId: string, lat: number, lng: number): Promise<void> {
+  check(await db().supabase.rpc('set_school_pin', { p_van: vanId, p_lat: lat, p_lng: lng }));
+}
+
+/** Children whose family said "we're ready" on this trip (ids only). */
+export async function readyOn(tripId: string): Promise<string[]> {
+  const rows = check(await db().supabase.from('ready_signals').select('child_id').eq('trip_id', tripId)) as { child_id: string }[];
+  return rows.map((r) => r.child_id);
+}
+
 // ---- writes through the Edge Function
 export const driverApi = {
   startTrip: (vanId: string, kind: 'morning' | 'afternoon', clientId: string) => db().api<{ tripId: string }>('trip.start', { vanId, kind, clientId }),

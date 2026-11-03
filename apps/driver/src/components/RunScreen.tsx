@@ -5,12 +5,13 @@
 //
 // How it moves: when a stop is done the big button lifts away and the next one rises in its place;
 // the undo bar slides in above it; rows reflow on a spring; the map eases along with the van.
-import { distanceM, formatDistance, type StopGroup } from '@pohnch/core';
+import { distanceM, formatDistance, nudges, type StopGroup } from '@pohnch/core';
 import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, ChildRow, DrawnCheck, HelpSheet, OfflineBanner, PohnchMap, TapButton, TripHeader, UndoBar, type LateReason, type MapPin } from '@pohnch/ui/native';
-import { useEffect, useRef, useState } from 'react';
+import { AppText, ChildRow, DrawnCheck, HelpSheet, Icon, OfflineBanner, PohnchMap, PressableScale, TapButton, TripHeader, UndoBar, type LateReason, type MapPin } from '@pohnch/ui/native';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
-import Animated, { Easing, FadeInDown, FadeOutUp, LinearTransition, SlideInDown, useAnimatedStyle, useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import Animated, { Easing, FadeInDown, FadeOutUp, LinearTransition, SlideInDown, cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import { say } from '../voice';
 import { haptic } from '@pohnch/ui/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -57,7 +58,28 @@ export type RunScreenProps = {
   stops?: { id: string; lat: number; lng: number; position: number }[];
   /** The van's newest position on this phone (only while the trip's location runs). */
   fix?: { lat: number; lng: number; heading: number | null; speed?: number | null } | null;
+  /** v8: children whose family said "we're ready" (ids). */
+  ready?: string[];
+  /** v8: the school pin, for the "reached school" nudge. */
+  school?: { lat: number; lng: number } | null;
+  /** v8: spoken prompts, and the switch for them. */
+  voice?: boolean;
+  onVoice?: () => void;
 };
+
+/** A soft, slow breath (scale and glow) around the button that is due now; still otherwise. */
+function Breathe({ on, children }: { on: boolean; children: ReactNode }) {
+  const v = useSharedValue(0);
+  useEffect(() => {
+    if (on) v.value = withRepeat(withTiming(1, { duration: 900, easing: Easing.inOut(Easing.quad) }), -1, true);
+    else {
+      cancelAnimation(v);
+      v.value = withTiming(0, { duration: 200 });
+    }
+  }, [on, v]);
+  const style = useAnimatedStyle(() => ({ transform: [{ scale: 1 + v.value * 0.025 }] }));
+  return <Animated.View style={style}>{children}</Animated.View>;
+}
 
 /** Once, when the last child is in: a zamurrad wash sweeps across the sheet from the reading start. */
 function AllDoneSweep({ show }: { show: boolean }) {
@@ -91,7 +113,36 @@ export function RunScreen(p: RunScreenProps) {
   const rest = p.groups.filter((g) => g !== next);
   const stopOf = (id: string | null) => (id ? p.stops?.find((s) => s.id === id) : undefined);
   const nextStop = next ? stopOf(next.stopId) : undefined;
-  const dist = p.fix && nextStop ? formatDistance(distanceM({ latitude: p.fix.lat, longitude: p.fix.lng }, { latitude: nextStop.lat, longitude: nextStop.lng })) : null;
+  const toStop = p.fix && nextStop ? distanceM({ latitude: p.fix.lat, longitude: p.fix.lng }, { latitude: nextStop.lat, longitude: nextStop.lng }) : null;
+  const dist = toStop !== null ? formatDistance(toStop) : null;
+  const toSchool = p.fix && p.school ? distanceM({ latitude: p.fix.lat, longitude: p.fix.lng }, { latitude: p.school.lat, longitude: p.school.lng }) : null;
+  const nudge = nudges({ toStop, toSchool, speed: p.fix?.speed ?? null, morning: p.kind === 'morning', allDone });
+  const readyHere = waitingAtNext.filter((c) => p.ready?.includes(c.childId));
+
+  // One bump when the van stops at the next stop (once per stop).
+  const bumped = useRef<string | null>(null);
+  useEffect(() => {
+    const key = next?.stopId ?? null;
+    if (nudge.atStop && key && bumped.current !== key) {
+      bumped.current = key;
+      haptic.press();
+    }
+  }, [nudge.atStop, next?.stopId]);
+
+  // Spoken prompts: the next stop when the van comes near it, and each mark after the tap.
+  const spokenStop = useRef<string | null>(null);
+  useEffect(() => {
+    const key = next?.stopId ?? null;
+    if (!p.voice || !nudge.nearStop || !next || !key || spokenStop.current === key) return;
+    spokenStop.current = key;
+    say(t('driver.voice.next', { stop: next.label, names: join(waitingAtNext.map((c) => c.firstName)) }), lang);
+  }, [p.voice, nudge.nearStop, next?.stopId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const spokenUndo = useRef<number | null>(null);
+  useEffect(() => {
+    if (!p.voice || !p.undo || spokenUndo.current === p.undo.at) return;
+    spokenUndo.current = p.undo.at;
+    say(p.undo.text, lang);
+  }, [p.voice, p.undo?.at]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const tapText = (names: string[]) => t('undo.marked', { name: join(names), step: t(`step.${step}`) });
   const tapGroup = (g: StopGroup) => p.onTapStop(g, tapText(g.children.filter((c) => c.state === 'waiting').map((c) => c.firstName)));
@@ -141,9 +192,26 @@ export function RunScreen(p: RunScreenProps) {
 
         {next ? (
           <Animated.View key={next.stopId ?? 'none'} entering={FadeInDown.springify().damping(20).stiffness(220)} exiting={FadeOutUp.duration(200)} layout={layout} style={{ gap: 10 }} testID={`stop-${p.groups.indexOf(next)}`}>
-            <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>
-              {[t('driver.trip.nextHere'), waitingAtNext.length > 1 ? t('driver.trip.sameHome') : next.stopId ? next.label : t('driver.trip.noStop')].join(' · ')}
-            </AppText>
+            <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
+              <AppText bold color={nudge.atStop ? colors.zamurradOnTint : colors.ink2} style={{ fontSize: 15, flex: 1 }}>
+                {nudge.atStop
+                  ? [t('driver.trip.atStop'), waitingAtNext.length > 1 ? t('driver.trip.sameHome') : next.label].join(' · ')
+                  : [t('driver.trip.nextHere'), waitingAtNext.length > 1 ? t('driver.trip.sameHome') : next.stopId ? next.label : t('driver.trip.noStop')].join(' · ')}
+              </AppText>
+              {p.onVoice ? (
+                <PressableScale accessibilityRole="switch" accessibilityState={{ checked: !!p.voice }} accessibilityLabel={t('driver.voice.label')} onPress={p.onVoice} scaleTo="chip" testID="voice-toggle"
+                  faceStyle={{ width: 64, height: 64, borderRadius: 32, alignItems: 'center', justifyContent: 'center', backgroundColor: p.voice ? colors.neel : colors.sand }}>
+                  <Icon name="sound" size={24} color={p.voice ? colors.ghee : colors.ink2} />
+                </PressableScale>
+              ) : null}
+            </View>
+            {readyHere.length > 0 ? (
+              <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: row, alignItems: 'center', gap: 8, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.zamurradTint }} testID="ready-note">
+                <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.zamurrad }} />
+                <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 15 }}>{t('driver.trip.ready', { name: join(readyHere.map((c) => c.firstName)) })}</AppText>
+              </Animated.View>
+            ) : null}
+            <Breathe on={nudge.atStop && !p.undo}>
             <TapButton
               size={p.undo ? 'later' : 'next'}
               tone={step}
@@ -153,6 +221,7 @@ export function RunScreen(p: RunScreenProps) {
               onConfirm={() => tapGroup(next)}
               testID={`stop-${p.groups.indexOf(next)}-tap`}
             />
+            </Breathe>
             {waitingAtNext.length > 1 && !p.undo ? (
               <View style={{ flexDirection: row, gap: 8 }}>
                 {waitingAtNext.map((c) => (
@@ -183,7 +252,9 @@ export function RunScreen(p: RunScreenProps) {
           </Animated.View>
         ) : null}
 
-        <Animated.View layout={layout}>
+        <Animated.View layout={layout} style={{ gap: 8 }}>
+          {nudge.atSchool ? <AppText bold align="center" color={colors.kesarText} testID="at-school">{t('driver.trip.atSchool')}</AppText> : null}
+          <Breathe on={nudge.atSchool}>
           <TapButton
             testID="finish-trip"
             hold
@@ -193,6 +264,7 @@ export function RunScreen(p: RunScreenProps) {
             label={p.kind === 'morning' ? t('driver.trip.reachedSchool') : t('driver.trip.end')}
             onConfirm={() => p.onFinish(p.kind === 'morning' ? t('step.reachedSchool') : t('driver.trip.end'))}
           />
+          </Breathe>
         </Animated.View>
       </Animated.View>
 

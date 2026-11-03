@@ -2,6 +2,7 @@
 import { useLang } from '@pohnch/ui';
 import { Redirect, router } from 'expo-router';
 import { useEffect, useState } from 'react';
+import { setVoiceOn, voiceOn } from '../voice';
 import { onTripFix, type Fix } from '../location/tripLocation';
 import { clearTripLive, showTripLive } from '../notifications/tripLive';
 import { RunScreen } from '../components/RunScreen';
@@ -12,6 +13,10 @@ export default function Trip() {
   const d = useDriver();
   const [fix, setFix] = useState<Fix | null>(null);
   useEffect(() => onTripFix(setFix), []);
+  const [voice, setVoice] = useState(false);
+  useEffect(() => {
+    voiceOn().then(setVoice);
+  }, []);
 
   // Android: the live trip notification follows the screen (next stop, count, bar); gone at the end.
   const next = d.run.groups.find((g) => g.isNext && g.state === 'waiting');
@@ -41,6 +46,13 @@ export default function Trip() {
       undo={d.undo}
       stops={d.stops}
       fix={fix}
+      ready={d.ready}
+      school={d.school}
+      voice={voice}
+      onVoice={() => {
+        setVoiceOn(!voice);
+        setVoice(!voice);
+      }}
       onTapStop={(g, text, only) => d.actions.tapStop(g, text, only)}
       onUndo={() => d.actions.undoLast()}
       onUndoExpire={() => d.actions.clearUndo()}
