@@ -321,6 +321,9 @@ importers:
       '@pohnch/messages':
         specifier: workspace:*
         version: link:../messages
+      expo-haptics:
+        specifier: '*'
+        version: 58.0.7(expo@58.0.22)
       react:
         specifier: '*'
         version: 19.3.0
