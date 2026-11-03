@@ -50,10 +50,12 @@ describe('Live Activity updates from the server', () => {
     expect(ok).toBe(true);
   });
 
-  it('does nothing without Apple\'s key, and sends, marks and forgets dead cards with it', async () => {
+  it('skips iPhone cards without Apple\'s key, and sends, marks and forgets dead cards with it', async () => {
     const rpc = vi.fn(async (fn: string) => (fn === 'live_activity_targets' ? { data: [target, { ...target, token: 'gone' }], error: null } : { data: null, error: null }));
-    await updateLiveActivities({ tripId: 't1', step: null, van }, { rpc, fetch: vi.fn() as unknown as typeof fetch, apns: null, log: () => undefined });
-    expect(rpc).not.toHaveBeenCalled();
+    const none = vi.fn();
+    await updateLiveActivities({ tripId: 't1', step: null, van }, { rpc, fetch: none as unknown as typeof fetch, apns: null, log: () => undefined });
+    expect(none).not.toHaveBeenCalled();
+    rpc.mockClear();
 
     const { p8 } = await testKey();
     const fetch = vi.fn(async (url: RequestInfo | URL) => new Response('', { status: String(url).endsWith('/gone') ? 410 : 200 }));
@@ -66,5 +68,19 @@ describe('Live Activity updates from the server', () => {
     expect(url).toBe('https://api.push.apple.com/3/device/la-1');
     expect((init.headers as Record<string, string>)['apns-topic']).toBe('pk.pohnch.parent.push-type.liveactivity');
     expect(rpc).toHaveBeenCalledWith('mark_activity_pushed', { p_tokens: ['la-1'], p_dead: ['gone'] });
+  });
+
+  it('refreshes Android phones with a quiet data message (no title, no sound), without needing Apple', async () => {
+    const androidTarget = { ...target, kind: 'android' as const, token: 'ExponentPushToken[a]' };
+    const rpc = vi.fn(async (fn: string) => (fn === 'live_activity_targets' ? { data: [androidTarget], error: null } : { data: null, error: null }));
+    const fetch = vi.fn(async () => new Response(JSON.stringify({ data: [{ status: 'ok' }] }), { status: 200 }));
+    await updateLiveActivities({ tripId: 't1', step: null, van }, { rpc, fetch: fetch as unknown as typeof globalThis.fetch, apns: null, log: () => undefined });
+    const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit];
+    expect(url).toBe('https://exp.host/--/api/v2/push/send');
+    const [msg] = JSON.parse(String(init.body));
+    expect(msg.title).toBeUndefined();
+    expect(msg.sound).toBeUndefined();
+    expect(JSON.parse(msg.data.pohnchLive).card.state).toBe('coming');
+    expect(rpc).toHaveBeenCalledWith('mark_activity_pushed', { p_tokens: ['ExponentPushToken[a]'], p_dead: [] });
   });
 });

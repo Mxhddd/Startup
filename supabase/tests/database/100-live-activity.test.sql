@@ -1,6 +1,6 @@
 -- Live Activity tokens: private, only for your own child on a van you follow; the server's target list.
 begin;
-select plan(7);
+select plan(9);
 select tests.seed_world();
 
 select tests.as_user(tests.id('pa'));
@@ -10,14 +10,18 @@ select throws_ok($$insert into public.live_activity_tokens (token, kind, trip_id
 insert into public.live_activity_tokens (token, kind) values ('start-a', 'start');
 select is((select count(*)::int from public.live_activity_tokens where kind = 'start'), 1, 'and the phone''s push-to-start token');
 
+insert into public.live_activity_tokens (token, kind, trip_id, child_id) values ('ExponentPushToken[and]', 'android', tests.id('t1'), tests.id('ali'));
+select throws_ok($$insert into public.live_activity_tokens (token, kind) values ('x', 'android')$$, '23514', null, 'an Android token always names its trip');
+
 select tests.as_user(tests.id('pb'));
 select is((select count(*)::int from public.live_activity_tokens), 0, 'another parent cannot see them');
 
 select tests.as_service();
-select is((select first_name from public.live_activity_targets(tests.id('t1'))), 'Ali', 'the server gets the card to update, with the child');
-select public.mark_activity_pushed(array['la-ali']);
+select is((select first_name from public.live_activity_targets(tests.id('t1')) where kind = 'update'), 'Ali', 'the server gets the card to update, with the child');
+select is((select count(*)::int from public.live_activity_targets(tests.id('t1')) where kind = 'android'), 1, 'and the Android phone to refresh');
+select public.mark_activity_pushed(array['la-ali', 'ExponentPushToken[and]']);
 select is((select count(*)::int from public.live_activity_targets(tests.id('t1'))), 0, 'not again within a minute');
-select is((select count(*)::int from public.live_activity_targets(tests.id('t1'), true)), 1, 'unless a step just happened');
+select is((select count(*)::int from public.live_activity_targets(tests.id('t1'), true)), 2, 'unless a step just happened (both phones)');
 
 select * from finish();
 rollback;

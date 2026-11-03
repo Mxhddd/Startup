@@ -350,5 +350,8 @@
   "settings.off": "Pohnch alerts are off on this phone",
   "settings.open": "Open",
   "settings.saved": "Saved",
-  "parent.notifications": "Notifications"
+  "parent.notifications": "Notifications",
+  "driver.live.count": "{done} of {total}",
+  "driver.live.next": "Next: {stop}",
+  "driver.live.done": "Every child is marked"
 }

@@ -12,7 +12,10 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useParent } from '../state/ParentStore';
 import { endLive, showLive, updateWidget, watchStartToken } from '../widgets/lockScreen';
 import { clearOngoing, showOngoing } from './ongoing';
+import { registerLiveTask } from './liveTask';
 import { registerForPush, setupChannels } from './setup';
+import * as Device from 'expo-device';
+import { Platform } from 'react-native';
 
 const STEP_KEY = { left: 'left', picked: 'picked', reached_school: 'reachedSchool', left_school: 'leftSchool', dropped: 'dropped' } as const;
 
@@ -26,6 +29,10 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
     registered.current = true;
     setupChannels({ trip: t('notify.channel.trip'), live: t('notify.channel.live'), arrive: t('notify.channel.arrive'), quiet: t('notify.channel.quiet'), open: t('notify.action.open') })
       .then(registerForPush)
+      .then((r) => {
+        if (r === 'registered') registerLiveTask();
+        return r;
+      })
       .catch(() => {
         registered.current = false; // try again next time
       });
@@ -83,12 +90,21 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
 
   // Android: the live notification. iPhone: the Live Activity. Both follow the live trip.
   const wasLive = useRef(false);
+  const androidTokenSent = useRef(new Set<string>());
   useEffect(() => {
     if (card) {
       wasLive.current = true;
-      showOngoing(card).catch(() => undefined);
+      showOngoing(card, t('min.short')).catch(() => undefined);
       const tripId = p.shownTrip?.id;
       const childId = p.child?.id;
+      // Android: this phone's push token, so the server can refresh the live notification while the
+      // app is closed (quiet data messages, liveTask.ts).
+      if (Platform.OS === 'android' && Device.isDevice && tripId && childId && !androidTokenSent.current.has(tripId)) {
+        androidTokenSent.current.add(tripId);
+        Notifications.getExpoPushTokenAsync()
+          .then(({ data: token }) => parent.registerActivityToken({ token, kind: 'android', tripId, childId }))
+          .catch(() => androidTokenSent.current.delete(tripId));
+      }
       showLive(card, (token) => {
         if (tripId && childId) parent.registerActivityToken({ token, kind: 'update', tripId, childId }).catch(() => undefined);
       }).catch(() => undefined);

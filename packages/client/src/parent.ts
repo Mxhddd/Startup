@@ -170,7 +170,7 @@ export async function setAlertLanguage(lang: 'ur' | 'en'): Promise<void> {
 }
 
 /** Saves an iPhone Live Activity token so the server can update the card on a locked phone. */
-export async function registerActivityToken(t: { token: string; kind: 'update' | 'start'; tripId?: string; childId?: string }): Promise<void> {
+export async function registerActivityToken(t: { token: string; kind: 'update' | 'start' | 'android'; tripId?: string; childId?: string }): Promise<void> {
   const { supabase } = db();
   check(
     await supabase

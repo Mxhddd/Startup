@@ -3,6 +3,7 @@ import { useLang } from '@pohnch/ui';
 import { Redirect } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { onTripFix, type Fix } from '../location/tripLocation';
+import { clearTripLive, showTripLive } from '../notifications/tripLive';
 import { RunScreen } from '../components/RunScreen';
 import { useDriver } from '../state/DriverStore';
 
@@ -11,6 +12,24 @@ export default function Trip() {
   const d = useDriver();
   const [fix, setFix] = useState<Fix | null>(null);
   useEffect(() => onTripFix(setFix), []);
+
+  // Android: the live trip notification follows the screen (next stop, count, bar); gone at the end.
+  const next = d.run.groups.find((g) => g.isNext && g.state === 'waiting');
+  const liveKey = d.running ? `${d.running.id}:${d.progress.done}/${d.progress.total}:${next?.label ?? ''}` : '';
+  useEffect(() => {
+    if (!d.running || d.running.is_practice) {
+      clearTripLive();
+      return;
+    }
+    showTripLive({
+      run: t(d.running.kind === 'morning' ? 'trip.morning' : 'trip.afternoon'),
+      count: t('driver.live.count', { done: d.progress.done, total: d.progress.total }),
+      next: next ? t('driver.live.next', { stop: next.label }) : t('driver.live.done'),
+      progress: d.progress.total ? d.progress.done / d.progress.total : 0,
+    });
+  }, [liveKey]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => () => void clearTripLive(), []);
+
   if (!d.running) return <Redirect href="/" />;
   const kind = d.running.kind;
   return (

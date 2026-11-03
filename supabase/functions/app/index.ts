@@ -37,6 +37,6 @@ Deno.serve((req) =>
     siteUrl: Deno.env.get('SITE_URL') ?? 'https://pohnch.pk',
     log,
     notify: (job) => notifyTrip(job, { rpc, fetch, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined, log }),
-    live: (job) => updateLiveActivities(job, { rpc, fetch, apns, log }),
+    live: (job) => updateLiveActivities(job, { rpc, fetch, apns, log, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined }),
   }),
 );

@@ -51,6 +51,8 @@ const config: ExpoConfig = {
         // The server updates the Live Activity on a locked phone (ActivityKit push), about once a minute.
         enablePushNotifications: true,
         frequentUpdates: true,
+        // Android: the home-screen widget (src/widgets/NextTripWidget.android.tsx).
+        enableAndroid: true,
         widgets: [
           {
             name: 'NextTripWidget',
@@ -60,6 +62,7 @@ const config: ExpoConfig = {
               supportedFamilies: ['systemSmall', 'systemMedium', 'accessoryCircular', 'accessoryRectangular', 'accessoryInline'],
               initialLayout: 'src/widgets/NextTripWidget.tsx',
             },
+            android: { minWidth: 150, minHeight: 150, targetCellWidth: 2, targetCellHeight: 2, resizeMode: 'both', initialLayout: 'src/widgets/NextTripWidget.android.tsx' },
           },
         ],
       },

@@ -3,8 +3,10 @@
 // - on every van position (at most about once a minute per card): a fresh arrival time;
 // - on every step: the new state, with an alert that lights up the Dynamic Island; at school or home
 //   the card ends and leaves itself after 15 minutes.
-// Sent straight to Apple (APNs) with Pohnch's key. Until that key exists (it comes with the Apple
-// Developer account) this does nothing: the app still updates the card whenever it is open.
+// iPhone: sent straight to Apple (APNs) with Pohnch's key; until that key exists (it comes with the
+// Apple Developer account) iPhone cards are skipped and the app updates them whenever it is open.
+// Android: quiet data messages through Expo's push service refresh the live notification
+// (needs the Firebase key in Expo, like every Android push).
 // Logs carry counts only: never tokens, names or positions.
 import text from './pushText.json' with { type: 'json' };
 import type { PushStep } from './push.ts';
@@ -35,7 +37,7 @@ export function serverEta(van: { lat: number; lng: number; speed: number | null 
   return Math.max(1, Math.round((d * ROAD_FACTOR) / speed / 60));
 }
 
-export type Target = { token: string; child_id: string; first_name: string; lang: string; stop_lat: number | null; stop_lng: number | null; driver_name: string };
+export type Target = { token: string; kind?: 'update' | 'android'; child_id: string; first_name: string; lang: string; stop_lat: number | null; stop_lng: number | null; driver_name: string };
 
 /** The card's content (the same fields as buildLiveCard in @pohnch/core makes in the app). */
 export function serverCard(t: Target, o: { now: number; step: PushStep | null; van: { lat: number; lng: number; speed: number | null } | null }) {
@@ -102,38 +104,68 @@ export type LiveDeps = {
   rpc: (fn: string, args: Record<string, unknown>) => Promise<{ data: unknown; error: { message: string } | null }>;
   fetch: typeof fetch;
   apns: ApnsConfig | null;
+  /** For Android's quiet data messages (sent through Expo's push service). */
+  expoAccessToken?: string;
   log: (line: string) => void;
   now?: () => number;
 };
 
+/** The quiet data message for an Android phone: the card under one key (see findLivePayload). */
+export function androidMessage(t: Target, card: ReturnType<typeof serverCard>, step: PushStep | null) {
+  const lang: Lang = t.lang === 'en' ? 'en' : 'ur';
+  const end = step === 'reached_school' || step === 'dropped';
+  return { to: t.token, priority: 'high' as const, data: { pohnchLive: JSON.stringify({ card, unit: T(lang, 'min.short'), end }) } };
+}
+
 export async function updateLiveActivities(job: { tripId: string; step: PushStep | null; van: { lat: number; lng: number; speed: number | null } | null }, deps: LiveDeps): Promise<void> {
-  if (!deps.apns) return; // no Apple key yet: the app keeps the card fresh while it is open
   try {
     const { data, error } = await deps.rpc('live_activity_targets', { p_trip: job.tripId, p_force: job.step !== null });
     if (error) throw new Error('targets');
-    const targets = (data ?? []) as Target[];
+    // iPhone cards need Apple's key; without it only Android phones are refreshed.
+    const targets = ((data ?? []) as Target[]).filter((t) => t.kind === 'android' || deps.apns);
     if (targets.length === 0) return;
     const now = deps.now?.() ?? Date.now();
-    const jwt = await apnsJwt(deps.apns, now);
     const sentTokens: string[] = [];
     const dead: string[] = [];
-    for (const t of targets) {
-      const card = serverCard(t, { now, step: job.step, van: job.van });
-      const payload = activityPayload(card, { now, step: job.step, lang: t.lang === 'en' ? 'en' : 'ur', name: t.first_name });
-      const res = await deps.fetch(`https://${deps.apns.host}/3/device/${t.token}`, {
+
+    const android = targets.filter((t) => t.kind === 'android');
+    if (android.length) {
+      const messages = android.map((t) => androidMessage(t, serverCard(t, { now, step: job.step, van: job.van }), job.step));
+      const res = await deps.fetch('https://exp.host/--/api/v2/push/send', {
         method: 'POST',
-        headers: {
-          authorization: `bearer ${jwt}`,
-          'apns-push-type': 'liveactivity',
-          'apns-topic': `${deps.apns.bundleId}.push-type.liveactivity`,
-          'apns-priority': job.step ? '10' : '5',
-          'content-type': 'application/json',
-        },
-        body: JSON.stringify(payload),
+        headers: { 'content-type': 'application/json', accept: 'application/json', ...(deps.expoAccessToken ? { authorization: `Bearer ${deps.expoAccessToken}` } : {}) },
+        body: JSON.stringify(messages),
       });
-      if (res.ok) sentTokens.push(t.token);
-      else if (res.status === 410 || res.status === 400) dead.push(t.token);
+      const json = res.ok ? ((await res.json().catch(() => ({}))) as { data?: { status: string; details?: { error?: string } }[] }) : {};
+      (json.data ?? []).forEach((ticket, i) => {
+        const token = (android[i] as Target).token;
+        if (ticket.status === 'ok') sentTokens.push(token);
+        else if (ticket.details?.error === 'DeviceNotRegistered') dead.push(token);
+      });
     }
+
+    const iphone = targets.filter((t) => t.kind !== 'android');
+    if (iphone.length && deps.apns) {
+      const jwt = await apnsJwt(deps.apns, now);
+      for (const t of iphone) {
+        const card = serverCard(t, { now, step: job.step, van: job.van });
+        const payload = activityPayload(card, { now, step: job.step, lang: t.lang === 'en' ? 'en' : 'ur', name: t.first_name });
+        const res = await deps.fetch(`https://${deps.apns.host}/3/device/${t.token}`, {
+          method: 'POST',
+          headers: {
+            authorization: `bearer ${jwt}`,
+            'apns-push-type': 'liveactivity',
+            'apns-topic': `${deps.apns.bundleId}.push-type.liveactivity`,
+            'apns-priority': job.step ? '10' : '5',
+            'content-type': 'application/json',
+          },
+          body: JSON.stringify(payload),
+        });
+        if (res.ok) sentTokens.push(t.token);
+        else if (res.status === 410 || res.status === 400) dead.push(t.token);
+      }
+    }
+
     await deps.rpc('mark_activity_pushed', { p_tokens: sentTokens, p_dead: dead });
     const sent = sentTokens.length;
     deps.log(`live ${job.step} sent=${sent} dead=${dead.length}`);

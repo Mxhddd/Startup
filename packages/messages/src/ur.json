@@ -350,5 +350,8 @@
   "settings.off": "فون میں پہنچ کی اطلاعات بند ہیں",
   "settings.open": "کھولیں",
   "settings.saved": "محفوظ",
-  "parent.notifications": "اطلاعات"
+  "parent.notifications": "اطلاعات",
+  "driver.live.count": "{total} میں سے {done}",
+  "driver.live.next": "اگلا: {stop}",
+  "driver.live.done": "سب بچے مارک ہو گئے"
 }

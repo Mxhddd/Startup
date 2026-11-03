@@ -16,6 +16,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ParentProvider } from '../state/ParentStore';
 import { TripNotifications } from '../notifications/TripNotifications';
 import { rememberInvite, takeInvite } from '../state/pendingInvite';
+import '../notifications/liveTask'; // defines the Android live-notification task at start-up
 
 SplashScreen.preventAutoHideAsync();
 
