@@ -115,7 +115,7 @@ export async function updateLiveActivities(job: { tripId: string; step: PushStep
     if (targets.length === 0) return;
     const now = deps.now?.() ?? Date.now();
     const jwt = await apnsJwt(deps.apns, now);
-    const sent: string[] = [];
+    const sentTokens: string[] = [];
     const dead: string[] = [];
     for (const t of targets) {
       const card = serverCard(t, { now, step: job.step, van: job.van });
@@ -131,12 +131,13 @@ export async function updateLiveActivities(job: { tripId: string; step: PushStep
         },
         body: JSON.stringify(payload),
       });
-      if (res.ok) sent.push(t.token);
+      if (res.ok) sentTokens.push(t.token);
       else if (res.status === 410 || res.status === 400) dead.push(t.token);
     }
-    await deps.rpc('mark_activity_pushed', { p_tokens: sent, p_dead: dead });
-    deps.log(`live ${job.step ?? 'eta'} sent=${sent.length} dead=${dead.length}`);
+    await deps.rpc('mark_activity_pushed', { p_tokens: sentTokens, p_dead: dead });
+    const sent = sentTokens.length;
+    deps.log(`live ${job.step} sent=${sent} dead=${dead.length}`);
   } catch {
-    deps.log(`live ${job.step ?? 'eta'} failed`);
+    deps.log(`live ${job.step} failed`);
   }
 }
