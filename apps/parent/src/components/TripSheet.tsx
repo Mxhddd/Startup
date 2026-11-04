@@ -7,7 +7,7 @@
 // - Under it, one quiet row: the driver, the plate, and three round actions.
 // - Further down (seen when the sheet is open): today's timeline.
 // - When a step happens while you watch, its moment plays in the head (a ring or a star burst).
-import { arrivalClock, childPlace, newMoment, waitClock, type MomentStep } from '@pohnch/core';
+import { arrivalClock, childPlace, homeState, newMoment, waitClock, type MomentStep } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
 import { AbsentChip, AppText, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
 import { router } from 'expo-router';
@@ -131,6 +131,10 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
   const offToday = !live && p.vanOff === 'today';
   const offBy = t('parent.dayOff.by', { who: p.driverName ?? p.van?.name ?? '' });
   const offNote = !live && p.vanOff === 'tomorrow' ? t('parent.dayOff.tomorrow') : '';
+  const next = homeState({
+    phase: p.phase, kind: p.kind, items, eta: p.eta, vanOff: p.vanOff, absentToday: p.absentToday,
+    canUndoChutti: p.canUndoChuttiToday, ready: p.ready, storyDone: p.story !== null,
+  });
   const nextLine = nextTime ? t(p.kind === 'morning' ? 'parent.idle.morning' : 'parent.idle.afternoon', { time: nextTime.slice(0, 5).replace(/^0/, '') }) : '';
 
   // The compact line (peek) and the full head (open), for each situation.
@@ -252,11 +256,22 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
             <AppText bold color={colors.kesarText} style={{ fontSize: 15 }}>{t('parent.chutti.plan')}</AppText>
           </PressableScale>
           <View style={{ width: 8 }} />
-          <PressableScale accessibilityRole="button" onPress={() => router.push('/history')} scaleTo="chip" testID="open-history"
+          {next.action !== 'week' ? <PressableScale accessibilityRole="button" onPress={() => router.push('/history')} scaleTo="chip" testID="open-history"
             faceStyle={{ minHeight: 44, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.neelTint, flexDirection: row, alignItems: 'center', gap: 8 }}>
             <Icon name="pulse" size={18} color={colors.link} />
             <AppText bold color={colors.link} style={{ fontSize: 15 }}>{t('history.link')}</AppText>
-          </PressableScale>
+          </PressableScale> : null}
+        </Animated.View>
+      ) : null}
+
+      {/* v9: the one obvious next thing for this state of the day (homeState in @pohnch/core). */}
+      {next.action === 'offToday' && canSetChutti ? (
+        <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout}>
+          <TapButton tone="quiet" icon="calendar" label={t('parent.chutti.offToday')} onConfirm={() => p.actions.toggleChutti(p.today)} testID="next-off-today" />
+        </Animated.View>
+      ) : next.action === 'week' ? (
+        <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout}>
+          <TapButton tone="quiet" icon="pulse" label={t('history.link')} onConfirm={() => router.push('/history')} testID="next-week" />
         </Animated.View>
       ) : null}
 

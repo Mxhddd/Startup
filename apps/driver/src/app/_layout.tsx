@@ -39,7 +39,14 @@ function AuthGate({ ready, signedIn, configured }: { ready: boolean; signedIn: b
 // The screens, with the push animation that follows the reading direction.
 function Screens() {
   const options = useScreenOptions();
-  return <Stack screenOptions={options} />;
+  // v9: the trip and "Trip complete" fade in (their neel headers continue Today's), so starting and
+  // finishing a trip feels like one continuous motion rather than a new page sliding over.
+  return (
+    <Stack screenOptions={options}>
+      <Stack.Screen name="trip" options={{ animation: 'fade', animationDuration: 420 }} />
+      <Stack.Screen name="done" options={{ animation: 'fade', animationDuration: 520, gestureEnabled: false }} />
+    </Stack>
+  );
 }
 
 function RootLayout() {

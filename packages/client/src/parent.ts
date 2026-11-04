@@ -191,6 +191,8 @@ export const parentApi = {
   setAbsence: (childId: string, date: string) => db().api('absence.set', { childId, date }),
   clearAbsence: (childId: string, date: string) => db().api('absence.clear', { childId, date }),
   joinVan: (token: string, childId: string) => db().api<{ membershipId: string }>('invite.accept', { token, childId }),
+  /** v9: the van behind an invite link (name, school, driver, verified), for the join card. */
+  peekInvite: (token: string) => db().api<{ vanName: string; schoolName: string; driverName: string; verified: boolean }>('invite.peek', { token }),
   inviteDriver: (childId: string) => db().api<{ url: string }>('invite.driver', { childId }),
   addFamilyMember: (phone: string) => db().api('family.add', { phone }),
   leaveVan: (childId: string) => db().api('van.leave', { childId }),

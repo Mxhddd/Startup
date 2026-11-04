@@ -5,7 +5,9 @@ import { AppText, DrawnCheck, TapButton } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { View } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { RunScreen } from '../components/RunScreen';
+import { PRACTICED } from '../components/SetupChecklist';
 
 // Pretend places for the practice map (somewhere in Gulshan); nothing about them is real or sent.
 const PRETEND_STOPS = [
@@ -72,7 +74,11 @@ export default function Practice() {
       onUndo={() => { if (undo) setEvents((e) => e.filter((x) => x.tap !== undo.tap)); setUndo(null); }}
       onUndoExpire={() => setUndo(null)}
       onLate={() => undefined}
-      onFinish={() => setFinished(true)}
+      onFinish={() => {
+        // The setup checklist on Today ticks "practice run" once one is finished.
+        AsyncStorage.setItem(PRACTICED, '1').catch(() => undefined);
+        setFinished(true);
+      }}
     />
   );
 }

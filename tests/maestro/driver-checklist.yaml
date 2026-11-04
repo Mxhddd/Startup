@@ -1,0 +1,10 @@
+# Driver app (v9): the setup checklist on Today ticks itself; tapping "a practice run" opens practice.
+# Needs the test driver login with a van that isn't fully set up yet (docs/PILOT.md).
+appId: pk.pohnch.driver
+---
+- launchApp
+- assertVisible:
+    id: "setup-checklist"
+- tapOn:
+    id: "check-practice"
+- assertVisible: "مشق"

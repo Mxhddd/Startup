@@ -238,4 +238,16 @@ describe('leaving a van', () => {
     expect(res.status).toBe(409);
     expect(await res.json()).toEqual({ error: 'van_has_families' });
   });
+
+  it('peeks at a van invite by the hash of its token, and never logs the token (v9)', async () => {
+    const token = newInviteToken();
+    const { post, rpc, logs } = setup({ data: [{ van_name: 'V1', school_name: 'School', driver_name: 'Rafiq bhai', verified: true }] });
+    const res = await post('invite.peek', { token });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ vanName: 'V1', schoolName: 'School', driverName: 'Rafiq bhai', verified: true });
+    const args = rpc.mock.calls.find((c) => c[0] === 'peek_van_invite')?.[1] as { p_token_hash: string };
+    expect(args.p_token_hash).not.toContain(token);
+    expect(logs.join(' ')).not.toContain(token);
+    expect((await setup().post('invite.peek', { token: 'short' })).status).toBe(400);
+  });
 });

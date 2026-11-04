@@ -126,6 +126,15 @@ export const actions: Record<string, Action> = {
     return inviteLink(deps, (hash) => call(deps, 'create_driver_invite', { p_actor: actor, p_child: child, p_token_hash: hash }));
   },
   // A parent joins a van with one child, or a driver takes a parent's request into their van.
+  // v9: what a van invite is for (van, school, driver's name, verified), before joining it.
+  'invite.peek': async ({ body, deps }) => {
+    if (!isInviteToken(body.token)) throw new BadInput('token');
+    const rows = (await call(deps, 'peek_van_invite', { p_token_hash: byteaHex(await hashToken(body.token)) })) as
+      { van_name: string; school_name: string; driver_name: string; verified: boolean }[] | null;
+    const r = rows?.[0];
+    if (!r) throw new DbError('invite_invalid');
+    return { vanName: r.van_name, schoolName: r.school_name, driverName: r.driver_name, verified: r.verified };
+  },
   'invite.accept': async ({ actor, body, deps }) => {
     if (!isInviteToken(body.token)) throw new BadInput('token');
     const hash = byteaHex(await hashToken(body.token));
@@ -202,7 +211,7 @@ const DAY = 86400;
 export const LIMITS: Record<string, [max: number, windowS: number]> = {
   position: [1500, HOUR], tap: [600, HOUR], 'tap.undo': [200, HOUR], late: [30, HOUR],
   'trip.start': [20, HOUR], 'trip.end': [40, HOUR],
-  'invite.van': [20, DAY], 'invite.driver': [20, DAY], 'invite.accept': [30, HOUR],
+  'invite.van': [20, DAY], 'invite.driver': [20, DAY], 'invite.accept': [30, HOUR], 'invite.peek': [60, HOUR],
   'membership.decide': [200, HOUR], 'absence.set': [60, HOUR], 'absence.clear': [60, HOUR], 'dayoff.set': [30, DAY],
   'family.add': [10, DAY], 'family.removeMember': [20, DAY], 'account.delete': [5, DAY], 'van.leave': [20, HOUR], 'rider.remove': [60, HOUR],
   'admin.verify': [300, HOUR], 'admin.switchOff': [300, HOUR], 'admin.endTrip': [300, HOUR],

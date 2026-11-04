@@ -43,3 +43,4 @@ export { LivingSky, SKY } from './native/LivingSky';
 export { MomentFX } from './native/MomentFX';
 export { LiquidProgress } from './native/LiquidProgress';
 export { MorphProvider, MorphTarget, useMorphSource, MORPH_SPRING } from './native/Morph';
+export { FlowSteps } from './native/FlowSteps';

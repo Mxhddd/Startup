@@ -6,7 +6,7 @@
 // through set_home_pin; taking a child off a van goes through the "app" Edge Function (van.leave).
 import { parent } from '@pohnch/client';
 import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, MorphTarget, TapButton, TextField } from '@pohnch/ui/native';
+import { AppText, FlowSteps, MorphTarget, TapButton, TextField } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -14,6 +14,7 @@ import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { BrandMap } from '../components/BrandMap';
 import { Page } from '../components/Page';
 import { useParent } from '../state/ParentStore';
+import { takeInvite } from '../state/pendingInvite';
 
 export default function ChildPage() {
   const { t } = useLang();
@@ -59,7 +60,15 @@ export default function ChildPage() {
     if (!name.trim() || !school.trim()) return setError(t('parent.child.needed'));
     if (!pin) return setError(t('parent.child.pinNeeded'));
     const c = { firstName: name.trim(), schoolName: school.trim() };
-    if (!existing) return run(() => parent.addChild({ ...c, lat: pin.lat, lng: pin.lng }), () => router.replace('/'));
+    if (!existing) {
+      // v9 guided path: back to a waiting invite card, or on to joining a van if this is the first child.
+      const first = p.children.length === 0;
+      return run(() => parent.addChild({ ...c, lat: pin.lat, lng: pin.lng }), () => {
+        const tok = takeInvite();
+        if (tok) router.replace({ pathname: '/i/[token]', params: { token: tok } });
+        else router.replace(first ? '/join' : '/');
+      });
+    }
     const moved = existing.lat !== pin.lat || existing.lng !== pin.lng;
     return run(async () => {
       await parent.updateChild(existing.id, c);
@@ -69,6 +78,7 @@ export default function ChildPage() {
 
   return (
     <Page title={existing ? existing.first_name : t('parent.addChild')}>
+      {!existing && p.children.length === 0 ? <FlowSteps step={2} total={4} label={t('parent.flow.label', { n: 2, of: 4 })} /> : null}
       {existing ? (
         // v9: the kesar initial flies here from the child's row in the menu (Morph), then stays.
         <MorphTarget morphKey={`child-${existing.id}`} style={{ alignSelf: 'center' }}>

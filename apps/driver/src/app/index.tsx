@@ -14,6 +14,7 @@ import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationDisclosure } from '../components/LocationDisclosure';
+import { SetupChecklist } from '../components/SetupChecklist';
 import { useDriver } from '../state/DriverStore';
 
 const DISCLOSED = 'pohnch.driver.locationDisclosed.v1';
@@ -159,6 +160,8 @@ export default function DriverToday() {
                   })}
                 </View>
               ) : null}
+
+              <SetupChecklist d={d} />
 
               <View style={{ flexDirection: row, gap: space.sm, marginTop: space.sm }}>
                 <NavTile label={t('driver.nav.stops')} href="/stops" icon="pin" />

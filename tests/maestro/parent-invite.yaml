@@ -1,0 +1,13 @@
+# Parent app (v9): a driver's link opens the join card: the van, the driver, the school, then a hold to
+# join, a moment, and home. Needs a parent test login with a child, and a fresh van invite link from the
+# test driver (Families > share link) in INVITE_URL. Run:
+#   maestro test -e INVITE_URL=https://pohnch.pk/i/... tests/maestro/parent-invite.yaml
+appId: pk.pohnch.parent
+---
+- openLink: ${INVITE_URL}
+- assertVisible: "آپ کو بلایا گیا ہے"
+- longPressOn:
+    id: "invite-join"
+- assertVisible: "درخواست بھیج دی"
+- tapOn:
+    id: "invite-home"

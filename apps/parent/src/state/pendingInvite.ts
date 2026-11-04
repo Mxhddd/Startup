@@ -1,5 +1,6 @@
-// A driver's invite opened while logged out: the token waits here, in memory only (never in a URL,
-// storage or a log), until login finishes and the join form can use it.
+// A driver's invite that can't be used yet: opened while logged out (it waits until login finishes),
+// or before the parent has added a child (v9: it waits until the child is added, then the join card
+// opens again). In memory only: never in storage or a log.
 let pending: string | null = null;
 
 export function rememberInvite(token: string) {
