@@ -13,18 +13,18 @@ export type ExpoMessage = {
   title: string;
   body: string;
   /** iPhone: the step's own Pohnch tone ("a_picked.wav"), or null for a quiet alert. Android takes the channel's sound. */
-  sound: `a_${PushStep}.wav` | null;
+  sound: `a_${PushStep}.wav` | 'default' | null;
   priority: 'high';
-  channelId: AlertChannel;
+  channelId: AlertChannel | 'driver';
   /** iPhone: "arriving" and "late" may show through Focus; the rest are ordinary. */
   interruptionLevel: 'time-sensitive' | 'active';
   /**
    * The notification's buttons, registered by the app: 'trip' has "Open trip"; 'trip-left' (the
    * morning "van left" alert, before pick-up) also has "Off today", which opens the chutti calendar.
    */
-  categoryId: 'trip' | 'trip-left';
-  /** children: the ids (never names) of this phone's children in the alert, for "Off today". */
-  data: { kind: 'trip'; step: PushStep; children?: string[] } | { kind: 'dayoff'; date: string; off: boolean };
+  categoryId: 'trip' | 'trip-left' | 'trip-door' | 'driver';
+  /** children / trip: ids only (never names), for "Off today" and "We're ready". */
+  data: { kind: 'trip'; step: PushStep; children?: string[]; trip?: string } | { kind: 'dayoff'; date: string; off: boolean } | { kind: 'driver'; what: 'request' | 'verified' };
 };
 
 // The same table the apps use (packages/core/src/moments.ts), copied by value: Edge Functions can't
@@ -41,12 +41,17 @@ type Key = keyof (typeof text)['en'];
 const T = (lang: Lang, key: Key, vars: Record<string, string> = {}) =>
   (text[lang][key] as string).replace(/\{(\w+)\}/g, (w, n: string) => vars[n] ?? w);
 
-const STEP_KEY: Record<Exclude<PushStep, 'arriving' | 'late'>, Key> = {
-  left: 'step.left', picked: 'step.picked', reached_school: 'step.reachedSchool', left_school: 'step.leftSchool', dropped: 'step.dropped',
-};
+/** v9 quiet hours: from 21:00 to 06:00 in Karachi, alerts arrive silently (except "late"). */
+export function inQuietHours(now: Date): boolean {
+  const h = Number(new Intl.DateTimeFormat('en-GB', { timeZone: 'Asia/Karachi', hour: '2-digit', hour12: false }).format(now)) % 24;
+  return h >= 21 || h < 6;
+}
 
-/** One message per phone; brothers and sisters in one step share it ("علی، سارہ"). */
-export function buildPushes(step: PushStep, recipients: Recipient[], reason?: string | null): ExpoMessage[] {
+/**
+ * One message per phone; brothers and sisters in one step share it ("علی، سارہ").
+ * v9 words: the title says what happened, name first ("علی وین میں بیٹھ گئے"); the body says who.
+ */
+export function buildPushes(step: PushStep, recipients: Recipient[], reason?: string | null, opts: { tripId?: string; quietHours?: boolean } = {}): ExpoMessage[] {
   const byToken = new Map<string, Recipient[]>();
   for (const r of recipients) byToken.set(r.token, [...(byToken.get(r.token) ?? []), r]);
   const out: ExpoMessage[] = [];
@@ -55,23 +60,26 @@ export function buildPushes(step: PushStep, recipients: Recipient[], reason?: st
     const lang: Lang = first.lang === 'en' ? 'en' : 'ur';
     const names = [...new Set(rows.map((r) => r.first_name))].join(lang === 'ur' ? '، ' : ', ');
     let body: string;
-    if (step === 'arriving') body = T(lang, 'eta.door');
+    if (step === 'arriving') body = T(lang, 'push.body.arriving', { who: first.driver_name });
     else if (step === 'late') {
       const r = (['traffic', 'breakdown', 'roadClosed'].includes(reason ?? '') ? reason : 'traffic') as 'traffic' | 'breakdown' | 'roadClosed';
       body = T(lang, 'parent.late', { reason: T(lang, `help.reason.${r}`) });
-    } else body = `${T(lang, STEP_KEY[step])} · ${T(lang, 'timeline.by', { who: first.driver_name })}`;
-    const quiet = first.sound === false;
+    } else body = T(lang, 'push.body.by', { who: first.driver_name });
+    const quiet = first.sound === false || (opts.quietHours === true && step !== 'late');
+    const kids = [...new Set(rows.map((r) => r.child_id))];
     const tone = STEP_SOUND[step];
     out.push({
       to: token,
-      title: names,
+      title: T(lang, `push.title.${step}` as Key, { names }),
       body,
       sound: quiet ? null : `a_${tone}.wav`,
       priority: 'high',
       channelId: quiet ? 'step-quiet' : stepChannel(step),
       interruptionLevel: TIME_SENSITIVE.includes(step) ? 'time-sensitive' : 'active',
-      categoryId: step === 'left' ? 'trip-left' : 'trip',
-      data: step === 'left' ? { kind: 'trip', step, children: [...new Set(rows.map((r) => r.child_id))] } : { kind: 'trip', step },
+      categoryId: step === 'left' ? 'trip-left' : step === 'arriving' ? 'trip-door' : 'trip',
+      data: step === 'left' ? { kind: 'trip', step, children: kids }
+        : step === 'arriving' ? { kind: 'trip', step, children: kids, ...(opts.tripId ? { trip: opts.tripId } : {}) }
+        : { kind: 'trip', step },
     });
   }
   return out;
@@ -110,6 +118,31 @@ export function buildDayOffPushes(recipients: DayOffRecipient[], job: { date: st
       interruptionLevel: 'active',
       categoryId: 'trip',
       data: { kind: 'dayoff', date: job.date, off: job.off },
+    });
+  }
+  return out;
+}
+
+export type DriverRecipient = { token: string; lang: string; first_name?: string };
+
+/** v9: the driver's two alerts: a family asking to join (with the child's first name), the van verified. */
+export function buildDriverPushes(what: 'request' | 'verified', recipients: DriverRecipient[]): ExpoMessage[] {
+  const seen = new Set<string>();
+  const out: ExpoMessage[] = [];
+  for (const r of recipients) {
+    if (seen.has(r.token)) continue;
+    seen.add(r.token);
+    const lang: Lang = r.lang === 'en' ? 'en' : 'ur';
+    out.push({
+      to: r.token,
+      title: T(lang, what === 'request' ? 'push.driver.request.title' : 'push.driver.verified.title'),
+      body: T(lang, what === 'request' ? 'push.driver.request.body' : 'push.driver.verified.body', { name: r.first_name ?? '' }),
+      sound: 'default',
+      priority: 'high',
+      channelId: 'driver',
+      interruptionLevel: 'active',
+      categoryId: 'driver',
+      data: { kind: 'driver', what },
     });
   }
   return out;

@@ -59,6 +59,9 @@ export function serverCard(t: Target, o: { now: number; step: PushStep | null; v
     minutes: eta === 'door' ? '0' : typeof eta === 'number' ? String(eta) : '',
     ahead: '',
     footer: step ? `${step} · ${T(lang, 'timeline.by', { who: t.driver_name })}` : t.driver_name,
+    // v9: the step row (left · in the van · there), the same as the app's buildLiveCard.
+    steps: place === 'coming' ? 1 : place === 'inVan' ? 2 : 3,
+    marks: T(lang, o.step === 'left_school' || o.step === 'dropped' ? 'live.marks.afternoon' : 'live.marks.morning'),
   };
 }
 

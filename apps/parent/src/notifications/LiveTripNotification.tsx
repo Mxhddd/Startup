@@ -17,6 +17,9 @@ export type LiveTripProps = {
   progress: number;
   ahead: string;
   footer: string;
+  /** v9: the step row: how many of three steps are done, and their names joined by "|". */
+  steps?: number;
+  marks?: string;
 };
 
 const LiveTrip = (p: LiveTripProps) => {
@@ -61,6 +64,16 @@ const LiveTrip = (p: LiveTripProps) => {
           {big ? <Text color={accent} style={{ fontSize: 26, fontWeight: '800' }}>{big}</Text> : null}
         </Row>
         <LinearProgressIndicator progress={Math.max(0.02, Math.min(1, p.progress))} color={accent} trackColor="#E6E9F5" modifiers={[fillMaxWidth(), height(8)]} />
+        {(p.marks ?? '').split('|').length === 3 ? (
+          <Row horizontalArrangement={{ spacedBy: 12 }} verticalAlignment="center">
+            {(p.marks ?? '').split('|').map((n, i) => (
+              <Row key={n} horizontalArrangement={{ spacedBy: 4 }} verticalAlignment="center">
+                <Box modifiers={[size(9, 9), cornerRadius(5), background(i < (p.steps ?? 0) ? accent : '#E6E9F5')]} />
+                <Text color={i < (p.steps ?? 0) ? ink : ink2} maxLines={1} style={{ fontSize: 13, fontWeight: i < (p.steps ?? 0) ? '700' : '500' }}>{n}</Text>
+              </Row>
+            ))}
+          </Row>
+        ) : null}
         <Spacer modifiers={[height(2)]} />
         <Text color={ink2} maxLines={1} style={{ fontSize: 14, fontWeight: '600' }}>
           {[p.ahead, p.footer].filter(Boolean).join(' · ')}

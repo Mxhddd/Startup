@@ -8,7 +8,7 @@ import { LIVE_CHANNEL } from './setup';
 export const LIVE_ID = 'pohnch-live-trip';
 
 export function toLiveProps(card: LiveCard, unit: string): LiveTripProps {
-  return { state: card.state, lead: card.lead, headline: card.headline, minutes: card.minutes, unit, progress: card.progress, ahead: card.ahead, footer: card.footer };
+  return { state: card.state, lead: card.lead, headline: card.headline, minutes: card.minutes, unit, progress: card.progress, ahead: card.ahead, footer: card.footer, steps: card.steps, marks: card.marks };
 }
 
 export async function showOngoing(card: LiveCard, unit = 'min') {

@@ -10,6 +10,11 @@ export const PUSH_KEYS = [
   'parent.place.coming', 'parent.place.inVan', 'parent.place.atSchool', 'parent.place.home', 'eta.unit.home',
   'min.short', 'moment.left', 'moment.picked', 'moment.arriving', 'moment.reached_school', 'moment.left_school', 'moment.dropped', 'moment.late',
   // The driver's whole-van day off (v8).
+  'live.marks.morning', 'live.marks.afternoon',
+  // v9: name-first alert titles, short bodies.
+  'push.title.left', 'push.title.picked', 'push.title.arriving', 'push.title.reached_school', 'push.title.left_school', 'push.title.dropped', 'push.title.late',
+  'push.body.by', 'push.body.arriving',
+  'push.driver.request.title', 'push.driver.request.body', 'push.driver.verified.title', 'push.driver.verified.body',
   'push.when.today', 'push.when.tomorrow', 'push.when.date', 'push.dayOff.title', 'push.dayOff.body', 'push.dayOn.title', 'push.dayOn.body',
 ];
 

@@ -6,6 +6,7 @@ import * as Notifications from 'expo-notifications';
 import * as TaskManager from 'expo-task-manager';
 import { Platform } from 'react-native';
 import { clearOngoing, showOngoing } from './ongoing';
+import { tidyStepAlerts } from './setup';
 
 export const LIVE_TASK = 'pohnch-live-update';
 
@@ -16,6 +17,8 @@ if (Platform.OS === 'android') {
     if (!payload) return;
     if (payload.end) await clearOngoing();
     else await showOngoing(payload.card, payload.unit);
+    // v9: the newest step alert replaces the older ones on the lock screen.
+    await tidyStepAlerts();
   });
 }
 

@@ -12,24 +12,25 @@ const r = (over: Partial<Recipient>): Recipient => ({
 });
 
 describe('push messages', () => {
-  it('say what happened and who marked it, in Urdu', () => {
+  it('say what happened, name first, and who marked it, in Urdu (v9)', () => {
     const [m] = buildPushes('picked', [r({})]);
-    expect(m).toMatchObject({ to: 'ExponentPushToken[a]', title: 'علی', body: 'وین میں بیٹھ گئے · رفیق بھائی نے مارک کیا', channelId: 'step-picked', sound: 'a_picked.wav', categoryId: 'trip' });
+    expect(m).toMatchObject({ to: 'ExponentPushToken[a]', title: 'علی وین میں بیٹھ گئے', body: 'رفیق بھائی', channelId: 'step-picked', sound: 'a_picked.wav', categoryId: 'trip' });
   });
 
   it("use each phone's own language", () => {
     const [m] = buildPushes('reached_school', [r({ lang: 'en', first_name: 'Ali', driver_name: 'Rafiq bhai' })]);
-    expect(m?.body).toBe('Reached school · Marked by Rafiq bhai');
+    expect(m?.title).toBe('Ali reached school');
+    expect(m?.body).toBe('Rafiq bhai');
   });
 
   it('put brothers and sisters in one message per phone', () => {
     const msgs = buildPushes('left', [r({}), r({ child_id: 'c-sara', first_name: 'سارہ' }), r({ token: 'ExponentPushToken[b]', first_name: 'حمزہ', child_id: 'c-h' })]);
     expect(msgs).toHaveLength(2);
-    expect(msgs[0]?.title).toBe('علی، سارہ');
+    expect(msgs[0]?.title).toBe('علی، سارہ کی وین نکل گئی');
   });
 
   it('say "at your door" for arriving and give the late reason', () => {
-    expect(buildPushes('arriving', [r({})])[0]?.body).toBe('وین دروازے پر ہے');
+    expect(buildPushes('arriving', [r({})])[0]).toMatchObject({ title: 'علی کی وین دروازے پر ہے', body: 'تیار رہیں · رفیق بھائی' });
     expect(buildPushes('late', [r({ lang: 'en' })], 'breakdown')[0]?.body).toBe('The van is running late: Breakdown');
   });
 
@@ -145,6 +146,41 @@ describe('"Off today" on the van-left alert (v8)', () => {
     const [p] = buildPushes('picked', [r({})]);
     expect(p?.categoryId).toBe('trip');
     expect(p?.data).toEqual({ kind: 'trip', step: 'picked' });
+  });
+});
+
+import { inQuietHours } from './push.ts';
+describe('notifications v2 (v9)', () => {
+  it('gives the at-the-door alert a "We\'re ready" button, with the trip and children ids', () => {
+    const [m] = buildPushes('arriving', [r({})], null, { tripId: 't-1' });
+    expect(m?.categoryId).toBe('trip-door');
+    expect(m?.data).toEqual({ kind: 'trip', step: 'arriving', children: ['c-ali'], trip: 't-1' });
+  });
+  it('keeps quiet from 21:00 to 06:00 in Karachi, except for "late"', () => {
+    expect(inQuietHours(new Date('2026-11-04T17:00:00Z'))).toBe(true); // 22:00 in Karachi
+    expect(inQuietHours(new Date('2026-11-04T00:30:00Z'))).toBe(true); // 05:30
+    expect(inQuietHours(new Date('2026-11-04T02:00:00Z'))).toBe(false); // 07:00
+    expect(buildPushes('picked', [r({})], null, { quietHours: true })[0]).toMatchObject({ sound: null, channelId: 'step-quiet' });
+    expect(buildPushes('late', [r({})], 'traffic', { quietHours: true })[0]?.sound).toBe('a_late.wav');
+  });
+});
+
+import { buildDriverPushes } from './push.ts';
+import { notifyDriver } from './notify.ts';
+describe("the driver's alerts (v9)", () => {
+  it('names the child in a request, in the driver\'s language, one per phone', () => {
+    const msgs = buildDriverPushes('request', [{ token: 't1', lang: 'en', first_name: 'Zoya' }, { token: 't1', lang: 'en', first_name: 'Zoya' }]);
+    expect(msgs).toHaveLength(1);
+    expect(msgs[0]).toMatchObject({ title: 'A new family request', channelId: 'driver', data: { kind: 'driver', what: 'request' } });
+    expect(msgs[0]?.body).toContain('Zoya');
+  });
+  it('asks the database for the right list and logs only counts', async () => {
+    const rpc = vi.fn(async (fn: string) => ({ data: fn === 'driver_push_targets' ? [{ token: 't1', lang: 'ur' }] : null, error: null }));
+    const logs: string[] = [];
+    const fetch = vi.fn(async () => new Response(JSON.stringify({ data: [{ status: 'ok' }] })));
+    await notifyDriver({ what: 'verified', vanId: 'v' }, { rpc, fetch, log: (l) => logs.push(l) });
+    expect(rpc).toHaveBeenCalledWith('driver_push_targets', { p_van: 'v' });
+    expect(logs).toEqual(['push driver sent=1 dead=0']);
   });
 });
 

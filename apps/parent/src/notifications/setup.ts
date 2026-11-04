@@ -22,13 +22,18 @@ Notifications.setNotificationHandler({
   handleNotification: async () => ({ shouldShowBanner: true, shouldShowList: true, shouldPlaySound: true, shouldSetBadge: false }),
 });
 
-export async function setupChannels(names: { live: string; quiet: string; open: string; offToday: string; steps: Record<MomentStep, string> }) {
+export async function setupChannels(names: { live: string; quiet: string; open: string; offToday: string; ready: string; steps: Record<MomentStep, string> }) {
   // The button on every step alert, on both platforms.
   await Notifications.setNotificationCategoryAsync('trip', [{ identifier: 'open', buttonTitle: names.open, options: { opensAppToForeground: true } }]).catch(() => undefined);
   // The morning "van left" alert also offers "Off today" (v8): it opens the chutti calendar with today chosen.
   await Notifications.setNotificationCategoryAsync('trip-left', [
     { identifier: 'open', buttonTitle: names.open, options: { opensAppToForeground: true } },
     { identifier: 'chutti', buttonTitle: names.offToday, options: { opensAppToForeground: true } },
+  ]).catch(() => undefined);
+  // v9: "The van is at your door" offers "We're ready": the driver sees a green note by the child.
+  await Notifications.setNotificationCategoryAsync('trip-door', [
+    { identifier: 'ready', buttonTitle: names.ready, options: { opensAppToForeground: true } },
+    { identifier: 'open', buttonTitle: names.open, options: { opensAppToForeground: true } },
   ]).catch(() => undefined);
   if (Platform.OS !== 'android') return;
   // v9: one channel per trip step, each with its own Pohnch tone (Android fixes a channel's sound when
@@ -88,3 +93,17 @@ export async function registerForPush(): Promise<'registered' | 'denied' | 'skip
   if (error) throw error;
   return 'registered';
 }
+
+/**
+ * v9: one alert per trip on the lock screen, not a pile: keeps the newest step alert and clears the
+ * older ones (they are all still in the app's timeline). Called when an alert arrives with the app
+ * open, when the app comes back to the front, and (Android) from the background live-update task.
+ */
+export async function tidyStepAlerts(): Promise<void> {
+  const shown = await Notifications.getPresentedNotificationsAsync().catch(() => []);
+  const steps = shown
+    .filter((n) => (n.request.content.data as { kind?: string } | undefined)?.kind === 'trip')
+    .sort((a, b) => b.date - a.date);
+  for (const old of steps.slice(1)) await Notifications.dismissNotificationAsync(old.request.identifier).catch(() => undefined);
+}
+

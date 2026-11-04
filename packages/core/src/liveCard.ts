@@ -25,6 +25,9 @@ export type LiveCard = {
   ahead: string;
   /** The bottom line: the last step and who marked it, or "last seen 40 s ago". */
   footer: string;
+  /** v9: the step row: how many of three steps are done, and their names joined by "|". */
+  steps: number;
+  marks: string;
 };
 
 export type LiveText = {
@@ -34,7 +37,14 @@ export type LiveText = {
   ahead: (n: number) => string;
   next: string;
   stale: (secondsAgo: number) => string;
+  /** v9: the three step names for the step row, joined by "|" ("وین نکلی|بیٹھ گئے|اسکول"). */
+  marks: (kind: 'morning' | 'afternoon') => string;
 };
+
+/** v9: how many of the three steps in the step row are done (left · in the van · there). */
+export function stepsDone(place: 'coming' | 'inVan' | 'atSchool' | 'home'): number {
+  return place === 'coming' ? 1 : place === 'inVan' ? 2 : 3;
+}
 
 export function buildLiveCard(o: {
   name: string;
@@ -68,5 +78,7 @@ export function buildLiveCard(o: {
     minutes: o.eta === 'door' ? '0' : typeof o.eta === 'number' ? String(o.eta) : '',
     ahead,
     footer: o.stale ? o.text.stale(o.secondsAgo) : o.lastStep,
+    steps: stepsDone(place),
+    marks: o.text.marks(o.kind),
   };
 }

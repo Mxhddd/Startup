@@ -9,11 +9,12 @@ import { useLang } from '@pohnch/ui';
 import { router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useMemo, useRef } from 'react';
+import { AppState } from 'react-native';
 import { useParent } from '../state/ParentStore';
 import { endLive, showLive, updateWidget, watchStartToken } from '../widgets/lockScreen';
 import { clearOngoing, showOngoing } from './ongoing';
 import { registerLiveTask } from './liveTask';
-import { registerForPush, setupChannels } from './setup';
+import { registerForPush, setupChannels, tidyStepAlerts } from './setup';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
@@ -27,7 +28,7 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
   useEffect(() => {
     if (!signedIn || registered.current) return;
     registered.current = true;
-    setupChannels({ live: t('notify.channel.live'), quiet: t('notify.channel.quiet'), open: t('notify.action.open'), offToday: t('parent.chutti.offToday'), steps: Object.fromEntries(ALERT_STEPS.map((s) => [s, t(`settings.step.${s}`)])) as Record<MomentStep, string> })
+    setupChannels({ live: t('notify.channel.live'), quiet: t('notify.channel.quiet'), open: t('notify.action.open'), offToday: t('parent.chutti.offToday'), ready: t('notify.action.ready'), steps: Object.fromEntries(ALERT_STEPS.map((s) => [s, t(`settings.step.${s}`)])) as Record<MomentStep, string> })
       .then(registerForPush)
       .then((r) => {
         if (r === 'registered') registerLiveTask();
@@ -48,14 +49,27 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
   // chutti calendar with today already chosen, for the child in the alert.
   useEffect(() => {
     const sub = Notifications.addNotificationResponseReceivedListener((r) => {
-      if (r.actionIdentifier === 'chutti') {
+      const data = r.notification.request.content.data as { children?: unknown; trip?: unknown } | undefined;
+      if (r.actionIdentifier === 'ready') {
+        // "We're ready" straight from the alert: tell the driver, then show the map.
+        const kid = Array.isArray(data?.children) && typeof data.children[0] === 'string' ? data.children[0] : null;
+        if (kid && typeof data?.trip === 'string') parent.sayReady(data.trip, kid).then(() => p.actions.refresh()).catch(() => undefined);
+        router.navigate('/');
+      } else if (r.actionIdentifier === 'chutti') {
         const kids = (r.notification.request.content.data as { children?: unknown } | undefined)?.children;
         const child = Array.isArray(kids) && typeof kids[0] === 'string' ? kids[0] : undefined;
         router.navigate({ pathname: '/chutti', params: { quick: 'today', ...(child ? { child } : {}) } });
       } else router.navigate('/');
     });
-    return () => sub.remove();
-  }, []);
+    // A new alert while the app is open, or coming back to the app: keep only the newest step alert.
+    const got = Notifications.addNotificationReceivedListener(() => void tidyStepAlerts());
+    const app = AppState.addEventListener('change', (s) => s === 'active' && void tidyStepAlerts());
+    return () => {
+      sub.remove();
+      got.remove();
+      app.remove();
+    };
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const name = p.child?.first_name ?? '';
   const live = p.phase === 'live' && p.child !== null;
@@ -72,6 +86,7 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
         const a = ageParts(s);
         return t('parent.live.lastSeen', { age: t(`age.${a.unit}`, { n: a.n }) });
       },
+      marks: (k) => t(k === 'morning' ? 'live.marks.morning' : 'live.marks.afternoon'),
     }),
     [t, name],
   );

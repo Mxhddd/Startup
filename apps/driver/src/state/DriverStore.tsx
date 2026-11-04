@@ -6,6 +6,7 @@ import { driver, driverApiQueueSend, type JoinRequest, type Stop, type Trip, typ
 import { addDays, ApiError, buildRun, createQueue, defaultRunKind, karachiDate, runProgress, type EventRow, type QueueItem, type RiderRow, type StopGroup } from '@pohnch/core';
 import { randomUUID } from 'expo-crypto';
 import { useLang } from '@pohnch/ui';
+import { feel } from '@pohnch/ui/native';
 import { startTripLocation, stopTripLocation, type LocationStart } from '../location/tripLocation';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
@@ -122,7 +123,12 @@ function useDriverState() {
   useEffect(() => {
     if (!running || running.is_practice) return;
     const id = setInterval(() => {
-      driver.readyOn(running.id).then((ready) => setS((old) => (old.ready.join() === ready.join() ? old : { ...old, ready }))).catch(() => undefined);
+      driver.readyOn(running.id).then((ready) => setS((old) => {
+        if (old.ready.join() === ready.join()) return old;
+        // v9: a family said "we're ready": a soft sound only (no banner over the trip screen).
+        if (ready.some((id) => !old.ready.includes(id))) feel('toggleOn');
+        return { ...old, ready };
+      })).catch(() => undefined);
     }, 15_000);
     return () => clearInterval(id);
   }, [running?.id, running?.is_practice]); // eslint-disable-line react-hooks/exhaustive-deps

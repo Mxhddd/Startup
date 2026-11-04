@@ -34,6 +34,9 @@ export type VanActivityProps = {
   minutes: string;
   ahead: string;
   footer: string;
+  /** v9: the step row: how many of three steps are done, and their names joined by "|". */
+  steps?: number;
+  marks?: string;
 };
 
 const VanActivity = (p: VanActivityProps, env: LiveActivityEnvironment) => {
@@ -63,6 +66,19 @@ const VanActivity = (p: VanActivityProps, env: LiveActivityEnvironment) => {
       <Text modifiers={[font({ weight: 'heavy', size: size * 0.6 }), foregroundStyle(ghee), contentTransition('opacity'), lineLimit(2)]}>{p.headline}</Text>
     );
 
+  // v9: three steps (left · in the van · there): a filled kesar dot for each one done, its name under it.
+  const names = (p.marks ?? '').split('|');
+  const stepRow = names.length === 3 ? (
+    <HStack spacing={6}>
+      {names.map((n, i) => (
+        <HStack key={n} spacing={4}>
+          <Circle modifiers={[frame({ width: 9, height: 9 }), foregroundStyle(i < (p.steps ?? 0) ? accent : 'rgba(250,246,238,0.25)')]} />
+          <Text modifiers={[font({ weight: i < (p.steps ?? 0) ? 'bold' : 'regular', size: 13 }), foregroundStyle(i < (p.steps ?? 0) ? ghee : muted), lineLimit(1)]}>{n}</Text>
+        </HStack>
+      ))}
+    </HStack>
+  ) : null;
+
   const progressBar = counting ? (
     <ProgressView timerInterval={range} countsDown={false} modifiers={[tint(bar)]} />
   ) : (
@@ -84,6 +100,7 @@ const VanActivity = (p: VanActivityProps, env: LiveActivityEnvironment) => {
           <Spacer />
         </HStack>
         {progressBar}
+        {stepRow}
         <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle(muted), lineLimit(1)]}>{[p.ahead, p.footer].filter(Boolean).join(' · ')}</Text>
       </VStack>
     ),
@@ -113,6 +130,7 @@ const VanActivity = (p: VanActivityProps, env: LiveActivityEnvironment) => {
     expandedBottom: (
       <VStack alignment="leading" spacing={8} modifiers={[padding({ horizontal: 6, bottom: 6 })]}>
         {progressBar}
+        {stepRow}
         <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle(muted), lineLimit(1)]}>{[p.ahead, p.footer].filter(Boolean).join(' · ')}</Text>
       </VStack>
     ),

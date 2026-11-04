@@ -3,7 +3,7 @@
 // SUPABASE_SERVICE_ROLE_KEY, SITE_URL (https://pohnch.pk), and EXPO_ACCESS_TOKEN (for pushes).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { handle } from '../_shared/handler.ts';
-import { notifyDayOff, notifyTrip } from '../_shared/notify.ts';
+import { notifyDayOff, notifyDriver, notifyTrip } from '../_shared/notify.ts';
 import { updateLiveActivities, type ApnsConfig } from '../_shared/liveActivity.ts';
 
 const url = Deno.env.get('SUPABASE_URL')!;
@@ -37,6 +37,7 @@ Deno.serve((req) =>
     siteUrl: Deno.env.get('SITE_URL') ?? 'https://pohnch.pk',
     log,
     notify: (job) => notifyTrip(job, { rpc, fetch, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined, log }),
+    notifyDriver: (job) => notifyDriver(job, { rpc, fetch, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined, log }),
     dayOff: (job) => notifyDayOff(job, { rpc, fetch, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined, log }),
     live: (job) => updateLiveActivities(job, { rpc, fetch, apns, log, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined }),
   }),

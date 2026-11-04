@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { DriverAlerts } from '../notifications/DriverAlerts';
 import { DriverProvider } from '../state/DriverStore';
 import '../location/tripLocation'; // defines the trip-only location task at start-up
 
@@ -76,6 +77,7 @@ function RootLayout() {
           <DriverProvider key={session?.user.id ?? 'out'}>
             <Screens />
           </DriverProvider>
+          <DriverAlerts signedIn={configured && !!session} />
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
           <LaunchReveal />
         </LangProvider>

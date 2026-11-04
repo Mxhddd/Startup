@@ -9,6 +9,7 @@ const text: LiveText = {
   ahead: (n) => `${n} stops before you`,
   next: 'your stop is next',
   stale: (s) => `last seen ${s} s ago`,
+  marks: (k) => (k === 'morning' ? 'Van left|In the van|At school' : 'Left school|In the van|Home'),
 };
 const items = (picked: boolean, school = false): TimelineItem[] => [
   { step: 'left', at: 'x', by: 'R' },
@@ -49,3 +50,16 @@ describe('the Live Activity card', () => {
     expect(c.footer).toBe('last seen 45 s ago');
   });
 });
+
+import { stepsDone } from './liveCard';
+describe('the step row (v9)', () => {
+  it('fills one, two, then three steps as the run goes on', () => {
+    expect(stepsDone('coming')).toBe(1);
+    expect(stepsDone('inVan')).toBe(2);
+    expect(stepsDone('atSchool')).toBe(3);
+    const c = buildLiveCard({ ...base, items: items(true), eta: null });
+    expect(c.steps).toBe(2);
+    expect(c.marks).toBe('Van left|In the van|At school');
+  });
+});
+

@@ -33,6 +33,8 @@ const config: ExpoConfig = {
   plugins: [
     'expo-router',
     'expo-font',
+    // v9: alerts for the driver (a family asks to join; the van is verified).
+    ['expo-notifications', { color: '#1F2A5C', defaultChannel: 'driver', icon: './assets/android-icon-monochrome.png' }],
     // The map: MapLibre with free OpenFreeMap tiles (no Google key needed).
     '@maplibre/maplibre-react-native',
     [

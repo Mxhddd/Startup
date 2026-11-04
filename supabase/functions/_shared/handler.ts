@@ -5,7 +5,7 @@
 // Logs say only which action ran and how it ended: never tokens, phone numbers or children's names.
 import { BadInput, bool, date, isoTime, num, oneOf, optionalUuid, phone, uuid, uuids } from './validate.ts';
 import { byteaHex, hashToken, isInviteToken, newInviteToken } from './tokens.ts';
-import type { DayOffJob, NotifyJob } from './notify.ts';
+import type { DayOffJob, DriverJob, NotifyJob } from './notify.ts';
 import type { PushStep } from './push.ts';
 
 export type Deps = {
@@ -19,6 +19,8 @@ export type Deps = {
   /** Sends the pushes for a stored step (notify.ts). Optional so tests can leave it out. */
   notify?: (job: NotifyJob) => Promise<void>;
   /** Updates iPhone Live Activities on locked phones (liveActivity.ts). Optional, like notify. */
+  /** v9: tells the van's driver about a new request or the van being verified (notify.ts). Optional. */
+  notifyDriver?: (job: DriverJob) => Promise<void>;
   /** Tells the van's families about a whole-van day off (notify.ts). Optional, like notify. */
   dayOff?: (job: DayOffJob) => Promise<void>;
   live?: (job: { tripId: string; step: PushStep | null; van: { lat: number; lng: number; speed: number | null } | null }) => Promise<void>;
@@ -139,7 +141,11 @@ export const actions: Record<string, Action> = {
     if (!isInviteToken(body.token)) throw new BadInput('token');
     const hash = byteaHex(await hashToken(body.token));
     const child = optionalUuid(body, 'childId');
-    if (child) return { membershipId: await call(deps, 'accept_van_invite', { p_actor: actor, p_token_hash: hash, p_child: child }) };
+    if (child) {
+      const membershipId = (await call(deps, 'accept_van_invite', { p_actor: actor, p_token_hash: hash, p_child: child })) as string;
+      if (deps.notifyDriver) await deps.notifyDriver({ what: 'request', membershipId });
+      return { membershipId };
+    }
     return { membershipId: await call(deps, 'accept_driver_invite', { p_actor: actor, p_token_hash: hash, p_van: uuid(body, 'vanId') }) };
   },
   'membership.decide': async ({ actor, body, deps }) => {
@@ -182,7 +188,9 @@ export const actions: Record<string, Action> = {
     return { ok: true };
   },
   'admin.verify': async ({ actor, body, deps }) => {
-    await call(deps, 'verify_van', { p_actor: actor, p_van: uuid(body, 'vanId') });
+    const vanId = uuid(body, 'vanId');
+    await call(deps, 'verify_van', { p_actor: actor, p_van: vanId });
+    if (deps.notifyDriver) await deps.notifyDriver({ what: 'verified', vanId });
     return { ok: true };
   },
   'admin.endTrip': async ({ actor, body, deps }) => {
