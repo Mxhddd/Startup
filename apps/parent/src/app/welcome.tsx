@@ -4,8 +4,10 @@
 //   3. Alerts: what they are, then the phone's permission prompt (asked only now, after explaining why).
 // Swipe or tap to move on; "Not now" on the last screen skips the prompt (Settings can ask later).
 // Seen once per install (a flag on the phone), then the login screen.
+// v10 (canvas "Z10P-Welcome"): a starry neel ground; each picture sits in a pale jharoka arch, and the
+// words are set in Gulzar below it.
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, Icon, LangSwitch, LineArt, PressableScale, TapButton, type IconName } from '@pohnch/ui/native';
+import { AppText, ArchShape, Icon, LangSwitch, LineArt, PressableScale, StarPattern, TapButton, type IconName } from '@pohnch/ui/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -46,7 +48,7 @@ function Dot({ on }: { on: boolean }) {
     w.value = withSpring(on ? 24 : 8, { damping: 18, stiffness: 220 });
   }, [on, w]);
   const style = useAnimatedStyle(() => ({ width: w.value }));
-  return <Animated.View style={[{ height: 8, borderRadius: 4, backgroundColor: on ? colors.neel : colors.line }, style]} />;
+  return <Animated.View style={[{ height: 8, borderRadius: 4, backgroundColor: on ? colors.kesar : 'rgba(250,246,238,0.35)' }, style]} />;
 }
 
 export default function Welcome() {
@@ -80,24 +82,29 @@ export default function Welcome() {
 
   return (
     <GestureDetector gesture={fling}>
-      <View testID="welcome" style={{ flex: 1, backgroundColor: colors.ghee, paddingTop: insets.top + space.md, paddingBottom: insets.bottom + space.xl, paddingHorizontal: space.xl }}>
-        <StatusBar style="dark" />
+      <View testID="welcome" style={{ flex: 1, backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(165deg, ${colors.headerTop} 0%, ${colors.neel} 55%, ${colors.headerBottom} 100%)`, paddingTop: insets.top + space.md, paddingBottom: insets.bottom + space.xl, paddingHorizontal: space.xl }}>
+        <StatusBar style="light" />
+        <StarPattern />
         <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 48 }}>
-          <LangSwitch />
+          <LangSwitch tone="dark" />
           {!last ? (
             <PressableScale accessibilityRole="button" onPress={() => finish(false)} scaleTo="chip" testID="welcome-skip" faceStyle={{ minHeight: 48, paddingHorizontal: 12, justifyContent: 'center' }}>
-              <AppText bold color={colors.ink2}>{t('welcome.skip')}</AppText>
+              <AppText bold color={colors.mutedOnDark}>{t('welcome.skip')}</AppText>
             </PressableScale>
           ) : null}
         </View>
 
         <Animated.View key={slide} entering={enter.springify().damping(24).stiffness(180)} exiting={FadeOut.duration(140)} style={{ flex: 1, justifyContent: 'center', gap: space.xl }}>
-          <View style={{ alignItems: 'center', minHeight: 170, justifyContent: 'center' }}>
-            {slide === 'map' ? <LineArt width={240} /> : <Mark icon={slide === 'privacy' ? 'pin' : 'bell'} />}
+          <View style={{ alignItems: 'center' }}>
+            <ArchShape width={232} height={250} rise={130} color={colors.ghee}>
+              <View style={{ position: 'absolute', left: 0, right: 0, top: 70, alignItems: 'center' }}>
+                {slide === 'map' ? <LineArt width={190} /> : <Mark icon={slide === 'privacy' ? 'pin' : 'bell'} />}
+              </View>
+            </ArchShape>
           </View>
-          <View style={{ gap: space.md }}>
-            <AppText variant="display" testID={`welcome-title-${slide}`}>{t(`welcome.${slide}.title`)}</AppText>
-            <AppText variant="secondary" style={{ fontSize: 18 }}>{t(`welcome.${slide}.body`)}</AppText>
+          <View style={{ gap: space.sm }}>
+            <AppText variant="display" color={colors.onBrand} align="center" style={{ fontSize: 40 }} testID={`welcome-title-${slide}`}>{t(`welcome.${slide}.title`)}</AppText>
+            <AppText color={colors.mutedOnDark} align="center" style={{ fontSize: 18 }}>{t(`welcome.${slide}.body`)}</AppText>
           </View>
         </Animated.View>
 
@@ -105,10 +112,10 @@ export default function Welcome() {
           <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', gap: 6, justifyContent: 'center' }} accessibilityLabel={t('welcome.page', { n: i + 1, of: SLIDES.length })}>
             {SLIDES.map((s, k) => <Dot key={s} on={k === i} />)}
           </View>
-          <TapButton size="next" tone="left" icon={last ? 'bell' : undefined} label={last ? t('welcome.allow') : t('welcome.next')} onConfirm={() => go(1)} testID="welcome-next" />
+          <TapButton size="next" tone="reachedSchool" icon={last ? 'bell' : undefined} label={last ? t('welcome.allow') : t('welcome.next')} onConfirm={() => go(1)} testID="welcome-next" />
           {last ? (
             <PressableScale accessibilityRole="button" onPress={() => finish(false)} testID="welcome-notnow" faceStyle={{ minHeight: 48, alignItems: 'center', justifyContent: 'center', borderRadius: radius.pill }}>
-              <AppText bold color={colors.ink2}>{t('welcome.notNow')}</AppText>
+              <AppText bold color={colors.mutedOnDark}>{t('welcome.notNow')}</AppText>
             </PressableScale>
           ) : null}
         </Animated.View>

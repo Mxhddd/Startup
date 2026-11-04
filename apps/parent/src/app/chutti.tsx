@@ -6,7 +6,7 @@
 // Data: absences, through the "app" Edge Function (absence.set / absence.clear).
 import { parent } from '@pohnch/client';
 import { canPlanDay, chuttiChanges, dayPartsOf, monthGrid, nextMonth } from '@pohnch/core';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, Icon, PressableScale, TapButton } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -87,7 +87,7 @@ export default function Chutti() {
     <Page title={t('parent.chutti.title', { name })}>
       <AppText variant="secondary">{t('parent.chutti.hint', { who: p.driverName ?? t('parent.chutti.theDriver') })}</AppText>
 
-      <View style={{ backgroundColor: colors.white, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.sm, paddingVertical: space.md, gap: space.sm }}>
+      <View style={{ backgroundColor: colors.white, borderRadius: 28, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.sm, paddingVertical: space.md, gap: space.sm }}>
         <View style={{ flexDirection: row, alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: space.sm }}>
           <PressableScale accessibilityRole="button" accessibilityLabel={t('parent.chutti.prev')} disabled={page === 0} onPress={() => setPage((x) => x - 1)} scaleTo="chip"
             faceStyle={{ width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', opacity: page === 0 ? 0.3 : 1 }}>

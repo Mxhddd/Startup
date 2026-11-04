@@ -4,8 +4,8 @@
 // only this family's van and its trips).
 import { parent, type ParentTrip } from '@pohnch/client';
 import { addDays, dayPartsOf, karachiClock, storyOf, timelineFor, type ParentEvent } from '@pohnch/core';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, ChoiceChip, Shimmer, TimelineEvent } from '@pohnch/ui/native';
+import { colors, elevation, radius10, space, useLang } from '@pohnch/ui';
+import { AppText, ChoiceChip, SectionCaption, Shimmer, TimelineEvent } from '@pohnch/ui/native';
 import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
@@ -53,7 +53,7 @@ export default function History() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', paddingVertical: 4 }}>
         {days.map((d) => <ChoiceChip key={d} label={label(d, true)} on={d === date} onPress={() => setDate(d)} testID={`history-${d}`} />)}
       </ScrollView>
-      <AppText variant="headline">{label(date)}</AppText>
+      <SectionCaption>{label(date)}</SectionCaption>
       {!van || !child ? (
         <AppText variant="secondary">{t('history.none')}</AppText>
       ) : failed ? (
@@ -70,7 +70,7 @@ export default function History() {
           const story = storyOf(tr.kind, tl.items);
           return (
             <Animated.View key={tr.id} entering={FadeInDown.delay(n * 80).springify().damping(22)}
-              style={{ backgroundColor: colors.white, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.lg, gap: space.sm }}>
+              style={{ backgroundColor: colors.white, borderRadius: radius10.group, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.lg, gap: space.sm }}>
               <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
                 <AppText bold style={{ flex: 1, fontSize: 18 }}>{t(tr.kind === 'morning' ? 'trip.morning' : 'trip.afternoon')}</AppText>
                 {story?.minutes ? <AppText bold color={colors.link}>{t('history.minutes', { n: story.minutes })}</AppText> : null}

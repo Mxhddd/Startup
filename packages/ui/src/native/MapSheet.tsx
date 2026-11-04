@@ -4,6 +4,7 @@
 // stretches a little (rubber band) instead of stopping dead.
 import { useEffect, type ReactNode } from 'react';
 import { View } from 'react-native';
+import Svg, { Path } from 'react-native-svg';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withSpring, type SharedValue } from 'react-native-reanimated';
 import { useLang } from '../lang';
@@ -102,6 +103,13 @@ export function MapSheet({
         style,
       ]}
     >
+      {/* v10: the sheet's top edge rises into a small pointed arch around the handle, a kesar dot at its point. */}
+      <View pointerEvents="none" style={{ position: 'absolute', top: -20, left: 0, right: 0, height: 24, alignItems: 'center' }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
+        <Svg width={128} height={24} viewBox="0 0 128 24">
+          <Path d="M0 24 L0 22 C14 22 34 21 44 14 C52 9 59 3 64 0 C69 3 76 9 84 14 C94 21 114 22 128 22 L128 24 Z" fill={colors.white} />
+        </Svg>
+        <View style={{ position: 'absolute', top: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.kesar }} />
+      </View>
       <GestureDetector gesture={Gesture.Exclusive(pan, tapHandle)}>
         <View accessibilityRole="adjustable" accessibilityLabel={t('sheet.handle')} style={{ height: 30, alignItems: 'center', justifyContent: 'center' }}>
           <View style={{ width: 40, height: 5, borderRadius: 3, borderCurve: 'continuous', backgroundColor: colors.line }} />

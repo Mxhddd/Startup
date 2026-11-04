@@ -5,8 +5,8 @@
 // Data: children (row-level security: only the child's family can change or remove them); the pin goes
 // through set_home_pin; taking a child off a van goes through the "app" Edge Function (van.leave).
 import { parent } from '@pohnch/client';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, FlowSteps, MorphTarget, TapButton, TextField } from '@pohnch/ui/native';
+import { colors, space, useLang } from '@pohnch/ui';
+import { AppText, ArchAvatar, FlowSteps, Icon, MorphTarget, SectionCaption, TapButton, TextField } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -77,30 +77,38 @@ export default function ChildPage() {
   };
 
   return (
-    <Page title={existing ? existing.first_name : t('parent.addChild')}>
-      {!existing && p.children.length === 0 ? <FlowSteps step={2} total={4} label={t('parent.flow.label', { n: 2, of: 4 })} /> : null}
-      {existing ? (
-        // v9: the kesar initial flies here from the child's row in the menu (Morph), then stays.
-        <MorphTarget morphKey={`child-${existing.id}`} style={{ alignSelf: 'center' }}>
-          <Animated.View entering={ZoomIn.springify().damping(16).stiffness(220)} style={{ width: 88, height: 88, borderRadius: 44, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 0px 0px 4px ${colors.white}, 0px 0px 0px 6px ${colors.gold}, ${shadow.card}` }}>
-            <AppText bold color={colors.onKesar} style={{ fontSize: 36, lineHeight: 52 }}>{(name || existing.first_name).slice(0, 1)}</AppText>
+    <Page
+      title={existing ? existing.first_name : t('parent.addChild')}
+      sub={existing ? existing.school_name : null}
+      accent={existing ? (
+        // v9: the initial flies here from the child's portrait in the menu (Morph), then stays (v10: in an arch).
+        <MorphTarget morphKey={`child-${existing.id}`}>
+          <Animated.View entering={ZoomIn.springify().damping(16).stiffness(220)}>
+            <ArchAvatar letter={(name || existing.first_name).slice(0, 1)} size={64} ring={colors.onBrand} />
           </Animated.View>
         </MorphTarget>
-      ) : null}
+      ) : null}>
+      {!existing && p.children.length === 0 ? <FlowSteps step={2} total={4} label={t('parent.flow.label', { n: 2, of: 4 })} /> : null}
       <TextField label={t('parent.child.firstName')} value={name} onChange={setName} maxLength={30} testID="child-name" />
       <TextField label={t('parent.child.school')} value={school} onChange={setSchool} maxLength={80} testID="child-school" />
-      <View style={{ gap: 6 }}>
-        <AppText variant="small" bold color={colors.ink2}>{t('parent.child.pin')}</AppText>
-        <View style={{ height: 300, borderRadius: radius.big, borderCurve: 'continuous', overflow: 'hidden', boxShadow: shadow.card }}>
+      <View style={{ gap: 8 }}>
+        <SectionCaption>{t('parent.child.pin')}</SectionCaption>
+        {/* v10: the map runs edge to edge and fades into the page, never framed in a card. */}
+        <View style={{ height: 280, marginHorizontal: -18 }}>
           <BrandMap accessibilityLabel={t('parent.child.pin')} home={pin} onPress={setPin} style={{ flex: 1 }} />
+          <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 36, experimental_backgroundImage: `linear-gradient(180deg, ${colors.ghee}, transparent)` }} />
+          <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 36, experimental_backgroundImage: `linear-gradient(0deg, ${colors.ghee}, transparent)` }} />
         </View>
-        <AppText variant="small" color={colors.ink2}>{t('parent.child.pinHint')}</AppText>
+        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, paddingHorizontal: 6 }}>
+          <Icon name="shield" size={16} color={colors.zamurrad} />
+          <AppText variant="small" color={colors.ink2} style={{ flex: 1 }}>{t('parent.child.pinHint')}</AppText>
+        </View>
       </View>
       {error ? <AppText color={colors.dangerText}>{error}</AppText> : null}
-      <TapButton size="next" tone="left" label={existing ? t('common.save') : t('parent.addChild')} disabled={busy} onConfirm={save} testID="child-save" />
+      <TapButton size="next" tone="left" icon="check" label={existing ? t('common.save') : t('parent.addChild')} disabled={busy} onConfirm={save} testID="child-save" />
 
       {existing ? (
-        <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ gap: space.md, marginTop: space.lg, paddingTop: space.lg, borderTopWidth: 1, borderColor: colors.hairline }}>
+        <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ gap: space.md, marginTop: space.lg }}>
           {onVan ? (
             <>
               <TapButton hold tone="quiet" label={t('parent.family.leave', { name: existing.first_name })} disabled={busy} testID="leave-van"

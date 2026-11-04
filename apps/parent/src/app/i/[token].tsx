@@ -5,11 +5,11 @@
 // yet, it waits in memory (pendingInvite.ts) while the parent adds one, then this card opens again.
 import { parent } from '@pohnch/client';
 import { ApiError } from '@pohnch/core';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, ChoiceChip, FlowSteps, Icon, MomentFX, Shimmer, TapButton } from '@pohnch/ui/native';
+import { colors, elevation, radius, shadow, space, useLang } from '@pohnch/ui';
+import { AppText, ArchAvatar, ArchShape, ChoiceChip, FlowSteps, Icon, MomentFX, SectionCaption, Shimmer, StarPattern, TapButton } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { JoinForm } from '../../components/JoinForm';
@@ -22,6 +22,8 @@ type Peek = { vanName: string; schoolName: string; driverName: string; verified:
 export default function JoinFromLink() {
   const { t, dir } = useLang();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const cardW = Math.min(width, 480) - space.lg * 2;
   const p = useParent();
   const { token } = useLocalSearchParams<{ token: string }>();
   const tok = typeof token === 'string' ? token : '';
@@ -68,33 +70,42 @@ export default function JoinFromLink() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.neelDeep }}>
+    <View style={{ flex: 1, backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(170deg, ${colors.headerTop} 0%, ${colors.neel} 50%, ${colors.headerBottom} 100%)` }}>
+      <StarPattern opacity={0.08} />
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', padding: space.lg, paddingTop: insets.top + space.lg, paddingBottom: insets.bottom + space.xl, gap: space.lg }}>
         {p.children.length === 0 || !p.membership ? <FlowSteps step={3} total={4} label={t('parent.flow.label', { n: 3, of: 4 })} /> : null}
-        <Animated.View entering={FadeInDown.springify().damping(20)} style={{ backgroundColor: colors.white, borderRadius: radius.sheet, borderCurve: 'continuous', overflow: 'hidden', boxShadow: shadow.raised }}>
-          <View style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(160deg, ${colors.neelRaised}, ${colors.neel})`, padding: space.xl, gap: 4 }}>
-            <AppText bold color={colors.kesar} style={{ fontSize: 15 }}>{t('parent.invite.eyebrow')}</AppText>
-            {peek ? (
-              <AppText variant="display" color={colors.onBrand} style={{ fontSize: 32 }}>{t('parent.invite.title', { van: peek.vanName })}</AppText>
-            ) : (
-              <Shimmer lines={[{ w: '80%', h: 34 }]} />
-            )}
-          </View>
+        {/* v10: the card is a jharoka arch: a pale arch with a kesar seal at its crown, the van's name in Gulzar. */}
+        <Animated.View entering={FadeInDown.springify().damping(20)} style={{ boxShadow: shadow.raised, borderBottomLeftRadius: radius.sheet, borderBottomRightRadius: radius.sheet }}>
+          <ArchShape width={cardW} height={Math.round(cardW * 0.62)} rise={Math.round(cardW * 0.5)} color={colors.ghee}>
+            <View style={{ position: 'absolute', left: space.xl, right: space.xl, top: 34, alignItems: 'center', gap: 4 }}>
+              <ArchShape width={64} height={76} color={colors.kesar}>
+                <View style={{ position: 'absolute', left: 0, right: 0, top: 30, alignItems: 'center' }}>
+                  <Icon name="van" size={28} color={colors.onKesar} />
+                </View>
+              </ArchShape>
+              <AppText bold color={colors.kesarText} style={{ fontSize: 15 }}>{t('parent.invite.eyebrow')}</AppText>
+              {peek ? (
+                <AppText variant="display" align="center" style={{ fontSize: 32 }}>{t('parent.invite.title', { van: peek.vanName })}</AppText>
+              ) : (
+                <Shimmer lines={[{ w: '80%', h: 34 }]} />
+              )}
+            </View>
+          </ArchShape>
+          <View style={{ backgroundColor: colors.ghee, borderBottomLeftRadius: radius.sheet, borderBottomRightRadius: radius.sheet, marginTop: -1 }}>
           <View style={{ padding: space.xl, gap: space.lg }}>
             {peek ? (
-              <Animated.View entering={FadeIn} style={{ flexDirection: row, alignItems: 'center', gap: space.md }}>
-                <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 0px 0px 3px ${colors.white}, 0px 0px 0px 5px ${colors.gold}` }}>
-                  <AppText bold color={colors.onKesar} style={{ fontSize: 22 }}>{peek.driverName.slice(0, 1)}</AppText>
-                </View>
-                <View style={{ flex: 1 }}>
+              <Animated.View entering={FadeIn} style={{ flexDirection: row, alignItems: 'center', gap: space.md, backgroundColor: colors.white, borderRadius: 28, borderCurve: 'continuous', padding: 14, boxShadow: elevation.e1 }}>
+                <ArchAvatar letter={peek.driverName.slice(0, 1)} size={44} />
+                <View style={{ flex: 1, gap: 2 }}>
                   <AppText bold style={{ fontSize: 18 }}>{peek.driverName}</AppText>
                   <AppText variant="small" color={colors.ink2}>{peek.schoolName}</AppText>
+                  {peek.verified ? (
+                    <View style={{ flexDirection: row, alignItems: 'center', gap: 4 }}>
+                      <Icon name="shield" size={15} color={colors.zamurrad} />
+                      <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 14 }}>{t('van.verified')}</AppText>
+                    </View>
+                  ) : null}
                 </View>
-                {peek.verified ? (
-                  <View style={{ paddingHorizontal: 10, paddingVertical: 4, borderRadius: radius.pill, backgroundColor: colors.zamurradTint }}>
-                    <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 14 }}>{t('van.verified')}</AppText>
-                  </View>
-                ) : null}
               </Animated.View>
             ) : (
               <Shimmer lines={[{ w: '100%', h: 52 }]} />
@@ -122,8 +133,8 @@ export default function JoinFromLink() {
             ) : (
               <View style={{ gap: space.md }}>
                 {p.children.length > 1 ? (
-                  <View style={{ gap: 6 }}>
-                    <AppText variant="small" bold color={colors.ink2}>{t('parent.join.which')}</AppText>
+                  <View style={{ gap: 8 }}>
+                    <SectionCaption>{t('parent.join.which')}</SectionCaption>
                     <View style={{ flexDirection: row, flexWrap: 'wrap', gap: 8 }}>
                       {p.children.map((c) => <ChoiceChip key={c.id} label={c.first_name} on={c.id === childId} onPress={() => setChildId(c.id)} />)}
                     </View>
@@ -135,6 +146,7 @@ export default function JoinFromLink() {
                 <TapButton size="next" tone="left" hold feel="success" label={t('parent.invite.join')} disabled={!peek || state === 'busy' || !childId} onConfirm={join} testID="invite-join" />
               </View>
             )}
+          </View>
           </View>
         </Animated.View>
       </ScrollView>

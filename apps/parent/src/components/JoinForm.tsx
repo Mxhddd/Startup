@@ -2,7 +2,7 @@
 import { parent } from '@pohnch/client';
 import { ApiError, tokenFromInviteLink } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ChoiceChip, TapButton, TextField } from '@pohnch/ui/native';
+import { AppText, ChoiceChip, SectionCaption, TapButton, TextField } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -37,8 +37,8 @@ export function JoinForm({ initialToken }: { initialToken?: string }) {
     <View style={{ gap: space.lg }}>
       <TextField label={t('parent.join.paste')} value={link} onChange={setLink} ltr maxLength={300} testID="join-link" />
       {p.children.length > 0 ? (
-        <View style={{ gap: 6 }}>
-          <AppText variant="small" bold color={colors.ink2}>{t('parent.join.which')}</AppText>
+        <View style={{ gap: 8 }}>
+          <SectionCaption>{t('parent.join.which')}</SectionCaption>
           <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
             {p.children.map((c) => (
               <ChoiceChip key={c.id} label={c.first_name} on={c.id === childId} onPress={() => setChildId(c.id)} />
@@ -49,7 +49,7 @@ export function JoinForm({ initialToken }: { initialToken?: string }) {
         <TapButton label={t('parent.addChild')} onConfirm={() => router.push('/child')} />
       )}
       {msg ? <AppText color={msg.ok ? colors.zamurradOnTint : colors.dangerText}>{msg.text}</AppText> : null}
-      <TapButton size="next" tone="left" label={t('parent.join.send')} disabled={busy} onConfirm={send} testID="join-send" />
+      <TapButton size="next" tone="left" icon="route" label={t('parent.join.send')} disabled={busy} onConfirm={send} testID="join-send" />
     </View>
   );
 }

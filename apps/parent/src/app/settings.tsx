@@ -8,10 +8,10 @@ import { parent } from '@pohnch/client';
 
 type NotificationPrefs = Awaited<ReturnType<typeof parent.notificationPrefs>>;
 import { ALERT_STEPS, MOMENTS, type MomentStep } from '@pohnch/core';
-import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ChoiceChip, PressableScale, Shimmer, Toggle, feel, soundsAreOn } from '@pohnch/ui/native';
+import { colors, radius, useLang } from '@pohnch/ui';
+import { AppText, Group, GroupRow, PressableScale, RowIcon, SectionCaption, Segmented, Shimmer, Toggle, feel, soundsAreOn, type IconName } from '@pohnch/ui/native';
 import * as Notifications from 'expo-notifications';
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Linking, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Page } from '../components/Page';
@@ -20,9 +20,14 @@ import { saveSounds } from '../sounds';
 
 const TONE = { neel: colors.neel, zamurrad: colors.zamurrad, kesar: colors.kesar, shingarf: colors.shingarf } as const;
 
-function Row({ children, last = false }: { children: ReactNode; last?: boolean }) {
-  const { dir } = useLang();
-  return <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 14, minHeight: 60, borderBottomWidth: last ? 0 : 1, borderColor: colors.hairline }}>{children}</View>;
+/** v10: each step's two-tone icon, in its meaning's tint. */
+const STEP_ICON: Record<MomentStep, IconName> = { left: 'left', arriving: 'pin', picked: 'picked', reached_school: 'reachedSchool', left_school: 'leftSchool', dropped: 'dropped', late: 'help' };
+function stepTint(s: MomentStep) {
+  const tone = MOMENTS[s].tone;
+  if (tone === 'zamurrad') return { tint: colors.zamurradTint, ink: colors.zamurradOnTint };
+  if (tone === 'kesar') return { tint: colors.kesarTint, ink: colors.onKesar };
+  if (tone === 'shingarf') return { tint: colors.shingarfTint, ink: colors.dangerText };
+  return { tint: colors.neelTint, ink: colors.link };
 }
 
 export default function Settings() {
@@ -66,11 +71,10 @@ export default function Settings() {
   };
 
   return (
-    <Page title={t('settings.title')}>
-      <AppText variant="secondary">{t('settings.hint')}</AppText>
+    <Page title={t('settings.title')} sub={t('settings.hint')}>
 
       {!allowed ? (
-        <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: colors.kesarTint }}>
+        <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 16, borderRadius: 28, borderCurve: 'continuous', backgroundColor: colors.kesarTint }}>
           <AppText bold style={{ flex: 1 }}>{t('settings.off')}</AppText>
           <PressableScale accessibilityRole="button" testID="alerts-allow"
             onPress={() => (undecided ? askForAlerts().then((ok) => { setAllowed(ok); setUndecided(false); if (ok) registerForPush().catch(() => undefined); }) : Linking.openSettings())} faceStyle={{ height: 44, paddingHorizontal: 16, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.night, justifyContent: 'center' }}>
@@ -79,60 +83,47 @@ export default function Settings() {
         </Animated.View>
       ) : null}
 
-      <AppText bold color={colors.ink2} style={{ fontSize: 14, marginTop: space.sm }}>{t('settings.steps')}</AppText>
+      <SectionCaption>{t('settings.steps')}</SectionCaption>
       {!prefs ? (
         <Shimmer lines={ALERT_STEPS.map(() => ({ w: '100%', h: 44 }))} />
       ) : (
         <Animated.View entering={FadeIn.duration(250)}>
-          {ALERT_STEPS.map((s, i) => (
-            <Row key={s} last={i === ALERT_STEPS.length - 1}>
-              <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: TONE[MOMENTS[s].tone] }} />
-              <View style={{ flex: 1 }}>
-                <AppText bold style={{ fontSize: 17 }}>{t(`settings.step.${s}`)}</AppText>
-                {MOMENTS[s].timeSensitive ? <AppText variant="small" color={colors.ink2}>{t('settings.focus')}</AppText> : null}
-              </View>
-              <Toggle value={!prefs.offSteps.includes(s)} onChange={(on) => setStep(s, on)} label={t(`settings.step.${s}`)} testID={`alert-${s}`} />
-            </Row>
-          ))}
+          <Group>
+            {ALERT_STEPS.map((s) => {
+              const c = stepTint(s);
+              return (
+                <GroupRow key={s} title={t(`settings.step.${s}`)} sub={MOMENTS[s].timeSensitive ? t('settings.focus') : null}
+                  lead={<RowIcon name={STEP_ICON[s]} tint={c.tint} ink={c.ink} />}
+                  trail={<Toggle value={!prefs.offSteps.includes(s)} onChange={(on) => setStep(s, on)} label={t(`settings.step.${s}`)} testID={`alert-${s}`} />} />
+              );
+            })}
+          </Group>
         </Animated.View>
       )}
 
-      <AppText bold color={colors.ink2} style={{ fontSize: 14, marginTop: space.lg }}>{t('settings.sound')}</AppText>
-      <View>
-        <Row>
-          <View style={{ flex: 1 }}>
-            <AppText bold style={{ fontSize: 17 }}>{t('settings.sound.brand')}</AppText>
-            <AppText variant="small" color={colors.ink2}>{t('settings.sound.hint')}</AppText>
-          </View>
-          {prefs ? <Toggle value={prefs.sound} onChange={(v) => update({ ...prefs, sound: v })} label={t('settings.sound.brand')} testID="alert-sound" /> : null}
-        </Row>
-        <Row>
-          <View style={{ flex: 1 }}>
-            <AppText bold style={{ fontSize: 17 }}>{t('settings.sound.app')}</AppText>
-            <AppText variant="small" color={colors.ink2}>{t('settings.sound.appHint')}</AppText>
-          </View>
-          {appSounds !== null ? <Toggle value={appSounds} onChange={(v) => { setAppSounds(v); void saveSounds(v); }} label={t('settings.sound.app')} testID="app-sounds" /> : null}
-        </Row>
-      </View>
+      <SectionCaption>{t('settings.sound')}</SectionCaption>
+      <Group>
+        <GroupRow title={t('settings.sound.brand')} sub={t('settings.sound.hint')} lead={<RowIcon name="bell" />}
+          trail={prefs ? <Toggle value={prefs.sound} onChange={(v) => update({ ...prefs, sound: v })} label={t('settings.sound.brand')} testID="alert-sound" /> : null} />
+        <GroupRow title={t('settings.sound.app')} sub={t('settings.sound.appHint')} lead={<RowIcon name="sound" />}
+          trail={appSounds !== null ? <Toggle value={appSounds} onChange={(v) => { setAppSounds(v); void saveSounds(v); }} label={t('settings.sound.app')} testID="app-sounds" /> : null} />
+      </Group>
 
       {/* v9: every step's tone, to hear before it comes (the alert is its longer twin). */}
-      <AppText bold color={colors.ink2} style={{ fontSize: 14, marginTop: space.lg }}>{t('settings.sound.board')}</AppText>
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+      <SectionCaption>{t('settings.sound.board')}</SectionCaption>
+      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
         {ALERT_STEPS.map((s) => (
           <PressableScale key={s} accessibilityRole="button" accessibilityLabel={`${t('settings.sound.hear')} ${t(`settings.step.${s}`)}`} haptic="none"
             onPress={() => { feel(s); setPlaying(s); }} testID={`hear-${s}`}
-            faceStyle={{ minHeight: 48, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: playing === s ? TONE[MOMENTS[s].tone] : colors.neelTint, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            faceStyle={{ minHeight: 48, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: playing === s ? TONE[MOMENTS[s].tone] : colors.white, boxShadow: playing === s ? undefined : '0px 1px 1px rgba(31,42,92,0.04), 0px 4px 10px rgba(31,42,92,0.05)', flexDirection: 'row', alignItems: 'center', gap: 8 }}>
             <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: playing === s ? colors.onBrand : TONE[MOMENTS[s].tone] }} />
             <AppText bold color={playing === s ? (MOMENTS[s].tone === 'kesar' ? colors.onKesar : colors.onBrand) : colors.link} style={{ fontSize: 15 }}>{t(`settings.step.${s}`)}</AppText>
           </PressableScale>
         ))}
       </View>
 
-      <AppText bold color={colors.ink2} style={{ fontSize: 14, marginTop: space.lg }}>{t('settings.language')}</AppText>
-      <View style={{ flexDirection: 'row-reverse', gap: 8 }}>
-        <ChoiceChip label="اردو" on={lang === 'ur'} onPress={() => setLanguage('ur')} />
-        <ChoiceChip label="English" on={lang === 'en'} onPress={() => setLanguage('en')} />
-      </View>
+      <SectionCaption>{t('settings.language')}</SectionCaption>
+      <Segmented testID="alert-language" items={[{ key: 'ur', label: 'اردو' }, { key: 'en', label: 'English' }]} value={lang} onChange={(l) => setLanguage(l)} />
     </Page>
   );
 }

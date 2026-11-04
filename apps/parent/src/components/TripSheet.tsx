@@ -1,7 +1,8 @@
 // What the bottom sheet shows (v7 "un-boxed"), depending on where the family is: no child yet, not on
 // a van, waiting for approval, no trip right now, or the van live on the map.
 //
-// One calm surface, no inner cards:
+// One calm surface, no inner cards (v10: no tinted boxes or divider lines either; the driver in an
+// arch, the place in Gulzar, a seal for the van at your door):
 // - The head morphs with the sheet: at peek it is one line ("Ali's van · 2 stops before you · 6 min");
 //   pulled up, that line grows into the big rolling minutes with the arrival time.
 // - Under it, one quiet row: the driver, the plate, and three round actions.
@@ -9,7 +10,7 @@
 // - When a step happens while you watch, its moment plays in the head (a ring or a star burst).
 import { arrivalClock, childPlace, homeState, newMoment, waitClock, type MomentStep } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AbsentChip, AppText, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
+import { AbsentChip, AppText, ArchAvatar, ArchShape, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Share, View } from 'react-native';
@@ -172,7 +173,7 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
   ) : (
     <View>
       <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{live ? t('parent.timeline.title') : name}</AppText>
-      <AppText bold style={{ fontSize: 32, lineHeight: 50 }}>{live ? t(`parent.place.${place}`, { name }) : offToday ? t('parent.dayOff.today') : t('parent.idle.title')}</AppText>
+      <AppText variant="display" style={{ fontSize: 30 }}>{live ? t(`parent.place.${place}`, { name }) : offToday ? t('parent.dayOff.today') : t('parent.idle.title')}</AppText>
       {live && p.schoolEta !== null ? <AppText bold color={colors.ink2}>{t('parent.schoolEta', { n: p.schoolEta })}</AppText> : null}
       {!live && offToday ? <AppText bold color={colors.kesarText}>{offBy}</AppText> : !live && nextLine ? <AppText variant="secondary">{nextLine}</AppText> : null}
       {!live && offNote ? <AppText bold color={colors.kesarText}>{offNote}</AppText> : null}
@@ -206,13 +207,18 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
 
       {/* v8: the van is at your door: how long it has waited, and "we're ready" for the driver. */}
       {live && !childDone && (p.eta === 'door' || (typeof p.eta === 'number' && p.eta <= 3)) ? (
-        <Animated.View entering={FadeInDown.springify().damping(20)} layout={layout} testID="door-panel"
-          style={{ backgroundColor: colors.zamurradTint, borderRadius: radius.card, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
+        <Animated.View entering={FadeInDown.springify().damping(20)} layout={layout} testID="door-panel" style={{ gap: space.md }}>
           {p.doorSince ? (
-            <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
-              <AppText bold color={colors.zamurradOnTint} style={{ flex: 1, fontSize: 18 }}>{t('parent.door.title')}</AppText>
-              <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 15 }}>{t('parent.door.wait')}</AppText>
-              <AppText variant="number" color={colors.zamurradOnTint} style={{ fontSize: 24, lineHeight: 30 }} testID="door-wait">{waitClock(p.doorSince, p.now)}</AppText>
+            <View style={{ flexDirection: row, alignItems: 'center', gap: 12 }}>
+              {/* v10: a zamurrad arch seal with the home mark, beside the wait. */}
+              <ArchShape width={44} height={52} color={colors.zamurrad}>
+                <View style={{ position: 'absolute', left: 0, right: 0, top: 20, alignItems: 'center' }}>
+                  <Icon name="home" size={20} color={colors.onFill} />
+                </View>
+              </ArchShape>
+              <AppText bold style={{ flex: 1, fontSize: 18 }}>{t('parent.door.title')}</AppText>
+              <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{t('parent.door.wait')}</AppText>
+              <AppText variant="number" color={colors.zamurrad} style={{ fontSize: 24, lineHeight: 30 }} testID="door-wait">{waitClock(p.doorSince, p.now)}</AppText>
             </View>
           ) : null}
           {p.ready ? (
@@ -228,9 +234,7 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
 
       {/* One quiet row: who drives, the plate, and the round actions. */}
       <Animated.View layout={layout} style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
-        <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 0px 0px 2.5px ${colors.white}, 0px 0px 0px 4px ${colors.gold}` }}>
-          <AppText bold color={colors.onKesar} style={{ fontSize: 17 }}>{(p.driverName ?? p.van?.name ?? '').slice(0, 1)}</AppText>
-        </View>
+        <ArchAvatar letter={(p.driverName ?? p.van?.name ?? '').slice(0, 1)} size={40} />
         <View style={{ flex: 1 }}>
           <AppText bold numberOfLines={1} style={{ fontSize: 15 }}>{p.driverName ?? p.van?.name ?? ''}</AppText>
           {p.van?.plate ? <AppText variant="number" color={colors.ink2} style={{ fontSize: 14, lineHeight: 20, letterSpacing: 0.8, textAlign: dir === 'rtl' ? 'right' : 'left' }}>{p.van.plate}</AppText> : null}
@@ -288,7 +292,7 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
           {p.canUndoChuttiToday ? <AbsentChip onUndo={() => p.actions.toggleChutti(p.today)} /> : <AppText variant="small" color={colors.ink2}>{t('parent.chutti.locked')}</AppText>}
         </Animated.View>
       ) : (
-        <Animated.View entering={FadeIn.duration(300)} layout={layout} style={{ gap: space.sm, paddingTop: space.sm, borderTopWidth: 1, borderColor: colors.hairline }}>
+        <Animated.View entering={FadeIn.duration(300)} layout={layout} style={{ gap: space.sm, paddingTop: space.xs }}>
           {p.story ? (
             // v8: the run is over: today's story, in brand type, with how long the ride took.
             <View testID="story-card" style={{ flexDirection: row, alignItems: 'flex-end', gap: space.md, marginTop: space.sm }}>
@@ -304,7 +308,7 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
               ) : null}
             </View>
           ) : (
-          <AppText bold color={colors.ink2} style={{ fontSize: 15, marginTop: space.sm }}>{t('parent.timeline.title')}</AppText>
+          <SectionCaption>{t('parent.timeline.title')}</SectionCaption>
           )}
           <View>
             {items.map((i, n) => (

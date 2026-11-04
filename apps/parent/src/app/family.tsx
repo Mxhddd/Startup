@@ -1,4 +1,5 @@
-// The menu (v8, canvas "Z8P-Settings"): everything that isn't the map, in quiet rows.
+// The menu (v8; v10 canvas "Z10P-Menu"): everything that isn't the map. Children stand in a row of
+// arch portraits; family and "more" are soft groups (rows separated by space, never lines).
 // - Children: tap one to change their name, school or home pin, or remove them (child.tsx).
 // - Family: who else follows the children, by name only (never phone numbers). The owner can add
 //   up to 3 people and remove them; someone who was added can leave.
@@ -9,10 +10,10 @@
 import { deleteMyAccount, parent } from '@pohnch/client';
 import { ApiError, normalisePkMobile, PILOT_WHATSAPP } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, EditSheet, Icon, PressableScale, Shimmer, TapButton, TextField, useMorphSource, type IconName } from '@pohnch/ui/native';
+import { AppText, ArchAvatar, ArchShape, EditSheet, Group, GroupRow, Icon, PressableScale, RowIcon, SectionCaption, Shimmer, TapButton, TextField, useMorphSource, type IconName } from '@pohnch/ui/native';
 import { router } from 'expo-router';
-import { useCallback, useEffect, useState, type ReactNode } from 'react';
-import { Linking, View } from 'react-native';
+import { useCallback, useEffect, useRef, useState, type ComponentRef, type ReactNode } from 'react';
+import { Linking, ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { Page } from '../components/Page';
 import { useParent } from '../state/ParentStore';
@@ -22,49 +23,79 @@ const PRIVACY_URL = 'https://pohnch.pk/privacy';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout} style={{ gap: 2 }}>
-      <AppText bold color={colors.ink2} style={{ fontSize: 14, marginBottom: 4 }}>{title}</AppText>
+    <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout} style={{ gap: space.sm }}>
+      <SectionCaption>{title}</SectionCaption>
       {children}
     </Animated.View>
   );
 }
 
-/** One quiet row: a round mark, a title and a line, and what happens on the far side. */
-function MenuRow({ mark, icon, title, line, end, onPress, last = false, testID, morphKey }: {
-  mark?: string; icon?: IconName; title: string; line?: string; end?: ReactNode; onPress?: () => void; last?: boolean; testID?: string;
-  /** v9: the round mark flies into the next page (Morph) under this key. */
-  morphKey?: string;
-}) {
-  const morph = useMorphSource(morphKey ?? 'none');
-  const { dir } = useLang();
-  const row = dir === 'rtl' ? 'row-reverse' : 'row';
-  const body = (
-    <View style={{ flexDirection: row, alignItems: 'center', gap: 14, minHeight: 64, paddingVertical: 8, borderBottomWidth: last ? 0 : 1, borderColor: colors.hairline }}>
-      <View ref={morph.ref} collapsable={false} style={{ width: 40, height: 40, borderRadius: 20, borderCurve: 'continuous', backgroundColor: mark ? colors.kesar : colors.neelTint, alignItems: 'center', justifyContent: 'center' }}>
-        {mark ? <AppText bold color={colors.onKesar} style={{ fontSize: 17 }}>{mark}</AppText> : icon ? <Icon name={icon} size={20} color={colors.link} /> : null}
-      </View>
-      <View style={{ flex: 1 }}>
-        <AppText bold style={{ fontSize: 17 }} numberOfLines={1}>{title}</AppText>
-        {line ? <AppText variant="small" color={colors.ink2} numberOfLines={1}>{line}</AppText> : null}
-      </View>
-      {end ?? (onPress ? <View style={{ transform: [{ scaleX: dir === 'rtl' ? -1 : 1 }] }}><Icon name="arrow" size={18} color={colors.ink2} /></View> : null)}
-    </View>
-  );
-  if (!onPress) return body;
+/** Portrait size: three fit across a 360-wide phone; more scroll. */
+const TILE = 100;
+const TILE_H = 122;
+
+/** A child's colours, by place in the family (kesar, zamurrad, neel, then round again). */
+const PORTRAIT = [
+  () => ({ fill: colors.kesar, ink: colors.onKesar }),
+  () => ({ fill: colors.zamurrad, ink: colors.onFill }),
+  () => ({ fill: colors.neel, ink: colors.onBrand }),
+];
+
+/** A child as an arch portrait: the initial in a coloured arch inside a white one, the name below. */
+function ChildPortrait({ id, name, line, index, onPress, testID }: { id: string; name: string; line?: string; index: number; onPress: () => void; testID?: string }) {
+  const morph = useMorphSource(`child-${id}`);
+  const c = PORTRAIT[index % PORTRAIT.length]!();
+  const letter = name.slice(0, 1);
   return (
-    <PressableScale accessibilityRole="button" accessibilityLabel={line ? `${title}, ${line}` : title} scaleTo="big" testID={testID}
+    <PressableScale accessibilityRole="button" accessibilityLabel={line ? `${name}, ${line}` : name} scaleTo="big" testID={testID}
       onPress={() => {
-        if (morphKey && mark) void morph.fly(<View style={{ flex: 1, borderRadius: 999, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center' }}><AppText bold color={colors.onKesar} style={{ fontSize: 20 }}>{mark}</AppText></View>);
-        onPress?.();
+        void morph.fly(<View style={{ flex: 1, borderRadius: 999, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}><AppText bold color={c.ink} style={{ fontSize: 20 }}>{letter}</AppText></View>);
+        onPress();
       }}>
-      {body}
+      <View style={{ width: TILE, alignItems: 'center', gap: 4 }}>
+        <ArchShape width={TILE} height={TILE_H} color={colors.white}>
+          <View style={{ position: 'absolute', left: 12, top: 14 }}>
+            <ArchShape width={TILE - 24} height={TILE_H - 26} color={c.fill} />
+          </View>
+          <View ref={morph.ref} collapsable={false} style={{ position: 'absolute', left: TILE / 2 - 20, top: TILE_H * 0.4, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
+            <AppText bold color={c.ink} style={{ fontSize: 34, lineHeight: 48 }}>{letter}</AppText>
+          </View>
+        </ArchShape>
+        <AppText bold style={{ fontSize: 17 }} numberOfLines={1}>{name}</AppText>
+        {line ? <AppText variant="small" color={colors.ink2} numberOfLines={1} style={{ marginTop: -4, maxWidth: TILE }}>{line}</AppText> : null}
+      </View>
     </PressableScale>
   );
 }
 
+function AddPortrait({ label, onPress, testID }: { label: string; onPress: () => void; testID?: string }) {
+  return (
+    <PressableScale accessibilityRole="button" accessibilityLabel={label} scaleTo="big" onPress={onPress} testID={testID}>
+      <View style={{ width: TILE, alignItems: 'center', gap: 4 }}>
+        <ArchShape width={TILE} height={TILE_H} color={colors.inset}>
+          <View style={{ position: 'absolute', left: 0, right: 0, top: TILE_H * 0.42, alignItems: 'center' }}>
+            <Icon name="plus" size={30} color={colors.link} strokeWidth={2.6} />
+          </View>
+        </ArchShape>
+        <AppText bold color={colors.link} align="center" style={{ fontSize: 15 }} numberOfLines={2}>{label}</AppText>
+      </View>
+    </PressableScale>
+  );
+}
+
+/** One row of a group (thin wrapper so every row reads the same). */
+function MenuRow({ mark, icon, iconTint, title, line, end, onPress, testID }: {
+  mark?: string; icon?: IconName; iconTint?: { tint: string; ink: string }; title: string; line?: string; end?: ReactNode; onPress?: () => void; testID?: string;
+}) {
+  const lead = mark ? <ArchAvatar letter={mark} size={40} color={colors.neelTint} ink={colors.link} /> : icon ? <RowIcon name={icon} tint={iconTint?.tint} ink={iconTint?.ink} /> : null;
+  return <GroupRow title={title} sub={line} lead={lead} trail={end ?? (onPress ? 'chevron' : undefined)} onPress={onPress} testID={testID} accessibilityLabel={line ? `${title}, ${line}` : title} />;
+}
+
 export default function Menu() {
-  const { t } = useLang();
+  const { t, dir } = useLang();
   const p = useParent();
+  // In Urdu the row reads from the right: start scrolled to its end.
+  const strip = useRef<ComponentRef<typeof ScrollView>>(null);
   const [members, setMembers] = useState<parent.FamilyMember[] | null>(null);
   const [sheet, setSheet] = useState<'add' | 'help' | 'delete' | { remove: parent.FamilyMember } | null>(null);
   const [phone, setPhone] = useState('');
@@ -123,10 +154,12 @@ export default function Menu() {
   return (
     <Page title={t('parent.menu')}>
       <Section title={t('parent.menu.children')}>
-        {p.children.map((c, i) => (
-          <MenuRow key={c.id} morphKey={`child-${c.id}`} mark={c.first_name.slice(0, 1)} title={c.first_name} line={c.school_name} onPress={() => router.push({ pathname: '/child', params: { id: c.id } })} testID={`menu-child-${i}`} />
-        ))}
-        <MenuRow icon="plus" title={t('parent.addChild')} onPress={() => router.push('/child')} last testID="menu-add-child" />
+        <ScrollView ref={strip} horizontal showsHorizontalScrollIndicator={false} onContentSizeChange={() => dir === 'rtl' && strip.current?.scrollToEnd({ animated: false })} contentContainerStyle={{ gap: 12, paddingHorizontal: 4, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', flexGrow: 1 }}>
+          {p.children.map((c, i) => (
+            <ChildPortrait key={c.id} id={c.id} name={c.first_name} line={c.school_name} index={i} onPress={() => router.push({ pathname: '/child', params: { id: c.id } })} testID={`menu-child-${i}`} />
+          ))}
+          <AddPortrait label={t('parent.addChild')} onPress={() => router.push('/child')} testID="menu-add-child" />
+        </ScrollView>
       </Section>
 
       <Section title={members ? t('parent.menu.family', { n: family.length }) : t('parent.family.title')}>
@@ -134,25 +167,29 @@ export default function Menu() {
           <Shimmer lines={[{ w: '100%', h: 52 }, { w: '100%', h: 52 }]} />
         ) : (
           <Animated.View entering={FadeIn.duration(250)}>
-            {family.map((m) => (
-              <MenuRow key={m.user_id} mark={m.display_name.slice(0, 1)} title={m.is_me ? t('parent.menu.you') : m.display_name}
-                line={m.is_me ? t('parent.menu.thisPhone') : m.is_owner ? t('parent.menu.owner') : undefined}
-                end={(iOwn && !m.is_me) || (m.is_me && !m.is_owner) ? (
-                  <PressableScale accessibilityRole="button" accessibilityLabel={m.is_me ? t('parent.menu.leave') : `${t('parent.menu.remove')} ${m.display_name}`} onPress={() => setSheet({ remove: m })} scaleTo="chip" testID={`member-remove-${m.is_me ? 'me' : m.display_name}`}
-                    faceStyle={{ height: 44, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.sand, justifyContent: 'center' }}>
-                    <AppText bold style={{ fontSize: 15 }}>{m.is_me ? t('parent.menu.leave') : t('parent.menu.remove')}</AppText>
-                  </PressableScale>
-                ) : undefined} />
-            ))}
-            {iOwn && family.length < 4 ? <MenuRow icon="family" title={t('parent.menu.addPerson')} line={t('parent.menu.addPersonLine')} onPress={() => { setMsg(null); setSheet('add'); }} last testID="menu-add-person" /> : null}
+            <Group>
+              {family.map((m) => (
+                <MenuRow key={m.user_id} mark={m.display_name.slice(0, 1)} title={m.is_me ? t('parent.menu.you') : m.display_name}
+                  line={m.is_me ? t('parent.menu.thisPhone') : m.is_owner ? t('parent.menu.owner') : undefined}
+                  end={(iOwn && !m.is_me) || (m.is_me && !m.is_owner) ? (
+                    <PressableScale accessibilityRole="button" accessibilityLabel={m.is_me ? t('parent.menu.leave') : `${t('parent.menu.remove')} ${m.display_name}`} onPress={() => setSheet({ remove: m })} scaleTo="chip" testID={`member-remove-${m.is_me ? 'me' : m.display_name}`}
+                      faceStyle={{ height: 44, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.inset, justifyContent: 'center' }}>
+                      <AppText bold style={{ fontSize: 15 }}>{m.is_me ? t('parent.menu.leave') : t('parent.menu.remove')}</AppText>
+                    </PressableScale>
+                  ) : undefined} />
+              ))}
+              {iOwn && family.length < 4 ? <MenuRow icon="family" iconTint={{ tint: colors.inset, ink: colors.link }} title={t('parent.menu.addPerson')} line={t('parent.menu.addPersonLine')} onPress={() => { setMsg(null); setSheet('add'); }} testID="menu-add-person" /> : null}
+            </Group>
           </Animated.View>
         )}
       </Section>
 
       <Section title={t('parent.menu.more')}>
-        <MenuRow icon="bell" title={t('parent.notifications')} line={t('parent.menu.notificationsLine')} onPress={() => router.push('/settings')} testID="open-settings" />
-        <MenuRow icon="route" title={t('parent.join')} onPress={() => router.push('/join')} />
-        <MenuRow icon="phone" title={t('parent.menu.help')} line={t('parent.menu.helpLine', { phone: PILOT_WHATSAPP.display })} onPress={() => setSheet('help')} last testID="menu-help" />
+        <Group>
+          <MenuRow icon="bell" title={t('parent.notifications')} line={t('parent.menu.notificationsLine')} onPress={() => router.push('/settings')} testID="open-settings" />
+          <MenuRow icon="route" title={t('parent.join')} onPress={() => router.push('/join')} />
+          <MenuRow icon="phone" iconTint={{ tint: colors.kesarTint, ink: colors.onKesar }} title={t('parent.menu.help')} line={t('parent.menu.helpLine', { phone: PILOT_WHATSAPP.display })} onPress={() => setSheet('help')} testID="menu-help" />
+        </Group>
       </Section>
 
       {msg && sheet === null ? <AppText color={msg.ok ? colors.zamurradOnTint : colors.dangerText}>{msg.text}</AppText> : null}
