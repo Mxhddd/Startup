@@ -1,0 +1,27 @@
+# Parent app (v9): Settings > sounds. Hear two steps' tones, then switch in-app sounds off and on again.
+# Works without a server. Run: maestro test tests/maestro/parent-sounds.yaml
+appId: pk.pohnch.parent
+---
+- launchApp
+- assertVisible:
+    id: "trip-sheet"
+- tapOn: "مینو"
+- tapOn:
+    id: "open-settings"
+- scrollUntilVisible:
+    element:
+      id: "hear-picked"
+- tapOn:
+    id: "hear-picked"
+- tapOn:
+    id: "hear-reached_school"
+- scrollUntilVisible:
+    element:
+      id: "app-sounds"
+    direction: UP
+- tapOn:
+    id: "app-sounds"
+- tapOn:
+    id: "app-sounds"
+- assertVisible:
+    id: "app-sounds"

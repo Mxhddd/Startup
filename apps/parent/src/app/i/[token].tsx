@@ -6,7 +6,7 @@
 import { parent } from '@pohnch/client';
 import { ApiError } from '@pohnch/core';
 import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, ChoiceChip, FlowSteps, MomentFX, Shimmer, TapButton } from '@pohnch/ui/native';
+import { AppText, ChoiceChip, FlowSteps, Icon, MomentFX, Shimmer, TapButton } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -101,8 +101,14 @@ export default function JoinFromLink() {
             )}
 
             {state === 'sent' ? (
-              <Animated.View entering={ZoomIn.springify().damping(16)} style={{ alignItems: 'center', gap: space.sm, paddingVertical: space.md }}>
-                <View style={{ width: 0, height: 0 }}><MomentFX kind="burst" color={colors.kesar} size={200} /></View>
+              <Animated.View entering={ZoomIn.springify().damping(16)} style={{ alignItems: 'stretch', gap: space.sm, paddingVertical: space.md }}>
+                {/* A kesar seal with room above it, so the stars rise into empty space, not over the driver's name. */}
+                <View style={{ height: 112, alignItems: 'center', justifyContent: 'flex-end' }}>
+                  <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center' }}>
+                    <View style={{ position: 'absolute', left: 28, top: 28, width: 0, height: 0 }}><MomentFX kind="burst" color={colors.kesar} size={200} /></View>
+                    <Icon name="check" size={28} color={colors.onKesar} strokeWidth={2.8} />
+                  </View>
+                </View>
                 <AppText variant="display" align="center" style={{ fontSize: 28 }}>{t('parent.invite.sentTitle')}</AppText>
                 <AppText variant="secondary" align="center">{t('parent.invite.sentBody', { who: peek ? peek.driverName : '' })}</AppText>
                 <TapButton size="next" tone="left" label={t('parent.invite.home')} onConfirm={() => router.replace('/')} testID="invite-home" />

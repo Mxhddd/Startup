@@ -308,3 +308,59 @@ Not done in this phase: true shared-element transitions (still experimental in R
 | Dark mode (parent) | `nightColors`, `applyColorScheme` in `theme.ts`; `apps/parent/src/app/_layout.tsx` | Follows the phone. The palette switches in place and the screens are redrawn when the phone switches; the map uses the night mood; glass turns dark. New roles (`onBrand`, `onFill`, `onKesar`, `night`, `link`) keep text readable on both; contrast tests cover the night pairs. The driver app stays light. |
 
 Live: migration `20261103000500_extras.sql` applied; the `app` function redeployed.
+
+## v9 "Alive": sound, motion, flows and alerts (4 November 2026)
+
+The design came first: the canvas page "v9 · Alive" (with a sound board where every tone plays) and the Design System's new `sound`, `haptic` and spring tokens. Then the apps.
+
+### Sound: "Pohnch tones"
+
+| What | Where | How it works |
+| --- | --- | --- |
+| The kit | `scripts/sounds/make-tones.py` | Every sound is made by code: a struck wooden bar with a soft bell overtone in a small room, every note in D major so sounds that follow each other make music. Re-make it with `python3 scripts/sounds/make-tones.py` (needs numpy and scipy). It writes UI sounds (-24 LUFS) and a tone per step (-20) into `packages/ui/assets/sounds`, longer alert tones (-16) into `apps/parent/assets/sounds`, and `packages/ui/src/sounds.json`. |
+| Checked by a test | `packages/ui/src/feedbackTable.test.ts` | Every sound exists, every trip step has its tone, loudness and peaks are in range, and the ends are silent (no clicks). |
+| `feel(kind)` | `packages/ui/src/native/feedback.ts`, `feedbackTable.ts` | One call plays the sound and the haptic in the same frame. Presses, toggles, the sheet's snaps, the hold (four rising notes), confirm, undo, errors and each trip step use it. Sounds follow the phone's silent switch and mix with music (`expo-audio`, `playsInSilentMode: false`). |
+| The switch | Settings > In-app sounds (both apps), `apps/*/src/sounds.ts` | On by default, kept on the phone (`pohnch.sounds.v1`), not on the server: it is a per-phone choice. Parents can hear each step's tone on the same page. |
+| Alert tones | `supabase/functions/_shared/push.ts` (`STEP_SOUND`), `apps/parent/src/notifications/setup.ts` | Each step's push uses its own tone (`a_<step>.wav`). Android plays a channel's sound, so each step has its own channel (`step-picked`, `step-reached-school`…) plus `step-quiet`. |
+
+### Graphics and motion (Skia on the GPU)
+
+| What | Where | Notes |
+| --- | --- | --- |
+| Skia | `@shopify/react-native-skia` in `packages/ui` and both apps | The web preview loads CanvasKit first (`apps/*/index.web.js`); copy `canvaskit.wasm` next to a web export. Skia paths are built with `Skia.PathBuilder.Make()` … `.detach()`. |
+| The van, v3 | `packages/ui/src/native/VanMarker.tsx` | A blurred shadow that stretches with speed, a small squash when it brakes, a lean into turns, headlights at dusk and night, a breathing glow while it waits at your door. Grey and still when the signal is old. |
+| Glide v2 | `packages/core/src/glide.ts` (tested), `apps/parent/src/hooks/useGlide.ts` | Between two positions the van keeps rolling at its last speed (at most 4 s ahead), then eases onto each new real position over 1.6 s. It never jumps, and it freezes when the signal is stale. |
+| Living sky | `LivingSky.tsx` | A band of light over the map that follows Karachi's time of day (dawn, day, dusk, night with stars), cross-fading between moods. |
+| Moments v3 | `MomentFX.tsx`, `MomentBanner.tsx` | In the van: a ring closes around the step's disc. At school: kesar stars rise into a small constellation. Home: a warm glow. Each plays with its tone. |
+| Liquid progress | `LiquidProgress.tsx` | The route bar in the open sheet fills like liquid toward your stop, with a sheen; it fills from the reading start. |
+| Morph | `Morph.tsx` (`MorphProvider`, `useMorphSource`, `MorphTarget`) | Our own shared-element move: measure the source, fly a copy over the screens, land on the target, hand over. Used for the child's initial from the menu to the child page. |
+| Reduce Motion | every component above | Motion jumps to its end state; sounds and haptics stay. |
+
+### Flows
+
+- **The day as states** (`packages/core/src/home.ts`, tested): idle, van left, coming, at your door, in the van, at school, the story. Each state has one next action: "Off today" before the van leaves, "We're ready" at the door, "This week" when the day is told.
+- **First run as one path** (`FlowSteps.tsx`): add the first child, then join the van (open the driver's link or invite the driver), with a route-dots line at the top that fills as you go.
+- **Invite links** (`apps/parent/src/app/i/[token].tsx`): a join card with the van, the driver, the school and "verified" (`invite.peek`, by the token's hash, names only), one hold to join, a star moment. A link opened before any child exists waits and reopens after the child is added.
+- **Driver checklist** (`apps/driver/src/components/SetupChecklist.tsx`): van, stops, times, school, families, practice; it ticks itself and folds away when done.
+
+### Alerts v2
+
+| What | Where | Notes |
+| --- | --- | --- |
+| Words | `packages/messages`, `push.ts` | Name first ("علی وین میں بیٹھ گئے"), the driver's name in the body; "at your door" says "be ready". |
+| One alert per trip | `tidyStepAlerts()` in `apps/parent/src/notifications/setup.ts` | When a newer step alert arrives (app open, app back to front, Android's background live task), the older step alerts of that trip are cleared. |
+| Quiet hours | `inQuietHours()` in `push.ts` | 21:00-06:00 Karachi: step alerts arrive silently (no sound, `step-quiet` channel); "late" still rings. |
+| "We're ready" from the alert | `trip-door` category, `TripNotifications.tsx` | The at-the-door alert has a "We're ready" button. It carries only the trip and child ids; it opens the app, which sends it with your own login. |
+| Lock screen step row | `liveCard.ts` (`stepsDone`, `LiveText.marks`), `VanActivity.tsx`, `LiveTripNotification.tsx` | The Live Activity, Dynamic Island and Android live notification show three marks (left · in the van · there) that fill as the trip goes, from the app and from the server alike. |
+| Driver alerts | `notifyDriver` in `notify.ts`, `apps/driver/src/notifications/`, `AlertsCard.tsx` | A family asking to join (opens Families) and "your van is verified". Today shows an "Allow alerts" card that explains first. A parent's "we're ready" plays a soft sound during the trip, never a banner. Server: `driver_push_targets`, `request_push_targets` (migration `20261104000200_driver_pushes.sql`, pgTAP test 140). |
+
+### Checked
+
+Type check, unit tests (core 99, ui 19, server 62, client 3, messages 6), database tests (206), both app bundles, the leak check and expo-doctor (20/20 each). In the web preview, the live map holds 60 fps with the van, sky and sheet moving; when a moment first appears there is one long frame (about 170 ms) in the software-rendered preview. Check it on a phone with Android's "Profile HWUI rendering" bars. Maestro flows: `parent-invite.yaml`, `driver-checklist.yaml`, `parent-sounds.yaml`.
+
+### Not done yet
+
+- Android 16's promoted "Live Update" chip (needs a small Kotlin module); the live notification is the v7 custom one with the new step row.
+- The step row on the home-screen widgets.
+- "We're ready" sent from the alert without opening the app (it opens the app instead, which is reliable on every phone).
+- The sheet's inner list handing the drag to the sheet when it reaches the top.
