@@ -20,8 +20,9 @@ select is((select done from public.admin_trips_today()), 2, 'two children tapped
 select is((select count(*)::int from public.admin_vans() where verified_at is null), 1, 'one driver waiting for the check');
 select ok((select driver_phone from public.admin_vans() where van_name = 'V3') is not null, 'the team sees the driver''s phone to call them');
 
--- End the trip: everyone riding was tapped and there is a position, so it counts as tracked.
+-- End the trip: started, everyone riding tapped, reached school, positions throughout: tracked.
 select tests.as_admin_db();
+insert into public.trip_events (trip_id, step, client_id, created_by, happened_at) values (tests.id('t1'), 'reached_school', gen_random_uuid(), tests.id('rafiq'), now());
 update public.trips set status = 'ended', ended_at = now() where id = tests.id('t1');
 select tests.as_user(tests.id('tina'));
 select is((public.admin_stats() ->> 'tripsTracked')::int, 1, 'an ended trip with every child tapped counts as tracked end to end');

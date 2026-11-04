@@ -24,6 +24,9 @@ export type NextTripProps = {
   unit: string;
   /** "Off today" before the morning van leaves (a link into the chutti calendar), else empty. */
   offLabel?: string;
+  /** v10: the step row: how many of three steps are done, and their names joined by "|". */
+  steps?: number;
+  marks?: string;
 };
 
 const NextTripWidget = (p: NextTripProps, env: WidgetEnvironment) => {
@@ -79,6 +82,13 @@ const NextTripWidget = (p: NextTripProps, env: WidgetEnvironment) => {
           {live ? timer(32, kesar) : <Text modifiers={[font({ weight: 'bold', size: 18 }), foregroundStyle(kesar)]}>{p.title}</Text>}
         </HStack>
         {live ? <ProgressView timerInterval={range} countsDown={false} modifiers={[tint(kesar)]} /> : <ProgressView value={p.progress} modifiers={[tint(kesar)]} />}
+        {p.marks ? (
+          <HStack spacing={10}>
+            {p.marks.split('|').map((m, i) => (
+              <Text key={m} modifiers={[font({ weight: 'bold', size: 14 }), foregroundStyle(i < (p.steps ?? 0) ? kesar : '#9AA3C7'), lineLimit(1)]}>{`${i < (p.steps ?? 0) ? '●' : '○'} ${m}`}</Text>
+            ))}
+          </HStack>
+        ) : null}
         <HStack>
           <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle('#E6E9F5'), lineLimit(1)]}>{live ? `${p.title} · ${p.line}` : p.line}</Text>
           <Spacer />
@@ -104,6 +114,13 @@ const NextTripWidget = (p: NextTripProps, env: WidgetEnvironment) => {
       ) : (
         <Text modifiers={[font({ weight: 'heavy', size: 20 }), foregroundStyle(siyahi), lineLimit(2)]}>{p.title}</Text>
       )}
+      {p.marks ? (
+        <HStack spacing={4}>
+          {[0, 1, 2].map((i) => (
+            <Rectangle key={i} modifiers={[frame({ height: 5 }), foregroundStyle(i < (p.steps ?? 0) ? (p.mode === 'done' ? siyahi : kesar) : '#D9D1C1')]} />
+          ))}
+        </HStack>
+      ) : null}
       <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle(p.mode === 'done' ? siyahi : ink2), lineLimit(1)]}>{live ? p.title : p.line}</Text>
     </VStack>
   );
@@ -121,4 +138,6 @@ export default createWidget('NextTripWidget', NextTripWidget, {
   minutes: '',
   unit: 'منٹ',
   offLabel: '',
+  steps: 0,
+  marks: '',
 });

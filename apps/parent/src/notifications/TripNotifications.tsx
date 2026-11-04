@@ -154,6 +154,8 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
         minutes: card.minutes,
         unit: t('min.short'),
         offLabel: '',
+        steps: card.steps,
+        marks: card.marks,
       }
     : {
         mode: 'idle' as const,
@@ -168,6 +170,8 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
         unit: t('min.short'),
         // "Off today" on the widget, before the morning van has left.
         offLabel: p.phase === 'idle' && p.kind === 'morning' && !p.absentToday && p.vanOff !== 'today' ? t('parent.chutti.offToday') : '',
+        steps: 0,
+        marks: '',
       };
   const widgetKey = JSON.stringify(widget);
   useEffect(() => {

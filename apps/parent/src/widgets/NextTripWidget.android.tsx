@@ -39,6 +39,16 @@ const NextTripWidget = (p: NextTripProps) => {
         <Text color={ink} maxLines={2} style={{ fontSize: 20, fontWeight: '800' }}>{p.title}</Text>
       )}
       {live ? <LinearProgressIndicator progress={Math.max(0.02, p.progress)} color={kesar} trackColor="#3A4680" modifiers={[fillMaxWidth(), height(6)]} /> : null}
+      {p.marks ? (
+        // v10: the step row (left · in the van · there), filled ones in kesar.
+        <Row verticalAlignment="center" modifiers={[fillMaxWidth()]}>
+          {p.marks.split('|').map((m, i) => (
+            <Text key={m} color={i < (p.steps ?? 0) ? (done ? siyahi : kesar) : done ? '#5E4A1F' : '#9AA3C7'} maxLines={1} style={{ fontSize: 14, fontWeight: '800' }} modifiers={[weight(1)]}>
+              {`${i < (p.steps ?? 0) ? '●' : '○'} ${m}`}
+            </Text>
+          ))}
+        </Row>
+      ) : null}
       <Text color={ink} maxLines={1} style={{ fontSize: 14, fontWeight: '700' }}>
         {live ? p.title : p.line}
       </Text>
@@ -57,4 +67,6 @@ export default createWidget('NextTripWidget', NextTripWidget, {
   progress: 0,
   minutes: '',
   unit: 'منٹ',
+  steps: 0,
+  marks: '',
 });
