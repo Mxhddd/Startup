@@ -4,7 +4,7 @@
 // In development builds, a long press on the greeting opens the component gallery.
 import { useSession } from '@pohnch/client';
 import { karachiDayParts } from '@pohnch/core';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { colors, elevation, radius, radius10, space, useLang } from '@pohnch/ui';
 import { AppText, ChildRow, Icon, LangSwitch, PohnchMap, PressableScale, Shimmer, TapButton, VanBadge, type IconName } from '@pohnch/ui/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Redirect, router } from 'expo-router';
@@ -21,20 +21,23 @@ import { useDriver } from '../state/DriverStore';
 const DISCLOSED = 'pohnch.driver.locationDisclosed.v1';
 type Href = '/stops' | '/families' | '/setup' | '/practice' | '/dayoff' | '/account';
 
-function NavTile({ label, href, icon, badge }: { label: string; href: Href; icon: IconName; badge?: number }) {
+/** v10: a 2 x 2 group of plain actions, each with its icon in a soft square and its name beside it. */
+function NavTile({ label, href, icon, badge, tint = colors.neelTint, ink = colors.neel }: { label: string; href: Href; icon: IconName; badge?: number; tint?: string; ink?: string }) {
   const { dir } = useLang();
   return (
-    <PressableScale accessibilityRole="button" accessibilityLabel={label} onPress={() => router.push(href)} testID={`nav-${href.slice(1)}`} style={{ flex: 1 }}
-      faceStyle={{ minHeight: 80, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: colors.white, boxShadow: shadow.card, alignItems: 'center', justifyContent: 'center', gap: 4, paddingHorizontal: 6 }}>
+    <PressableScale accessibilityRole="button" accessibilityLabel={label} onPress={() => router.push(href)} testID={`nav-${href.slice(1)}`} style={{ flexBasis: '47%', flexGrow: 1 }}
+      faceStyle={{ minHeight: 72, borderRadius: radius10.row + 2, borderCurve: 'continuous', backgroundColor: colors.white, boxShadow: elevation.e1, flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12 }}>
       <View>
-        <Icon name={icon} size={22} color={colors.neel} />
+        <View style={{ width: 44, height: 44, borderRadius: 14, borderCurve: 'continuous', backgroundColor: tint, alignItems: 'center', justifyContent: 'center' }}>
+          <Icon name={icon} size={22} color={ink} />
+        </View>
         {badge ? (
-          <Animated.View entering={FadeIn} style={{ position: 'absolute', top: -8, [dir === 'rtl' ? 'left' : 'right']: -14, minWidth: 22, height: 22, borderRadius: 11, borderCurve: 'continuous', backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 }}>
+          <Animated.View entering={FadeIn} style={{ position: 'absolute', top: -6, [dir === 'rtl' ? 'left' : 'right']: -8, minWidth: 22, height: 22, borderRadius: 11, borderCurve: 'continuous', backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 5 }}>
             <AppText variant="number" style={{ fontSize: 14, lineHeight: 18 }}>{String(badge)}</AppText>
           </Animated.View>
         ) : null}
       </View>
-      <AppText bold align="center" style={{ fontSize: 15 }}>{label}</AppText>
+      <AppText bold style={{ flex: 1, fontSize: 16 }} numberOfLines={2}>{label}</AppText>
     </PressableScale>
   );
 }
@@ -69,7 +72,7 @@ export default function DriverToday() {
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       {/* Header */}
       <StatusBar style="light" />
-      <Animated.View entering={FadeInUp.springify().damping(22)} style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 58 : 22, gap: 10 }}>
+      <Animated.View entering={FadeInUp.springify().damping(22)} style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 58 : 30, gap: 10, borderBottomLeftRadius: 36, borderBottomRightRadius: 36 }}>
         <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
           <Pressable style={{ flex: 1 }} onLongPress={__DEV__ ? () => router.push('/gallery') : undefined}>
             <AppText variant="display" color={colors.ghee} style={{ fontSize: 30 }} testID="today-title" numberOfLines={2}>
@@ -100,7 +103,7 @@ export default function DriverToday() {
       >
         {hasMap ? (
           // The route as a raised card that overlaps the header, so the screen has depth.
-          <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ height: 196, marginTop: -38, marginHorizontal: space.gutter, borderRadius: 26, borderCurve: 'continuous', overflow: 'hidden', boxShadow: shadow.raised, backgroundColor: colors.white }}>
+          <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ height: 196, marginTop: -38, marginHorizontal: space.gutter, borderRadius: 28, borderCurve: 'continuous', overflow: 'hidden', boxShadow: elevation.e3, backgroundColor: colors.white }}>
             <PohnchMap
               testID="today-map"
               accessibilityLabel={t('driver.nav.stops')}
@@ -113,7 +116,7 @@ export default function DriverToday() {
 
         <View style={{ paddingHorizontal: space.gutter, paddingTop: space.xl, gap: space.lg }}>
           {!configured ? (
-            <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.xl, gap: space.md }}>
+            <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius10.group, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.xl, gap: space.md }}>
               <AppText bold>{t('app.driver.name')}</AppText>
               <AppText variant="secondary">{t('common.notConnected')}</AppText>
               <TapButton tone="left" label={t('driver.nav.practice')} onConfirm={() => router.push('/practice')} testID="nav-practice" />
@@ -148,12 +151,12 @@ export default function DriverToday() {
               {!d.dayOff && childCount === 0 ? (
                 <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>
               ) : !d.dayOff ? (
-                <View style={{ backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', boxShadow: shadow.card, paddingHorizontal: 18, paddingVertical: 4 }}>
+                <View style={{ backgroundColor: colors.white, borderRadius: radius10.group, borderCurve: 'continuous', boxShadow: elevation.e1, paddingHorizontal: 16, paddingVertical: 6 }}>
                   {d.run.groups.map((g, i) => {
                     const s = g.stopId ? stopById.get(g.stopId) : undefined;
                     const time = (d.run.kind === 'morning' ? s?.morning_time : s?.afternoon_time)?.slice(0, 5).replace(/^0/, '');
                     return (
-                      <View key={g.stopId ?? i} style={{ borderBottomWidth: i < d.run.groups.length - 1 ? 1 : 0, borderColor: colors.hairline }}>
+                      <View key={g.stopId ?? i}>
                         <ChildRow index={i} readOnly names={g.children.map((c) => c.firstName)} stop={g.label} order={s?.position} time={time}
                           step={d.run.kind === 'morning' ? 'picked' : 'dropped'} state={g.state === 'absent' ? 'absent' : 'waiting'} onTap={() => undefined} />
                       </View>
@@ -165,11 +168,11 @@ export default function DriverToday() {
               <AlertsCard />
               <SetupChecklist d={d} />
 
-              <View style={{ flexDirection: row, gap: space.sm, marginTop: space.sm }}>
-                <NavTile label={t('driver.nav.stops')} href="/stops" icon="pin" />
+              <View style={{ flexDirection: row, flexWrap: 'wrap', gap: space.sm, marginTop: space.sm }}>
                 <NavTile label={t('driver.nav.families')} href="/families" icon="family" badge={d.requests.length} />
-                <NavTile label={t('driver.nav.practice')} href="/practice" icon="route" />
-                <NavTile label={t('driver.nav.dayOff')} href="/dayoff" icon="calendar" badge={d.daysOff.length || undefined} />
+                <NavTile label={t('driver.nav.stops')} href="/stops" icon="pin" />
+                <NavTile label={t('driver.nav.dayOff')} href="/dayoff" icon="calendar" badge={d.daysOff.length || undefined} tint={colors.kesarTint} ink={colors.onKesar} />
+                <NavTile label={t('driver.nav.practice')} href="/practice" icon="route" tint={colors.zamurradTint} ink={colors.zamurradOnTint} />
               </View>
               <PressableScale accessibilityRole="button" onPress={() => router.push('/account')} testID="nav-account"
                 faceStyle={{ minHeight: 64, flexDirection: row, alignItems: 'center', justifyContent: 'center', gap: 8 }}>

@@ -2,7 +2,7 @@
 // families, a practice run. Each row ticks itself as the work gets done (read from the van's data),
 // tapping a row goes there, and once everything is ready the card folds away for good.
 // Plain and high-contrast like every driver screen: 64 px rows, no decoration.
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, DrawnCheck, Icon, PressableScale, feel } from '@pohnch/ui/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
@@ -44,15 +44,15 @@ export function SetupChecklist({ d }: { d: ReturnType<typeof useDriver> }) {
   if (all || !d.van) return null;
   return (
     <Animated.View entering={FadeInDown.springify().damping(22)} exiting={FadeOutUp.duration(260)} layout={LinearTransition.springify().damping(22)} testID="setup-checklist"
-      style={{ backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', boxShadow: shadow.card, paddingHorizontal: space.lg, paddingTop: space.md }}>
+      style={{ backgroundColor: colors.white, borderRadius: 28, borderCurve: 'continuous', boxShadow: elevation.e1, paddingHorizontal: space.lg, paddingTop: space.md }}>
       <AppText variant="headline">{t('driver.checklist.title', { n, of: steps.length })}</AppText>
       {steps.map((s, i) => (
         <PressableScale key={s.key} accessibilityRole="button" accessibilityState={{ checked: s.done }} onPress={() => router.push(s.href)} scaleTo="big" testID={`check-${s.key}`}>
-          <View style={{ flexDirection: row, alignItems: 'center', gap: space.md, minHeight: 64, borderBottomWidth: i < steps.length - 1 ? 1 : 0, borderColor: colors.hairline }}>
+          <View style={{ flexDirection: row, alignItems: 'center', gap: space.md, minHeight: 64 }}>
             {s.done ? (
               <DrawnCheck fill={colors.zamurrad} color={colors.white} size={30} />
             ) : (
-              <View style={{ width: 30, height: 30, borderRadius: 15, borderWidth: 2, borderColor: colors.line }} />
+              <View style={{ width: 30, height: 30, borderRadius: 15, backgroundColor: colors.inset }} />
             )}
             <AppText bold color={s.done ? colors.ink2 : colors.siyahi} style={{ flex: 1, fontSize: 17 }}>{t(`driver.checklist.${s.key}` as 'driver.checklist.van')}</AppText>
             {!s.done ? <View style={{ transform: [{ scaleX: dir === 'rtl' ? -1 : 1 }] }}><Icon name="arrow" size={18} color={colors.ink2} /></View> : null}

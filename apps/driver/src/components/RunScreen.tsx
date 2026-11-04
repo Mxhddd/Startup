@@ -6,7 +6,7 @@
 // How it moves: when a stop is done the big button lifts away and the next one rises in its place;
 // the undo bar slides in above it; rows reflow on a spring; the map eases along with the van.
 import { distanceM, formatDistance, nudges, type StopGroup } from '@pohnch/core';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { colors, elevation, radius, shadow, space, useLang } from '@pohnch/ui';
 import { AppText, ChildRow, DrawnCheck, HelpSheet, Icon, OfflineBanner, PohnchMap, PressableScale, TapButton, TripHeader, UndoBar, type LateReason, type MapPin } from '@pohnch/ui/native';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
@@ -178,7 +178,7 @@ export function RunScreen(p: RunScreenProps) {
         />
         <View style={{ paddingHorizontal: space.lg, paddingTop: space.sm, gap: space.sm }}>
           {p.banner ? (
-            <Animated.View entering={FadeInDown.springify()} style={{ backgroundColor: colors.kesarTint, borderRadius: 14, borderCurve: 'continuous', padding: space.md, boxShadow: shadow.float }}>
+            <Animated.View entering={FadeInDown.springify()} style={{ backgroundColor: colors.kesarTint, borderRadius: 20, borderCurve: 'continuous', padding: space.md, boxShadow: elevation.e2 }}>
               <AppText variant="small" bold>{p.banner}</AppText>
             </Animated.View>
           ) : null}

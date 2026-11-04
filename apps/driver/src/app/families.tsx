@@ -4,7 +4,7 @@
 // Data: memberships via the "app" Edge Function (membership.decide, rider.remove); the invite link
 // goes straight to the share sheet and is never shown or logged.
 import { driver } from '@pohnch/client';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, ApprovalCard, ChoiceChip, EditSheet, InviteCard, PressableScale, TapButton } from '@pohnch/ui/native';
 import { useState } from 'react';
 import { Share, View } from 'react-native';
@@ -83,12 +83,12 @@ export default function Families() {
       <Animated.View layout={layout} style={{ gap: space.sm }}>
         <AppText variant="headline">{t('driver.families.riders', { n: riders.length })}</AppText>
         {riders.length > 0 ? (
-          <View style={{ backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', boxShadow: shadow.card, paddingHorizontal: space.lg }}>
+          <View style={{ backgroundColor: colors.white, borderRadius: 24, borderCurve: 'continuous', boxShadow: elevation.e1, paddingHorizontal: space.lg }}>
             {riders.map((r, i) => {
               const stop = d.stops.find((s) => s.id === r.stopId);
               return (
                 <Animated.View key={r.childId} entering={FadeInDown.delay(i * 30).springify().damping(22)} layout={layout}
-                  style={{ flexDirection: row, alignItems: 'center', gap: space.md, minHeight: 72, borderBottomWidth: i < riders.length - 1 ? 1 : 0, borderColor: colors.hairline }}>
+                  style={{ flexDirection: row, alignItems: 'center', gap: space.md, minHeight: 72 }}>
                   <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>
                     <AppText variant="number" color={colors.white} style={{ fontSize: 15, lineHeight: 20 }}>{stop ? String(stop.position) : '—'}</AppText>
                   </View>

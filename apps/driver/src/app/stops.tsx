@@ -6,7 +6,7 @@
 // Data: stops (row-level security lets only the van's driver change them); times are saved as HH:MM.
 import { driver, type Stop } from '@pohnch/client';
 import { nudgeTime, shortTime } from '@pohnch/core';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
+import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, EditSheet, Icon, PressableScale, TapButton, type IconName } from '@pohnch/ui/native';
 import { useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
@@ -67,7 +67,7 @@ function TimeSheet({ edit, onClose, onSave }: { edit: { stop: Stop; which: Which
         {steps.map((m) => (
           <PressableScale key={m} accessibilityRole="button" accessibilityLabel={t('driver.stops.minutes', { n: m > 0 ? `+${m}` : String(m) })} haptic="tick" scaleTo="chip"
             onPress={() => setValue((v) => nudgeTime(v, m, DEFAULT.morning))} style={{ flex: 1 }} testID={`time-${m}`}
-            faceStyle={{ height: 64, borderRadius: 18, borderCurve: 'continuous', backgroundColor: colors.white, boxShadow: shadow.card, alignItems: 'center', justifyContent: 'center' }}>
+            faceStyle={{ height: 64, borderRadius: 18, borderCurve: 'continuous', backgroundColor: colors.white, boxShadow: elevation.e1, alignItems: 'center', justifyContent: 'center' }}>
             <AppText variant="number" style={{ fontSize: 20, lineHeight: 26 }}>{m > 0 ? `+${m}` : `−${-m}`}</AppText>
           </PressableScale>
         ))}
@@ -121,7 +121,7 @@ export default function Stops() {
       {d.stops.length === 0 ? <AppText variant="secondary">{t('driver.stops.empty')}</AppText> : <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{t('driver.stops.timesHint')}</AppText>}
       {d.stops.length > 1 ? (
         <PressableScale accessibilityRole="button" onPress={() => (reordering ? finishReorder() : setReordering(true))} scaleTo="chip" testID="stops-reorder"
-          faceStyle={{ minHeight: 64, borderRadius: radius.card, borderCurve: 'continuous', backgroundColor: reordering ? colors.neel : colors.sand, flexDirection: row, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          faceStyle={{ minHeight: 64, borderRadius: 24, borderCurve: 'continuous', backgroundColor: reordering ? colors.neel : colors.sand, flexDirection: row, alignItems: 'center', justifyContent: 'center', gap: 8 }}>
           <Icon name={reordering ? 'check' : 'grip'} size={22} color={reordering ? colors.ghee : colors.siyahi} strokeWidth={reordering ? 2.4 : 3.4} />
           <AppText bold color={reordering ? colors.ghee : colors.siyahi}>{reordering ? t('driver.stops.reorderDone') : t('driver.stops.reorder')}</AppText>
         </PressableScale>
@@ -137,7 +137,7 @@ export default function Stops() {
           const names = namesAt(s.id);
           return (
             <Animated.View key={s.id} testID={`stop-row-${i}`} entering={FadeInDown.delay(i * 40).springify().damping(22)} layout={layout}
-              style={{ backgroundColor: colors.white, borderRadius: radius.card, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.md, gap: space.sm }}>
+              style={{ backgroundColor: colors.white, borderRadius: 24, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.md, gap: space.sm }}>
               <View style={{ flexDirection: row, alignItems: 'center', gap: space.sm }}>
                 <View style={{ width: 36, height: 36, borderRadius: 18, borderCurve: 'continuous', backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>
                   <AppText variant="number" color={colors.white} style={{ fontSize: 16, lineHeight: 20 }}>{String(s.position)}</AppText>

@@ -1,6 +1,6 @@
 // v9: on Today, once the van exists: why alerts help ("a family asks to join; your van is verified"),
 // then the phone's permission prompt. Shown only while the phone hasn't been asked yet.
-import { colors, radius, space, useLang } from '@pohnch/ui';
+import { colors, space, useLang } from '@pohnch/ui';
 import { AppText, Icon, TapButton } from '@pohnch/ui/native';
 import { useEffect, useState } from 'react';
 import { View } from 'react-native';
@@ -16,7 +16,7 @@ export function AlertsCard() {
   if (!show) return null;
   return (
     <Animated.View entering={FadeInDown.springify().damping(22)} exiting={FadeOutUp.duration(240)} testID="alerts-card"
-      style={{ backgroundColor: colors.neelTint, borderRadius: radius.card, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
+      style={{ backgroundColor: colors.neelTint, borderRadius: 28, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
       <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md }}>
         <Icon name="bell" size={24} color={colors.link} />
         <AppText variant="headline" style={{ flex: 1 }}>{t('driver.alerts.title')}</AppText>
