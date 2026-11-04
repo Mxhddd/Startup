@@ -7,7 +7,7 @@
 import { parent } from '@pohnch/client';
 import { addDays, onTimeStreak, storyOf, timelineFor, weekStory, type StoryDay } from '@pohnch/core';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
-import { AppText, ArchShape, Icon, Shimmer, StarIcon, TapButton, TiltLayer, useTilt } from '@pohnch/ui/native';
+import { AppText, ArchShape, Icon, Shimmer, StarIcon, TapButton, TiltLayer, useTilt, StarBurst } from '@pohnch/ui/native';
 import { makeImageFromView } from '@shopify/react-native-skia';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -84,7 +84,7 @@ export default function Story() {
       ) : failed ? (
         <AppText bold color={colors.dangerText}>{t('error.offline')}</AppText>
       ) : !s ? (
-        <Shimmer lines={[{ w: '100%', h: 300 }]} />
+        <View style={{ alignItems: 'center' }}><Shimmer arches={{ count: 1, w: 260, h: 300 }} /></View>
       ) : (
         <Animated.View entering={FadeInDown.springify().damping(20)} style={{ gap: space.lg, alignItems: 'center' }}>
           {/* The card that becomes the picture. collapsable={false} so Android keeps it as one view. */}
@@ -113,6 +113,8 @@ export default function Story() {
             <AppText variant="number" color={colors.ink2} style={{ fontSize: 14, lineHeight: 26 }}>pohnch.pk</AppText>
           </View>
           </TiltLayer>
+          {/* v12: on Friday, the week ends with a small burst of stars over the card. */}
+          <StarBurst play={new Date(Date.now() + 5 * 3600_000).getUTCDay() === 5} />
           {streak >= 2 ? (
             <Animated.View entering={FadeInDown.delay(300).springify().damping(20)} testID="streak-card"
               style={{ alignSelf: 'stretch', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: 24, backgroundColor: colors.zamurradTint }}>

@@ -10,7 +10,7 @@
 // - When a step happens while you watch, its moment plays in the head (a ring or a star burst).
 import { arrivalClock, childPlace, homeState, newMoment, waitClock, type MomentStep } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AbsentChip, AppText, ArchAvatar, ArchShape, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
+import { AbsentChip, AppText, RouteRibbon, StarSpinner, ArchAvatar, ArchShape, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Share, View } from 'react-native';
@@ -108,7 +108,12 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
     );
   }
   if (p.phase === 'loading') {
-    return <Shimmer lines={[{ w: '45%', h: 16 }, { w: '80%', h: 36 }, { w: '100%', h: 48 }]} />;
+    return (
+      <View style={{ gap: space.md }}>
+        <View style={{ alignItems: 'center' }}><StarSpinner label={t('common.loading')} testID="sheet-loading" /></View>
+        <Shimmer lines={[{ w: '45%', h: 16 }, { w: '80%', h: 36 }, { w: '100%', h: 48 }]} />
+      </View>
+    );
   }
   if (p.phase === 'noChild') {
     return (
@@ -336,6 +341,8 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
           ) : (
           <SectionCaption>{t('parent.timeline.title')}</SectionCaption>
           )}
+          {/* v12: the trip's steps as arch milestones joined by route dots. */}
+          {live ? <RouteRibbon testID="route-ribbon" steps={items.map((i) => ({ step: STEP_KEY[i.step], label: t(`step.${STEP_KEY[i.step]}`), done: !!i.at }))} /> : null}
           <View>
             {items.map((i, n) => (
               <TimelineEvent key={`${p.child?.id}-${i.step}`} index={n} step={STEP_KEY[i.step]} time={clock(i.at)} by={i.by ?? undefined} pending={!i.at} current={live && n === firstPending} last={n === items.length - 1} />

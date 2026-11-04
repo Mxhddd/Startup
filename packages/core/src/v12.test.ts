@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bestOrder, blendEta, getReadyDue, kmh, nextReminder, preTripDue, replayAt, shiftTime, speedWarn, isRaining, karachiMinutes, lateBy, onTimeStreak, seasonFor, stuckInTraffic, upcomingHolidays } from './v12';
+import { bestOrder, blendEta, getReadyDue, km, kmh, lookAhead, nextReminder, preTripDue, replayAt, shiftTime, speedWarn, isRaining, karachiMinutes, lateBy, onTimeStreak, seasonFor, stuckInTraffic, upcomingHolidays } from './v12';
 
 // 07:00 in Karachi = 02:00 UTC.
 const at = (hhmm: string) => Date.parse(`2026-11-04T${hhmm}:00Z`) - 5 * 3600_000;
@@ -132,5 +132,18 @@ describe('driver start reminder', () => {
     const mon = Date.parse('2026-11-09T00:00:00Z') - 5 * 3600_000 + (7 * 60) * 60_000;
     expect(nextReminder('morning', '07:10', [], [], fri)).toBe(mon);
     expect(nextReminder('morning', null, [], [], now)).toBeNull();
+  });
+});
+
+describe('map camera look-ahead', () => {
+  it('stays on the van when stopped and moves ahead when driving', () => {
+    expect(lookAhead(24.9, 67, 0, 0)).toEqual({ lat: 24.9, lng: 67, pitch: 45 });
+    const north = lookAhead(24.9, 67, 0, 10);
+    expect(north.lat).toBeGreaterThan(24.9);
+    expect(north.lng).toBeCloseTo(67);
+    expect(km({ lat: 24.9, lng: 67 }, north)).toBeCloseTo(0.06, 2);
+    const fast = lookAhead(24.9, 67, 90, 30);
+    expect(km({ lat: 24.9, lng: 67 }, fast)).toBeCloseTo(0.14, 2);
+    expect(fast.pitch).toBe(58);
   });
 });

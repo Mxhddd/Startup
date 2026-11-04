@@ -61,10 +61,10 @@ export default function Trip() {
   const kind = d.running.kind;
   const tripId = d.running.id;
   const name = new Map(d.riders.map((r) => [r.childId, r.firstName]));
-  const fresh = d.signals.filter((s) => s.kind !== 'left_item' && Date.parse(s.at) > Date.now() - 30 * 60_000).slice(0, 2);
+  const fresh = d.signals.filter((s) => s.kind !== 'left_item' && Date.parse(s.at) > Date.now() - 30 * 60_000).slice(0, 1);
   const extra = (
     <View style={{ gap: space.sm }}>
-      {!d.running.is_practice ? <DriverNotes d={d} onRainDelay={() => d.actions.late('rain')} /> : null}
+      {!d.running.is_practice ? <DriverNotes d={d} compact onRainDelay={() => d.actions.late('rain')} /> : null}
       {fresh.map((s, i) => (
         <View key={`${s.childId}-${i}`} testID="trip-signal" style={{ minHeight: 48, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius10.row, backgroundColor: s.kind === 'sick_today' ? colors.kesarTint : colors.zamurradTint }}>
           <AppText bold color={s.kind === 'sick_today' ? colors.onKesar : colors.zamurradOnTint} style={{ fontSize: 17 }}>{`${name.get(s.childId) ?? ''}: ${t(`signal.${s.kind}`)}`}</AppText>

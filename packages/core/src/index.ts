@@ -24,4 +24,4 @@ export { arrivedAt, waitClock, storyOf, weekStory, type StoryDay } from './story
 export { glidePosition, predicted, speedOf, MAX_AHEAD_MS, EASE_MS, type GlideState, type Fix as GlideFix } from './glide';
 export { homeState, type HomeState, type NextAction, type HomeInput } from './home';
 export { tipsDue, type TipsSaved } from './tips';
-export { bestOrder, blendEta, clockMinutes, getReadyDue, isRaining, karachiMinutes, km, kmh, lateBy, nextReminder, onTimeStreak, PK_HOLIDAYS, preTripDue, replayAt, seasonFor, shiftTime, SPEED_LIMIT_MS, speedWarn, stuckInTraffic, upcomingHolidays, type Season } from './v12';
+export { bestOrder, blendEta, clockMinutes, getReadyDue, isRaining, karachiMinutes, km, kmh, lateBy, lookAhead, nextReminder, onTimeStreak, PK_HOLIDAYS, preTripDue, replayAt, seasonFor, shiftTime, SPEED_LIMIT_MS, speedWarn, stuckInTraffic, upcomingHolidays, type Season } from './v12';

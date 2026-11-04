@@ -10,12 +10,13 @@
 // fades, the middle and far arches grow less (depth), the sky drifts up, the title rises and fades,
 // and a slim frosted bar with the title takes over the top. Reduce Motion: no walk-through; the
 // header simply scrolls away and the bar fades in.
-import { karachiHour } from '@pohnch/core';
+import { karachiHour, type Season } from '@pohnch/core';
 import { BlurView } from 'expo-blur';
 import { useEffect } from 'react';
 import { useWindowDimensions, View } from 'react-native';
 import Animated, { Easing, interpolate, useAnimatedStyle, useReducedMotion, useSharedValue, withDelay, withRepeat, withTiming, type SharedValue } from 'react-native-reanimated';
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, Pattern, Rect, Stop } from 'react-native-svg';
+import { Bunting, Clouds, Lanterns, Moon, RainStreaks } from './Weather';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLang } from '../lang';
 import { colorScheme, colors, mapMoodAt } from '../theme';
@@ -113,8 +114,10 @@ function Twinkle({ x, y, r, delay }: { x: number; y: number; r: number; delay: n
   return <Animated.View style={[{ position: 'absolute', left: x, top: y, width: r, height: r, borderRadius: r, backgroundColor: '#FFFFFF' }, s]} />;
 }
 
-/** The sky, with the sun glowing low in the doorway (it breathes slowly) and stars at dawn and night. */
-export function Sky({ height, mood }: { height: number; mood: SkyMood }) {
+/** The sky, with the sun glowing low in the doorway (it breathes slowly) and stars at dawn and night.
+ * v12: rain streaks and clouds while it rains; a crescent at night; lanterns in Ramadan and Eid;
+ * green and white bunting for 14 August; clouds through the monsoon. */
+export function Sky({ height, mood, weather = null, season = null }: { height: number; mood: SkyMood; weather?: 'rain' | null; season?: Season }) {
   const { width } = useWindowDimensions();
   const reduce = useReducedMotion();
   const glow = useSharedValue(1);
@@ -133,9 +136,14 @@ export function Sky({ height, mood }: { height: number; mood: SkyMood }) {
             <Twinkle key={i} x={(fx as number) * width} y={y as number} r={r as number} delay={d as number} />
           ))
         : null}
-      <Animated.View style={[{ position: 'absolute', left: width / 2 - 140, bottom: -110, width: 280, height: 280 }, sun]}>
+      {mood === 'night' || season === 'ramadan' ? <Moon x={width * 0.8} y={70} sky={c[0] as string} /> : null}
+      {weather === 'rain' || season === 'monsoon' ? <Clouds dark={mood === 'night' || weather === 'rain'} /> : null}
+      <Animated.View style={[{ position: 'absolute', left: width / 2 - 140, bottom: -110, width: 280, height: 280, opacity: weather === 'rain' ? 0.4 : 1 }, sun]}>
         <Gradient radial stops={[[0, sunColor], [0.45, sunColor, 0.45], [1, sunColor, 0]]} />
       </Animated.View>
+      {weather === 'rain' ? <RainStreaks height={height} light={mood !== 'day'} /> : null}
+      {season === 'ramadan' || season === 'eid' ? <Lanterns /> : null}
+      {season === 'independence' ? <Bunting top={36} /> : null}
     </View>
   );
 }
@@ -162,7 +170,10 @@ export const BAR_HEIGHT = 56;
  * The corridor header. Put it over an Animated.ScrollView whose content starts `corridorHeight()`
  * down, and pass that scroll's y. It shrinks as you scroll and hands over to a slim frosted bar.
  */
-export function Corridor({ title, sub, scrollY, height, onBack, mood, accent, testID }: {
+export function Corridor({ title, sub, scrollY, height, onBack, mood, accent, testID, weather = null, season = null }: {
+  /** v12: the sky's weather (rain mode) and season. */
+  weather?: 'rain' | null;
+  season?: Season;
   title: string;
   sub?: string | null;
   scrollY: SharedValue<number>;
@@ -181,11 +192,21 @@ export function Corridor({ title, sub, scrollY, height, onBack, mood, accent, te
   const travel = height - bar;
   const offset = insets.top;
 
-  const frame = useAnimatedStyle(() => ({ height: Math.max(bar, height - Math.max(0, scrollY.value)) }));
+  // v12: pulling down past the top (iOS) stretches the sky and arches a little, then springs back.
+  const frame = useAnimatedStyle(() => ({ height: Math.max(bar, height - scrollY.value) }));
+  // v12 ink reveal: the title settles in like ink spreading, and a kesar brush line draws under it.
+  const ink = useSharedValue(reduce ? 1 : 0);
+  useEffect(() => {
+    if (reduce) return;
+    ink.value = withDelay(120, withTiming(1, { duration: 900, easing: Easing.out(Easing.cubic) }));
+  }, [ink, reduce, title]);
+  const inkStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, ink.value * 1.6), transform: [{ scale: 0.94 + 0.06 * ink.value }, { translateY: 8 * (1 - ink.value) }] }));
+  const brush = useAnimatedStyle(() => ({ width: `${Math.max(0, ink.value - 0.25) / 0.75 * 46}%`, opacity: 0.9 }));
   const wallStyle = (i: number) =>
     // eslint-disable-next-line react-hooks/rules-of-hooks
     useAnimatedStyle(() => {
       if (reduce) return { transform: [{ translateY: -Math.min(travel, Math.max(0, scrollY.value)) * 0.4 }] };
+      if (scrollY.value < 0) return { transform: [{ scale: 1 + Math.min(0.25, (-scrollY.value / height) * (0.3 + i * 0.15)) }] };
       const p = Math.min(1, Math.max(0, scrollY.value / travel));
       const grow = [1.3, 1.75, 2.7][i] as number;
       return {
@@ -196,7 +217,9 @@ export function Corridor({ title, sub, scrollY, height, onBack, mood, accent, te
   const far = wallStyle(0);
   const mid = wallStyle(1);
   const near = wallStyle(2);
-  const skyStyle = useAnimatedStyle(() => ({ transform: [{ translateY: -Math.min(40, Math.max(0, scrollY.value) * 0.25) }] }));
+  const skyStyle = useAnimatedStyle(() => (scrollY.value < 0
+    ? { transform: [{ scale: 1 + Math.min(0.3, -scrollY.value / height) }], transformOrigin: '50% 0%' }
+    : { transform: [{ translateY: -Math.min(40, Math.max(0, scrollY.value) * 0.25) }] }));
   const titleStyle = useAnimatedStyle(() => {
     const p = Math.min(1, Math.max(0, scrollY.value / (travel * 0.55)));
     return { opacity: 1 - p, transform: [{ translateY: -40 * p }, { scale: 1 - 0.3 * p }] };
@@ -210,7 +233,7 @@ export function Corridor({ title, sub, scrollY, height, onBack, mood, accent, te
   return (
     <Animated.View testID={testID} pointerEvents="box-none" style={[{ position: 'absolute', left: 0, right: 0, top: 0, overflow: 'hidden', zIndex: 5, backgroundColor: SKIES[sky][1] }, frame]}>
       <Animated.View style={[{ position: 'absolute', left: 0, right: 0, top: 0, height }, skyStyle]}>
-        <Sky height={height} mood={sky} />
+        <Sky height={height} mood={sky} weather={weather} season={season} />
       </Animated.View>
       {/* The walls grow from a point low in the doorway, like walking toward it. */}
       {[far, mid, near].map((s, i) => (
@@ -220,7 +243,10 @@ export function Corridor({ title, sub, scrollY, height, onBack, mood, accent, te
       ))}
       <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: 24, right: 24, top: offset + height * 0.24, alignItems: 'center' }, titleStyle]} accessibilityRole="header">
         {accent ? <View style={{ marginBottom: 6 }}>{accent}</View> : null}
-        <AppText variant="display" color={colors.onBrand} align="center" style={{ fontSize: 42, textShadowColor: 'rgba(10,15,38,0.6)', textShadowRadius: 18, textShadowOffset: { width: 0, height: 4 } }}>{title}</AppText>
+        <Animated.View style={[{ alignItems: 'center' }, inkStyle]}>
+          <AppText variant="display" color={colors.onBrand} align="center" style={{ fontSize: 42, textShadowColor: 'rgba(10,15,38,0.6)', textShadowRadius: 18, textShadowOffset: { width: 0, height: 4 } }}>{title}</AppText>
+          <Animated.View style={[{ height: 3, borderRadius: 2, backgroundColor: colors.kesar, marginTop: -4, marginBottom: 6 }, brush]} />
+        </Animated.View>
         {sub ? <AppText color="rgba(250,246,238,0.9)" align="center" style={{ fontSize: 15, marginTop: -6, textShadowColor: 'rgba(10,15,38,0.6)', textShadowRadius: 10 }}>{sub}</AppText> : null}
       </Animated.View>
       {/* The slim bar that takes over once you've walked through. */}

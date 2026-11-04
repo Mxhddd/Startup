@@ -7,6 +7,7 @@ import { deleteMyAccount } from '@pohnch/client';
 import { ApiError, PILOT_WHATSAPP } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
 import { AppText, EditSheet, TapButton, Toggle, soundsAreOn } from '@pohnch/ui/native';
+import { setSunlightMode, sunlightOn } from '../sunlight';
 import { saveSounds } from '../sounds';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -17,6 +18,7 @@ import { useDriver } from '../state/DriverStore';
 const PRIVACY_URL = 'https://pohnch.pk/privacy';
 
 export default function Account() {
+  const [sun, setSun] = useState(sunlightOn());
   const { t } = useLang();
   const d = useDriver();
   const [asking, setAsking] = useState(false);
@@ -49,6 +51,15 @@ export default function Account() {
           <AppText variant="small" color={colors.ink2}>{t('driver.account.soundsHint')}</AppText>
         </View>
         <Toggle value={sounds} onChange={(v) => { setSounds(v); void saveSounds(v); }} label={t('settings.sound.app')} testID="app-sounds" />
+      </View>
+
+      {/* v12: sunlight mode, for bright sun on the dashboard. */}
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: space.md, minHeight: 64 }}>
+        <View style={{ flex: 1 }}>
+          <AppText bold style={{ fontSize: 17 }}>{t('driver.sun.title')}</AppText>
+          <AppText variant="small" color={colors.ink2}>{t('driver.sun.hint')}</AppText>
+        </View>
+        <Toggle value={sun} onChange={(v) => { setSun(v); setSunlightMode(v); setTimeout(() => router.push('/account'), 60); }} label={t('driver.sun.title')} testID="sunlight" />
       </View>
 
       <View style={{ height: 1, backgroundColor: colors.hairline, marginVertical: space.md }} />

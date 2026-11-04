@@ -56,3 +56,9 @@ export { LivingGround, JaliLight, Niche, useTilt, TiltLayer } from './native/Dep
 export { ArchWipeProvider, useArchWipe } from './native/ArchWipe';
 export { Gradient, type GradientStop } from './native/Gradient';
 export { ArchMoment, type ArchMomentTone } from './native/ArchMoment';
+// v12
+export { RainStreaks, Clouds, Moon, Lanterns, Bunting } from './native/Weather';
+export { StarSpinner } from './native/StarSpinner';
+export { RouteRibbon } from './native/RouteRibbon';
+export { EmptyScene } from './native/EmptyScene';
+export { StarBurst } from './native/StarBurst';

@@ -10,7 +10,8 @@ import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useSyncExternalStore } from 'react';
+import { loadSunlight, onSunlight, sunlightOn } from '../sunlight';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { DriverAlerts } from '../notifications/DriverAlerts';
@@ -23,6 +24,8 @@ import { startSounds } from '../sounds';
 SplashScreen.preventAutoHideAsync();
 // v9: load the in-app sounds (and the phone's sound setting) once, at start.
 void startSounds();
+// v12: the sunlight palette, if the driver chose it.
+void loadSunlight();
 
 // Sends a logged-out person to /login and a logged-in one away from it. The gallery stays open for
 // development. Without Supabase settings (before the account exists) there is no login at all.
@@ -60,6 +63,8 @@ function RootLayout() {
   });
 
   const { ready, session, configured } = useSession();
+  // v12: switching sunlight mode redraws every screen with the new palette.
+  const sun = useSyncExternalStore(onSunlight, sunlightOn, sunlightOn);
   const fontsDone = loaded || !!error;
 
   useEffect(() => {
@@ -75,7 +80,7 @@ function RootLayout() {
         <LangProvider>
           <StatusBar style="dark" />
           <DriverProvider key={session?.user.id ?? 'out'}>
-            <Screens />
+            <Screens key={sun ? 'sun' : 'day'} />
           </DriverProvider>
           <DriverAlerts signedIn={configured && !!session} />
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />

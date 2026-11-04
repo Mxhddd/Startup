@@ -17,6 +17,7 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Page } from '../components/Page';
 import { alertsUndecided, askForAlerts, registerForPush } from '../notifications/setup';
 import { saveSounds } from '../sounds';
+import { bigTextOn, setBigText } from '../textSize';
 import { DEFAULT_LOCAL, localPrefs, PREP_CHOICES, saveLocalPrefs, type LocalPrefs } from '../notifications/localPrefs';
 
 const TONE = { neel: colors.neel, zamurrad: colors.zamurrad, kesar: colors.kesar, shingarf: colors.shingarf } as const;
@@ -44,6 +45,7 @@ export default function Settings() {
     return () => clearTimeout(id);
   }, [playing]);
   const [local, setLocal] = useState<LocalPrefs>(DEFAULT_LOCAL);
+  const [big, setBig] = useState(bigTextOn());
   useEffect(() => {
     localPrefs().then(setLocal);
   }, []);
@@ -142,6 +144,12 @@ export default function Settings() {
           </PressableScale>
         ))}
       </View>
+
+      {/* v12: bigger text everywhere. */}
+      <Group>
+        <GroupRow title={t('settings.bigText.title')} sub={t('settings.bigText.hint')} lead={<RowIcon name="search" />}
+          trail={<Toggle value={big} onChange={(v) => { setBig(v); setBigText(v); }} label={t('settings.bigText.title')} testID="big-text" />} />
+      </Group>
 
       <SectionCaption>{t('settings.language')}</SectionCaption>
       <Segmented testID="alert-language" items={[{ key: 'ur', label: 'اردو' }, { key: 'en', label: 'English' }]} value={lang} onChange={(l) => setLanguage(l)} />

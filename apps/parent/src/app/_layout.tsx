@@ -5,6 +5,7 @@ import { Manrope_500Medium, Manrope_800ExtraBold } from '@expo-google-fonts/manr
 import { NotoSansArabic_500Medium, NotoSansArabic_700Bold } from '@expo-google-fonts/noto-sans-arabic';
 import { useSession } from '@pohnch/client';
 import { LangProvider, applyColorScheme, colorScheme } from '@pohnch/ui';
+import { loadTextSize } from '../textSize';
 import { ArchWipeProvider, LaunchReveal, MorphProvider, useScreenOptions } from '@pohnch/ui/native';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
@@ -26,6 +27,8 @@ import { startSounds } from '../sounds';
 SplashScreen.preventAutoHideAsync();
 // v9: load the in-app sounds (and the phone's sound setting) once, at start.
 void startSounds();
+// v12: big-text mode, if chosen.
+void loadTextSize();
 
 // Sends a logged-out person to /login and a logged-in one away from it. The gallery stays open for
 // development. Without Supabase settings (before the account exists) there is no login at all.

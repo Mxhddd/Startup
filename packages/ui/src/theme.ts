@@ -96,6 +96,39 @@ export function applyColorScheme(next: 'light' | 'dark') {
   Object.assign(colors, dayColors, next === 'dark' ? nightColors : {});
 }
 
+/**
+ * v12 driver sunlight mode: for bright midday sun on the dashboard. Pure white ground, near-black
+ * secondary text, deeper tints and lines, so everything reads at a glance. Same meanings and colours.
+ */
+export const sunColors: Partial<Record<ColorName, string>> = {
+  ghee: '#FFFFFF', white: '#FFFFFF', ink2: '#262B40', line: '#8F8A7E', sand: '#E3DAC6', hairline: '#CFC7B5',
+  neelTint: '#D3D9F0', zamurradTint: '#C6E6D8', kesarTint: '#F8DDAA', shingarfTint: '#F1C9BE', inset: '#E9E1D0',
+};
+let sun = false;
+export function sunlight(): boolean {
+  return sun;
+}
+export function applySunlight(on: boolean) {
+  sun = on;
+  scheme = 'light';
+  Object.assign(colors, dayColors, on ? sunColors : {});
+}
+
+/** v12 big-text mode: one scale for all text (1 or 1.18), chosen in settings. */
+let scale = 1;
+const scaleSubs = new Set<() => void>();
+export function textScale(): number {
+  return scale;
+}
+export function setTextScale(next: number) {
+  scale = next;
+  scaleSubs.forEach((cb) => cb());
+}
+export function onTextScale(cb: () => void): () => void {
+  scaleSubs.add(cb);
+  return () => scaleSubs.delete(cb);
+}
+
 export type Step = 'left' | 'picked' | 'reachedSchool' | 'leftSchool' | 'dropped';
 
 /** One colour per meaning: the fill and text colour for each trip step. */

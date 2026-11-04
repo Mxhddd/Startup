@@ -2,9 +2,10 @@
 // brand. No Google account, map key or billing is needed. It never shows the phone's own location.
 import { Camera, GeoJSONSource, Layer, Map, Marker, type CameraRef, type StyleSpecification } from '@maplibre/maplibre-react-native';
 import { useEffect, useRef, useState } from 'react';
+import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring } from 'react-native-reanimated';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { brandMapStyle, type MapStyleJson } from '../mapStyle';
-import { karachiHour } from '@pohnch/core';
+import { karachiHour, lookAhead } from '@pohnch/core';
 import { BASE_MAP_STYLE_URL, colorScheme, colors, karachiRegion, mapMoodAt, type MapMood } from '../theme';
 import { AppText } from './AppText';
 import { StopPin } from './StopPin';
@@ -97,7 +98,24 @@ function PinView({ pin }: { pin: MapPin }) {
       </View>
     );
   }
-  return <StopPin kind={pin.kind} />;
+  return <DropIn><StopPin kind={pin.kind} /></DropIn>;
+}
+
+/** v12: a home or school pin drops in from above with a small bounce, its shadow growing under it. */
+function DropIn({ children }: { children: React.ReactNode }) {
+  const v = useSharedValue(0);
+  const reduce = useReducedMotion();
+  useEffect(() => {
+    v.value = reduce ? 1 : withSpring(1, { damping: 9, stiffness: 180, mass: 0.8 });
+  }, [v, reduce]);
+  const pin = useAnimatedStyle(() => ({ transform: [{ translateY: -46 * (1 - v.value) }], opacity: Math.min(1, v.value * 3) }));
+  const shade = useAnimatedStyle(() => ({ transform: [{ scaleX: 0.4 + 0.6 * Math.min(1, v.value) }], opacity: 0.35 * Math.min(1, v.value) }));
+  return (
+    <View style={{ alignItems: 'center' }}>
+      <Animated.View style={pin}>{children}</Animated.View>
+      <Animated.View style={[{ width: 22, height: 6, borderRadius: 3, backgroundColor: '#141A33', marginTop: -3 }, shade]} />
+    </View>
+  );
 }
 
 export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false, onFollowChange, recenterKey = 0, trail, ahead, mood: fixedMood }: PohnchMapProps) {
@@ -144,16 +162,18 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
   }, [follow, recenterKey]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (!following || !van || !framed.current) return;
+    // v12: look ahead of the van along its heading (more at speed), and tilt deeper as it speeds up.
+    const ahead = lookAhead(van.lat, van.lng, van.heading, van.speed);
     camera.current?.easeTo({
-      center: [van.lng, van.lat],
+      center: [ahead.lng, ahead.lat],
       zoom: 16,
-      pitch: 50, // v11: tilted further so the buildings stand up
+      pitch: ahead.pitch,
       bearing: van.heading ?? 0,
       duration: 1400,
       padding: { top: topInset, bottom: bottomInset, left: 0, right: 0 },
     });
     setMapBearing(van.heading ?? 0);
-  }, [following, van?.lat, van?.lng, van?.heading, topInset, bottomInset]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [following, van?.lat, van?.lng, van?.heading, van?.speed, topInset, bottomInset]); // eslint-disable-line react-hooks/exhaustive-deps
   const dash = useDashStep(!!ahead && ahead.length > 1);
 
   if (!mapStyle) return <View testID={testID} style={[StyleSheet.absoluteFill, { backgroundColor: colors.ghee }, style]} />;

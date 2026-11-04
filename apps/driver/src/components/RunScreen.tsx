@@ -213,7 +213,6 @@ export function RunScreen(p: RunScreenProps) {
 
       <Animated.View entering={SlideInDown.springify().damping(26).stiffness(220)} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxHeight: sheetMax, overflow: 'hidden', backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, boxShadow: shadow.sheet, paddingTop: 22, paddingHorizontal: space.gutter, paddingBottom: insets.bottom + 20, gap: 14 }}>
         <AllDoneSweep show={allDone && p.groups.length > 0} />
-        {p.extra && seat === null ? p.extra : null}
         {seat !== null ? (
           <Animated.View key="seat" entering={FadeInDown.springify().damping(20)} layout={layout} style={{ gap: 12 }} testID="seat-check">
             <AppText bold style={{ fontSize: 24, lineHeight: 36 }}>{t('driver.seat.title')}</AppText>
@@ -276,6 +275,9 @@ export function RunScreen(p: RunScreenProps) {
             <AppText bold align="center" color={colors.zamurradOnTint}>{t('driver.trip.allDone')}</AppText>
           </Animated.View>
         ) : null}
+
+        {/* v12: rain, families' signals and "stuck in traffic?" sit under the next tap, never above it. */}
+        {p.extra && !p.undo ? <Animated.View layout={layout}>{p.extra}</Animated.View> : null}
 
         {rest.length > 0 ? (
           <Animated.View layout={layout} style={{ flexShrink: 1, gap: 6 }}>

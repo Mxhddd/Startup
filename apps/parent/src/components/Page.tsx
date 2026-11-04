@@ -4,6 +4,8 @@
 // into a slim frosted bar. Content sections rise in as they arrive.
 import { space } from '@pohnch/ui';
 import { Corridor, FloorLight, JaliLight, LivingGround, skyMoodNow } from '@pohnch/ui/native';
+import { useRain } from '@pohnch/client';
+import { karachiDate, seasonFor } from '@pohnch/core';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useMemo, type ReactNode } from 'react';
@@ -21,6 +23,9 @@ export function Page({ title, sub, accent, children }: { title: string; sub?: st
     y.value = e.contentOffset.y;
   });
   const mood = useMemo(() => skyMoodNow(), []);
+  // v12: the sky dresses for rain and the season (Ramadan, Eid, 14 August, monsoon).
+  const rain = useRain();
+  const season = useMemo(() => seasonFor(karachiDate(new Date())), []);
   const height = insets.top + CORRIDOR;
   return (
     <View style={{ flex: 1 }}>
@@ -33,7 +38,7 @@ export function Page({ title, sub, accent, children }: { title: string; sub?: st
           <View style={{ paddingHorizontal: 18, paddingTop: 22, gap: space.lg }}>{children}</View>
         </View>
       </Animated.ScrollView>
-      <Corridor title={title} sub={sub} accent={accent} scrollY={y} height={height} mood={mood} onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
+      <Corridor title={title} sub={sub} accent={accent} scrollY={y} height={height} mood={mood} weather={rain ? 'rain' : null} season={season} onBack={() => (router.canGoBack() ? router.back() : router.replace('/'))} />
     </View>
   );
 }

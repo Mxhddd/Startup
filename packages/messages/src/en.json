@@ -762,5 +762,10 @@
   "driver.best.use": "Use this order",
   "driver.remind.morning": "Morning run in 10 minutes",
   "driver.remind.afternoon": "Afternoon run in 10 minutes",
-  "driver.remind.body": "Open Pohnch Driver to start the trip."
+  "driver.remind.body": "Open Pohnch Driver to start the trip.",
+  "driver.sun.title": "Sunlight mode",
+  "driver.sun.hint": "Brighter screen with stronger contrast, for bright sun.",
+  "settings.bigText.title": "Bigger text",
+  "settings.bigText.hint": "All words in Pohnch a little larger.",
+  "rain.short": "Raining"
 }

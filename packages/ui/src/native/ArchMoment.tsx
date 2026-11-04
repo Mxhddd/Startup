@@ -39,8 +39,15 @@ export function ArchMoment({ visible, tone, letter, title, sub, onDone }: { visi
   const ink = tone === 'kesar' ? colors.onKesar : colors.onFill;
   const glow = tone === 'kesar' ? '#F6CF8E' : tone === 'zamurrad' ? '#78DCB4' : '#9DAAF0';
 
+  // v12: the light beats with the step's tone (three soft pulses as its notes play).
+  const beat = useSharedValue(0);
   useEffect(() => {
     if (!visible) return;
+    if (!reduce) {
+      const pulse = () => withSequence(withTiming(1, { duration: 120, easing: Easing.out(Easing.quad) }), withTiming(0, { duration: 260, easing: Easing.in(Easing.quad) }));
+      beat.value = 0;
+      beat.value = withDelay(260, withSequence(pulse(), pulse(), pulse()));
+    }
     t.value = 0;
     t.value = withSequence(
       withTiming(1, { duration: reduce ? 250 : 900, easing: Easing.out(Easing.cubic) }),
@@ -56,7 +63,7 @@ export function ArchMoment({ visible, tone, letter, title, sub, onDone }: { visi
     const e = 1 - (1 - p) ** 3;
     return { opacity: Math.min(1, p * 2) * (1 - out), transform: [{ translateY: 60 * (1 - e) + 20 * out }, { scale: 0.6 + 0.4 * e - 0.1 * out }] };
   });
-  const rays = useAnimatedStyle(() => ({ opacity: reduce ? 0 : Math.max(0, Math.min(0.9, (t.value - 0.2) * 1.5)) * (t.value > 1 ? 2 - t.value : 1), transform: [{ scale: 0.5 + 0.6 * Math.min(1, t.value) }, { rotate: `${t.value * 18}deg` }] }));
+  const rays = useAnimatedStyle(() => ({ opacity: reduce ? 0 : Math.max(0, Math.min(0.9, (t.value - 0.2) * 1.5)) * (t.value > 1 ? 2 - t.value : 1), transform: [{ scale: (0.5 + 0.6 * Math.min(1, t.value)) * (1 + 0.14 * beat.value) }, { rotate: `${t.value * 18}deg` }] }));
   const words = useAnimatedStyle(() => ({ opacity: Math.max(0, Math.min(1, (t.value - 0.4) * 2)) * (t.value > 1 ? 2 - t.value : 1), transform: [{ translateY: 12 * (1 - Math.min(1, t.value)) }] }));
 
   if (!visible) return null;

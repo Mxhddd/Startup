@@ -140,3 +140,26 @@ describe('child colours (v12)', () => {
   });
 });
 
+
+describe('driver sunlight mode (v12)', () => {
+  it('keeps the trip pairs at 4.5:1 or better in bright sun, and goes back', async () => {
+    const t = await import('./theme');
+    t.applySunlight(true);
+    expect(t.colors.ghee).toBe('#FFFFFF');
+    for (const [fg, bg] of [[t.colors.siyahi, t.colors.ghee], [t.colors.ink2, t.colors.white], [t.colors.zamurradOnTint, t.colors.zamurradTint], [t.colors.link, t.colors.neelTint], [t.colors.onKesar, t.colors.kesarTint], [t.colors.dangerText, t.colors.shingarfTint], [t.colors.siyahi, t.colors.sand]]) {
+      expect(contrast(fg as string, bg as string), `${fg} on ${bg}`).toBeGreaterThanOrEqual(4.5);
+    }
+    t.applySunlight(false);
+    expect(t.colors.ghee).toBe(t.dayColors.ghee);
+  });
+  it('scales text and tells listeners', async () => {
+    const t = await import('./theme');
+    let told = 0;
+    const off = t.onTextScale(() => told++);
+    t.setTextScale(1.18);
+    expect(t.textScale()).toBe(1.18);
+    t.setTextScale(1);
+    off();
+    expect(told).toBe(2);
+  });
+});

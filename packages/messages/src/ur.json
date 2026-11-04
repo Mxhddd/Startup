@@ -762,5 +762,10 @@
   "driver.best.use": "یہ ترتیب لگائیں",
   "driver.remind.morning": "صبح کا سفر 10 منٹ میں",
   "driver.remind.afternoon": "دوپہر کا سفر 10 منٹ میں",
-  "driver.remind.body": "سفر شروع کرنے کے لیے پہنچ ڈرائیور کھولیں۔"
+  "driver.remind.body": "سفر شروع کرنے کے لیے پہنچ ڈرائیور کھولیں۔",
+  "driver.sun.title": "دھوپ والا رنگ",
+  "driver.sun.hint": "تیز دھوپ کے لیے زیادہ روشن اور واضح اسکرین۔",
+  "settings.bigText.title": "بڑا متن",
+  "settings.bigText.hint": "پہنچ کے سب الفاظ تھوڑے بڑے۔",
+  "rain.short": "بارش ہو رہی ہے"
 }

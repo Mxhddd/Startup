@@ -60,6 +60,7 @@ export function VanMarker({
   const breathe = useSharedValue(0);
   const beams = useSharedValue(0);
   const lastSpeed = useRef(speed ?? 0);
+  const brakeV = useSharedValue(0);
 
   // Turning: the short way round, with a small lean into the turn that springs back.
   useEffect(() => {
@@ -77,8 +78,10 @@ export function VanMarker({
     if (lastSpeed.current > 2 && v < 0.6 && !reduce) {
       squash.value = withSequence(withTiming(1, { duration: 140 }), withSpring(0, springs.pop));
     }
+    // Slowing hard or stopping: the brake lights glow, then fade.
+    if (lastSpeed.current > 2 && v < lastSpeed.current - 1.5) brakeV.value = withSequence(withTiming(1, { duration: 120 }), withDelay(1400, withTiming(0, { duration: 700 })));
     lastSpeed.current = v;
-  }, [speed, stale, stretch, squash, reduce]);
+  }, [speed, stale, stretch, squash, reduce, brakeV]);
 
   useEffect(() => {
     appear.value = withSpring(1, springs.pop);
@@ -137,6 +140,7 @@ export function VanMarker({
   const ring2R = useDerivedValue(() => size * 0.3 + r2.value * size * 0.32);
   const ring2O = useDerivedValue(() => 0.28 * (1 - r2.value));
   const glowR = useDerivedValue(() => 26 + breathe.value * 10);
+  const brake = useDerivedValue(() => (stale ? 0 : brakeV.value));
   const glowO = useDerivedValue(() => (waiting && !stale ? 0.25 + breathe.value * 0.25 : 0));
 
   return (
@@ -163,7 +167,23 @@ export function VanMarker({
             </RoundedRect>
             <RoundedRect x={27} y={17} width={26} height={46} r={9} color={colors.white} />
             <RoundedRect x={28.5} y={18.5} width={23} height={43} r={7.5} color={body} />
+            {/* v12: a soft sheen across the roof, side windows, and brake lights that glow as it stops. */}
+            <RoundedRect x={28.5} y={18.5} width={23} height={43} r={7.5}>
+              <LinearGradient start={vec(28, 18)} end={vec(52, 62)} colors={['rgba(255,255,255,0.22)', 'rgba(255,255,255,0)', 'rgba(0,0,0,0.12)']} />
+            </RoundedRect>
             <RoundedRect x={31} y={22} width={18} height={9} r={3} color={GLASS} />
+            {[35, 43, 51].map((y) => (
+              <Group key={y}>
+                <RoundedRect x={29.6} y={y} width={2.4} height={5} r={1.2} color={GLASS} opacity={0.75} />
+                <RoundedRect x={48} y={y} width={2.4} height={5} r={1.2} color={GLASS} opacity={0.75} />
+              </Group>
+            ))}
+            <Group opacity={brake}>
+              <RoundedRect x={29} y={59} width={6} height={3} r={1.5} color="#FF5A3D" />
+              <RoundedRect x={45} y={59} width={6} height={3} r={1.5} color="#FF5A3D" />
+              <Circle cx={32} cy={63} r={6} color="rgba(255,90,61,0.45)"><BlurMask blur={4} style="normal" /></Circle>
+              <Circle cx={48} cy={63} r={6} color="rgba(255,90,61,0.45)"><BlurMask blur={4} style="normal" /></Circle>
+            </Group>
             <RoundedRect x={37} y={34} width={6} height={22} r={3} color={stripe} />
             <RoundedRect x={23.5} y={25} width={4} height={6} r={2} color={body} />
             <RoundedRect x={52.5} y={25} width={4} height={6} r={2} color={body} />

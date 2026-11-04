@@ -4,7 +4,9 @@
 // the component gallery.
 import { karachiClock } from '@pohnch/core';
 import { colors, space, useLang } from '@pohnch/ui';
-import { ArchMoment, Glass, Icon, LivingSky, MapSheet, PressableScale } from '@pohnch/ui/native';
+import { ArchMoment, Glass, Icon, LivingSky, MapSheet, PressableScale, RainStreaks } from '@pohnch/ui/native';
+import { useRain } from '@pohnch/client';
+import { childPlace } from '@pohnch/core';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -33,6 +35,10 @@ export default function ParentHome() {
   const live = p.phase === 'live';
   const onboarding = p.phase !== 'live' && p.phase !== 'idle';
   const peek = onboarding ? 360 : 196;
+  // v12: rain over the sky, and the sheet tinted by the moment of the trip.
+  const rain = useRain(p.membership?.status === 'approved');
+  const place = live ? childPlace(p.kind, p.timeline.items) : null;
+  const accent = !live ? null : p.lateMin >= 5 ? colors.shingarf : place === 'inVan' || place === 'home' ? colors.zamurrad : place === 'atSchool' ? colors.kesar : colors.neel;
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       <Animated.View style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, transformOrigin: 'top' }, mapStyle]}>
@@ -50,6 +56,7 @@ export default function ParentHome() {
       </Animated.View>
       {/* v9: the living sky over the top of the map, following the time of day (night when dark). */}
       <LivingSky height={insets.top + 190} />
+      {rain ? <RainStreaks height={insets.top + 190} /> : null}
       <Animated.View pointerEvents="none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: colors.night }, dimStyle]} />
       <Animated.View pointerEvents="box-none" style={[{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0 }, barStyle]}>
 
@@ -73,7 +80,7 @@ export default function ParentHome() {
       {live ? <LivePill top={insets.top} clock={karachiClock(new Date(p.now))} staleSeconds={p.signal?.stale ? p.signal.secondsAgo : null} /> : null}
       </Animated.View>
 
-      <MapSheet peek={peek} open={onboarding ? 360 : 640} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen} progress={sheet}>
+      <MapSheet peek={peek} open={onboarding ? 360 : 640} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen} progress={sheet} accent={accent}>
         <TripSheet expanded={open} onOpenTrip={() => setOpen((o) => !o)} progress={sheet} onMoment={setArch} />
       </MapSheet>
       {/* v11: the step as an arch of light over everything, then it settles away. */}

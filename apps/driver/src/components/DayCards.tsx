@@ -29,10 +29,26 @@ function Card({ tint, ink, icon, title, sub, children, testID }: { tint: string;
   );
 }
 
-export function DriverNotes({ d, onRainDelay }: { d: DriverStore; onRainDelay?: () => void }) {
-  const { t } = useLang();
+export function DriverNotes({ d, onRainDelay, compact = false }: { d: DriverStore; onRainDelay?: () => void; compact?: boolean }) {
+  const { t, dir } = useLang();
   const rain = useRain(!!d.van);
   const [told, setTold] = useState(false);
+  // On the trip screen: one slim rain row with its button; notices stay on Today.
+  if (compact) {
+    if (!rain) return null;
+    return (
+      <View testID="driver-rain" style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, minHeight: 64, paddingHorizontal: 14, borderRadius: radius10.row, backgroundColor: colors.neelTint }}>
+        <Icon name="cloud" size={22} color={colors.link} />
+        <AppText bold color={colors.link} style={{ flex: 1, fontSize: 16 }} numberOfLines={2}>{told ? t('rain.sent') : t('rain.short')}</AppText>
+        {onRainDelay && !told ? (
+          <PressableScale accessibilityRole="button" testID="rain-delay" onPress={() => { onRainDelay(); setTold(true); feel('confirm'); }}
+            faceStyle={{ minHeight: 48, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.neel, justifyContent: 'center' }}>
+            <AppText bold color={colors.ghee} style={{ fontSize: 15 }}>{t('rain.delay')}</AppText>
+          </PressableScale>
+        ) : null}
+      </View>
+    );
+  }
   return (
     <>
       {d.notices.map((n) => <Card key={n.id} testID="driver-notice" tint={colors.kesarTint} ink={colors.onKesar} icon="bell" title={t('push.notice.title')} sub={n.body} />)}

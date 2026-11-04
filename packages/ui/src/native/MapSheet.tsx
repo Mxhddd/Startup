@@ -7,7 +7,8 @@ import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { BlurView } from 'expo-blur';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
-import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withSpring, type SharedValue } from 'react-native-reanimated';
+import Animated, { FadeIn, runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withSpring, type SharedValue } from 'react-native-reanimated';
+import { Gradient } from './Gradient';
 import { useLang } from '../lang';
 import { pickSnap, rubberBand, springs } from '../motion';
 import { colorScheme, colors, radius, shadow, space } from '../theme';
@@ -21,7 +22,11 @@ export function MapSheet({
   expanded,
   onExpandedChange,
   progress,
+  accent,
 }: {
+  /** v12 trip-state theming: the colour of the moment (neel on the way, zamurrad in the van or home,
+   * kesar at school, shingarf when late) washes softly down from the sheet's top edge and lights the dot. */
+  accent?: string | null;
   children: ReactNode;
   peek?: number;
   open?: number;
@@ -107,6 +112,11 @@ export function MapSheet({
       {/* v11: frosted glass, so the map stays alive behind the sheet (a strong tint keeps text crisp). */}
       <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, overflow: 'hidden' }}>
         <BlurView intensity={50} tint={colorScheme() === 'dark' ? 'dark' : 'light'} style={{ flex: 1, backgroundColor: colorScheme() === 'dark' ? 'rgba(24,32,68,0.84)' : 'rgba(255,255,255,0.80)' }} />
+        {accent ? (
+          <Animated.View key={accent} entering={FadeIn.duration(600)} style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 140 }}>
+            <Gradient stops={[[0, accent, 0.16], [1, accent, 0]]} />
+          </Animated.View>
+        ) : null}
         <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.9)' }} />
       </View>
       {/* v10: the sheet's top edge rises into a small pointed arch around the handle, a kesar dot at its point. */}
@@ -114,7 +124,7 @@ export function MapSheet({
         <Svg width={128} height={24} viewBox="0 0 128 24">
           <Path d="M0 24 L0 22 C14 22 34 21 44 14 C52 9 59 3 64 0 C69 3 76 9 84 14 C94 21 114 22 128 22 L128 24 Z" fill={colorScheme() === 'dark' ? 'rgba(24,32,68,0.9)' : 'rgba(255,255,255,0.86)'} />
         </Svg>
-        <View style={{ position: 'absolute', top: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.kesar }} />
+        <View style={{ position: 'absolute', top: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: accent ?? colors.kesar }} />
       </View>
       <GestureDetector gesture={Gesture.Exclusive(pan, tapHandle)}>
         <View accessibilityRole="adjustable" accessibilityLabel={t('sheet.handle')} style={{ height: 30, alignItems: 'center', justifyContent: 'center' }}>

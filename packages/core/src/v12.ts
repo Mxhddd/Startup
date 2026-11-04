@@ -227,3 +227,17 @@ export function nextReminder(kind: 'morning' | 'afternoon', usual: string | null
 
 const karachiDateOf = (ms: number) => new Date(ms + 5 * 3600_000).toISOString().slice(0, 10);
 const addDaysUtc = (date: string, n: number) => new Date(Date.parse(`${date}T00:00:00Z`) + n * 86400_000).toISOString().slice(0, 10);
+
+/**
+ * Map camera look-ahead: centre the camera a little ahead of the van in the way it is heading, more
+ * the faster it goes (about 6 s of driving, at most 140 m), so the road ahead is in view. Also a
+ * tilt that deepens with speed (45° stopped to 58° at 50 km/h).
+ */
+export function lookAhead(lat: number, lng: number, heading: number | null, speed: number | null | undefined): { lat: number; lng: number; pitch: number } {
+  const v = Math.max(0, speed ?? 0);
+  const pitch = Math.round(45 + 13 * Math.min(1, v / 14));
+  if (heading === null || v < 1) return { lat, lng, pitch };
+  const d = Math.min(140, v * 6);
+  const h = (heading * Math.PI) / 180;
+  return { lat: lat + (d * Math.cos(h)) / 111_320, lng: lng + (d * Math.sin(h)) / (111_320 * Math.cos((lat * Math.PI) / 180)), pitch };
+}

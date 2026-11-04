@@ -5,7 +5,7 @@
 import { parent, type ParentTrip } from '@pohnch/client';
 import { addDays, dayPartsOf, karachiClock, storyOf, timelineFor, type ParentEvent } from '@pohnch/core';
 import { colors, elevation, radius10, space, useLang } from '@pohnch/ui';
-import { AppText, ChoiceChip, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
+import { AppText, ChoiceChip, EmptyScene, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
@@ -65,7 +65,7 @@ export default function History() {
         <Shimmer lines={[{ w: '100%', h: 52 }, { w: '100%', h: 52 }, { w: '100%', h: 52 }]} />
       ) : day.trips.length === 0 ? (
         <Animated.View entering={FadeIn}>
-          <AppText variant="secondary" testID="history-empty">{t('history.noTrips')}</AppText>
+          <EmptyScene kind={date === p.today ? 'road' : 'stars'} title={t('history.noTrips')} testID="history-empty" />
         </Animated.View>
       ) : (
         day.trips.map((tr, n) => {
