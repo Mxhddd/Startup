@@ -9,6 +9,7 @@ import Animated, { interpolate, useAnimatedStyle, useSharedValue, withSequence, 
 import { useLang, uiFont } from '../lang';
 import { colors, fonts, radius, shadow, space, type as typeScale } from '../theme';
 import { AppText } from './AppText';
+import { feel } from './feedback';
 
 export function TextField({
   label,
@@ -43,6 +44,7 @@ export function TextField({
     up.value = withSpring(floating ? 1 : 0, { damping: 20, stiffness: 260 });
   }, [floating, up]);
   useEffect(() => {
+    if (error) feel('error');
     if (error) shake.value = withSequence(withTiming(-8, { duration: 50 }), withTiming(8, { duration: 70 }), withTiming(-5, { duration: 60 }), withTiming(0, { duration: 60 }));
   }, [error, shake]);
 

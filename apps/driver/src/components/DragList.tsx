@@ -3,7 +3,7 @@
 // Let go and the order is handed back. Rows are a fixed 72 px, so positions are simple arithmetic.
 import { moveId } from '@pohnch/core';
 import { colors, radius, shadow, space, springs, useLang } from '@pohnch/ui';
-import { AppText, Icon, haptic } from '@pohnch/ui/native';
+import { AppText, Icon, feel } from '@pohnch/ui/native';
 import { useState } from 'react';
 import { View } from 'react-native';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
@@ -35,7 +35,7 @@ function Row({ item, order, onDrop }: { item: DragItem; order: SharedValue<strin
     .onStart(() => {
       start.value = y.value;
       lifted.value = withTiming(1, { duration: 120 });
-      runOnJS(haptic.press)();
+      runOnJS(feel)('press');
     })
     .onUpdate((e) => {
       const max = (order.value.length - 1) * H;
@@ -43,7 +43,7 @@ function Row({ item, order, onDrop }: { item: DragItem; order: SharedValue<strin
       const to = Math.max(0, Math.min(order.value.length - 1, Math.round(y.value / H)));
       if (to !== order.value.indexOf(item.id)) {
         order.value = moveId(order.value, item.id, to);
-        runOnJS(haptic.tick)();
+        runOnJS(feel)('tick');
       }
     })
     .onFinalize(() => {

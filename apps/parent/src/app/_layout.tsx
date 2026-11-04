@@ -20,8 +20,11 @@ import { rememberInvite, takeInvite } from '../state/pendingInvite';
 import '../notifications/liveTask'; // defines the Android live-notification task at start-up
 
 import { withCrashReports } from '../crash';
+import { startSounds } from '../sounds';
 
 SplashScreen.preventAutoHideAsync();
+// v9: load the in-app sounds (and the phone's sound setting) once, at start.
+void startSounds();
 
 // Sends a logged-out person to /login and a logged-in one away from it. The gallery stays open for
 // development. Without Supabase settings (before the account exists) there is no login at all.

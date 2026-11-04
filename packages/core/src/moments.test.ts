@@ -15,8 +15,8 @@ describe('moments', () => {
   });
 
   it('arrivals get the two-note sound and a celebration', () => {
-    expect(MOMENTS.reached_school.sound).toBe('pohnch');
-    expect(MOMENTS.dropped.sound).toBe('pohnch');
+    // v9: every step has its own tone, named after the step.
+    for (const [step, m] of Object.entries(MOMENTS)) expect(m.sound).toBe(step);
     expect(MOMENTS.reached_school.celebrate).toBe('burst');
   });
 

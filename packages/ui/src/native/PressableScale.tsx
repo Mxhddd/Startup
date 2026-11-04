@@ -8,10 +8,14 @@ import type { ReactNode } from 'react';
 import { Pressable, View, type PressableProps, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from 'react-native-reanimated';
 import { pressScale, springs } from '../motion';
+import { feel as feelIt } from './feedback';
+import type { FeelKind } from '../feedbackTable';
 import { haptic, type HapticKind } from './haptics';
 
 const AnimatedPressable = Animated.createAnimatedComponent(Pressable);
 
+
+const PRESS_FEEL: Record<Exclude<HapticKind, 'none'>, FeelKind> = { tap: 'tap', press: 'press', tick: 'tick', success: 'confirm', warn: 'undo' };
 export type PressableScaleProps = Omit<PressableProps, 'style' | 'children'> & {
   children: ReactNode;
   /** How far it sinks: 'big' for the large driver buttons, 'small' for most, 'chip' for pills. */
@@ -64,7 +68,8 @@ export function PressableScale({
       disabled={disabled}
       onPressIn={(e) => {
         down.value = withSpring(1, springs.press);
-        if (feel !== 'none' && !disabled) haptic[feel]();
+        // v9: the touch and its sound together (the press kinds map onto the feedback table).
+        if (feel !== 'none' && !disabled) feelIt(PRESS_FEEL[feel]);
         onPressIn?.(e);
       }}
       onPressOut={(e) => {

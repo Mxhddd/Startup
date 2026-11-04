@@ -5,15 +5,15 @@ import text from './pushText.json' with { type: 'json' };
 
 export type Recipient = { child_id: string; first_name: string; token: string; platform: string; lang: string; driver_name: string; sound?: boolean };
 export type PushStep = 'left' | 'picked' | 'arriving' | 'reached_school' | 'left_school' | 'dropped' | 'late';
-/** Android channels (one per sound, since Android fixes a channel's sound when it is made). */
-export type AlertChannel = 'step-chime' | 'step-pohnch' | 'step-quiet';
+/** Android channels (v9): one per step, each with its own tone (Android fixes a channel's sound when it is made). */
+export type AlertChannel = `step-${string}` | 'step-quiet';
 
 export type ExpoMessage = {
   to: string;
   title: string;
   body: string;
-  /** iPhone: our sound file, or null for a quiet alert. Android takes the channel's sound. */
-  sound: 'chime.wav' | 'pohnch.wav' | null;
+  /** iPhone: the step's own Pohnch tone ("a_picked.wav"), or null for a quiet alert. Android takes the channel's sound. */
+  sound: `a_${PushStep}.wav` | null;
   priority: 'high';
   channelId: AlertChannel;
   /** iPhone: "arriving" and "late" may show through Focus; the rest are ordinary. */
@@ -29,9 +29,11 @@ export type ExpoMessage = {
 
 // The same table the apps use (packages/core/src/moments.ts), copied by value: Edge Functions can't
 // import the app workspace. push.test.ts checks the two stay in step.
-export const STEP_SOUND: Record<PushStep, 'chime' | 'pohnch'> = {
-  left: 'chime', picked: 'chime', arriving: 'chime', reached_school: 'pohnch', left_school: 'chime', dropped: 'pohnch', late: 'chime',
+export const STEP_SOUND: Record<PushStep, PushStep> = {
+  left: 'left', picked: 'picked', arriving: 'arriving', reached_school: 'reached_school', left_school: 'left_school', dropped: 'dropped', late: 'late',
 };
+/** The app makes the same channel names (apps/parent/src/notifications/setup.ts, stepChannel). */
+export const stepChannel = (step: PushStep): AlertChannel => `step-${STEP_SOUND[step].replace(/_/g, '-')}`;
 export const TIME_SENSITIVE: PushStep[] = ['arriving', 'late'];
 
 type Lang = 'ur' | 'en';
@@ -64,9 +66,9 @@ export function buildPushes(step: PushStep, recipients: Recipient[], reason?: st
       to: token,
       title: names,
       body,
-      sound: quiet ? null : tone === 'pohnch' ? 'pohnch.wav' : 'chime.wav',
+      sound: quiet ? null : `a_${tone}.wav`,
       priority: 'high',
-      channelId: quiet ? 'step-quiet' : tone === 'pohnch' ? 'step-pohnch' : 'step-chime',
+      channelId: quiet ? 'step-quiet' : stepChannel(step),
       interruptionLevel: TIME_SENSITIVE.includes(step) ? 'time-sensitive' : 'active',
       categoryId: step === 'left' ? 'trip-left' : 'trip',
       data: step === 'left' ? { kind: 'trip', step, children: [...new Set(rows.map((r) => r.child_id))] } : { kind: 'trip', step },
@@ -102,9 +104,9 @@ export function buildDayOffPushes(recipients: DayOffRecipient[], job: { date: st
       to: token,
       title: T(lang, job.off ? 'push.dayOff.title' : 'push.dayOn.title', { when }),
       body: T(lang, job.off ? 'push.dayOff.body' : 'push.dayOn.body', { who: first.driver_name, names }),
-      sound: quiet ? null : 'chime.wav',
+      sound: quiet ? null : 'a_left.wav',
       priority: 'high',
-      channelId: quiet ? 'step-quiet' : 'step-chime',
+      channelId: quiet ? 'step-quiet' : stepChannel('left'),
       interruptionLevel: 'active',
       categoryId: 'trip',
       data: { kind: 'dayoff', date: job.date, off: job.off },

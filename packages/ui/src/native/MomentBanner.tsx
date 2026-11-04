@@ -10,7 +10,7 @@ import { useLang } from '../lang';
 import { springs } from '../motion';
 import { colors, type Step } from '../theme';
 import { AppText } from './AppText';
-import { haptic } from './haptics';
+import { feel } from './feedback';
 import { Icon, StarIcon } from './icons';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -43,7 +43,8 @@ export function MomentBanner({ step, title, sub, onDone }: { step: MomentStep; t
   const ring = useSharedValue(0);
 
   useEffect(() => {
-    haptic[m.haptic]();
+    // v9: the step's own tone and haptic, with the picture.
+    feel(step);
     t.value = withDelay(120, withTiming(1, { duration: 900, easing: Easing.out(Easing.cubic) }));
     ring.value = withDelay(150, withTiming(1, { duration: 650, easing: Easing.out(Easing.cubic) }));
     const id = setTimeout(() => onDone?.(), 3800);

@@ -1,0 +1,218 @@
+[
+ {
+  "group": "ui",
+  "name": "ui_tap",
+  "seconds": 0.165,
+  "lufs": -24.0,
+  "peak_db": -9.1,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_toggle_on",
+  "seconds": 0.225,
+  "lufs": -24.0,
+  "peak_db": -9.04,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_toggle_off",
+  "seconds": 0.225,
+  "lufs": -24.0,
+  "peak_db": -8.55,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_sheet_up",
+  "seconds": 0.32,
+  "lufs": -24.0,
+  "peak_db": -8.29,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_sheet_down",
+  "seconds": 0.3,
+  "lufs": -24.0,
+  "peak_db": -7.01,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_confirm",
+  "seconds": 0.405,
+  "lufs": -24.0,
+  "peak_db": -11.07,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_undo",
+  "seconds": 0.35,
+  "lufs": -24.0,
+  "peak_db": -11.29,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_error",
+  "seconds": 0.39,
+  "lufs": -24.0,
+  "peak_db": -13.13,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_hold_1",
+  "seconds": 0.13,
+  "lufs": -24.0,
+  "peak_db": -7.81,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_hold_2",
+  "seconds": 0.13,
+  "lufs": -24.0,
+  "peak_db": -7.27,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_hold_3",
+  "seconds": 0.13,
+  "lufs": -24.0,
+  "peak_db": -6.56,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_hold_4",
+  "seconds": 0.14,
+  "lufs": -24.0,
+  "peak_db": -7.92,
+  "edge": 0.0
+ },
+ {
+  "group": "ui",
+  "name": "ui_success",
+  "seconds": 0.66,
+  "lufs": -24.0,
+  "peak_db": -11.64,
+  "edge": 0.0
+ },
+ {
+  "group": "moment",
+  "name": "m_left",
+  "seconds": 1.12,
+  "lufs": -20.0,
+  "peak_db": -8.02,
+  "edge": 0.0
+ },
+ {
+  "group": "moment",
+  "name": "m_arriving",
+  "seconds": 1.4,
+  "lufs": -20.0,
+  "peak_db": -8.55,
+  "edge": 0.0
+ },
+ {
+  "group": "moment",
+  "name": "m_picked",
+  "seconds": 1.32,
+  "lufs": -20.0,
+  "peak_db": -7.97,
+  "edge": 0.0
+ },
+ {
+  "group": "moment",
+  "name": "m_reached_school",
+  "seconds": 1.8,
+  "lufs": -20.0,
+  "peak_db": -7.95,
+  "edge": 0.0
+ },
+ {
+  "group": "moment",
+  "name": "m_left_school",
+  "seconds": 1.12,
+  "lufs": -20.0,
+  "peak_db": -7.75,
+  "edge": 0.0
+ },
+ {
+  "group": "moment",
+  "name": "m_dropped",
+  "seconds": 1.64,
+  "lufs": -20.0,
+  "peak_db": -7.86,
+  "edge": 0.0
+ },
+ {
+  "group": "moment",
+  "name": "m_late",
+  "seconds": 1.24,
+  "lufs": -20.0,
+  "peak_db": -9.74,
+  "edge": 0.0
+ },
+ {
+  "group": "alert",
+  "name": "a_left",
+  "seconds": 1.515,
+  "lufs": -16.0,
+  "peak_db": -4.25,
+  "edge": 0.0
+ },
+ {
+  "group": "alert",
+  "name": "a_arriving",
+  "seconds": 1.835,
+  "lufs": -16.0,
+  "peak_db": -4.81,
+  "edge": 0.0
+ },
+ {
+  "group": "alert",
+  "name": "a_picked",
+  "seconds": 1.755,
+  "lufs": -16.0,
+  "peak_db": -3.66,
+  "edge": 0.0
+ },
+ {
+  "group": "alert",
+  "name": "a_reached_school",
+  "seconds": 2.37,
+  "lufs": -16.0,
+  "peak_db": -3.54,
+  "edge": 0.0
+ },
+ {
+  "group": "alert",
+  "name": "a_left_school",
+  "seconds": 1.515,
+  "lufs": -16.0,
+  "peak_db": -5.18,
+  "edge": 0.0
+ },
+ {
+  "group": "alert",
+  "name": "a_dropped",
+  "seconds": 2.21,
+  "lufs": -16.0,
+  "peak_db": -2.8,
+  "edge": 0.0
+ },
+ {
+  "group": "alert",
+  "name": "a_late",
+  "seconds": 1.675,
+  "lufs": -16.0,
+  "peak_db": -5.54,
+  "edge": 0.0
+ }
+]

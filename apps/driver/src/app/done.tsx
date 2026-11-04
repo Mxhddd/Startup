@@ -3,7 +3,7 @@
 // long the trip took and how many children were taken safely. One button back to Today.
 // The numbers come from the trip screen as route params (nothing is read or stored here).
 import { colors, space, useLang } from '@pohnch/ui';
-import { AppText, DrawnCheck, StarIcon, TapButton, haptic } from '@pohnch/ui/native';
+import { AppText, DrawnCheck, StarIcon, TapButton, feel } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -43,8 +43,8 @@ export default function Done() {
   const insets = useSafeAreaInsets();
   const { minutes, children, kind } = useLocalSearchParams<{ minutes?: string; children?: string; kind?: string }>();
   useEffect(() => {
-    haptic.success();
-  }, []);
+    feel(kind === 'afternoon' ? 'dropped' : 'reached_school');
+  }, [kind]);
   return (
     <View testID="trip-done" style={{ flex: 1, backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + space.xxl, paddingBottom: insets.bottom + space.xl, paddingHorizontal: space.xl }}>
       <StatusBar style="light" />

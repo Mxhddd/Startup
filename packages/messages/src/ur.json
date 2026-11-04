@@ -342,10 +342,8 @@
   "settings.step.late": "وین کو دیر",
   "settings.focus": "فوکس موڈ میں بھی آئے گی",
   "settings.sound": "آواز",
-  "settings.sound.brand": "پہنچ کی آواز",
-  "settings.sound.hint": "ہلکی گھنٹی · اسکول اور گھر پر دو سُر",
-  "settings.sound.chime": "گھنٹی سنیں",
-  "settings.sound.pohnch": "دو سُر سنیں",
+  "settings.sound.brand": "پہنچ کی گھنٹیاں",
+  "settings.sound.hint": "ہر قدم کی اپنی ہلکی سی دھن، تاکہ بغیر دیکھے پتا چل جائے",
   "settings.language": "اطلاعات کی زبان",
   "settings.off": "فون میں پہنچ کی اطلاعات بند ہیں",
   "settings.open": "کھولیں",
@@ -484,5 +482,10 @@
   "history.noTrips": "اس دن کوئی سفر نہیں۔",
   "history.minutes": "{n} منٹ کا سفر",
   "history.link": "یہ ہفتہ",
-  "driver.week": "اس ہفتے: {done} میں سے {tracked} سفر شروع سے آخر تک"
+  "driver.week": "اس ہفتے: {done} میں سے {tracked} سفر شروع سے آخر تک",
+  "settings.sound.app": "ایپ میں آوازیں",
+  "settings.sound.appHint": "ایپ کھلی ہو تو ہلکی ٹیپ اور ہر قدم کی دھن۔ فون خاموش ہو تو کوئی آواز نہیں۔",
+  "settings.sound.board": "ہر قدم کی دھن سنیں",
+  "settings.sound.hear": "سنیں",
+  "driver.account.soundsHint": "ہر ٹیپ پر ہلکی دھن اور دبائے رکھنے پر بڑھتی ٹِک۔ فون خاموش ہو تو کوئی آواز نہیں۔"
 }

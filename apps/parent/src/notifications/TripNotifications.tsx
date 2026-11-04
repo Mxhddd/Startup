@@ -4,7 +4,7 @@
 //   buildLiveCard from @pohnch/core, and the card's push tokens handed to the server;
 // - Android: the live notification (ongoing.ts).
 import { parent } from '@pohnch/client';
-import { ageParts, buildLiveCard, karachiClock, type LiveText } from '@pohnch/core';
+import { ALERT_STEPS, ageParts, buildLiveCard, karachiClock, type LiveText, type MomentStep } from '@pohnch/core';
 import { useLang } from '@pohnch/ui';
 import { router } from 'expo-router';
 import * as Notifications from 'expo-notifications';
@@ -27,7 +27,7 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
   useEffect(() => {
     if (!signedIn || registered.current) return;
     registered.current = true;
-    setupChannels({ trip: t('notify.channel.trip'), live: t('notify.channel.live'), arrive: t('notify.channel.arrive'), quiet: t('notify.channel.quiet'), open: t('notify.action.open'), offToday: t('parent.chutti.offToday') })
+    setupChannels({ live: t('notify.channel.live'), quiet: t('notify.channel.quiet'), open: t('notify.action.open'), offToday: t('parent.chutti.offToday'), steps: Object.fromEntries(ALERT_STEPS.map((s) => [s, t(`settings.step.${s}`)])) as Record<MomentStep, string> })
       .then(registerForPush)
       .then((r) => {
         if (r === 'registered') registerLiveTask();

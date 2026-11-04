@@ -342,10 +342,8 @@
   "settings.step.late": "The van is late",
   "settings.focus": "Comes through Focus too",
   "settings.sound": "Sound",
-  "settings.sound.brand": "Pohnch sounds",
-  "settings.sound.hint": "A soft chime · two notes at school and home",
-  "settings.sound.chime": "Hear the chime",
-  "settings.sound.pohnch": "Hear the two notes",
+  "settings.sound.brand": "Pohnch alert tones",
+  "settings.sound.hint": "Each step has its own soft tone, so you know what happened without looking",
   "settings.language": "Language of alerts",
   "settings.off": "Pohnch alerts are off on this phone",
   "settings.open": "Open",
@@ -484,5 +482,10 @@
   "history.noTrips": "No trips this day.",
   "history.minutes": "{n} min ride",
   "history.link": "This week",
-  "driver.week": "This week: {tracked} of {done} trips tracked start to finish"
+  "driver.week": "This week: {tracked} of {done} trips tracked start to finish",
+  "settings.sound.app": "In-app sounds",
+  "settings.sound.appHint": "Soft taps and each step's tone while the app is open. Silent mode always wins.",
+  "settings.sound.board": "Hear each step",
+  "settings.sound.hear": "Hear",
+  "driver.account.soundsHint": "A tone for each tap and a rising tick while you hold. Silent mode always wins."
 }

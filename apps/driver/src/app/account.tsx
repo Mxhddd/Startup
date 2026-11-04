@@ -6,7 +6,8 @@
 import { deleteMyAccount } from '@pohnch/client';
 import { ApiError, PILOT_WHATSAPP } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, EditSheet, TapButton } from '@pohnch/ui/native';
+import { AppText, EditSheet, TapButton, Toggle, soundsAreOn } from '@pohnch/ui/native';
+import { saveSounds } from '../sounds';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { Linking, View } from 'react-native';
@@ -21,6 +22,7 @@ export default function Account() {
   const [asking, setAsking] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const hasFamilies = d.riders.length > 0;
+  const [sounds, setSounds] = useState(soundsAreOn());
 
   const remove = async () => {
     setError(null);
@@ -39,6 +41,15 @@ export default function Account() {
       <TapButton size="next" tone="picked" icon="phone" label={t('parent.menu.whatsapp', { phone: PILOT_WHATSAPP.display })}
         onConfirm={() => Linking.openURL(`https://wa.me/${PILOT_WHATSAPP.waNumber}`)} testID="help-whatsapp" />
       <TapButton tone="quiet" label={t('parent.menu.privacy')} onConfirm={() => Linking.openURL(PRIVACY_URL)} testID="help-privacy" />
+
+      {/* v9: the trip's sounds (a tone for each tap, a rising tick while holding). */}
+      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: space.md, minHeight: 64 }}>
+        <View style={{ flex: 1 }}>
+          <AppText bold style={{ fontSize: 17 }}>{t('settings.sound.app')}</AppText>
+          <AppText variant="small" color={colors.ink2}>{t('driver.account.soundsHint')}</AppText>
+        </View>
+        <Toggle value={sounds} onChange={(v) => { setSounds(v); void saveSounds(v); }} label={t('settings.sound.app')} testID="app-sounds" />
+      </View>
 
       <View style={{ height: 1, backgroundColor: colors.hairline, marginVertical: space.md }} />
       <TapButton tone="quiet" label={t('parent.menu.delete')} onConfirm={() => { setError(null); setAsking(true); }} testID="account-delete" />

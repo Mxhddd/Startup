@@ -14,7 +14,7 @@ const r = (over: Partial<Recipient>): Recipient => ({
 describe('push messages', () => {
   it('say what happened and who marked it, in Urdu', () => {
     const [m] = buildPushes('picked', [r({})]);
-    expect(m).toMatchObject({ to: 'ExponentPushToken[a]', title: 'علی', body: 'وین میں بیٹھ گئے · رفیق بھائی نے مارک کیا', channelId: 'step-chime', sound: 'chime.wav', categoryId: 'trip' });
+    expect(m).toMatchObject({ to: 'ExponentPushToken[a]', title: 'علی', body: 'وین میں بیٹھ گئے · رفیق بھائی نے مارک کیا', channelId: 'step-picked', sound: 'a_picked.wav', categoryId: 'trip' });
   });
 
   it("use each phone's own language", () => {
@@ -70,10 +70,10 @@ describe('sending', () => {
 });
 
 describe('alert sounds, urgency and settings (v7)', () => {
-  it('arrivals get the two-note sound, other steps the chime', () => {
-    expect(buildPushes('reached_school', [r({})])[0]).toMatchObject({ sound: 'pohnch.wav', channelId: 'step-pohnch' });
-    expect(buildPushes('dropped', [r({})])[0]).toMatchObject({ sound: 'pohnch.wav', channelId: 'step-pohnch' });
-    expect(buildPushes('left', [r({})])[0]).toMatchObject({ sound: 'chime.wav', channelId: 'step-chime' });
+  it('gives every step its own tone and channel (v9)', () => {
+    expect(buildPushes('reached_school', [r({})])[0]).toMatchObject({ sound: 'a_reached_school.wav', channelId: 'step-reached-school' });
+    expect(buildPushes('dropped', [r({})])[0]).toMatchObject({ sound: 'a_dropped.wav', channelId: 'step-dropped' });
+    expect(buildPushes('left', [r({})])[0]).toMatchObject({ sound: 'a_left.wav', channelId: 'step-left' });
   });
 
   it('only "arriving" and "late" break through Focus', () => {

@@ -26,7 +26,8 @@ import { useLang } from '../lang';
 import { springs } from '../motion';
 import { colors, radius, stepColors, tap, type Step } from '../theme';
 import { AppText } from './AppText';
-import { haptic } from './haptics';
+import { HOLD_FEELS, type FeelKind } from '../feedbackTable';
+import { feel as feelIt } from './feedback';
 import { Icon, type IconName } from './icons';
 import { PressableScale } from './PressableScale';
 
@@ -90,6 +91,7 @@ export function TapButton({
   disabled = false,
   onConfirm,
   testID,
+  feel: confirmFeel = 'confirm',
 }: {
   label: string;
   sublabel?: string;
@@ -100,6 +102,8 @@ export function TapButton({
   disabled?: boolean;
   onConfirm: () => void;
   testID?: string;
+  /** v9: the sound and haptic when it confirms (a trip step plays its own tone). */
+  feel?: FeelKind;
 }) {
   const { t, dir } = useLang();
   const c = look(tone);
@@ -114,11 +118,14 @@ export function TapButton({
   confirmRef.current = onConfirm;
 
   const celebrate = () => {
-    haptic.success();
+    feelIt(confirmFeel);
     pop.value = withSequence(withTiming(1.03, { duration: 110 }), withSpring(1, springs.pop));
     shine.value = 0;
     shine.value = withTiming(1, { duration: 720, easing: Easing.out(Easing.cubic) });
   };
+
+  // A rising tick at each quarter of the hold (sound and touch), so the driver hears it filling.
+  const holdTick = (q: number) => feelIt(HOLD_FEELS[q - 1] ?? 'hold1');
 
   const holdCtl = useMemo(
     () =>
@@ -140,7 +147,7 @@ export function TapButton({
   useAnimatedReaction(
     () => Math.floor(progress.value * 4),
     (q, prev) => {
-      if (prev !== null && q > prev && q > 0 && q < 4) runOnJS(haptic.tick)();
+      if (prev !== null && q > prev && q > 0 && q < 4) runOnJS(holdTick)(q);
     },
   );
 

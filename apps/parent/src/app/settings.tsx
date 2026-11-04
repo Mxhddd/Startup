@@ -9,13 +9,14 @@ import { parent } from '@pohnch/client';
 type NotificationPrefs = Awaited<ReturnType<typeof parent.notificationPrefs>>;
 import { ALERT_STEPS, MOMENTS, type MomentStep } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ChoiceChip, PressableScale, Shimmer, Toggle } from '@pohnch/ui/native';
+import { AppText, ChoiceChip, PressableScale, Shimmer, Toggle, feel, soundsAreOn } from '@pohnch/ui/native';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Linking, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Page } from '../components/Page';
-import { alertsUndecided, askForAlerts, previewSound, registerForPush } from '../notifications/setup';
+import { alertsUndecided, askForAlerts, registerForPush } from '../notifications/setup';
+import { saveSounds } from '../sounds';
 
 const TONE = { neel: colors.neel, zamurrad: colors.zamurrad, kesar: colors.kesar, shingarf: colors.shingarf } as const;
 
@@ -29,6 +30,13 @@ export default function Settings() {
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
   const [allowed, setAllowed] = useState(true);
   const [undecided, setUndecided] = useState(false);
+  const [appSounds, setAppSounds] = useState<boolean | null>(() => soundsAreOn());
+  const [playing, setPlaying] = useState<MomentStep | null>(null);
+  useEffect(() => {
+    if (!playing) return;
+    const id = setTimeout(() => setPlaying(null), 1400);
+    return () => clearTimeout(id);
+  }, [playing]);
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -98,14 +106,26 @@ export default function Settings() {
           </View>
           {prefs ? <Toggle value={prefs.sound} onChange={(v) => update({ ...prefs, sound: v })} label={t('settings.sound.brand')} testID="alert-sound" /> : null}
         </Row>
-        <Row last>
-          {(['chime', 'pohnch'] as const).map((k) => (
-            <PressableScale key={k} accessibilityRole="button" onPress={() => previewSound(k, t(k === 'chime' ? 'settings.sound.chime' : 'settings.sound.pohnch')).catch(() => undefined)} style={{ flex: 1 }}
-              faceStyle={{ height: 48, borderRadius: radius.pill, backgroundColor: colors.neelTint, alignItems: 'center', justifyContent: 'center' }} testID={`hear-${k}`}>
-              <AppText bold color={colors.link}>{t(k === 'chime' ? 'settings.sound.chime' : 'settings.sound.pohnch')}</AppText>
-            </PressableScale>
-          ))}
+        <Row>
+          <View style={{ flex: 1 }}>
+            <AppText bold style={{ fontSize: 17 }}>{t('settings.sound.app')}</AppText>
+            <AppText variant="small" color={colors.ink2}>{t('settings.sound.appHint')}</AppText>
+          </View>
+          {appSounds !== null ? <Toggle value={appSounds} onChange={(v) => { setAppSounds(v); void saveSounds(v); }} label={t('settings.sound.app')} testID="app-sounds" /> : null}
         </Row>
+      </View>
+
+      {/* v9: every step's tone, to hear before it comes (the alert is its longer twin). */}
+      <AppText bold color={colors.ink2} style={{ fontSize: 14, marginTop: space.lg }}>{t('settings.sound.board')}</AppText>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8 }}>
+        {ALERT_STEPS.map((s) => (
+          <PressableScale key={s} accessibilityRole="button" accessibilityLabel={`${t('settings.sound.hear')} ${t(`settings.step.${s}`)}`} haptic="none"
+            onPress={() => { feel(s); setPlaying(s); }} testID={`hear-${s}`}
+            faceStyle={{ minHeight: 48, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: playing === s ? TONE[MOMENTS[s].tone] : colors.neelTint, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: playing === s ? colors.onBrand : TONE[MOMENTS[s].tone] }} />
+            <AppText bold color={playing === s ? (MOMENTS[s].tone === 'kesar' ? colors.onKesar : colors.onBrand) : colors.link} style={{ fontSize: 15 }}>{t(`settings.step.${s}`)}</AppText>
+          </PressableScale>
+        ))}
       </View>
 
       <AppText bold color={colors.ink2} style={{ fontSize: 14, marginTop: space.lg }}>{t('settings.language')}</AppText>

@@ -46,7 +46,7 @@ const config: ExpoConfig = {
     'expo-font',
     // The map: MapLibre with free OpenFreeMap tiles (no Google key needed).
     '@maplibre/maplibre-react-native',
-    ['expo-notifications', { color: '#1F2A5C', defaultChannel: 'step-chime', icon: './assets/android-icon-monochrome.png', sounds: ['./assets/sounds/chime.wav', './assets/sounds/pohnch.wav'] }],
+    ['expo-notifications', { color: '#1F2A5C', defaultChannel: 'step-left', icon: './assets/android-icon-monochrome.png', sounds: ['left', 'arriving', 'picked', 'reached_school', 'left_school', 'dropped', 'late'].map((s) => `./assets/sounds/a_${s}.wav`) }],
     // iPhone: the trip's Live Activity (src/widgets/VanActivity.tsx) and the home-screen widget.
     [
       'expo-widgets',

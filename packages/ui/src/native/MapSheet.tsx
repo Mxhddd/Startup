@@ -9,7 +9,7 @@ import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValu
 import { useLang } from '../lang';
 import { pickSnap, rubberBand, springs } from '../motion';
 import { colors, radius, shadow, space } from '../theme';
-import { haptic } from './haptics';
+import { feel } from './feedback';
 
 export function MapSheet({
   children,
@@ -41,7 +41,7 @@ export function MapSheet({
   }, [expanded, hidden, y]);
 
   const settled = (isOpen: boolean) => {
-    haptic.tick();
+    feel(isOpen ? 'sheetUp' : 'sheetDown');
     onExpandedChange?.(isOpen);
   };
 

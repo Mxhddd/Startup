@@ -38,3 +38,4 @@ export { CircleAction } from './native/CircleAction';
 export { LaunchReveal } from './native/LaunchReveal';
 export { Toggle } from './native/Toggle';
 export { EditSheet } from './native/EditSheet';
+export { feel, playSound, setSoundsOn, soundsAreOn, warmFeedback, initFeedback } from './native/feedback';

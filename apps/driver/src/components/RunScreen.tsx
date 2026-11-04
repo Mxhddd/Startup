@@ -12,7 +12,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ScrollView, View, useWindowDimensions } from 'react-native';
 import Animated, { Easing, FadeInDown, FadeOutUp, LinearTransition, SlideInDown, cancelAnimation, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { say } from '../voice';
-import { haptic } from '@pohnch/ui/native';
+import { feel } from '@pohnch/ui/native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const layout = LinearTransition.springify().damping(24).stiffness(200);
@@ -88,7 +88,7 @@ function AllDoneSweep({ show }: { show: boolean }) {
   const was = useRef(show);
   useEffect(() => {
     if (show && !was.current) {
-      haptic.success();
+      feel('success');
       v.value = 0;
       v.value = withSequence(withTiming(1, { duration: 650, easing: Easing.out(Easing.cubic) }), withTiming(2, { duration: 500 }));
     }
@@ -125,7 +125,8 @@ export function RunScreen(p: RunScreenProps) {
     const key = next?.stopId ?? null;
     if (nudge.atStop && key && bumped.current !== key) {
       bumped.current = key;
-      haptic.press();
+      // A soft knock-and-bell (the "at your door" tone) before the spoken prompt.
+      feel('arriving');
     }
   }, [nudge.atStop, next?.stopId]);
 
@@ -219,6 +220,7 @@ export function RunScreen(p: RunScreenProps) {
               label={join(waitingAtNext.map((c) => c.firstName))}
               sublabel={waitingAtNext.length > 1 ? `${t(`step.${step}`)} · ${t('driver.trip.allOne')}` : t(`step.${step}`)}
               onConfirm={() => tapGroup(next)}
+              feel={step}
               testID={`stop-${p.groups.indexOf(next)}-tap`}
             />
             </Breathe>
@@ -226,7 +228,7 @@ export function RunScreen(p: RunScreenProps) {
               <View style={{ flexDirection: row, gap: 8 }}>
                 {waitingAtNext.map((c) => (
                   <View key={c.childId} style={{ flex: 1 }}>
-                    <TapButton label={t('driver.trip.only', { name: c.firstName })} onConfirm={() => p.onTapStop(next, tapText([c.firstName]), [c.childId])} testID={`only-${c.childId}`} />
+                    <TapButton label={t('driver.trip.only', { name: c.firstName })} onConfirm={() => p.onTapStop(next, tapText([c.firstName]), [c.childId])} feel={step} testID={`only-${c.childId}`} />
                   </View>
                 ))}
               </View>
@@ -262,6 +264,7 @@ export function RunScreen(p: RunScreenProps) {
             tone={p.kind === 'morning' ? 'reachedSchool' : allDone ? 'left' : 'neutral'}
             icon={p.kind === 'morning' ? 'reachedSchool' : allDone ? 'check' : undefined}
             label={p.kind === 'morning' ? t('driver.trip.reachedSchool') : t('driver.trip.end')}
+            feel={p.kind === 'morning' ? 'reached_school' : 'success'}
             onConfirm={() => p.onFinish(p.kind === 'morning' ? t('step.reachedSchool') : t('driver.trip.end'))}
           />
           </Breathe>

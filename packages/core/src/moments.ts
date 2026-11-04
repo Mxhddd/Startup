@@ -8,8 +8,12 @@ export type Moment = {
   tone: 'neel' | 'zamurrad' | 'kesar' | 'shingarf';
   /** The haptic the parent feels if the app is open. */
   haptic: 'tick' | 'success' | 'warn';
-  /** The alert sound: a soft chime, the two-note "pohnch" for arrivals, or the phone's default. */
-  sound: 'chime' | 'pohnch';
+  /**
+   * v9: the step's own tone in the Pohnch tones family (scripts/sounds/make-tones.py): "m_<sound>"
+   * in the app, "a_<sound>.wav" for the push, and Android channel "step-<sound>". One tone per step,
+   * so a parent knows what happened without looking.
+   */
+  sound: MomentStep;
   /** The in-app celebration: none, a ring that closes, or a burst of stars. */
   celebrate: 'none' | 'ring' | 'burst';
   /** iPhone "time-sensitive": may show through Focus. Only for things a parent must act on now. */
@@ -17,13 +21,13 @@ export type Moment = {
 };
 
 export const MOMENTS: Record<MomentStep, Moment> = {
-  left: { tone: 'neel', haptic: 'tick', sound: 'chime', celebrate: 'none', timeSensitive: false },
-  picked: { tone: 'zamurrad', haptic: 'success', sound: 'chime', celebrate: 'ring', timeSensitive: false },
-  arriving: { tone: 'zamurrad', haptic: 'tick', sound: 'chime', celebrate: 'none', timeSensitive: true },
-  reached_school: { tone: 'kesar', haptic: 'success', sound: 'pohnch', celebrate: 'burst', timeSensitive: false },
-  left_school: { tone: 'neel', haptic: 'tick', sound: 'chime', celebrate: 'none', timeSensitive: false },
-  dropped: { tone: 'zamurrad', haptic: 'success', sound: 'pohnch', celebrate: 'ring', timeSensitive: false },
-  late: { tone: 'shingarf', haptic: 'warn', sound: 'chime', celebrate: 'none', timeSensitive: true },
+  left: { tone: 'neel', haptic: 'tick', sound: 'left', celebrate: 'none', timeSensitive: false },
+  picked: { tone: 'zamurrad', haptic: 'success', sound: 'picked', celebrate: 'ring', timeSensitive: false },
+  arriving: { tone: 'zamurrad', haptic: 'tick', sound: 'arriving', celebrate: 'none', timeSensitive: true },
+  reached_school: { tone: 'kesar', haptic: 'success', sound: 'reached_school', celebrate: 'burst', timeSensitive: false },
+  left_school: { tone: 'neel', haptic: 'tick', sound: 'left_school', celebrate: 'none', timeSensitive: false },
+  dropped: { tone: 'zamurrad', haptic: 'success', sound: 'dropped', celebrate: 'ring', timeSensitive: false },
+  late: { tone: 'shingarf', haptic: 'warn', sound: 'late', celebrate: 'none', timeSensitive: true },
 };
 
 /** The steps a parent can switch off one by one in settings (the same list, in timeline order). */
