@@ -23,7 +23,7 @@ function Milestone({ step, label, done, current }: { step: Step; label: string; 
   const glow = useAnimatedStyle(() => ({ opacity: current ? 0.35 + 0.5 * v.value : 0, transform: [{ scale: 1 + 0.12 * v.value }] }));
   const c = stepColors[step];
   return (
-    <View style={{ alignItems: 'center', gap: 4, width: 72 }} accessibilityLabel={label} accessibilityState={{ checked: done, selected: current }}>
+    <View style={{ alignItems: 'center', gap: 4, width: 64 }} accessibilityLabel={label} accessibilityState={{ checked: done, selected: current }}>
       <View style={{ width: W, height: H }}>
         <Animated.View style={[{ position: 'absolute', left: -6, top: -7, width: W + 12, height: H + 12 }, glow]}>
           <Svg width={W + 12} height={H + 12}><Path d={archPath(W + 12, H + 12)} fill={colors.kesar} opacity={0.5} /></Svg>
@@ -46,11 +46,11 @@ export function RouteRibbon({ steps, testID }: { steps: { step: Step; label: str
   return (
     <View testID={testID} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
       {steps.map((s, i) => (
-        <View key={s.step} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', flex: i < steps.length - 1 ? 1 : 0 }}>
+        <View key={s.step} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'flex-start', flexGrow: i < steps.length - 1 ? 1 : 0, flexShrink: 1, minWidth: 0 }}>
           <Milestone step={s.step} label={s.label} done={s.done} current={i === current} />
           {i < steps.length - 1 ? (
-            <View style={{ flex: 1, height: H, justifyContent: 'center', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', gap: 5, overflow: 'hidden', paddingHorizontal: 2 }}>
-              {Array.from({ length: 6 }, (_, k) => (
+            <View style={{ flex: 1, flexShrink: 1, minWidth: 0, height: H, justifyContent: 'space-evenly', alignItems: 'center', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', overflow: 'hidden' }}>
+              {Array.from({ length: 4 }, (_, k) => (
                 <View key={k} style={{ width: 5, height: 5, borderRadius: 3, backgroundColor: s.done ? stepColors[s.step].fill : colors.line }} />
               ))}
             </View>
