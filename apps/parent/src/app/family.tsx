@@ -9,7 +9,7 @@
 import { deleteMyAccount, parent } from '@pohnch/client';
 import { ApiError, normalisePkMobile, PILOT_WHATSAPP } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, EditSheet, Icon, PressableScale, Shimmer, TapButton, TextField, type IconName } from '@pohnch/ui/native';
+import { AppText, EditSheet, Icon, PressableScale, Shimmer, TapButton, TextField, useMorphSource, type IconName } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useState, type ReactNode } from 'react';
 import { Linking, View } from 'react-native';
@@ -30,14 +30,17 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 }
 
 /** One quiet row: a round mark, a title and a line, and what happens on the far side. */
-function MenuRow({ mark, icon, title, line, end, onPress, last = false, testID }: {
+function MenuRow({ mark, icon, title, line, end, onPress, last = false, testID, morphKey }: {
   mark?: string; icon?: IconName; title: string; line?: string; end?: ReactNode; onPress?: () => void; last?: boolean; testID?: string;
+  /** v9: the round mark flies into the next page (Morph) under this key. */
+  morphKey?: string;
 }) {
+  const morph = useMorphSource(morphKey ?? 'none');
   const { dir } = useLang();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   const body = (
     <View style={{ flexDirection: row, alignItems: 'center', gap: 14, minHeight: 64, paddingVertical: 8, borderBottomWidth: last ? 0 : 1, borderColor: colors.hairline }}>
-      <View style={{ width: 40, height: 40, borderRadius: 20, borderCurve: 'continuous', backgroundColor: mark ? colors.kesar : colors.neelTint, alignItems: 'center', justifyContent: 'center' }}>
+      <View ref={morph.ref} collapsable={false} style={{ width: 40, height: 40, borderRadius: 20, borderCurve: 'continuous', backgroundColor: mark ? colors.kesar : colors.neelTint, alignItems: 'center', justifyContent: 'center' }}>
         {mark ? <AppText bold color={colors.onKesar} style={{ fontSize: 17 }}>{mark}</AppText> : icon ? <Icon name={icon} size={20} color={colors.link} /> : null}
       </View>
       <View style={{ flex: 1 }}>
@@ -49,7 +52,11 @@ function MenuRow({ mark, icon, title, line, end, onPress, last = false, testID }
   );
   if (!onPress) return body;
   return (
-    <PressableScale accessibilityRole="button" accessibilityLabel={line ? `${title}, ${line}` : title} onPress={onPress} scaleTo="big" testID={testID}>
+    <PressableScale accessibilityRole="button" accessibilityLabel={line ? `${title}, ${line}` : title} scaleTo="big" testID={testID}
+      onPress={() => {
+        if (morphKey && mark) void morph.fly(<View style={{ flex: 1, borderRadius: 999, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center' }}><AppText bold color={colors.onKesar} style={{ fontSize: 20 }}>{mark}</AppText></View>);
+        onPress?.();
+      }}>
       {body}
     </PressableScale>
   );
@@ -117,7 +124,7 @@ export default function Menu() {
     <Page title={t('parent.menu')}>
       <Section title={t('parent.menu.children')}>
         {p.children.map((c, i) => (
-          <MenuRow key={c.id} mark={c.first_name.slice(0, 1)} title={c.first_name} line={c.school_name} onPress={() => router.push({ pathname: '/child', params: { id: c.id } })} testID={`menu-child-${i}`} />
+          <MenuRow key={c.id} morphKey={`child-${c.id}`} mark={c.first_name.slice(0, 1)} title={c.first_name} line={c.school_name} onPress={() => router.push({ pathname: '/child', params: { id: c.id } })} testID={`menu-child-${i}`} />
         ))}
         <MenuRow icon="plus" title={t('parent.addChild')} onPress={() => router.push('/child')} last testID="menu-add-child" />
       </Section>

@@ -17,7 +17,7 @@ export type MapPin =
 export type PohnchMapProps = {
   accessibilityLabel: string;
   pins?: MapPin[];
-  van?: { lat: number; lng: number; heading: number | null; stale: boolean; speed?: number | null } | null;
+  van?: { lat: number; lng: number; heading: number | null; stale: boolean; speed?: number | null; waiting?: boolean } | null;
   onPress?: (p: { lat: number; lng: number }) => void;
   style?: StyleProp<ViewStyle>;
   testID?: string;
@@ -207,7 +207,7 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       ))}
       {van ? (
         <Marker id="van" lngLat={[van.lng, van.lat]} anchor="center">
-          <VanMarker heading={(van.heading ?? 0) - mapBearing} stale={van.stale} speed={van.speed} />
+          <VanMarker heading={(van.heading ?? 0) - mapBearing} stale={van.stale} speed={van.speed} waiting={van.waiting} lights={mood === 'dusk' || mood === 'night'} />
         </Marker>
       ) : null}
     </Map>

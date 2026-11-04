@@ -1,6 +1,7 @@
-// The moment a step happens while the parent is watching: a coloured disc pops in at the top of the
-// sheet with the step's icon, and either a ring closes around it (in the van, home) or a burst of
-// kesar stars flies out of it (reached school). It speaks the step, then lets the sheet settle.
+// The moment a step happens while the parent is watching (v9): a coloured disc pops in at the top of
+// the sheet with the step's icon; its tone and haptic play in the same frame (feel); and its picture is
+// drawn on the GPU (MomentFX): a ring closes (in the van), kesar stars rise into a constellation
+// (reached school), a warm glow swells and the ring closes (home). Then the sheet settles.
 import { MOMENTS, type MomentStep } from '@pohnch/core';
 import { useEffect } from 'react';
 import { View } from 'react-native';
@@ -11,7 +12,8 @@ import { springs } from '../motion';
 import { colors, type Step } from '../theme';
 import { AppText } from './AppText';
 import { feel } from './feedback';
-import { Icon, StarIcon } from './icons';
+import { Icon } from './icons';
+import { MomentFX } from './MomentFX';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 const TONE = { neel: colors.neel, zamurrad: colors.zamurrad, kesar: colors.kesar, shingarf: colors.shingarf } as const;
@@ -19,20 +21,6 @@ const ICON: Record<MomentStep, Step | 'help'> = {
   left: 'left', picked: 'picked', arriving: 'dropped', reached_school: 'reachedSchool', left_school: 'leftSchool', dropped: 'dropped', late: 'help',
 };
 
-function Particle({ i, n, t }: { i: number; n: number; t: SharedValue<number> }) {
-  const angle = (i / n) * Math.PI * 2;
-  const dist = 46 + (i % 3) * 16;
-  const size = 10 + (i % 3) * 4;
-  const style = useAnimatedStyle(() => ({
-    opacity: t.value < 0.12 ? t.value / 0.12 : 1 - t.value,
-    transform: [{ translateX: Math.cos(angle) * dist * t.value }, { translateY: Math.sin(angle) * dist * t.value }, { rotate: `${t.value * 160}deg` }, { scale: 0.3 + 0.7 * t.value }],
-  }));
-  return (
-    <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: 28 - size / 2, top: 28 - size / 2 }, style]}>
-      <StarIcon size={size} color={colors.kesar} />
-    </Animated.View>
-  );
-}
 
 export function MomentBanner({ step, title, sub, onDone }: { step: MomentStep; title: string; sub?: string; onDone?: () => void }) {
   const { dir } = useLang();
@@ -63,14 +51,17 @@ export function MomentBanner({ step, title, sub, onDone }: { step: MomentStep; t
       style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 16 }}
     >
       <View style={{ width: 56, height: 56, alignItems: 'center', justifyContent: 'center' }}>
-        {m.celebrate === 'burst' ? Array.from({ length: 10 }, (_, i) => <Particle key={i} i={i} n={10} t={t} />) : null}
+        {/* v9: the moment's picture on the GPU, behind the disc (stars, glow) or around it (ring). */}
+        <View pointerEvents="none" style={{ position: 'absolute', left: 28, top: 28, width: 0, height: 0 }}>
+          <MomentFX kind={step === 'dropped' ? 'glow' : m.celebrate} color={fill} />
+        </View>
         <View style={{ width: 52, height: 52, borderRadius: 26, backgroundColor: fill, alignItems: 'center', justifyContent: 'center' }}>
           <Icon name={stepKey === 'help' ? 'help' : stepKey} size={26} color={ink} strokeWidth={2.4} />
         </View>
-        {m.celebrate === 'ring' ? (
-          <Svg width={64} height={64} viewBox="0 0 64 64" style={{ position: 'absolute', left: -4, top: -4, transform: [{ rotate: '-90deg' }] }}>
-            <AnimatedCircle cx="32" cy="32" r="28" stroke={fill} strokeOpacity={0.4} strokeWidth={3} fill="none" strokeDasharray="176 176" animatedProps={ringProps} strokeLinecap="round" />
-          </Svg>
+        {step === 'dropped' ? (
+          <View pointerEvents="none" style={{ position: 'absolute', left: 28, top: 28, width: 0, height: 0 }}>
+            <MomentFX kind="ring" color={fill} />
+          </View>
         ) : null}
       </View>
       <View style={{ flex: 1 }}>

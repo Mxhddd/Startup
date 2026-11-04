@@ -7,7 +7,7 @@ import { useGlide } from '../hooks/useGlide';
 
 export type MapProps = {
   accessibilityLabel: string;
-  van?: { lat: number; lng: number; heading: number | null; stale: boolean; speed?: number | null } | null;
+  van?: { lat: number; lng: number; heading: number | null; stale: boolean; speed?: number | null; waiting?: boolean } | null;
   stop?: { lat: number; lng: number } | null;
   home?: { lat: number; lng: number } | null;
   onPress?: (p: { lat: number; lng: number }) => void;
@@ -20,7 +20,7 @@ export type MapProps = {
 };
 
 export function BrandMap({ accessibilityLabel, van, stop, home, onPress, style, bottomInset, trail, follow, onFollowChange, recenterKey }: MapProps) {
-  const vanAt = useGlide(van ? { latitude: van.lat, longitude: van.lng } : null);
+  const vanAt = useGlide(van ? { latitude: van.lat, longitude: van.lng } : null, van?.stale ?? false);
   const pins: MapPin[] = [
     ...(home ? [{ id: 'home', kind: 'home' as const, lat: home.lat, lng: home.lng }] : []),
     ...(stop ? [{ id: 'stop', kind: 'stop' as const, lat: stop.lat, lng: stop.lng }] : []),
@@ -30,7 +30,7 @@ export function BrandMap({ accessibilityLabel, van, stop, home, onPress, style, 
       testID="parent-map"
       accessibilityLabel={accessibilityLabel}
       pins={pins}
-      van={van && vanAt ? { lat: vanAt.latitude, lng: vanAt.longitude, heading: van.heading, stale: van.stale, speed: van.speed } : null}
+      van={van && vanAt ? { lat: vanAt.latitude, lng: vanAt.longitude, heading: van.heading, stale: van.stale, speed: van.speed, waiting: van.waiting } : null}
       onPress={onPress}
       style={style}
       bottomInset={bottomInset}

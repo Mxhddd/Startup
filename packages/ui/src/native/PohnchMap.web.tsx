@@ -114,7 +114,7 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       })}
       {van ? (
         <View pointerEvents="none" style={{ position: 'absolute', left: place(van.lat, van.lng).x - 32, top: place(van.lat, van.lng).y - 32 }}>
-          <VanMarker heading={van.heading ?? 90} stale={van.stale} />
+          <VanMarker heading={van.heading ?? 90} stale={van.stale} speed={van.speed} waiting={van.waiting} lights={colorScheme() === "dark"} />
         </View>
       ) : null}
     </Pressable>

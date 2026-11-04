@@ -1,39 +1,53 @@
-// Moves the van marker smoothly from where it was to the new position, instead of jumping every
-// 5 seconds. The glide lasts about as long as the gap between positions, so the van keeps rolling at
-// an even speed (like a ride-hailing app) instead of dashing and stopping.
-import { lerpLatLng, type LatLng } from '@pohnch/core';
-import { durations } from '@pohnch/ui';
+// Draws the van smoothly between real positions (v9 glide, packages/core/src/glide.ts): it keeps
+// rolling the way it was going for a few seconds (so it never stalls between positions), and when a
+// new position arrives it eases into it along a curve (so it never jumps). Stops when the trip does.
+import { glidePosition, type GlideState, type LatLng } from '@pohnch/core';
 import { useEffect, useRef, useState } from 'react';
 
-const MIN_MS = 800;
-
-export function useGlide(target: LatLng | null): LatLng | null {
+export function useGlide(target: LatLng | null, frozen = false): LatLng | null {
   const [shown, setShown] = useState<LatLng | null>(target);
-  const from = useRef<LatLng | null>(target);
-  const lastAt = useRef<number | null>(null);
+  const state = useRef<GlideState | null>(null);
+  const drawn = useRef<LatLng | null>(target);
+
+  // A new real position: remember it (and the one before), starting the ease from where the van is drawn.
   useEffect(() => {
     if (!target) {
+      state.current = null;
+      drawn.current = null;
       setShown(null);
-      from.current = null;
-      lastAt.current = null;
       return;
     }
     const now = Date.now();
-    const gap = lastAt.current === null ? MIN_MS : now - lastAt.current;
-    lastAt.current = now;
-    const duration = Math.min(durations.glide, Math.max(MIN_MS, gap));
-    const start = from.current ?? target;
-    const t0 = now;
-    let frame = 0;
-    const step = () => {
-      const t = Math.min(1, (Date.now() - t0) / duration);
-      const p = lerpLatLng(start, target, t);
-      setShown(p);
-      from.current = p;
-      if (t < 1) frame = requestAnimationFrame(step);
+    const old = state.current;
+    state.current = {
+      prev: old ? old.last : null,
+      last: { at: now, p: target },
+      from: drawn.current ?? target,
+      fromAt: now,
     };
-    frame = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(frame);
   }, [target?.latitude, target?.longitude]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // One frame loop while there is a van to draw. A stale signal (frozen) stops it rolling ahead.
+  useEffect(() => {
+    let frame = 0;
+    let lastPaint = 0;
+    const tick = () => {
+      const s = state.current;
+      if (s) {
+        const now = Date.now();
+        // About 30 updates a second is plenty for a marker and spares the battery.
+        if (now - lastPaint > 32) {
+          lastPaint = now;
+          const p = frozen ? s.last.p : glidePosition(s, now);
+          drawn.current = p;
+          setShown(p);
+        }
+      }
+      frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [frozen]);
+
   return shown;
 }

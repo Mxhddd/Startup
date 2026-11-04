@@ -39,3 +39,7 @@ export { LaunchReveal } from './native/LaunchReveal';
 export { Toggle } from './native/Toggle';
 export { EditSheet } from './native/EditSheet';
 export { feel, playSound, setSoundsOn, soundsAreOn, warmFeedback, initFeedback } from './native/feedback';
+export { LivingSky, SKY } from './native/LivingSky';
+export { MomentFX } from './native/MomentFX';
+export { LiquidProgress } from './native/LiquidProgress';
+export { MorphProvider, MorphTarget, useMorphSource, MORPH_SPRING } from './native/Morph';

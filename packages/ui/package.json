@@ -9,18 +9,19 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
+    "@pohnch/core": "workspace:*",
     "@pohnch/messages": "workspace:*",
-    "@pohnch/core": "workspace:*"
+    "@shopify/react-native-skia": "2.14.0"
   },
   "peerDependencies": {
+    "@maplibre/maplibre-react-native": "*",
+    "expo-blur": "*",
+    "expo-haptics": "*",
     "react": "*",
     "react-native": "*",
-    "react-native-reanimated": "*",
     "react-native-gesture-handler": "*",
-    "react-native-svg": "*",
-    "@maplibre/maplibre-react-native": "*",
-    "expo-haptics": "*",
-    "expo-blur": "*"
+    "react-native-reanimated": "*",
+    "react-native-svg": "*"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

@@ -9,7 +9,7 @@
 // - When a step happens while you watch, its moment plays in the head (a ring or a star burst).
 import { arrivalClock, childPlace, newMoment, waitClock, type MomentStep } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AbsentChip, AppText, CircleAction, EtaPill, Icon, LineArt, MomentBanner, PressableScale, RollingNumber, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
+import { AbsentChip, AppText, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Share, View } from 'react-native';
@@ -41,7 +41,7 @@ function Onboard({ title, body, children }: { title: string; body?: string; chil
 
 /** The head that morphs: compact line at peek, big minutes when open (progress 0 -> 1). */
 function MorphHead({ progress, compact, full }: { progress?: SharedValue<number>; compact: ReactNode; full: ReactNode }) {
-  const box = useAnimatedStyle(() => ({ height: interpolate(progress?.value ?? 0, [0, 1], [56, 128], 'clamp') }));
+  const box = useAnimatedStyle(() => ({ height: interpolate(progress?.value ?? 0, [0, 1], [56, 150], 'clamp') }));
   const small = useAnimatedStyle(() => {
     const p = progress?.value ?? 0;
     return { opacity: interpolate(p, [0, 0.45], [1, 0], 'clamp'), transform: [{ translateY: interpolate(p, [0, 1], [0, -10], 'clamp') }] };
@@ -157,8 +157,14 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
       {!live && (offToday || offNote) ? <AppText variant="small" bold color={colors.kesarText} numberOfLines={1}>{offToday ? offBy : offNote}</AppText> : !live && nextLine ? <AppText variant="small" bold color={colors.ink2} numberOfLines={1}>{nextLine}</AppText> : null}
     </View>
   );
+  // v9: how far along the road to your stop the van is (the same measure as the lock-screen bar).
+  const startedAt = p.running ? Date.parse(p.running.started_at) : 0;
+  const route = p.eta === 'door' ? 1 : typeof p.eta === 'number' && startedAt ? Math.min(1, Math.max(0.04, (p.now - startedAt) / (p.now + p.eta * 60_000 - startedAt))) : 0;
   const full = counting ? (
-    <EtaPill minutes={p.eta as number | 'door'} to="home" stale={stale} lead={t(`parent.place.${place}`, { name })} clock={typeof p.eta === 'number' && !stale ? arrivalClock(p.now, p.eta) : undefined} />
+    <View style={{ gap: 10 }}>
+      <EtaPill minutes={p.eta as number | 'door'} to="home" stale={stale} lead={t(`parent.place.${place}`, { name })} clock={typeof p.eta === 'number' && !stale ? arrivalClock(p.now, p.eta) : undefined} />
+      <LiquidProgress value={route} color={stale ? colors.ink2 : colors.neel} testID="route-progress" />
+    </View>
   ) : (
     <View>
       <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{live ? t('parent.timeline.title') : name}</AppText>
