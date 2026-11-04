@@ -7,10 +7,13 @@ import { onTripFix, type Fix } from '../location/tripLocation';
 import { clearTripLive, showTripLive } from '../notifications/tripLive';
 import { RunScreen } from '../components/RunScreen';
 import { useDriver } from '../state/DriverStore';
+import { useStage2 } from '../state/stage2';
+import { stage2 } from '@pohnch/client';
 
 export default function Trip() {
   const { t } = useLang();
   const d = useDriver();
+  const s2 = useStage2();
   const [fix, setFix] = useState<Fix | null>(null);
   useEffect(() => onTripFix(setFix), []);
   const [voice, setVoice] = useState(false);
@@ -39,6 +42,7 @@ export default function Trip() {
   const kind = d.running.kind;
   return (
     <RunScreen
+      onEmergency={s2 && !d.running.is_practice ? () => stage2.sendHelpAlert(d.running!.id).then(() => true).catch(() => false) : undefined}
       kind={kind}
       groups={d.run.groups}
       progress={d.progress}

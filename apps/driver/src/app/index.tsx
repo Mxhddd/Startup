@@ -18,9 +18,10 @@ import { LocationDisclosure } from '../components/LocationDisclosure';
 import { AlertsCard } from '../components/AlertsCard';
 import { SetupChecklist } from '../components/SetupChecklist';
 import { useDriver } from '../state/DriverStore';
+import { useStage2 } from '../state/stage2';
 
 const DISCLOSED = 'pohnch.driver.locationDisclosed.v1';
-type Href = '/stops' | '/families' | '/setup' | '/practice' | '/dayoff' | '/account';
+type Href = '/stops' | '/families' | '/setup' | '/practice' | '/dayoff' | '/account' | '/earnings';
 
 /** v10: a 2 x 2 group of plain actions, each with its icon in a soft square and its name beside it. */
 function NavTile({ label, href, icon, badge, tint = colors.neelTint, ink = colors.neel }: { label: string; href: Href; icon: IconName; badge?: number; tint?: string; ink?: string }) {
@@ -73,6 +74,7 @@ export default function DriverToday() {
   const insets = useSafeAreaInsets();
   const { configured } = useSession();
   const d = useDriver();
+  const s2 = useStage2();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   const [askFor, setAskFor] = useState<'morning' | 'afternoon' | null>(null);
 
@@ -197,6 +199,7 @@ export default function DriverToday() {
                 <NavTile label={t('driver.nav.stops')} href="/stops" icon="pin" />
                 <NavTile label={t('driver.nav.dayOff')} href="/dayoff" icon="calendar" badge={d.daysOff.length || undefined} tint={colors.kesarTint} ink={colors.onKesar} />
                 <NavTile label={t('driver.nav.practice')} href="/practice" icon="route" tint={colors.zamurradTint} ink={colors.zamurradOnTint} />
+                {s2 ? <NavTile label={t('s2.fees.title')} href="/earnings" icon="wallet" tint={colors.zamurradTint} ink={colors.zamurradOnTint} /> : null}
               </View>
               <PressableScale accessibilityRole="button" onPress={() => router.push('/account')} testID="nav-account"
                 faceStyle={{ minHeight: 64, flexDirection: row, alignItems: 'center', justifyContent: 'center', gap: 8 }}>

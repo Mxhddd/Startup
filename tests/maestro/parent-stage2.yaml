@@ -1,0 +1,38 @@
+# Parent app (v10, stage 2): Live plans, find a van, ask for a seat, request a van, fees and a rating.
+# Needs the pilot server with stage 2 switched on for the test family's van (admin page > Stage 2
+# switch). With the switch off these rows are not in the menu at all, which is the stage 1 behaviour.
+# Run: maestro test tests/maestro/parent-stage2.yaml
+appId: pk.pohnch.parent
+---
+- launchApp
+- tapOn: "مینو"
+- assertVisible:
+    id: "menu-live"
+- tapOn:
+    id: "menu-live"
+- assertVisible: "پہنچ لائیو"
+- back
+- tapOn:
+    id: "menu-find"
+- extendedWaitUntil:
+    visible:
+      id: "ask-sheet"
+    timeout: 1
+    optional: true
+- back
+- tapOn:
+    id: "menu-request"
+- assertVisible:
+    id: "request-card"
+- back
+- tapOn:
+    id: "menu-fees"
+- assertVisible:
+    id: "fee-now"
+- tapOn:
+    id: "rate-open"
+- tapOn:
+    id: "rate-5"
+- tapOn:
+    id: "rate-save"
+- assertVisible: "شکریہ"

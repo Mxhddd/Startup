@@ -24,6 +24,12 @@ async function fakeSupabase(ctx: BrowserContext, opts: { loggedIn: boolean; admi
     if (u.pathname === '/rest/v1/rpc/admin_trips_today')
       return json([{ trip_id: 't1', van_name: 'Rafiq bhai van', driver_name: 'Rafiq bhai', kind: 'morning', status: 'running', started_at: new Date().toISOString(), last_position_at: new Date(Date.now() - 20_000).toISOString(), riders: 9, done: 4 }]);
     if (u.pathname === '/functions/v1/app/admin.verify') return json({ ok: true });
+    // v10 stage 2
+    if (u.pathname === '/rest/v1/rpc/admin_flags') return json([]);
+    if (u.pathname === '/rest/v1/rpc/admin_help_alerts')
+      return json([{ id: 'h1', van_name: 'Rafiq bhai van', driver_name: 'Rafiq bhai', lat: 24.9, lng: 67.1, created_at: new Date().toISOString(), resolved_at: null }]);
+    if (u.pathname === '/rest/v1/rpc/admin_van_requests') return json([{ school_name: 'Green Valley', children: 5, lat: 24.9, lng: 67.1, oldest: new Date().toISOString() }]);
+    if (u.pathname === '/rest/v1/rpc/admin_set_flag' || u.pathname === '/rest/v1/rpc/admin_resolve_help') return json(null);
     return json([]);
   });
   return calls;
@@ -53,4 +59,18 @@ test('the team sees the four numbers, the check queue, and verifies a driver', a
   await expect(page.getByTestId('trip-row')).toContainText('4 / 9');
   await page.getByTestId('queue-row').getByRole('button').click();
   await expect.poll(() => calls.includes('/functions/v1/app/admin.verify')).toBe(true);
+});
+
+test('v10 stage 2: help alerts with the van on a map, the switch per van, requests by school', async ({ context, page }) => {
+  const calls = await fakeSupabase(context, { loggedIn: true, admin: true });
+  await page.goto('/admin');
+  await expect(page.getByTestId('help-row')).toHaveCount(1);
+  await expect(page.getByTestId('help-row').getByRole('link')).toHaveAttribute('href', /openstreetmap\.org\/\?mlat=24\.9&mlon=67\.1/);
+  await expect(page.getByTestId('request-row')).toContainText('Green Valley');
+  // The switch: everyone plus one row per verified van (the unverified one is not offered); all off.
+  await expect(page.getByTestId('stage2-switch').getByRole('button')).toHaveCount(2);
+  await page.getByTestId('stage2-switch').getByRole('button').last().click();
+  await expect.poll(() => calls.includes('/rest/v1/rpc/admin_set_flag')).toBe(true);
+  await page.getByTestId('help-row').getByRole('button').click();
+  await expect.poll(() => calls.includes('/rest/v1/rpc/admin_resolve_help')).toBe(true);
 });

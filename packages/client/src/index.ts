@@ -6,3 +6,5 @@ export * as driver from './driver';
 export type { Van, Stop, Request as JoinRequest, Trip } from './driver';
 export * as parent from './parent';
 export type { Child, Membership, ParentVan, MyStop, ParentTrip, Position } from './parent';
+export * as stage2 from './stage2';
+export type { NearVan, LiveStatus, FeeMonth, VanFee } from './stage2';

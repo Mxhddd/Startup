@@ -176,6 +176,8 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
         </section>
       ) : null}
 
+      <Stage2 supabase={supabase} vans={vans} t={t} />
+
       <h2 style={sectionTitle}>{t('admin.queue.title')}</h2>
       <p style={{ margin: 0, color: colors.ink2 }}>{t('admin.queue.hint')}</p>
       {queue.length === 0 ? <p style={{ margin: 0 }}>{t('admin.queue.empty')}</p> : null}
@@ -218,5 +220,81 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
         </div>
       ))}
     </div>
+  );
+}
+
+type FlagRow = { key: string; van_id: string | null; van_name: string | null; enabled: boolean };
+type HelpRow = { id: string; van_name: string; driver_name: string; lat: number | null; lng: number | null; created_at: string; resolved_at: string | null };
+type RequestRow = { school_name: string; children: number; lat: number; lng: number; oldest: string };
+
+/**
+ * v10 stage 2 for the team: emergency help alerts first (with a map link to the van's last position),
+ * the stage 2 switch (everyone, or one van at a time; off until gate 1), and open requests for a new
+ * van grouped by school (counts only; no names, places rounded).
+ */
+function Stage2({ supabase, vans, t }: { supabase: SupabaseClient; vans: VanRow[]; t: (k: MessageKey, v?: Vars) => string }) {
+  const [flags, setFlags] = useState<FlagRow[]>([]);
+  const [help, setHelp] = useState<HelpRow[]>([]);
+  const [reqs, setReqs] = useState<RequestRow[]>([]);
+  const load = useCallback(async () => {
+    const [f, h, r] = await Promise.all([supabase.rpc('admin_flags'), supabase.rpc('admin_help_alerts'), supabase.rpc('admin_van_requests')]);
+    setFlags((f.data ?? []) as FlagRow[]);
+    setHelp((h.data ?? []) as HelpRow[]);
+    setReqs((r.data ?? []) as RequestRow[]);
+  }, [supabase]);
+  useEffect(() => {
+    load();
+    const id = setInterval(load, 20_000);
+    return () => clearInterval(id);
+  }, [load]);
+  const setFlag = async (van: string | null, on: boolean) => {
+    await supabase.rpc('admin_set_flag', { p_key: 'stage2', p_van: van, p_on: on });
+    await load();
+  };
+  const isOn = (van: string | null) => flags.some((f) => f.van_id === van && f.enabled);
+  const title: CSSProperties = { margin: '8px 0 0', fontSize: 22 };
+  const open = help.filter((h) => !h.resolved_at);
+  return (
+    <>
+      <h2 style={{ ...title, color: open.length ? colors.dangerText : undefined }}>{t('admin.help.title')}</h2>
+      {help.length === 0 ? <p style={{ margin: 0 }}>{t('admin.help.empty')}</p> : null}
+      {help.map((h) => (
+        <div key={h.id} data-testid="help-row" style={{ ...card, display: 'flex', gap: 12, flexWrap: 'wrap', alignItems: 'center', background: h.resolved_at ? colors.white : colors.shingarfTint }}>
+          <strong style={{ flex: '1 1 200px' }}>{h.van_name} · {h.driver_name}</strong>
+          <span style={{ fontFamily: 'var(--font-latin), sans-serif', direction: 'ltr' }}>{new Date(h.created_at).toLocaleTimeString('en-GB', { timeZone: 'Asia/Karachi', hour: '2-digit', minute: '2-digit' })}</span>
+          {h.lat !== null && h.lng !== null ? (
+            <a href={`https://www.openstreetmap.org/?mlat=${h.lat}&mlon=${h.lng}#map=17/${h.lat}/${h.lng}`} target="_blank" rel="noreferrer" style={{ color: colors.neel }}>{t('admin.help.map')}</a>
+          ) : null}
+          {h.resolved_at ? (
+            <span style={{ color: colors.ink2 }}>{t('admin.help.resolved')}</span>
+          ) : (
+            <button type="button" style={btn(colors.zamurrad, colors.white)} onClick={async () => { await supabase.rpc('admin_resolve_help', { p_id: h.id }); await load(); }}>{t('admin.help.resolve')}</button>
+          )}
+        </div>
+      ))}
+
+      <h2 style={title}>{t('admin.s2.title')}</h2>
+      <p style={{ margin: 0, color: colors.ink2 }}>{t('admin.s2.hint')}</p>
+      <div data-testid="stage2-switch" style={{ ...card, display: 'grid', gap: 10 }}>
+        {[{ id: null as string | null, name: t('admin.s2.everyone') }, ...vans.filter((v) => v.verified_at).map((v) => ({ id: v.van_id as string | null, name: v.van_name }))].map((row) => (
+          <div key={row.id ?? 'all'} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <strong style={{ flex: 1 }}>{row.name}</strong>
+            <span style={{ color: isOn(row.id) ? colors.zamurradOnTint : colors.ink2 }}>{isOn(row.id) ? t('admin.s2.on') : t('admin.s2.off')}</span>
+            <button type="button" style={btn(isOn(row.id) ? colors.white : colors.neel, isOn(row.id) ? colors.shingarf : colors.white)} onClick={() => setFlag(row.id, !isOn(row.id))}>
+              {isOn(row.id) ? t('admin.s2.turnOff') : t('admin.s2.turnOn')}
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <h2 style={title}>{t('admin.req.title')}</h2>
+      {reqs.length === 0 ? <p style={{ margin: 0 }}>{t('admin.req.empty')}</p> : null}
+      {reqs.map((r) => (
+        <div key={`${r.school_name}-${r.lat}`} data-testid="request-row" style={{ ...card, display: 'flex', gap: 12, alignItems: 'center' }}>
+          <strong style={{ flex: 1 }}>{r.school_name}</strong>
+          <span>{t('admin.req.row', { n: r.children })}</span>
+        </div>
+      ))}
+    </>
   );
 }

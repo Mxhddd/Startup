@@ -1,0 +1,18 @@
+# Parent app (v10): This week -> Share the week -> the story card and its share button.
+# Works without a server (the card shows "no trips this week yet"). Run: maestro test tests/maestro/parent-story.yaml
+appId: pk.pohnch.parent
+---
+- launchApp
+- assertVisible:
+    id: "trip-sheet"
+- tapOn: "مینو"
+- back
+- openLink: "pohnch://history"
+- assertVisible:
+    id: "open-story"
+- tapOn:
+    id: "open-story"
+- assertVisible:
+    id: "story-card"
+- assertVisible:
+    id: "story-share"

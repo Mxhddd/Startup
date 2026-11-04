@@ -13,7 +13,14 @@ import { TapButton } from './TapButton';
 
 export type LateReason = 'traffic' | 'breakdown' | 'roadClosed';
 
-export function HelpSheet({ visible, onClose, onReason }: { visible: boolean; onClose: () => void; onReason: (reason: LateReason) => void }) {
+export function HelpSheet({ visible, onClose, onReason, onEmergency }: {
+  visible: boolean;
+  onClose: () => void;
+  onReason: (reason: LateReason) => void;
+  /** v10 stage 2 (only when switched on): a hold that tells the Pohnch team, with the van's last position. */
+  onEmergency?: () => Promise<boolean>;
+}) {
+  const [sent, setSent] = useState(false);
   const { t, dir } = useLang();
   const reasons: LateReason[] = ['traffic', 'breakdown', 'roadClosed'];
   const call = (n: string) => Linking.openURL(`tel:${n}`);
@@ -74,6 +81,19 @@ export function HelpSheet({ visible, onClose, onReason }: { visible: boolean; on
               </PressableScale>
             ))}
           </View>
+          {onEmergency ? (
+            <View style={{ marginTop: space.sm, padding: space.lg, gap: space.md, borderRadius: 28, borderCurve: 'continuous', backgroundColor: colors.shingarfTint }} testID="help-emergency">
+              <AppText bold color={colors.dangerText} style={{ fontSize: 18 }}>{t('s2.help.title')}</AppText>
+              {sent ? (
+                <AppText bold color={colors.dangerText} testID="help-emergency-sent">{t('s2.help.sent')}</AppText>
+              ) : (
+                <>
+                  <AppText color={colors.dangerText}>{t('s2.help.body')}</AppText>
+                  <TapButton size="next" tone="help" hold icon="help" label={t('s2.help.hold')} onConfirm={async () => setSent(await onEmergency())} testID="help-emergency-hold" />
+                </>
+              )}
+            </View>
+          ) : null}
           <PressableScale accessibilityRole="button" onPress={onClose} faceStyle={{ minHeight: 56, alignItems: 'center', justifyContent: 'center' }}>
             <AppText bold color={colors.link}>
               {t('help.close')}

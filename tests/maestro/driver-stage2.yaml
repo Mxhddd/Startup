@@ -1,0 +1,12 @@
+# Driver app (v10, stage 2): Today -> Fees: mark a family "cash received", set the fee.
+# Needs the pilot server with stage 2 switched on for this driver's van. Run: maestro test tests/maestro/driver-stage2.yaml
+appId: pk.pohnch.driver
+---
+- launchApp
+- tapOn:
+    id: "nav-earnings"
+- assertVisible:
+    id: "earn-sum"
+- tapOn:
+    id: "earn-save"
+- assertVisible: "محفوظ ہو گیا"

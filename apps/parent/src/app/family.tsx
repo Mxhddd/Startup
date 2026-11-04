@@ -17,6 +17,7 @@ import { Linking, ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { Page } from '../components/Page';
 import { useParent } from '../state/ParentStore';
+import { useStage2 } from '../state/stage2';
 
 const layout = LinearTransition.springify().damping(24).stiffness(200);
 const PRIVACY_URL = 'https://pohnch.pk/privacy';
@@ -95,6 +96,8 @@ export default function Menu() {
   const { t, dir } = useLang();
   const p = useParent();
   // In Urdu the row reads from the right: start scrolled to its end.
+  // v10 stage 2: shown only once the Pohnch team switches it on (off until gate 1).
+  const s2 = useStage2();
   const strip = useRef<ComponentRef<typeof ScrollView>>(null);
   const [members, setMembers] = useState<parent.FamilyMember[] | null>(null);
   const [sheet, setSheet] = useState<'add' | 'help' | 'delete' | { remove: parent.FamilyMember } | null>(null);
@@ -183,6 +186,17 @@ export default function Menu() {
           </Animated.View>
         )}
       </Section>
+
+      {s2 ? (
+        <Section title={t('s2.menu')}>
+          <Group>
+            <MenuRow icon="star" iconTint={{ tint: colors.kesarTint, ink: colors.onKesar }} title={t('s2.live.title')} line={t('s2.live.free')} onPress={() => router.push('/plans')} testID="menu-live" />
+            <MenuRow icon="search" title={t('s2.find.title')} onPress={() => router.push('/find')} testID="menu-find" />
+            <MenuRow icon="plus" title={t('s2.req.title')} onPress={() => router.push('/request')} testID="menu-request" />
+            {p.membership?.status === 'approved' ? <MenuRow icon="wallet" iconTint={{ tint: colors.zamurradTint, ink: colors.zamurradOnTint }} title={t('s2.fees.title')} onPress={() => router.push('/fees')} testID="menu-fees" /> : null}
+          </Group>
+        </Section>
+      ) : null}
 
       <Section title={t('parent.menu.more')}>
         <Group>

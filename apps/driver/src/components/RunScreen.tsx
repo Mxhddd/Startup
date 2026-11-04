@@ -40,6 +40,8 @@ function MarkedPanel({ text }: { text: string }) {
 }
 
 export type RunScreenProps = {
+  /** v10 stage 2: send the team a help alert (only when the switch is on). */
+  onEmergency?: () => Promise<boolean>;
   kind: 'morning' | 'afternoon';
   groups: StopGroup[];
   progress: { done: number; total: number };
@@ -271,7 +273,7 @@ export function RunScreen(p: RunScreenProps) {
         </Animated.View>
       </Animated.View>
 
-      <HelpSheet visible={help} onClose={() => setHelp(false)} onReason={(r) => { p.onLate(r); setHelp(false); }} />
+      <HelpSheet visible={help} onClose={() => setHelp(false)} onReason={(r) => { p.onLate(r); setHelp(false); }} onEmergency={p.onEmergency} />
     </View>
   );
 }
