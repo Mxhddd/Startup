@@ -633,5 +633,12 @@
   "admin.s2.turnOff": "Switch off",
   "admin.req.title": "Requests for a new van",
   "admin.req.empty": "No open requests",
-  "admin.req.row": "{n} children"
+  "admin.req.row": "{n} children",
+  "help.reason.rain": "rain",
+  "push.time.morning": "Morning van",
+  "push.time.afternoon": "Afternoon van",
+  "push.time.title": "{run} today at {time}",
+  "push.time.body": "{who} changed today's time",
+  "push.time.back": "{run} today at the usual time",
+  "push.notice.title": "Pohnch team"
 }

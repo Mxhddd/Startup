@@ -633,5 +633,12 @@
   "admin.s2.turnOff": "بند کریں",
   "admin.req.title": "نئی وین کی درخواستیں",
   "admin.req.empty": "کوئی کھلی درخواست نہیں",
-  "admin.req.row": "{n} بچے"
+  "admin.req.row": "{n} بچے",
+  "help.reason.rain": "بارش",
+  "push.time.morning": "صبح کی وین",
+  "push.time.afternoon": "دوپہر کی وین",
+  "push.time.title": "{run} آج {time} بجے",
+  "push.time.body": "{who} نے آج کا وقت بدلا ہے",
+  "push.time.back": "{run} آج معمول کے وقت پر",
+  "push.notice.title": "پہنچ ٹیم"
 }

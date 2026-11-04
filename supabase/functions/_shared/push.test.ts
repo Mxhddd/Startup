@@ -184,3 +184,24 @@ describe("the driver's alerts (v9)", () => {
   });
 });
 
+
+import { buildNoticePushes } from './push.ts';
+describe('v12 notice pushes', () => {
+  const r = (lang: string, sound = true) => ({ token: `t-${lang}`, lang, sound });
+  it('a time change names the run, the new time and who changed it, in each phone\'s language', () => {
+    const [ur, en] = buildNoticePushes([r('ur'), r('en')], { kind: 'time', run: 'afternoon', time: '11:30', driver: 'Rafiq' });
+    expect(en?.title).toBe('Afternoon van today at 11:30');
+    expect(en?.body).toBe("Rafiq changed today's time");
+    expect(ur?.title).toContain('11:30');
+  });
+  it('back to the usual time says so', () => {
+    expect(buildNoticePushes([r('en')], { kind: 'time', run: 'morning', time: null, driver: 'Rafiq' })[0]?.title).toBe('Morning van today at the usual time');
+  });
+  it('a team notice carries the team\'s words, once per phone, quiet where sounds are off', () => {
+    const out = buildNoticePushes([r('en'), r('en'), r('ur', false)], { kind: 'notice', body: 'Road closed' });
+    expect(out).toHaveLength(2);
+    expect(out[0]?.title).toBe('Pohnch team');
+    expect(out[0]?.body).toBe('Road closed');
+    expect(out[1]?.sound).toBeNull();
+  });
+});

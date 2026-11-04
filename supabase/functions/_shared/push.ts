@@ -24,7 +24,7 @@ export type ExpoMessage = {
    */
   categoryId: 'trip' | 'trip-left' | 'trip-door' | 'driver';
   /** children / trip: ids only (never names), for "Off today" and "We're ready". */
-  data: { kind: 'trip'; step: PushStep; children?: string[]; trip?: string } | { kind: 'dayoff'; date: string; off: boolean } | { kind: 'driver'; what: 'request' | 'verified' };
+  data: { kind: 'trip'; step: PushStep; children?: string[]; trip?: string } | { kind: 'dayoff'; date: string; off: boolean } | { kind: 'driver'; what: 'request' | 'verified' } | { kind: 'time' | 'notice' };
 };
 
 // The same table the apps use (packages/core/src/moments.ts), copied by value: Edge Functions can't
@@ -62,7 +62,7 @@ export function buildPushes(step: PushStep, recipients: Recipient[], reason?: st
     let body: string;
     if (step === 'arriving') body = T(lang, 'push.body.arriving', { who: first.driver_name });
     else if (step === 'late') {
-      const r = (['traffic', 'breakdown', 'roadClosed'].includes(reason ?? '') ? reason : 'traffic') as 'traffic' | 'breakdown' | 'roadClosed';
+      const r = (['traffic', 'breakdown', 'roadClosed', 'rain'].includes(reason ?? '') ? reason : 'traffic') as 'traffic' | 'breakdown' | 'roadClosed' | 'rain';
       body = T(lang, 'parent.late', { reason: T(lang, `help.reason.${r}`) });
     } else body = T(lang, 'push.body.by', { who: first.driver_name });
     const quiet = first.sound === false || (opts.quietHours === true && step !== 'late');
@@ -118,6 +118,37 @@ export function buildDayOffPushes(recipients: DayOffRecipient[], job: { date: st
       interruptionLevel: 'active',
       categoryId: 'trip',
       data: { kind: 'dayoff', date: job.date, off: job.off },
+    });
+  }
+  return out;
+}
+
+export type NoticeRecipient = { token: string; lang: string; sound: boolean };
+export type NoticeJob =
+  | { kind: 'time'; run: 'morning' | 'afternoon'; time: string | null; driver: string }
+  | { kind: 'notice'; body: string };
+
+/** v12: a one-day time change from the driver, or a notice from the Pohnch team. One message per phone. */
+export function buildNoticePushes(recipients: NoticeRecipient[], job: NoticeJob): ExpoMessage[] {
+  const seen = new Set<string>();
+  const out: ExpoMessage[] = [];
+  for (const r of recipients) {
+    if (seen.has(r.token)) continue;
+    seen.add(r.token);
+    const lang: Lang = r.lang === 'en' ? 'en' : 'ur';
+    const quiet = r.sound === false;
+    const title = job.kind === 'time'
+      ? T(lang, job.time ? 'push.time.title' : 'push.time.back', { run: T(lang, job.run === 'morning' ? 'push.time.morning' : 'push.time.afternoon'), time: job.time ?? '' })
+      : T(lang, 'push.notice.title');
+    const body = job.kind === 'time' ? T(lang, 'push.time.body', { who: job.driver }) : job.body;
+    out.push({
+      to: r.token, title, body,
+      sound: quiet ? null : 'a_late.wav',
+      priority: 'high',
+      channelId: quiet ? 'step-quiet' : stepChannel('late'),
+      interruptionLevel: 'active',
+      categoryId: 'trip',
+      data: { kind: job.kind },
     });
   }
   return out;

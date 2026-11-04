@@ -46,7 +46,14 @@
     "push.dayOff.title": "{when} وین کی چھٹی",
     "push.dayOff.body": "{who} نے وین کی چھٹی کی · {names}",
     "push.dayOn.title": "{when} وین آئے گی",
-    "push.dayOn.body": "{who} نے چھٹی ختم کر دی · {names}"
+    "push.dayOn.body": "{who} نے چھٹی ختم کر دی · {names}",
+    "help.reason.rain": "بارش",
+    "push.time.morning": "صبح کی وین",
+    "push.time.afternoon": "دوپہر کی وین",
+    "push.time.title": "{run} آج {time} بجے",
+    "push.time.body": "{who} نے آج کا وقت بدلا ہے",
+    "push.time.back": "{run} آج معمول کے وقت پر",
+    "push.notice.title": "پہنچ ٹیم"
   },
   "en": {
     "app.parent.name": "Pohnch",
@@ -95,6 +102,13 @@
     "push.dayOff.title": "No van {when}",
     "push.dayOff.body": "{who} gave the van a day off · {names}",
     "push.dayOn.title": "The van is coming {when}",
-    "push.dayOn.body": "{who} cancelled the day off · {names}"
+    "push.dayOn.body": "{who} cancelled the day off · {names}",
+    "help.reason.rain": "rain",
+    "push.time.morning": "Morning van",
+    "push.time.afternoon": "Afternoon van",
+    "push.time.title": "{run} today at {time}",
+    "push.time.body": "{who} changed today's time",
+    "push.time.back": "{run} today at the usual time",
+    "push.notice.title": "Pohnch team"
   }
 }

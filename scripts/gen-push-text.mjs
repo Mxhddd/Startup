@@ -16,6 +16,8 @@ export const PUSH_KEYS = [
   'push.body.by', 'push.body.arriving',
   'push.driver.request.title', 'push.driver.request.body', 'push.driver.verified.title', 'push.driver.verified.body',
   'push.when.today', 'push.when.tomorrow', 'push.when.date', 'push.dayOff.title', 'push.dayOff.body', 'push.dayOn.title', 'push.dayOn.body',
+  // v12: rain, a one-day time change, team notices.
+  'help.reason.rain', 'push.time.morning', 'push.time.afternoon', 'push.time.title', 'push.time.body', 'push.time.back', 'push.notice.title',
 ];
 
 export function pushText() {

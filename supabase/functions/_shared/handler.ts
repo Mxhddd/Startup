@@ -5,7 +5,7 @@
 // Logs say only which action ran and how it ended: never tokens, phone numbers or children's names.
 import { BadInput, bool, date, isoTime, num, oneOf, optionalUuid, phone, uuid, uuids } from './validate.ts';
 import { byteaHex, hashToken, isInviteToken, newInviteToken } from './tokens.ts';
-import type { DayOffJob, DriverJob, NotifyJob } from './notify.ts';
+import type { DayOffJob, DriverJob, NoticePush, NotifyJob } from './notify.ts';
 import type { PushStep } from './push.ts';
 
 export type Deps = {
@@ -21,6 +21,8 @@ export type Deps = {
   /** Updates iPhone Live Activities on locked phones (liveActivity.ts). Optional, like notify. */
   /** v9: tells the van's driver about a new request or the van being verified (notify.ts). Optional. */
   notifyDriver?: (job: DriverJob) => Promise<void>;
+  /** v12: a one-day time change or a team notice, to a van's families (and drivers). */
+  notifyNotice?: (n: NoticePush) => Promise<void>;
   /** Tells the van's families about a whole-van day off (notify.ts). Optional, like notify. */
   dayOff?: (job: DayOffJob) => Promise<void>;
   live?: (job: { tripId: string; step: PushStep | null; van: { lat: number; lng: number; speed: number | null } | null }) => Promise<void>;
@@ -99,7 +101,7 @@ export const actions: Record<string, Action> = {
   'tap.undo': async ({ actor, body, deps }) => ({ undone: await call(deps, 'undo_tap', { p_actor: actor, p_client_id: uuid(body, 'clientId') }) }),
   late: async ({ actor, body, deps }) => {
     const tripId = uuid(body, 'tripId');
-    const reason = oneOf(body, 'reason', ['traffic', 'breakdown', 'roadClosed'] as const);
+    const reason = oneOf(body, 'reason', ['traffic', 'breakdown', 'roadClosed', 'rain'] as const);
     const stored = (await call(deps, 'report_late', { p_actor: actor, p_trip: tripId, p_reason: reason, p_client_id: uuid(body, 'clientId') })) as number;
     if (stored > 0) await deps.notify?.({ tripId, step: 'late', children: null, reason });
     return { stored };
@@ -187,6 +189,26 @@ export const actions: Record<string, Action> = {
     await call(deps, 'delete_account', { p_actor: actor });
     return { ok: true };
   },
+  // v12: the driver moves today's (or a coming day's) run to another time, or back (time null).
+  'run.change': async ({ actor, body, deps }) => {
+    const van = uuid(body, 'vanId');
+    const kind = oneOf(body, 'kind', ['morning', 'afternoon'] as const);
+    const date = typeof body.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(body.date) ? body.date : (() => { throw new BadInput('date'); })();
+    const time = body.time === null ? null : typeof body.time === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(body.time) ? body.time : (() => { throw new BadInput('time'); })();
+    await call(deps, 'set_run_change', { p_actor: actor, p_van: van, p_date: date, p_kind: kind, p_time: time });
+    const driver = typeof body.driverName === 'string' ? body.driverName.slice(0, 40) : '';
+    if (deps.notifyNotice) await deps.notifyNotice({ vanId: van, job: { kind: 'time', run: kind, time, driver } });
+    return { ok: true };
+  },
+  // v12: the Pohnch team posts a notice for one van or everyone (closed roads, rain, strikes).
+  'admin.notice': async ({ actor, body, deps }) => {
+    const van = body.vanId == null ? null : uuid(body, 'vanId');
+    const text = typeof body.body === 'string' ? body.body.trim() : '';
+    if (text.length < 1 || text.length > 240) throw new BadInput('body');
+    const id = await call(deps, 'post_notice', { p_actor: actor, p_van: van, p_body: text });
+    if (deps.notifyNotice) await deps.notifyNotice({ vanId: van, job: { kind: 'notice', body: text } });
+    return { id };
+  },
   'admin.verify': async ({ actor, body, deps }) => {
     const vanId = uuid(body, 'vanId');
     await call(deps, 'verify_van', { p_actor: actor, p_van: vanId });
@@ -223,6 +245,7 @@ export const LIMITS: Record<string, [max: number, windowS: number]> = {
   'membership.decide': [200, HOUR], 'absence.set': [60, HOUR], 'absence.clear': [60, HOUR], 'dayoff.set': [30, DAY],
   'family.add': [10, DAY], 'family.removeMember': [20, DAY], 'account.delete': [5, DAY], 'van.leave': [20, HOUR], 'rider.remove': [60, HOUR],
   'admin.verify': [300, HOUR], 'admin.switchOff': [300, HOUR], 'admin.endTrip': [300, HOUR],
+  'run.change': [20, DAY], 'admin.notice': [30, DAY],
 };
 
 const json = (status: number, body: unknown) =>

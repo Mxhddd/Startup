@@ -1,6 +1,6 @@
 // After a step is stored: find who should hear about it, send the pushes, and forget phones that are gone.
 // A push failing never fails the driver's tap: the step is already saved, and the parent's map shows it.
-import { buildDayOffPushes, buildDriverPushes, buildPushes, inQuietHours, sendExpoPushes, type DayOffRecipient, type DriverRecipient, type PushStep, type Recipient } from './push.ts';
+import { buildDayOffPushes, buildDriverPushes, buildNoticePushes, buildPushes, inQuietHours, sendExpoPushes, type DayOffRecipient, type DriverRecipient, type NoticeJob, type NoticeRecipient, type PushStep, type Recipient } from './push.ts';
 
 export type NotifyJob = { tripId: string; step: PushStep; children: string[] | null; reason?: string | null };
 
@@ -67,3 +67,22 @@ export async function notifyDriver(job: DriverJob, deps: NotifyDeps): Promise<vo
   }
 }
 
+
+export type NoticePush = { vanId: string | null; job: NoticeJob };
+
+/** v12: a time change (one van) or a team notice (one van or everyone): families and drivers hear it once. */
+export async function notifyNotice(n: NoticePush, deps: NotifyDeps): Promise<void> {
+  try {
+    const { data, error } = await deps.rpc('notice_recipients', { p_van: n.vanId });
+    if (error) throw new Error('recipients');
+    const recipients = (data ?? []) as NoticeRecipient[];
+    if (recipients.length === 0) return;
+    const messages = buildNoticePushes(recipients, n.job);
+    const { sent, dead } = await sendExpoPushes(messages, { fetch: deps.fetch, accessToken: deps.expoAccessToken });
+    if (dead.length) await deps.rpc('remove_push_tokens', { p_tokens: dead });
+    await deps.rpc('record_push_stats', { p_sent: sent, p_dead: dead.length, p_failed: messages.length - sent - dead.length });
+    deps.log(`push ${n.job.kind} sent=${sent} dead=${dead.length}`);
+  } catch {
+    deps.log(`push ${n.job.kind} failed`);
+  }
+}
