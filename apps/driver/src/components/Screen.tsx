@@ -1,5 +1,6 @@
-// A driver screen (v8): the same neel header as Today (back, title, language switch, with a gentle light
-// from the top), then the content on ghee. High contrast, no pattern or frames. The header settles in
+// A driver screen (v8, v10): the same neel header as Today (back, title, language switch, with a gentle
+// light from the top) whose bottom edge curves softly, then the content on ghee. High contrast, no
+// pattern, arch or frames (the driver app stays plain). The header settles in
 // from the top and the content rises under it, so moving between screens feels like one place.
 import { colors, shadow, space, useLang } from '@pohnch/ui';
 import { AppText, Icon, LangSwitch, PressableScale } from '@pohnch/ui/native';
@@ -19,10 +20,10 @@ export function Screen({ title, children, back = true, scroll = true, footer }: 
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       <StatusBar style="light" />
       <Animated.View entering={FadeInUp.springify().damping(22)}
-        style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + space.md, paddingBottom: space.lg, paddingHorizontal: space.xl, flexDirection: row, alignItems: 'center', gap: space.md, boxShadow: shadow.card }}>
+        style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + space.md, paddingBottom: space.xl, paddingHorizontal: space.xl, flexDirection: row, alignItems: 'center', gap: space.md, boxShadow: shadow.card, borderBottomLeftRadius: 36, borderBottomRightRadius: 36, zIndex: 2 }}>
         {back ? (
           <PressableScale accessibilityRole="button" accessibilityLabel={t('common.back')} scaleTo="chip" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} hitSlop={8}
-            faceStyle={{ width: 48, height: 48, borderRadius: 24, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.glassDark, borderWidth: 1, borderColor: 'rgba(250,246,238,0.18)' }}>
+            faceStyle={{ width: 48, height: 48, borderRadius: 24, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.glassDark }}>
             <View style={{ transform: [{ scaleX: dir === 'rtl' ? 1 : -1 }] }}>
               <Icon name="arrow" size={22} color={colors.ghee} />
             </View>

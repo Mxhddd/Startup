@@ -86,3 +86,43 @@ describe('the night palette (v8 dark mode)', () => {
     expect(colors.ghee).toBe(dayColors.ghee);
   });
 });
+
+import { archPath, humpPath } from './theme';
+describe('v10 Jharoka', () => {
+  const lum = (hex: string) => {
+    const v = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255).map((x) => (x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4));
+    return 0.2126 * (v[0] as number) + 0.7152 * (v[1] as number) + 0.0722 * (v[2] as number);
+  };
+  const ratio = (a: string, b: string) => { const [h, l] = [lum(a), lum(b)].sort((x, y) => y - x) as [number, number]; return (h + 0.05) / (l + 0.05); };
+  const pairs: [string, string, string][] = [
+    ['text in a filled field', 'siyahi', 'inset'], ['label in a filled field', 'ink2', 'inset'],
+    ['soft button text', 'link', 'neelTint'], ['text on the light end of a neel button', 'onBrand', 'neelHi'],
+    ['text on the light end of a green button', 'onFill', 'zamurradHi'], ['text on the light end of a kesar button', 'onKesar', 'kesarHi'],
+    ['text on the light end of a help button', 'onFill', 'shingarfHi'], ['header title', 'onBrand', 'headerTop'], ['header subtitle', 'mutedOnDark', 'headerBottom'],
+  ];
+  it('keeps every new text-on-surface pair at 4.5:1, by day and by night', () => {
+    for (const scheme of [{}, nightColors]) {
+      const p = { ...dayColors, ...scheme } as Record<string, string>;
+      for (const [name, fg, bg] of pairs) expect(ratio(p[fg] as string, p[bg] as string), name).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+  it('draws a closed pointed arch inside its box, with the point at the centre', () => {
+    const d = archPath(100, 120);
+    expect(d.startsWith('M0 120')).toBe(true);
+    expect(d.endsWith('Z')).toBe(true);
+    expect(d).toContain('50 0'); // the apex
+    expect(d).toContain('L50 -3.7'); // the finial, 6% of the rise above it
+    const nums = d.match(/-?\d+(\.\d+)?/g)!.map(Number);
+    expect(Math.max(...nums)).toBeLessThanOrEqual(120);
+    expect(archPath(100, 120, 62, false)).not.toContain('-3.7');
+  });
+  it('the arch never rises taller than its box', () => {
+    expect(archPath(100, 40, 200)).toContain('L0 40');
+  });
+  it('the page hump spans the width and peaks at the centre', () => {
+    const d = humpPath(390);
+    expect(d.startsWith('M0 40 L0 30')).toBe(true);
+    expect(d).toContain('195 0');
+    expect(d).toContain('390 30 L390 40 Z');
+  });
+});

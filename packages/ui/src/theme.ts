@@ -46,6 +46,18 @@ export const colors = {
   onKesar: '#141A33', // text on kesar
   night: '#141A33', // a dark chip or panel (offline banner, the undo bar's ground)
   link: '#1F2A5C', // neel used as text or an icon on a light surface
+  // v10 "Jharoka": layered surfaces instead of boxes, buttons with depth.
+  inset: '#F2ECE0', // filled fields, segmented tracks, quiet chips (no borders)
+  neelHi: '#2B3A7E', // the top of a neel button face (it shades down to neel)
+  zamurradHi: '#1B8066',
+  kesarHi: '#F2B95C',
+  shingarfHi: '#C24A33',
+  neelTint2: '#D3D9EE', // the lip under a soft button; the second tone of two-tone icons
+  zamurradTint2: '#BFE3D4',
+  sandDeep: '#DCD3C1', // the lip under a sand button
+  toggleOff: '#D9D1C1', // the track of a switch that is off
+  headerTop: '#33428A', // the light corner of the arch header
+  headerBottom: '#18214C', // its dark corner
 };
 
 export type ColorName = keyof typeof colors;
@@ -66,6 +78,8 @@ export const nightColors: Partial<Record<ColorName, string>> = {
   absentText: '#C9C3B8', absentBg: '#262B40', link: '#AEBBF2',
   scrim: 'rgba(0,0,0,0.55)', glass: 'rgba(24,32,68,0.72)', glassEdge: 'rgba(255,255,255,0.10)',
   neelGlow: 'rgba(0,0,0,0.35)', zamurradGlow: 'rgba(0,0,0,0.35)', kesarGlow: 'rgba(0,0,0,0.30)',
+  inset: '#222B57', neelHi: '#4A5DB8', zamurradHi: '#1C836A', shingarfHi: '#C24A33', neelTint2: '#2C3766', zamurradTint2: '#1B4A3E',
+  sandDeep: '#141B40', toggleOff: '#3A4470', headerTop: '#24306A', headerBottom: '#0A0F26',
 };
 
 let scheme: 'light' | 'dark' = 'light';
@@ -112,6 +126,52 @@ export const shadow = {
   /** The coloured bloom under a big button (its own colour, soft). */
   glow: (color: string) => `0px 18px 36px ${color}`,
 } as const;
+
+/**
+ * v10 elevation: three soft layers tinted with neel (not grey), so depth reads as warm light.
+ * e1: a group on the page. e2: a featured card. e3: something floating (a toast, the join card).
+ */
+export const elevation = {
+  e1: '0px 1px 1px rgba(31,42,92,0.04), 0px 4px 10px rgba(31,42,92,0.05), 0px 14px 28px rgba(31,42,92,0.06)',
+  e2: '0px 1px 2px rgba(31,42,92,0.06), 0px 8px 18px rgba(31,42,92,0.08), 0px 24px 48px rgba(31,42,92,0.10)',
+  e3: '0px 2px 4px rgba(31,42,92,0.08), 0px 14px 30px rgba(31,42,92,0.14), 0px 40px 80px rgba(31,42,92,0.16)',
+  /** The 1 px light along the top edge of a button face. */
+  highlight: (alpha = 0.16) => `inset 0px 1px 0px rgba(255,255,255,${alpha})`,
+} as const;
+
+/** v10 radii for groups and fields (the older card/button radii stay for what still uses them). */
+export const radius10 = { group: 28, field: 20, row: 20 } as const;
+
+/**
+ * v10 the jharoka arch: one pointed Mughal arch used for parent page headers, avatars and brand
+ * cards. Straight sides, then two curves that bend in to a sharp point, with a tiny finial on top.
+ * Returns an SVG path for a box w x h (the finial pokes 6% of the rise above y = 0).
+ */
+export function archPath(w: number, h: number, rise = w * 0.62, finial = true): string {
+  const r = Math.min(rise, h);
+  const a = w / 2;
+  const n = (v: number) => Math.round(v * 10) / 10;
+  const fin = finial ? ` L${n(a)} ${n(-r * 0.06)} L${n(a)} 0` : '';
+  return (
+    `M0 ${n(h)} L0 ${n(r)} C0 ${n(r * 0.48)} ${n(a - w * 0.2)} ${n(r * 0.2)} ${n(a)} 0${fin} ` +
+    `C${n(a + w * 0.2)} ${n(r * 0.2)} ${n(w)} ${n(r * 0.48)} ${n(w)} ${n(r)} L${n(w)} ${n(h)} Z`
+  );
+}
+
+/**
+ * The top edge of a page that rises into its header: flat, then a pointed hump at the centre
+ * (the canvas curve "Z10" scaled to any width). The box is w x h; the flat edge sits at y = rise.
+ */
+export function humpPath(w: number, h = 40, rise = 30): string {
+  const x = (f: number) => Math.round(w * f * 10) / 10;
+  const y = (f: number) => Math.round(rise * f * 10) / 10;
+  return (
+    `M0 ${h} L0 ${y(1)} C${x(0.154)} ${y(1)} ${x(0.308)} ${y(0.933)} ${x(0.41)} ${y(0.6)} ` +
+    `C${x(0.451)} ${y(0.433)} ${x(0.482)} ${y(0.133)} ${x(0.5)} 0 ` +
+    `C${x(0.518)} ${y(0.133)} ${x(0.549)} ${y(0.433)} ${x(0.59)} ${y(0.6)} ` +
+    `C${x(0.692)} ${y(0.933)} ${x(0.846)} ${y(1)} ${w} ${y(1)} L${w} ${h} Z`
+  );
+}
 
 /** Driver tap targets: every tap at least 64 px, the next expected tap 104 px. */
 export const tap = { min: 64, next: 104 } as const;

@@ -24,6 +24,13 @@ import { TripHeader } from './TripHeader';
 import { UndoBar } from './UndoBar';
 import { VanBadge } from './VanBadge';
 import { VanMarker } from './VanMarker';
+import { ArchAvatar, ArchShape } from './Arch';
+import { ChoiceChip } from './ChoiceChip';
+import { Group, GroupRow, RowIcon, SectionCaption } from './Group';
+import { Icon } from './icons';
+import { Segmented } from './Segmented';
+import { TextField } from './TextField';
+import { Toggle } from './Toggle';
 
 // Sample data only: first names, no real families.
 const sample = {
@@ -41,6 +48,9 @@ function Section({ name, children, dark = false }: { name: string; children: Rea
 }
 
 export function ComponentGallery() {
+  const [on, setOn] = useState(true);
+  const [name, setName] = useState('علی');
+  const [seg, setSeg] = useState<'a' | 'b'>('a');
   const { t, lang, dir } = useLang();
   const s = sample[lang];
   const insets = useSafeAreaInsets();
@@ -63,6 +73,32 @@ export function ComponentGallery() {
       </View>
       <Text testID="gallery-log" style={{ fontFamily: fonts.latin.regular, fontSize: 14, color: colors.ink2 }}>{`last action: ${log}`}</Text>
 
+      <Section name="v10 · Jharoka">
+        <View style={{ flexDirection: 'row', gap: 12, alignItems: 'flex-end' }}>
+          <ArchShape width={64} height={84} color={colors.neel} />
+          <ArchShape width={84} height={110} color={colors.neel} gradient={[colors.headerTop, colors.neel]} pattern />
+          <ArchAvatar letter="ع" />
+          <ArchAvatar letter="س" color={colors.zamurrad} ink={colors.onFill} />
+        </View>
+        <SectionCaption>بچے</SectionCaption>
+        <Group>
+          <GroupRow title="اطلاعات اور آوازیں" sub="ہر قدم کی گھنٹی" lead={<RowIcon name="bell" />} trail="chevron" onPress={() => undefined} />
+          <GroupRow title="ایپ کی آوازیں" lead={<RowIcon name="sound" />} trail={<Toggle value={on} onChange={setOn} label="sounds" />} />
+        </Group>
+        <TextField label="بچے کا پہلا نام" value={name} onChange={setName} />
+        <TextField label="اسکول" value="" onChange={() => undefined} error="اسکول کا نام لکھیں" />
+        <Segmented items={[{ key: 'a', label: 'یہ ہفتہ' }, { key: 'b', label: 'پچھلا ہفتہ' }]} value={seg} onChange={setSeg} />
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <ChoiceChip label="علی" on onPress={() => undefined} />
+          <ChoiceChip label="سارہ" on={false} onPress={() => undefined} />
+        </View>
+        <TapButton label="آج چھٹی" icon="calendar" onConfirm={() => undefined} />
+        <View style={{ flexDirection: 'row', gap: 12 }}>
+          {(['left', 'picked', 'school', 'bell', 'wallet'] as const).map((n) => (
+            <Icon key={n} name={n === 'school' ? 'reachedSchool' : n} size={28} color={colors.link} duo={colors.neelTint2} />
+          ))}
+        </View>
+      </Section>
       <Section name="TapButton">
         <TapButton size="next" tone="picked" icon="picked" label={[s.a, s.b].join(lang === 'ur' ? '، ' : ', ')} sublabel={t('step.picked')} onConfirm={() => setLog('picked')} />
         <TapButton size="next" tone="left" icon="left" hold label={t('trip.start')} onConfirm={() => setLog('trip started (hold)')} testID="hold-demo" />

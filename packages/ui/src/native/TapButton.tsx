@@ -7,6 +7,10 @@
 //   soft tick at each quarter you can feel; only a full hold confirms. Let go early and the fill
 //   springs back.
 // - On confirm the button gives one small "pop" and a success haptic.
+// v10 "Jharoka": every face has depth: it shades from a lighter top to its colour, carries a 1 px
+// highlight along the top edge, and stands on its lip. The neutral tone is no longer a bordered white
+// box but a soft neel-tint face; quiet is sand on a sand lip. Big buttons hold their icon in a soft
+// circle instead of a square tile.
 import { HOLD_MS, createHold } from '@pohnch/core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
@@ -24,7 +28,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useLang } from '../lang';
 import { springs } from '../motion';
-import { colors, radius, stepColors, tap, type Step } from '../theme';
+import { colors, elevation, radius, radius10, stepColors, tap, type Step } from '../theme';
 import { AppText } from './AppText';
 import { HOLD_FEELS, type FeelKind } from '../feedbackTable';
 import { feel as feelIt } from './feedback';
@@ -50,11 +54,17 @@ const glows: Record<Step, string> = {
   reachedSchool: colors.kesarGlow,
 };
 
-function look(tone: Tone) {
-  if (tone === 'neutral') return { fill: colors.white, text: colors.link, border: colors.link, lip: null, glow: null };
-  if (tone === 'quiet') return { fill: colors.sand, text: colors.siyahi, border: null, lip: null, glow: null };
-  if (tone === 'help') return { fill: colors.shingarf, text: colors.white, border: null, lip: lips.help, glow: null };
-  return { ...stepColors[tone], border: null, lip: lips[tone], glow: glows[tone] };
+// Read when drawing (not at load), so the night palette's tops apply too.
+const tops = (k: Step | 'help'): string =>
+  ({ left: colors.neelHi, leftSchool: colors.neelHi, picked: colors.zamurradHi, dropped: colors.zamurradHi, reachedSchool: colors.kesarHi, help: colors.shingarfHi })[k];
+
+type Look = { fill: string; top: string; text: string; lip: string | null; glow: string | null; ring: string; hi: number };
+
+function look(tone: Tone): Look {
+  if (tone === 'neutral') return { fill: colors.neelTint, top: colors.neelTint, text: colors.link, lip: colors.neelTint2, glow: null, ring: colors.white, hi: 0.7 };
+  if (tone === 'quiet') return { fill: colors.sand, top: colors.sand, text: colors.siyahi, lip: colors.sandDeep, glow: null, ring: colors.white, hi: 0.7 };
+  if (tone === 'help') return { fill: colors.shingarf, top: tops('help'), text: colors.white, lip: lips.help, glow: null, ring: 'rgba(255,255,255,0.16)', hi: 0.16 };
+  return { ...stepColors[tone], top: tops(tone), lip: lips[tone], glow: glows[tone], ring: tone === 'reachedSchool' ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.16)', hi: tone === 'reachedSchool' ? 0.35 : 0.16 };
 }
 
 /** A soft band of light that sweeps across the button once, when a tap is confirmed. */
@@ -200,10 +210,10 @@ export function TapButton({
         onPressOut={cancel}
         faceStyle={{
           minHeight: big ? Math.max(tap.next, 120) : tap.min,
-          borderRadius: big ? radius.big : radius.button, borderCurve: 'continuous',
+          borderRadius: big ? radius.big : radius10.field, borderCurve: 'continuous',
           backgroundColor: fill,
-          borderWidth: c.border && !disabled ? 2 : 0,
-          borderColor: c.border ?? undefined,
+          experimental_backgroundImage: disabled ? undefined : `linear-gradient(180deg, ${c.top}, ${c.fill})`,
+          boxShadow: disabled ? undefined : elevation.highlight(c.hi),
           overflow: 'hidden',
           justifyContent: 'center',
         }}
@@ -222,8 +232,8 @@ export function TapButton({
         <View style={{ flexDirection: row, alignItems: 'center', gap: 16, paddingHorizontal: big ? 20 : 16 }}>
           {icon ? (
             big ? (
-              <View style={{ width: 72, height: 72, borderRadius: 24, borderCurve: 'continuous', backgroundColor: tone === 'reachedSchool' ? colors.night : colors.ghee, alignItems: 'center', justifyContent: 'center' }}>
-                <Icon name={icon} size={38} color={disabled ? colors.absentText : tone === 'reachedSchool' ? colors.kesar : c.fill} strokeWidth={2.3} />
+              <View style={{ width: 64, height: 64, borderRadius: 32, backgroundColor: disabled ? colors.sand : c.ring, alignItems: 'center', justifyContent: 'center' }}>
+                <Icon name={icon} size={34} color={text} strokeWidth={2.4} />
               </View>
             ) : (
               <Icon name={icon} size={24} color={text} />

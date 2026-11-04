@@ -44,3 +44,9 @@ export { MomentFX } from './native/MomentFX';
 export { LiquidProgress } from './native/LiquidProgress';
 export { MorphProvider, MorphTarget, useMorphSource, MORPH_SPRING } from './native/Morph';
 export { FlowSteps } from './native/FlowSteps';
+// v10 "Jharoka"
+export { ArchShape, ArchAvatar, StarPattern } from './native/Arch';
+export { ArchHeader } from './native/ArchHeader';
+export { Group, GroupRow, RowIcon, SectionCaption } from './native/Group';
+export { Segmented } from './native/Segmented';
+export { STAR_PATH } from './native/icons';
