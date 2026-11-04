@@ -11,7 +11,7 @@ import { Icon } from './icons';
 import { PressableScale } from './PressableScale';
 import { TapButton } from './TapButton';
 
-export type LateReason = 'traffic' | 'breakdown' | 'roadClosed';
+export type LateReason = 'traffic' | 'breakdown' | 'roadClosed' | 'rain';
 
 export function HelpSheet({ visible, onClose, onReason, onEmergency }: {
   visible: boolean;
@@ -22,7 +22,7 @@ export function HelpSheet({ visible, onClose, onReason, onEmergency }: {
 }) {
   const [sent, setSent] = useState(false);
   const { t, dir } = useLang();
-  const reasons: LateReason[] = ['traffic', 'breakdown', 'roadClosed'];
+  const reasons: LateReason[] = ['traffic', 'rain', 'breakdown', 'roadClosed'];
   const call = (n: string) => Linking.openURL(`tel:${n}`);
   const [mounted, setMounted] = useState(visible);
   const shown = useSharedValue(0);

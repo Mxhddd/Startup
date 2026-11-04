@@ -18,6 +18,7 @@ import Animated, { FadeIn, FadeInDown, LinearTransition, interpolate, useAnimate
 import { parent as data } from '@pohnch/client';
 import { useParent } from '../state/ParentStore';
 import { FirstTips } from './FirstTips';
+import { DayNotes, FoundItems, QuickSignals } from './DayCards';
 
 const STEP_KEY = { left: 'left', picked: 'picked', reached_school: 'reachedSchool', left_school: 'leftSchool', dropped: 'dropped' } as const;
 const layout = LinearTransition.springify().damping(24).stiffness(200);
@@ -149,7 +150,8 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
     phase: p.phase, kind: p.kind, items, eta: p.eta, vanOff: p.vanOff, absentToday: p.absentToday,
     canUndoChutti: p.canUndoChuttiToday, ready: p.ready, storyDone: p.story !== null,
   });
-  const nextLine = nextTime ? t(p.kind === 'morning' ? 'parent.idle.morning' : 'parent.idle.afternoon', { time: nextTime.slice(0, 5).replace(/^0/, '') }) : '';
+  const changedTime = p.runChange[p.kind];
+  const nextLine = changedTime ? t(p.kind === 'morning' ? 'parent.idle.morning' : 'parent.idle.afternoon', { time: changedTime.replace(/^0/, '') }) : nextTime ? t(p.kind === 'morning' ? 'parent.idle.morning' : 'parent.idle.afternoon', { time: nextTime.slice(0, 5).replace(/^0/, '') }) : '';
 
   // The compact line (peek) and the full head (open), for each situation.
   const compact = counting ? (
@@ -219,6 +221,9 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
         )}
       </Animated.View>
 
+      <DayNotes />
+      <FoundItems />
+
       {/* v8: the van is at your door: how long it has waited, and "we're ready" for the driver. */}
       {live && !childDone && (p.eta === 'door' || (typeof p.eta === 'number' && p.eta <= 3)) ? (
         <Animated.View entering={FadeInDown.springify().damping(20)} layout={layout} testID="door-panel" style={{ gap: space.md }}>
@@ -281,6 +286,8 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
           </PressableScale> : null}
         </Animated.View>
       ) : null}
+
+      <QuickSignals />
 
       {/* v9: the one obvious next thing for this state of the day (homeState in @pohnch/core). */}
       {next.action === 'offToday' && canSetChutti ? (

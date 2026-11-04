@@ -59,6 +59,9 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
         const kids = (r.notification.request.content.data as { children?: unknown } | undefined)?.children;
         const child = Array.isArray(kids) && typeof kids[0] === 'string' ? kids[0] : undefined;
         router.navigate({ pathname: '/chutti', params: { quick: 'today', ...(child ? { child } : {}) } });
+      } else if (typeof (data as { url?: unknown } | undefined)?.url === 'string' && String((data as { url: string }).url).startsWith('/')) {
+        // v12: local alerts that open a page (the Friday story).
+        router.navigate((data as { url: string }).url as '/story');
       } else router.navigate('/');
     });
     // A new alert while the app is open, or coming back to the app: keep only the newest step alert.

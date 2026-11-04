@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bestOrder, blendEta, getReadyDue, isRaining, karachiMinutes, lateBy, onTimeStreak, seasonFor, stuckInTraffic, upcomingHolidays } from './v12';
+import { bestOrder, blendEta, getReadyDue, kmh, preTripDue, shiftTime, speedWarn, isRaining, karachiMinutes, lateBy, onTimeStreak, seasonFor, stuckInTraffic, upcomingHolidays } from './v12';
 
 // 07:00 in Karachi = 02:00 UTC.
 const at = (hhmm: string) => Date.parse(`2026-11-04T${hhmm}:00Z`) - 5 * 3600_000;
@@ -69,5 +69,30 @@ describe('v12 rules', () => {
     expect(isRaining({ weather_code: 63 })).toBe(true);
     expect(isRaining({ rain: 0, weather_code: 1 })).toBe(false);
     expect(isRaining(null)).toBe(false);
+  });
+});
+
+describe('speed watch and pre-trip checklist', () => {
+  it('warns over 50 km/h, then not again for 2 minutes', () => {
+    expect(speedWarn(12, null, 0)).toBe(false);
+    expect(speedWarn(15, null, 0)).toBe(true);
+    expect(speedWarn(15, 0, 60_000)).toBe(false);
+    expect(speedWarn(15, 0, 120_000)).toBe(true);
+    expect(speedWarn(null, null, 0)).toBe(false);
+    expect(kmh(13.9)).toBe(50);
+  });
+  it('asks for the checklist once a day', () => {
+    expect(preTripDue(null, '2026-11-04')).toBe(true);
+    expect(preTripDue('2026-11-03', '2026-11-04')).toBe(true);
+    expect(preTripDue('2026-11-04', '2026-11-04')).toBe(false);
+  });
+});
+
+describe('one-day time change', () => {
+  it('moves a start time and keeps it inside the day', () => {
+    expect(shiftTime('07:10', 15)).toBe('07:25');
+    expect(shiftTime('07:10', -30)).toBe('06:40');
+    expect(shiftTime('00:10', -30)).toBe('00:00');
+    expect(shiftTime('13:45:00', 60)).toBe('14:45');
   });
 });

@@ -17,6 +17,7 @@ import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Page } from '../components/Page';
 import { alertsUndecided, askForAlerts, registerForPush } from '../notifications/setup';
 import { saveSounds } from '../sounds';
+import { DEFAULT_LOCAL, localPrefs, PREP_CHOICES, saveLocalPrefs, type LocalPrefs } from '../notifications/localPrefs';
 
 const TONE = { neel: colors.neel, zamurrad: colors.zamurrad, kesar: colors.kesar, shingarf: colors.shingarf } as const;
 
@@ -42,6 +43,14 @@ export default function Settings() {
     const id = setTimeout(() => setPlaying(null), 1400);
     return () => clearTimeout(id);
   }, [playing]);
+  const [local, setLocal] = useState<LocalPrefs>(DEFAULT_LOCAL);
+  useEffect(() => {
+    localPrefs().then(setLocal);
+  }, []);
+  const setLocalPref = (next: LocalPrefs) => {
+    setLocal(next);
+    void saveLocalPrefs(next);
+  };
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -107,6 +116,18 @@ export default function Settings() {
           trail={prefs ? <Toggle value={prefs.sound} onChange={(v) => update({ ...prefs, sound: v })} label={t('settings.sound.brand')} testID="alert-sound" /> : null} />
         <GroupRow title={t('settings.sound.app')} sub={t('settings.sound.appHint')} lead={<RowIcon name="sound" />}
           trail={appSounds !== null ? <Toggle value={appSounds} onChange={(v) => { setAppSounds(v); void saveSounds(v); }} label={t('settings.sound.app')} testID="app-sounds" /> : null} />
+      </Group>
+
+      {/* v12: alerts this phone makes by itself. */}
+      <SectionCaption>{t('settings.prep.title')}</SectionCaption>
+      <AppText variant="secondary">{t('settings.prep.body')}</AppText>
+      <Segmented testID="prep-minutes" items={PREP_CHOICES.map((m) => ({ key: String(m), label: m === 0 ? t('settings.prep.off') : t('settings.prep.min', { min: m }) }))}
+        value={String(local.prep)} onChange={(v) => setLocalPref({ ...local, prep: Number(v) })} />
+      <Group>
+        <GroupRow title={t('settings.friday.title')} sub={t('settings.friday.hint')} lead={<RowIcon name="star" />}
+          trail={<Toggle value={local.friday} onChange={(v) => setLocalPref({ ...local, friday: v })} label={t('settings.friday.title')} testID="friday-toggle" />} />
+        <GroupRow title={t('settings.brief.title')} sub={t('settings.brief.hint')} lead={<RowIcon name="calendar" />}
+          trail={<Toggle value={local.brief} onChange={(v) => setLocalPref({ ...local, brief: v })} label={t('settings.brief.title')} testID="brief-toggle" />} />
       </Group>
 
       {/* v9: every step's tone, to hear before it comes (the alert is its longer twin). */}

@@ -159,3 +159,67 @@ export const driverApi = {
   /** Used by the offline queue to send anything it holds. */
   send: (action: string, body: Record<string, unknown>) => db().api(action, body),
 };
+
+// ---- v12
+export type RunKind = 'morning' | 'afternoon';
+export type Signal = { childId: string; kind: 'two_minutes' | 'coming_down' | 'sick_today' | 'left_item'; at: string };
+export type FoundItem = { id: string; childId: string; what: 'bottle' | 'bag' | 'lunchbox' | 'jacket' | 'book' | 'other'; createdAt: string; collectedAt: string | null };
+export type Notice = { id: string; body: string; createdAt: string };
+
+/** "Van is empty": the driver checked every seat before ending the trip. */
+export async function confirmSeatCheck(tripId: string): Promise<void> {
+  check(await db().supabase.rpc('confirm_seat_check', { p_trip: tripId }));
+}
+
+/** Children off for just one run on a date (morning or afternoon), as child ids. */
+export async function runAbsencesOn(date: string, kind: RunKind): Promise<string[]> {
+  const rows = check(await db().supabase.from('run_absences').select('child_id').eq('service_date', date).eq('kind', kind)) as { child_id: string }[];
+  return rows.map((r) => r.child_id);
+}
+
+/** Today's signals from families ("2 minutes", "coming down", "sick today", "left something"), newest first. */
+export async function signalsToday(): Promise<Signal[]> {
+  const rows = check(
+    await db().supabase.from('signals').select('child_id, kind, created_at').eq('service_date', karachiDate(new Date())).order('created_at', { ascending: false }).limit(50),
+  ) as { child_id: string; kind: Signal['kind']; created_at: string }[];
+  return rows.map((r) => ({ childId: r.child_id, kind: r.kind, at: r.created_at }));
+}
+
+/** This van's one-day start times (today and the next two weeks). */
+export async function runChangesFrom(vanId: string, date: string): Promise<{ date: string; kind: RunKind; time: string }[]> {
+  const rows = check(
+    await db().supabase.from('run_changes').select('service_date, kind, start_time').eq('van_id', vanId).gte('service_date', date).order('service_date'),
+  ) as { service_date: string; kind: RunKind; start_time: string }[];
+  return rows.map((r) => ({ date: r.service_date, kind: r.kind, time: r.start_time.slice(0, 5) }));
+}
+
+/** Notices from the Pohnch team that haven't expired (for this van or everyone). */
+export async function activeNotices(): Promise<Notice[]> {
+  const rows = check(
+    await db().supabase.from('notices').select('id, body, created_at').gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(3),
+  ) as { id: string; body: string; created_at: string }[];
+  return rows.map((r) => ({ id: r.id, body: r.body, createdAt: r.created_at }));
+}
+
+/** Items left in the van and not yet collected. */
+export async function foundItems(vanId: string): Promise<FoundItem[]> {
+  const rows = check(
+    await db().supabase.from('found_items').select('id, child_id, what, created_at, collected_at').eq('van_id', vanId).is('collected_at', null).order('created_at', { ascending: false }),
+  ) as { id: string; child_id: string; what: FoundItem['what']; created_at: string; collected_at: string | null }[];
+  return rows.map((r) => ({ id: r.id, childId: r.child_id, what: r.what, createdAt: r.created_at, collectedAt: r.collected_at }));
+}
+
+export async function markFound(vanId: string, childId: string, what: FoundItem['what']): Promise<void> {
+  check(await db().supabase.from('found_items').insert({ van_id: vanId, child_id: childId, what }));
+}
+
+export async function markCollected(id: string): Promise<void> {
+  check(await db().supabase.from('found_items').update({ collected_at: new Date().toISOString() }).eq('id', id));
+}
+
+export const v12Api = {
+  /** A one-day start time for a run (time "HH:MM", or null to go back to the usual time). Families are told. */
+  runChange: (vanId: string, kind: RunKind, date: string, time: string | null, driverName: string) =>
+    db().api('run.change', { vanId, kind, date, time, driverName }),
+  rainDelay: (tripId: string, clientId: string) => db().api('late', { tripId, reason: 'rain', clientId }),
+};

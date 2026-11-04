@@ -5,7 +5,7 @@
 // (?quick=today): today comes already chosen, so one tap on Save confirms it.
 // Data: absences, through the "app" Edge Function (absence.set / absence.clear).
 import { parent } from '@pohnch/client';
-import { canPlanDay, chuttiChanges, dayPartsOf, monthGrid, nextMonth } from '@pohnch/core';
+import { addDays, canPlanDay, chuttiChanges, dayPartsOf, monthGrid, nextMonth } from '@pohnch/core';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, Icon, PressableScale, TapButton } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -116,6 +116,26 @@ export default function Chutti() {
             </View>
           ))}
         </Animated.View>
+      </View>
+
+      {/* v12: off for just one run (the morning or the afternoon), today or tomorrow. Saved at once. */}
+      <View style={{ gap: space.sm }} testID="run-off">
+        <AppText bold style={{ fontSize: 18 }}>{t('parent.runOff.title')}</AppText>
+        <AppText variant="secondary">{t('parent.runOff.hint', { name })}</AppText>
+        <View style={{ flexDirection: row, flexWrap: 'wrap', gap: 8 }}>
+          {[p.today, addDays(p.today, 1)].flatMap((date) => (['morning', 'afternoon'] as const).map((kind) => {
+            const on = p.runOff.some((r) => r.date === date && r.kind === kind);
+            const whole = saved.includes(date);
+            const locked = whole || (date === p.today && kind === 'morning' && !p.canUndoChuttiToday);
+            return (
+              <PressableScale key={`${date}-${kind}`} accessibilityRole="checkbox" accessibilityState={{ checked: on || whole, disabled: locked }} disabled={locked} haptic="tick"
+                onPress={() => p.actions.toggleRunOff(date, kind).catch(() => setError(true))} testID={`runoff-${date === p.today ? 'today' : 'tomorrow'}-${kind}`} style={{ flexBasis: '47%', flexGrow: 1 }}
+                faceStyle={{ minHeight: 56, borderRadius: 18, borderCurve: 'continuous', paddingHorizontal: 14, justifyContent: 'center', backgroundColor: on || whole ? colors.kesar : colors.inset, opacity: locked && !whole ? 0.5 : 1 }}>
+                <AppText bold color={on || whole ? colors.onKesar : colors.siyahi} style={{ fontSize: 15 }}>{t(`parent.runOff.${date === p.today ? 'today' : 'tomorrow'}.${kind}`)}</AppText>
+              </PressableScale>
+            );
+          }))}
+        </View>
       </View>
 
       <View style={{ gap: 4 }}>

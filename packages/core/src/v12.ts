@@ -163,3 +163,23 @@ export function isRaining(current: { rain?: number | null; precipitation?: numbe
   const code = current.weather_code ?? 0;
   return mm >= 0.3 || (code >= 51 && code <= 67) || (code >= 80 && code <= 82) || code >= 95;
 }
+
+/** Speed watch: 50 km/h (13.9 m/s) on Karachi's school roads. */
+export const SPEED_LIMIT_MS = 13.9;
+/** Warn the driver when over the limit, at most once every `coolMs` (2 min), so it nudges, not nags. */
+export function speedWarn(speed: number | null | undefined, lastWarnAt: number | null, now: number, coolMs = 120_000): boolean {
+  if (speed == null || speed <= SPEED_LIMIT_MS) return false;
+  return lastWarnAt === null || now - lastWarnAt >= coolMs;
+}
+export const kmh = (ms: number) => Math.round(ms * 3.6);
+
+/** The pre-trip checklist shows once per Karachi day, before the first real trip. */
+export function preTripDue(lastDoneDate: string | null, today: string): boolean {
+  return lastDoneDate !== today;
+}
+
+/** "07:10" moved by some minutes ("07:25"), kept within the day. */
+export function shiftTime(t: string, minutes: number): string {
+  const m = Math.min(23 * 60 + 59, Math.max(0, clockMinutes(t) + minutes));
+  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+}

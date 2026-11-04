@@ -5,7 +5,7 @@
 //
 // How it moves: when a stop is done the big button lifts away and the next one rises in its place;
 // the undo bar slides in above it; rows reflow on a spring; the map eases along with the van.
-import { distanceM, formatDistance, nudges, type StopGroup } from '@pohnch/core';
+import { distanceM, formatDistance, kmh, nudges, speedWarn, type StopGroup } from '@pohnch/core';
 import { colors, elevation, radius, shadow, space, useLang } from '@pohnch/ui';
 import { AppText, ChildRow, DrawnCheck, HelpSheet, Icon, OfflineBanner, PohnchMap, PressableScale, TapButton, TripHeader, UndoBar, type LateReason, type MapPin } from '@pohnch/ui/native';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
@@ -54,6 +54,12 @@ export type RunScreenProps = {
   onUndoExpire: () => void;
   /** Morning: "reached school" (then the trip ends). Afternoon: "end trip". */
   onFinish: (undoText: string) => void;
+  /** v12: morning only, sent the moment "reached school" is held (before the seat check), so families hear at once. */
+  onArrive?: (undoText: string) => void;
+  /** v12: the driver checked every seat ("the van is empty"). Asked before every trip ends. */
+  onSeatCheck?: () => void;
+  /** v12: extra card(s) above the sheet's content (rain, notices, signals, stuck in traffic). */
+  extra?: ReactNode;
   onLate: (r: LateReason) => void;
   banner?: string;
   /** Where the stops are, for the map. */
@@ -105,6 +111,8 @@ export function RunScreen(p: RunScreenProps) {
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
   const [help, setHelp] = useState(false);
+  // v12: after the finish tap, the seat check stands between the driver and the end of the trip.
+  const [seat, setSeat] = useState<string | null>(null);
   const step = p.kind === 'morning' ? 'picked' : 'dropped';
   const allDone = p.groups.every((g) => g.state !== 'waiting');
   const join = (names: string[]) => names.join(lang === 'ur' ? '، ' : ', ');
@@ -147,6 +155,16 @@ export function RunScreen(p: RunScreenProps) {
     say(p.undo.text, lang);
   }, [p.voice, p.undo?.at]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // v12 speed watch: over 50 km/h, a calm spoken nudge (at most every 2 minutes) and a red line in the header.
+  const lastWarn = useRef<number | null>(null);
+  const fast = (p.fix?.speed ?? 0) > 13.9;
+  useEffect(() => {
+    if (!speedWarn(p.fix?.speed, lastWarn.current, Date.now())) return;
+    lastWarn.current = Date.now();
+    feel('late');
+    if (p.voice) say(t('driver.speed.say'), lang);
+  }, [p.fix?.speed]); // eslint-disable-line react-hooks/exhaustive-deps
+
   const tapText = (names: string[]) => t('undo.marked', { name: join(names), step: t(`step.${step}`) });
   const tapGroup = (g: StopGroup) => p.onTapStop(g, tapText(g.children.filter((c) => c.state === 'waiting').map((c) => c.firstName)));
 
@@ -184,12 +202,27 @@ export function RunScreen(p: RunScreenProps) {
               <AppText variant="small" bold>{p.banner}</AppText>
             </Animated.View>
           ) : null}
+          {fast && p.fix?.speed ? (
+            <Animated.View entering={FadeInDown.springify()} testID="speed-banner" style={{ backgroundColor: colors.shingarf, borderRadius: 20, borderCurve: 'continuous', padding: space.md, boxShadow: elevation.e2 }}>
+              <AppText bold color={colors.white} style={{ fontSize: 17 }}>{t('driver.speed.banner', { kmh: kmh(p.fix.speed) })}</AppText>
+            </Animated.View>
+          ) : null}
           {p.pending ? <OfflineBanner side="driver" queued={p.pending} /> : null}
         </View>
       </View>
 
       <Animated.View entering={SlideInDown.springify().damping(26).stiffness(220)} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxHeight: sheetMax, overflow: 'hidden', backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, boxShadow: shadow.sheet, paddingTop: 22, paddingHorizontal: space.gutter, paddingBottom: insets.bottom + 20, gap: 14 }}>
         <AllDoneSweep show={allDone && p.groups.length > 0} />
+        {p.extra && seat === null ? p.extra : null}
+        {seat !== null ? (
+          <Animated.View key="seat" entering={FadeInDown.springify().damping(20)} layout={layout} style={{ gap: 12 }} testID="seat-check">
+            <AppText bold style={{ fontSize: 24, lineHeight: 36 }}>{t('driver.seat.title')}</AppText>
+            <AppText color={colors.ink2} style={{ fontSize: 17 }}>{t('driver.seat.body')}</AppText>
+            <TapButton testID="seat-empty" hold size="next" tone="picked" icon="check" label={t('driver.seat.confirm')} sublabel={t('driver.seat.hold')} feel="success"
+              onConfirm={() => { p.onSeatCheck?.(); const text = seat; setSeat(null); p.onFinish(text); }} />
+          </Animated.View>
+        ) : null}
+        {seat === null ? <>
         {p.undo ? <MarkedPanel key={`m${p.undo.at}`} text={p.undo.text} /> : null}
         {p.undo ? <UndoBar key={p.undo.at} text={t('undo.prompt')} tappedAt={p.undo.at} onUndo={p.onUndo} onExpire={p.onUndoExpire} /> : null}
 
@@ -267,10 +300,15 @@ export function RunScreen(p: RunScreenProps) {
             icon={p.kind === 'morning' ? 'reachedSchool' : allDone ? 'check' : undefined}
             label={p.kind === 'morning' ? t('driver.trip.reachedSchool') : t('driver.trip.end')}
             feel={p.kind === 'morning' ? 'reached_school' : 'success'}
-            onConfirm={() => p.onFinish(p.kind === 'morning' ? t('step.reachedSchool') : t('driver.trip.end'))}
+            onConfirm={() => {
+              const text = p.kind === 'morning' ? t('step.reachedSchool') : t('driver.trip.end');
+              if (p.kind === 'morning') p.onArrive?.(text);
+              setSeat(text);
+            }}
           />
           </Breathe>
         </Animated.View>
+        </> : null}
       </Animated.View>
 
       <HelpSheet visible={help} onClose={() => setHelp(false)} onReason={(r) => { p.onLate(r); setHelp(false); }} onEmergency={p.onEmergency} />

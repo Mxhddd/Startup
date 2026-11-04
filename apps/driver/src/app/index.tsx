@@ -17,6 +17,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationDisclosure } from '../components/LocationDisclosure';
 import { AlertsCard } from '../components/AlertsCard';
 import { SetupChecklist } from '../components/SetupChecklist';
+import { PreTripCheck, preTripNeeded } from '../components/PreTripCheck';
+import { DriverNotes, FoundCard, HolidayCard, SignalsCard, TimeCard } from '../components/DayCards';
 import { useDriver } from '../state/DriverStore';
 import { useStage2 } from '../state/stage2';
 
@@ -77,9 +79,12 @@ export default function DriverToday() {
   const s2 = useStage2();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   const [askFor, setAskFor] = useState<'morning' | 'afternoon' | null>(null);
+  const [checkFor, setCheckFor] = useState<'morning' | 'afternoon' | null>(null);
 
+  // v12: once a day, the pre-trip checklist comes first.
   // The first real trip shows the location explanation first (Google Play rule); after that, it starts straight away.
-  const start = async (kind: 'morning' | 'afternoon') => {
+  const start = async (kind: 'morning' | 'afternoon', checked = false) => {
+    if (!checked && (await preTripNeeded())) return setCheckFor(kind);
     const seen = await AsyncStorage.getItem(DISCLOSED).catch(() => null);
     if (!seen) return setAskFor(kind);
     d.actions.startTrip(kind).catch(() => d.actions.refresh());
@@ -184,6 +189,9 @@ export default function DriverToday() {
               </View>
               {!d.van.verified_at ? <AppText variant="secondary">{t('driver.check.pending')}</AppText> : null}
               {d.week && d.week.done > 0 ? <WeekScore tracked={d.week.tracked} done={d.week.done} /> : null}
+              <DriverNotes d={d} />
+              <SignalsCard d={d} />
+              <TimeCard d={d} />
 
               {!d.dayOff && childCount === 0 ? (
                 <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>
@@ -202,6 +210,8 @@ export default function DriverToday() {
                 </View>
               ) : null}
 
+              <FoundCard d={d} />
+              <HolidayCard d={d} />
               <AlertsCard />
               <SetupChecklist d={d} />
 
@@ -236,6 +246,15 @@ export default function DriverToday() {
           )}
         </Animated.View>
       ) : null}
+      <PreTripCheck
+        visible={checkFor !== null}
+        onClose={() => setCheckFor(null)}
+        onDone={() => {
+          const kind = checkFor;
+          setCheckFor(null);
+          if (kind) start(kind, true);
+        }}
+      />
       <LocationDisclosure
         visible={askFor !== null}
         onDecline={() => setAskFor(null)}

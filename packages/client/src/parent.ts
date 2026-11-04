@@ -233,3 +233,81 @@ export async function registerActivityToken(t: { token: string; kind: 'update' |
       .upsert({ token: t.token, kind: t.kind, trip_id: t.tripId ?? null, child_id: t.childId ?? null }, { onConflict: 'token', ignoreDuplicates: true }),
   );
 }
+
+// ---- v12
+export type RunKind = 'morning' | 'afternoon';
+export type SignalKind = 'two_minutes' | 'coming_down' | 'sick_today' | 'left_item';
+export type FoundItem = { id: string; what: 'bottle' | 'bag' | 'lunchbox' | 'jacket' | 'book' | 'other'; createdAt: string };
+export type Notice = { id: string; body: string; createdAt: string };
+
+/** How long this child's ride usually takes from the van's start (median minutes, per run kind). */
+export async function rideMinutes(childId: string): Promise<{ morning: number | null; afternoon: number | null }> {
+  const rows = check(await db().supabase.rpc('child_ride_minutes', { p_child: childId })) as { kind: RunKind; minutes: number; runs: number }[] | null;
+  const pick = (k: RunKind) => {
+    const r = (rows ?? []).find((x) => x.kind === k);
+    return r && r.runs >= 3 ? r.minutes : null; // three runs before we trust it
+  };
+  return { morning: pick('morning'), afternoon: pick('afternoon') };
+}
+
+/** A quick signal to the driver. Fixed messages only, never free text. */
+export async function sendSignal(childId: string, kind: SignalKind): Promise<void> {
+  const { supabase } = db();
+  const uid = (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) return;
+  check(await supabase.from('signals').insert({ child_id: childId, kind, created_by: uid }));
+}
+
+/** Signals this family already sent today for a child. */
+export async function signalsToday(childId: string): Promise<SignalKind[]> {
+  const today = karachiDate(new Date());
+  const rows = check(await db().supabase.from('signals').select('kind').eq('child_id', childId).eq('service_date', today)) as { kind: SignalKind }[];
+  return rows.map((r) => r.kind);
+}
+
+/** Off for just one run: on = true adds, false removes. */
+export async function setRunAbsence(childId: string, date: string, kind: RunKind, on: boolean): Promise<void> {
+  const { supabase } = db();
+  if (on) {
+    const uid = (await supabase.auth.getUser()).data.user?.id;
+    check(await supabase.from('run_absences').upsert({ child_id: childId, service_date: date, kind, created_by: uid }, { onConflict: 'child_id,service_date,kind', ignoreDuplicates: true }));
+  } else {
+    check(await supabase.from('run_absences').delete().eq('child_id', childId).eq('service_date', date).eq('kind', kind));
+  }
+}
+
+export async function runAbsences(childId: string, from: string): Promise<{ date: string; kind: RunKind }[]> {
+  const rows = check(await db().supabase.from('run_absences').select('service_date, kind').eq('child_id', childId).gte('service_date', from).order('service_date')) as { service_date: string; kind: RunKind }[];
+  return rows.map((r) => ({ date: r.service_date, kind: r.kind }));
+}
+
+/** The van's one-day start time for a run, if the driver changed it ("HH:MM"). */
+export async function runChange(vanId: string, date: string, kind: RunKind): Promise<string | null> {
+  const rows = check(await db().supabase.from('run_changes').select('start_time').eq('van_id', vanId).eq('service_date', date).eq('kind', kind)) as { start_time: string }[];
+  return rows[0]?.start_time.slice(0, 5) ?? null;
+}
+
+export async function activeNotices(): Promise<Notice[]> {
+  const rows = check(
+    await db().supabase.from('notices').select('id, body, created_at').gt('expires_at', new Date().toISOString()).order('created_at', { ascending: false }).limit(3),
+  ) as { id: string; body: string; created_at: string }[];
+  return rows.map((r) => ({ id: r.id, body: r.body, createdAt: r.created_at }));
+}
+
+/** Things the driver found in the van for this child, not yet collected. */
+export async function foundFor(childId: string): Promise<FoundItem[]> {
+  const rows = check(
+    await db().supabase.from('found_items').select('id, what, created_at').eq('child_id', childId).is('collected_at', null).order('created_at', { ascending: false }),
+  ) as { id: string; what: FoundItem['what']; created_at: string }[];
+  return rows.map((r) => ({ id: r.id, what: r.what, createdAt: r.created_at }));
+}
+
+export async function collectFound(id: string): Promise<void> {
+  check(await db().supabase.from('found_items').update({ collected_at: new Date().toISOString() }).eq('id', id));
+}
+
+/** One trip's positions in order, for the ride replay (only trips this family can see). */
+export async function tripPath(tripId: string): Promise<{ lat: number; lng: number; at: string }[]> {
+  const rows = check(await db().supabase.from('positions').select('lat, lng, recorded_at').eq('trip_id', tripId).order('recorded_at').limit(2000)) as { lat: number; lng: number; recorded_at: string }[];
+  return rows.map((r) => ({ lat: r.lat, lng: r.lng, at: r.recorded_at }));
+}

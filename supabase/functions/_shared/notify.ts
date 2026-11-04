@@ -81,8 +81,8 @@ export async function notifyNotice(n: NoticePush, deps: NotifyDeps): Promise<voi
     const { sent, dead } = await sendExpoPushes(messages, { fetch: deps.fetch, accessToken: deps.expoAccessToken });
     if (dead.length) await deps.rpc('remove_push_tokens', { p_tokens: dead });
     await deps.rpc('record_push_stats', { p_sent: sent, p_dead: dead.length, p_failed: messages.length - sent - dead.length });
-    deps.log(`push ${n.job.kind} sent=${sent} dead=${dead.length}`);
+    deps.log(`push notice sent=${sent} dead=${dead.length}`);
   } catch {
-    deps.log(`push ${n.job.kind} failed`);
+    deps.log(`push notice failed`);
   }
 }

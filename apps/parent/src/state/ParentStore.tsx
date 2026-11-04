@@ -2,9 +2,9 @@
 // One child is "selected" (the first by default); everything else follows from that child:
 // their van (once approved), their stop, today's trip, its steps and the van's latest position.
 // Live updates come from Supabase Realtime; a 30-second refresh catches anything missed.
-import { parent, type Child, type Membership, type MyStop, type ParentTrip, type ParentVan, type Position } from '@pohnch/client';
+import { parent, type FoundItem, type Notice, type SignalKind, type Child, type Membership, type MyStop, type ParentTrip, type ParentVan, type Position } from '@pohnch/client';
 import {
-  addDays, ApiError, arrivedAt, canUndoChutti, storyOf, defaultRunKind, etaMinutes, karachiDate, signalState, timelineFor, type ParentEvent,
+  addDays, ApiError, arrivedAt, blendEta, lateBy, canUndoChutti, storyOf, defaultRunKind, etaMinutes, karachiDate, signalState, timelineFor, type ParentEvent,
 } from '@pohnch/core';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
@@ -28,11 +28,20 @@ type Data = {
   /** v8: the school pin, and whether this child's family already said "we're ready" on the running trip. */
   school: { lat: number; lng: number } | null;
   ready: boolean;
+  /** v12: usual ride minutes (from past runs), one-run chutti, today's changed start time, team notices,
+   * things left in the van, and today's quick signals already sent. */
+  rideMin: { morning: number | null; afternoon: number | null };
+  runOff: { date: string; kind: 'morning' | 'afternoon' }[];
+  runChange: { morning: string | null; afternoon: string | null };
+  notices: Notice[];
+  found: FoundItem[];
+  signals: SignalKind[];
 };
 
 const empty: Data = {
   loading: true, error: null, children: [], membership: null, van: null, driverName: null, stop: null,
   trips: [], events: [], position: null, speeds: [], trail: [], stopsAhead: null, absences: [], vanDaysOff: [], school: null, ready: false,
+  rideMin: { morning: null, afternoon: null }, runOff: [], runChange: { morning: null, afternoon: null }, notices: [], found: [], signals: [],
 };
 
 function useParentState(enabled: boolean) {
@@ -57,6 +66,18 @@ function useParentState(enabled: boolean) {
         van && approved ? parent.vanDaysOff(van.id, karachiDate(new Date())).catch(() => []) : Promise.resolve([]),
         van && approved ? parent.schoolPoint(van.id).catch(() => null) : Promise.resolve(null),
       ]);
+      const on = !!(van && approved);
+      const today = karachiDate(new Date());
+      const none = <T,>(v: T) => Promise.resolve(v);
+      const [rideMin, runOff, rcM, rcA, notices, found, signals] = await Promise.all([
+        on ? parent.rideMinutes(child.id).catch(() => empty.rideMin) : none(empty.rideMin),
+        parent.runAbsences(child.id, today).catch(() => []),
+        on ? parent.runChange(van!.id, today, 'morning').catch(() => null) : none(null),
+        on ? parent.runChange(van!.id, today, 'afternoon').catch(() => null) : none(null),
+        parent.activeNotices().catch(() => []),
+        on ? parent.foundFor(child.id).catch(() => []) : none([] as FoundItem[]),
+        on ? parent.signalsToday(child.id).catch(() => []) : none([] as SignalKind[]),
+      ]);
       const running = trips.find((x) => x.status === 'running') ?? null;
       const shown = running ?? trips[trips.length - 1] ?? null;
       const [events, position, recent, stopsAhead, ready] = await Promise.all([
@@ -71,7 +92,7 @@ function useParentState(enabled: boolean) {
       // The trail: positions from the last 3 minutes, oldest first.
       const since = Date.now() - 3 * 60_000;
       const trail = recent.filter((r) => Date.parse(r.recorded_at) >= since).reverse().map((r) => ({ lat: r.lat, lng: r.lng }));
-      setD({ loading: false, error: null, children, membership, van, driverName, stop, trips, events, position, speeds, trail, stopsAhead, absences, vanDaysOff, school, ready });
+      setD({ loading: false, error: null, children, membership, van, driverName, stop, trips, events, position, speeds, trail, stopsAhead, absences, vanDaysOff, school, ready, rideMin, runOff, runChange: { morning: rcM, afternoon: rcA }, notices, found, signals });
     } catch (e) {
       setD((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }
@@ -114,13 +135,22 @@ function useParentState(enabled: boolean) {
     const childDone = timeline.items.some((i) => (i.step === 'picked' || i.step === 'dropped') && i.at);
     if (childDone) return null;
     if (timeline.arriving) return 'door' as const;
-    return etaMinutes({
+    const live = etaMinutes({
       van: { latitude: d.position.lat, longitude: d.position.lng },
       target: { latitude: d.stop.lat, longitude: d.stop.lng },
       recentSpeeds: d.speeds,
       stopsAhead: d.stopsAhead ?? 0,
     });
-  }, [running, d.position, d.stop, d.speeds, d.stopsAhead, timeline]);
+    // v12 learned ETA: early in the run, what this ride usually takes helps; near the door, live wins.
+    if (live === 'door') return live;
+    const leftAt = timeline.items.find((i) => (i.step === 'left' || i.step === 'left_school') && i.at)?.at;
+    return blendEta(live, d.rideMin[running.kind], leftAt ? Date.parse(leftAt) : null, now);
+  }, [running, d.position, d.stop, d.speeds, d.stopsAhead, d.rideMin, timeline, now]);
+
+  // v12 late warning: the stop's planned time (or today's changed start) against the estimate.
+  const plannedTime = running ? (running.kind === 'morning' ? d.stop?.morning_time : d.stop?.afternoon_time) ?? null : null;
+  const lateMin = typeof eta === 'number' ? lateBy(eta, now, plannedTime) : 0;
+  const learned = !!(running && d.rideMin[running.kind] !== null);
 
   // v8: after pick-up in the morning, minutes to school (when the driver has placed it).
   const schoolEta = useMemo(() => {
@@ -158,6 +188,30 @@ function useParentState(enabled: boolean) {
       setD((old) => ({ ...old, ready: true }));
       await parent.sayReady(running.id, child.id).catch(() => setD((old) => ({ ...old, ready: false })));
     },
+    /** v12: off for one run only (morning or afternoon), or back on. */
+    async toggleRunOff(date: string, kind: 'morning' | 'afternoon') {
+      if (!child) return;
+      const on = !d.runOff.some((r) => r.date === date && r.kind === kind);
+      await parent.setRunAbsence(child.id, date, kind, on);
+      await refresh();
+    },
+    /** v12: a quick signal to the driver. "Sick today" also marks today's chutti. */
+    async signal(kind: SignalKind) {
+      if (!child) return;
+      setD((old) => ({ ...old, signals: [...old.signals, kind] }));
+      try {
+        await parent.sendSignal(child.id, kind);
+        if (kind === 'sick_today' && !d.absences.includes(karachiDate(new Date()))) await parent.parentApi.setAbsence(child.id, karachiDate(new Date()));
+      } catch {
+        setD((old) => ({ ...old, signals: old.signals.filter((x) => x !== kind) }));
+        throw new Error('signal');
+      }
+      if (kind === 'sick_today') await refresh();
+    },
+    async collect(id: string) {
+      setD((old) => ({ ...old, found: old.found.filter((f) => f.id !== id) }));
+      await parent.collectFound(id).catch(() => refresh());
+    },
     async toggleChutti(date: string) {
       if (!child) return;
       if (d.absences.includes(date)) await parent.parentApi.clearAbsence(child.id, date);
@@ -167,7 +221,9 @@ function useParentState(enabled: boolean) {
   };
 
   return {
-    ...d, child, phase, running, shownTrip, kind, timeline, signal, eta, today, now, schoolEta, doorSince, story,
+    ...d, child, phase, running, shownTrip, kind, timeline, signal, eta, today, now, schoolEta, doorSince, story, lateMin, learned,
+    /** v12: this run is off for this child (a one-run chutti). */
+    runOffToday: d.runOff.some((r) => r.date === today && r.kind === kind),
     absentToday: d.absences.includes(today),
     /** The driver gave the whole van today (or tomorrow) off. */
     vanOff: d.vanDaysOff.includes(today) ? ('today' as const) : d.vanDaysOff.includes(addDays(today, 1)) ? ('tomorrow' as const) : null,

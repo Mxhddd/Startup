@@ -16,6 +16,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ParentProvider } from '../state/ParentStore';
 import { TripNotifications } from '../notifications/TripNotifications';
+import { LocalAlerts } from '../notifications/LocalAlerts';
 import { rememberInvite, takeInvite } from '../state/pendingInvite';
 import '../notifications/liveTask'; // defines the Android live-notification task at start-up
 
@@ -88,6 +89,7 @@ function RootLayout() {
               </ArchWipeProvider>
             </MorphProvider>
             <TripNotifications signedIn={configured && !!session} />
+            <LocalAlerts signedIn={configured && !!session} />
           </ParentProvider>
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
           <LaunchReveal />

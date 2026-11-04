@@ -33,9 +33,16 @@ type State = {
   ready: string[];
   /** v8: the last 7 days' trips, and how many were tracked start to finish. */
   week: { done: number; tracked: number } | null;
+  /** v12: one-run chutti today (child ids per run), families' quick signals, team notices,
+   * one-day start times, and things found in the van not yet collected. */
+  runOff: { morning: string[]; afternoon: string[] };
+  signals: driver.Signal[];
+  notices: driver.Notice[];
+  changes: { date: string; kind: 'morning' | 'afternoon'; time: string }[];
+  found: driver.FoundItem[];
 };
 
-const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, daysOff: [], name: null, school: null, ready: [], week: null };
+const empty: State = { loading: true, error: null, van: null, stops: [], riders: [], requests: [], absent: [], trips: [], events: [], dayOff: false, daysOff: [], name: null, school: null, ready: [], week: null, runOff: { morning: [], afternoon: [] }, signals: [], notices: [], changes: [], found: [] };
 
 function useDriverState() {
   const [s, setS] = useState<State>(empty);
@@ -79,6 +86,14 @@ function useDriverState() {
         driver.tripsToday(van.id),
         driver.daysOffFrom(van.id, today),
       ]);
+      const [offM, offA, signals, notices, changes, found] = await Promise.all([
+        driver.runAbsencesOn(today, 'morning').catch(() => []),
+        driver.runAbsencesOn(today, 'afternoon').catch(() => []),
+        driver.signalsToday().catch(() => []),
+        driver.activeNotices().catch(() => []),
+        driver.runChangesFrom(van.id, today).catch(() => []),
+        driver.foundItems(van.id).catch(() => []),
+      ]);
       const dayOff = daysOff.includes(today);
       const running = trips.find((x) => x.status === 'running');
       const [events, school, ready, week] = await Promise.all([
@@ -95,7 +110,7 @@ function useDriverState() {
         await stopTripLocation();
         setLocation('off');
       }
-      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, daysOff, name, school, ready, week });
+      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, daysOff, name, school, ready, week, runOff: { morning: offM, afternoon: offA }, signals, notices, changes, found });
     } catch (e) {
       setS((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }
@@ -123,6 +138,11 @@ function useDriverState() {
   useEffect(() => {
     if (!running || running.is_practice) return;
     const id = setInterval(() => {
+      driver.signalsToday().then((signals) => setS((old) => {
+        if (signals.length === old.signals.length) return old;
+        if (signals.length > old.signals.length) feel('toggleOn');
+        return { ...old, signals };
+      })).catch(() => undefined);
       driver.readyOn(running.id).then((ready) => setS((old) => {
         if (old.ready.join() === ready.join()) return old;
         // v9: a family said "we're ready": a soft sound only (no banner over the trip screen).
@@ -138,8 +158,10 @@ function useDriverState() {
   const nextKind: 'morning' | 'afternoon' | null = !doneKinds.has('morning') ? 'morning' : !doneKinds.has('afternoon') ? 'afternoon' : null;
   const run = useMemo(() => {
     const kind = running?.kind ?? nextKind ?? defaultRunKind(new Date());
-    return { kind, groups: buildRun({ stops: s.stops, riders: s.riders, absentChildIds: s.absent, events: s.events, kind, noStopLabel: '—' }) };
-  }, [running, nextKind, s.stops, s.riders, s.absent, s.events]);
+    // v12: a one-run chutti counts as off for that run only.
+    const absentChildIds = [...s.absent, ...s.runOff[kind]];
+    return { kind, groups: buildRun({ stops: s.stops, riders: s.riders, absentChildIds, events: s.events, kind, noStopLabel: '—' }) };
+  }, [running, nextKind, s.stops, s.riders, s.absent, s.runOff, s.events]);
 
   const actions = {
     refresh,
@@ -185,7 +207,7 @@ function useDriverState() {
 
     clearUndo: () => setUndo(null),
 
-    async late(reason: 'traffic' | 'breakdown' | 'roadClosed') {
+    async late(reason: 'traffic' | 'breakdown' | 'roadClosed' | 'rain') {
       if (!running) return;
       const clientId = randomUUID();
       await queue.add({ id: clientId, action: 'late', body: { tripId: running.id, reason, clientId }, queuedAt: Date.now() });
@@ -196,6 +218,22 @@ function useDriverState() {
       if (!s.van) return;
       await driver.driverApi.dayOff(s.van.id, date, off);
       await refresh();
+    },
+
+    /** v12: a one-day start time for a run (null = back to usual). Families are told by push. */
+    async changeTime(kind: 'morning' | 'afternoon', date: string, time: string | null) {
+      if (!s.van) return;
+      await driver.v12Api.runChange(s.van.id, kind, date, time, s.name ?? '');
+      await refresh();
+    },
+    async markFound(childId: string, what: driver.FoundItem['what']) {
+      if (!s.van) return;
+      await driver.markFound(s.van.id, childId, what);
+      await refresh();
+    },
+    async markCollected(id: string) {
+      setS((old) => ({ ...old, found: old.found.filter((f) => f.id !== id) }));
+      await driver.markCollected(id).catch(() => refresh());
     },
 
     async endTrip() {
