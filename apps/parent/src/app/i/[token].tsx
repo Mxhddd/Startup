@@ -6,7 +6,7 @@
 import { parent } from '@pohnch/client';
 import { ApiError } from '@pohnch/core';
 import { colors, elevation, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, ArchAvatar, ArchShape, ChoiceChip, FlowSteps, Icon, MomentFX, SectionCaption, Shimmer, StarPattern, TapButton } from '@pohnch/ui/native';
+import { AppText, ArchAvatar, ArchShape, ChoiceChip, FlowSteps, Gradient, Icon, MomentFX, SectionCaption, Shimmer, StarPattern, TapButton, TiltLayer, useTilt } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, useWindowDimensions, View } from 'react-native';
@@ -23,6 +23,7 @@ export default function JoinFromLink() {
   const { t, dir } = useLang();
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
+  const tilt = useTilt();
   const cardW = Math.min(width, 480) - space.lg * 2;
   const p = useParent();
   const { token } = useLocalSearchParams<{ token: string }>();
@@ -70,11 +71,16 @@ export default function JoinFromLink() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(170deg, ${colors.headerTop} 0%, ${colors.neel} 50%, ${colors.headerBottom} 100%)` }}>
-      <StarPattern opacity={0.08} />
+    <View style={{ flex: 1, backgroundColor: colors.headerBottom }}>
+      {/* v11: a starry sky behind the card; tilt the phone and the card floats over it. */}
+      <TiltLayer tilt={tilt} depth={-10} style={{ position: 'absolute', left: -30, right: -30, top: -30, bottom: -30 }}>
+        <Gradient stops={[[0, colors.headerTop], [0.5, colors.neel], [1, colors.headerBottom]]} />
+        <StarPattern opacity={0.08} />
+      </TiltLayer>
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', padding: space.lg, paddingTop: insets.top + space.lg, paddingBottom: insets.bottom + space.xl, gap: space.lg }}>
         {p.children.length === 0 || !p.membership ? <FlowSteps step={3} total={4} label={t('parent.flow.label', { n: 3, of: 4 })} /> : null}
         {/* v10: the card is a jharoka arch: a pale arch with a kesar seal at its crown, the van's name in Gulzar. */}
+        <TiltLayer tilt={tilt} depth={14}>
         <Animated.View entering={FadeInDown.springify().damping(20)} style={{ boxShadow: shadow.raised, borderBottomLeftRadius: radius.sheet, borderBottomRightRadius: radius.sheet }}>
           <ArchShape width={cardW} height={Math.round(cardW * 0.62)} rise={Math.round(cardW * 0.5)} color={colors.ghee}>
             <View style={{ position: 'absolute', left: space.xl, right: space.xl, top: 34, alignItems: 'center', gap: 4 }}>
@@ -149,6 +155,7 @@ export default function JoinFromLink() {
           </View>
           </View>
         </Animated.View>
+        </TiltLayer>
       </ScrollView>
     </View>
   );

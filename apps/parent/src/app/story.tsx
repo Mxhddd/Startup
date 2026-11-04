@@ -7,7 +7,7 @@
 import { parent } from '@pohnch/client';
 import { addDays, storyOf, timelineFor, weekStory, type StoryDay } from '@pohnch/core';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
-import { AppText, ArchShape, Icon, Shimmer, StarIcon, TapButton } from '@pohnch/ui/native';
+import { AppText, ArchShape, Icon, Shimmer, StarIcon, TapButton, TiltLayer, useTilt } from '@pohnch/ui/native';
 import { makeImageFromView } from '@shopify/react-native-skia';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
@@ -25,6 +25,7 @@ export default function Story() {
   const p = useParent();
   const [days, setDays] = useState<(StoryDay & { label: string })[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const tilt = useTilt();
   const card = useRef<ComponentRef<typeof View>>(null);
   const van = p.van;
   const child = p.child;
@@ -85,6 +86,7 @@ export default function Story() {
       ) : (
         <Animated.View entering={FadeInDown.springify().damping(20)} style={{ gap: space.lg, alignItems: 'center' }}>
           {/* The card that becomes the picture. collapsable={false} so Android keeps it as one view. */}
+          <TiltLayer tilt={tilt} depth={10}>
           <View ref={card} collapsable={false} style={{ width: CARD_W, height: CARD_H + 30, backgroundColor: colors.ghee, alignItems: 'center' }} testID="story-card">
             <ArchShape width={CARD_W} height={CARD_H} rise={170} color={colors.neel} gradient={[colors.headerTop, colors.neel]} pattern>
               <View style={{ position: 'absolute', left: 20, right: 20, top: 64, alignItems: 'center', gap: 2 }}>
@@ -108,6 +110,7 @@ export default function Story() {
             </ArchShape>
             <AppText variant="number" color={colors.ink2} style={{ fontSize: 14, lineHeight: 26 }}>pohnch.pk</AppText>
           </View>
+          </TiltLayer>
           <View style={{ alignSelf: 'stretch', gap: space.sm }}>
             <TapButton size="next" tone="picked" icon="share" label={t('story.share')} onConfirm={share} testID="story-share" />
             <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, justifyContent: 'center', padding: 6, borderRadius: 16, backgroundColor: colors.white, boxShadow: elevation.e1 }}>

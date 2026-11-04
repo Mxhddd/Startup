@@ -10,9 +10,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Redirect, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
-import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import { Pressable, RefreshControl, View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
-import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
+import Animated, { FadeIn, FadeInDown, FadeInUp, interpolate, useAnimatedScrollHandler, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationDisclosure } from '../components/LocationDisclosure';
 import { AlertsCard } from '../components/AlertsCard';
@@ -96,17 +96,26 @@ export default function DriverToday() {
   const hasMap = !!(configured && d.van && d.stops.length > 0);
   const canStart = configured && d.van && d.van.verified_at && !d.dayOff && childCount > 0;
 
+  // v11 (canvas "Z11D-Today"): the greeting folds a little as the list scrolls up (plain: no ornament).
+  const y = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((e) => {
+    y.value = e.contentOffset.y;
+  });
+  const greet = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [0, 120], [1, 0.75], 'clamp'), transform: [{ scale: interpolate(y.value, [0, 120], [1, 0.84], 'clamp') }] }));
+
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       {/* Header */}
       <StatusBar style="light" />
       <Animated.View entering={FadeInUp.springify().damping(22)} style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 58 : 30, gap: 10, borderBottomLeftRadius: 36, borderBottomRightRadius: 36 }}>
         <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
+          <Animated.View style={[{ flex: 1, transformOrigin: dir === 'rtl' ? 'right' : 'left' }, greet]}>
           <Pressable style={{ flex: 1 }} onLongPress={__DEV__ ? () => router.push('/gallery') : undefined}>
             <AppText variant="display" color={colors.ghee} style={{ fontSize: 30 }} testID="today-title" numberOfLines={2}>
               {d.name ? t('driver.hello', { name: d.name }) : t('driver.hello.plain')}
             </AppText>
           </Pressable>
+          </Animated.View>
           <LangSwitch tone="dark" />
         </View>
         <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
@@ -125,7 +134,9 @@ export default function DriverToday() {
         </View>
       </Animated.View>
 
-      <ScrollView
+      <Animated.ScrollView
+        onScroll={onScroll}
+        scrollEventThrottle={16}
         contentContainerStyle={{ paddingBottom: insets.bottom + 210 }}
         refreshControl={configured ? <RefreshControl refreshing={false} onRefresh={d.actions.refresh} tintColor={colors.kesar} colors={[colors.neel, colors.kesar]} /> : undefined}
       >
@@ -209,7 +220,7 @@ export default function DriverToday() {
             </>
           )}
         </View>
-      </ScrollView>
+      </Animated.ScrollView>
 
       {canStart ? (
         <Animated.View entering={FadeInDown.delay(260).springify().damping(20)} style={{ position: 'absolute', left: space.gutter, right: space.gutter, bottom: insets.bottom + space.xl }}>
