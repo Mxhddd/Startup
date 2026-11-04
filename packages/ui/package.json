@@ -21,7 +21,8 @@
     "react-native": "*",
     "react-native-gesture-handler": "*",
     "react-native-reanimated": "*",
-    "react-native-svg": "*"
+    "react-native-svg": "*",
+    "expo-sensors": "*"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

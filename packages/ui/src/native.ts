@@ -50,3 +50,9 @@ export { ArchHeader } from './native/ArchHeader';
 export { Group, GroupRow, RowIcon, SectionCaption } from './native/Group';
 export { Segmented } from './native/Segmented';
 export { STAR_PATH } from './native/icons';
+// v11 "Gehrai"
+export { Corridor, Sky, FloorLight, SKIES, skyMoodNow, archAt, BAR_HEIGHT, WallShape, WALLS, type SkyMood, type WallSpec } from './native/Corridor';
+export { LivingGround, JaliLight, Niche, useTilt, TiltLayer } from './native/Depth';
+export { ArchWipeProvider, useArchWipe } from './native/ArchWipe';
+export { Gradient, type GradientStop } from './native/Gradient';
+export { ArchMoment, type ArchMomentTone } from './native/ArchMoment';

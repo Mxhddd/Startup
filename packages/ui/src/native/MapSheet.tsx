@@ -5,11 +5,12 @@
 import { useEffect, type ReactNode } from 'react';
 import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
+import { BlurView } from 'expo-blur';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { runOnJS, useAnimatedReaction, useAnimatedStyle, useSharedValue, withSpring, type SharedValue } from 'react-native-reanimated';
 import { useLang } from '../lang';
 import { pickSnap, rubberBand, springs } from '../motion';
-import { colors, radius, shadow, space } from '../theme';
+import { colorScheme, colors, radius, shadow, space } from '../theme';
 import { feel } from './feedback';
 
 export function MapSheet({
@@ -93,7 +94,7 @@ export function MapSheet({
           right: 0,
           bottom: -open, // room underneath for the stretch
           height: open * 2 + bottomInset,
-          backgroundColor: colors.white,
+          backgroundColor: 'transparent',
           borderTopLeftRadius: radius.sheet,
           borderTopRightRadius: radius.sheet,
           paddingHorizontal: space.xl,
@@ -103,10 +104,15 @@ export function MapSheet({
         style,
       ]}
     >
+      {/* v11: frosted glass, so the map stays alive behind the sheet (a strong tint keeps text crisp). */}
+      <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, overflow: 'hidden' }}>
+        <BlurView intensity={50} tint={colorScheme() === 'dark' ? 'dark' : 'light'} style={{ flex: 1, backgroundColor: colorScheme() === 'dark' ? 'rgba(24,32,68,0.84)' : 'rgba(255,255,255,0.80)' }} />
+        <View style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 1, backgroundColor: 'rgba(255,255,255,0.9)' }} />
+      </View>
       {/* v10: the sheet's top edge rises into a small pointed arch around the handle, a kesar dot at its point. */}
       <View pointerEvents="none" style={{ position: 'absolute', top: -20, left: 0, right: 0, height: 24, alignItems: 'center' }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         <Svg width={128} height={24} viewBox="0 0 128 24">
-          <Path d="M0 24 L0 22 C14 22 34 21 44 14 C52 9 59 3 64 0 C69 3 76 9 84 14 C94 21 114 22 128 22 L128 24 Z" fill={colors.white} />
+          <Path d="M0 24 L0 22 C14 22 34 21 44 14 C52 9 59 3 64 0 C69 3 76 9 84 14 C94 21 114 22 128 22 L128 24 Z" fill={colorScheme() === 'dark' ? 'rgba(24,32,68,0.9)' : 'rgba(255,255,255,0.86)'} />
         </Svg>
         <View style={{ position: 'absolute', top: 10, width: 8, height: 8, borderRadius: 4, backgroundColor: colors.kesar }} />
       </View>

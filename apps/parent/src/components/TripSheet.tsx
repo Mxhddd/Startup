@@ -63,7 +63,13 @@ function MorphHead({ progress, compact, full }: { progress?: SharedValue<number>
   );
 }
 
-export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () => void; expanded: boolean; progress?: SharedValue<number> }) {
+export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
+  onOpenTrip: () => void;
+  expanded: boolean;
+  progress?: SharedValue<number>;
+  /** v11: a fresh step, to show as a full-screen arch of light (home draws it over everything). */
+  onMoment?: (m: { step: MomentStep; letter: string; title: string; sub?: string }) => void;
+}) {
   const { t, dir } = useLang();
   const p = useParent();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
@@ -76,7 +82,13 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
     const items = p.timeline.items.map((i) => ({ step: i.step, at: i.at }));
     const before = seen.current.child === (p.child?.id ?? null) ? seen.current.items : null;
     const fresh = newMoment(before, items) ?? (before && p.timeline.arriving && !seen.current.arriving ? 'arriving' : null);
-    if (fresh) setMoment(fresh);
+    if (fresh) {
+      setMoment(fresh);
+      if (fresh !== 'left' && fresh !== 'left_school' && fresh !== 'late') {
+        const by = p.timeline.items.find((i) => i.step === fresh)?.by;
+        onMoment?.({ step: fresh, letter: (p.child?.first_name ?? '').slice(0, 1), title: t(`moment.${fresh}`, { name: p.child?.first_name ?? '' }), sub: by ? t('timeline.by', { who: by }) : undefined });
+      }
+    }
     seen.current = { child: p.child?.id ?? null, items, arriving: p.timeline.arriving };
   }, [p.timeline, p.child?.id]);
 

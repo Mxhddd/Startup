@@ -12,7 +12,8 @@ const AnimatedPath = Animated.createAnimatedComponent(Path);
 const ROUTE = 'M14 96 C40 96 44 60 76 60 C108 60 112 30 150 30';
 const LEN = 190;
 
-export function LineArt({ width = 200 }: { width?: number }) {
+export function LineArt({ width = 200, color }: { width?: number; color?: string }) {
+  const ink = color ?? colors.link;
   const draw = useSharedValue(0);
   const star = useSharedValue(0);
   useEffect(() => {
@@ -25,8 +26,8 @@ export function LineArt({ width = 200 }: { width?: number }) {
   return (
     <View style={{ width, height: h }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Svg width={width} height={h} viewBox="0 0 200 120">
-        <AnimatedPath d={ROUTE} stroke={colors.link} strokeWidth={5} strokeLinecap="round" strokeDasharray={`2 12`} fill="none" opacity={0.35} />
-        <AnimatedPath d={ROUTE} stroke={colors.link} strokeWidth={5} strokeLinecap="round" fill="none" strokeDasharray={`${LEN} ${LEN}`} animatedProps={props} />
+        <AnimatedPath d={ROUTE} stroke={ink} strokeWidth={5} strokeLinecap="round" strokeDasharray={`2 12`} fill="none" opacity={0.35} />
+        <AnimatedPath d={ROUTE} stroke={ink} strokeWidth={5} strokeLinecap="round" fill="none" strokeDasharray={`${LEN} ${LEN}`} animatedProps={props} />
       </Svg>
       <Animated.View style={[{ position: 'absolute', left: (150 / 200) * width - 22, top: (30 / 120) * h - 22 }, starStyle]}>
         <StarIcon size={44} color={colors.kesar} />

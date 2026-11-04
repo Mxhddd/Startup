@@ -5,7 +5,7 @@ import { Manrope_500Medium, Manrope_800ExtraBold } from '@expo-google-fonts/manr
 import { NotoSansArabic_500Medium, NotoSansArabic_700Bold } from '@expo-google-fonts/noto-sans-arabic';
 import { useSession } from '@pohnch/client';
 import { LangProvider, applyColorScheme, colorScheme } from '@pohnch/ui';
-import { LaunchReveal, MorphProvider, useScreenOptions } from '@pohnch/ui/native';
+import { ArchWipeProvider, LaunchReveal, MorphProvider, useScreenOptions } from '@pohnch/ui/native';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -81,9 +81,11 @@ function RootLayout() {
           <StatusBar style={scheme === 'dark' ? 'light' : 'dark'} />
           <ParentProvider key={session?.user.id ?? 'out'} enabled={configured && !!session}>
             <MorphProvider>
-              <Fragment key={scheme}>
-                <Screens />
-              </Fragment>
+              <ArchWipeProvider>
+                <Fragment key={scheme}>
+                  <Screens />
+                </Fragment>
+              </ArchWipeProvider>
             </MorphProvider>
             <TripNotifications signedIn={configured && !!session} />
           </ParentProvider>

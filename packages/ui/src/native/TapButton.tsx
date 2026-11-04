@@ -30,6 +30,7 @@ import { useLang } from '../lang';
 import { springs } from '../motion';
 import { colors, elevation, radius, radius10, stepColors, tap, type Step } from '../theme';
 import { AppText } from './AppText';
+import { Gradient } from './Gradient';
 import { HOLD_FEELS, type FeelKind } from '../feedbackTable';
 import { feel as feelIt } from './feedback';
 import { Icon, type IconName } from './icons';
@@ -212,12 +213,13 @@ export function TapButton({
           minHeight: big ? Math.max(tap.next, 120) : tap.min,
           borderRadius: big ? radius.big : radius10.field, borderCurve: 'continuous',
           backgroundColor: fill,
-          experimental_backgroundImage: disabled ? undefined : `linear-gradient(180deg, ${c.top}, ${c.fill})`,
           boxShadow: disabled ? undefined : elevation.highlight(c.hi),
           overflow: 'hidden',
           justifyContent: 'center',
         }}
       >
+        {/* v10/v11: the face shades from a lighter top to its colour (drawn with svg, so it shows on the web too). */}
+        {!disabled && c.top !== c.fill ? <Gradient stops={[[0, c.top], [1, c.fill]]} /> : null}
         {hold ? (
           <Animated.View
             pointerEvents="none"

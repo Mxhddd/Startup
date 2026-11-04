@@ -90,7 +90,7 @@ export function GroupRow({
   );
   if (!onPress) return <View testID={testID}>{body}</View>;
   return (
-    <PressableScale testID={testID} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? title} onPress={onPress} scaleTo="small" haptic="tap">
+    <PressableScale testID={testID} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? title} onPress={onPress} scaleTo="small" haptic="tap" tilt>
       {body}
     </PressableScale>
   );

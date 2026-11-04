@@ -147,7 +147,7 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
     camera.current?.easeTo({
       center: [van.lng, van.lat],
       zoom: 16,
-      pitch: 35,
+      pitch: 50, // v11: tilted further so the buildings stand up
       bearing: van.heading ?? 0,
       duration: 1400,
       padding: { top: topInset, bottom: bottomInset, left: 0, right: 0 },
@@ -197,7 +197,10 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       ) : null}
       {ahead && ahead.length > 1 ? (
         <GeoJSONSource id="pohnch-ahead" data={line(ahead)}>
-          <Layer id="pohnch-ahead-line" type="line" layout={{ 'line-cap': 'round', 'line-join': 'round' }} paint={{ 'line-width': 6, 'line-color': colors.neel, 'line-opacity': 0.75, 'line-dasharray': dash }} />
+          {/* v11: the road ahead glows: a soft kesar halo, a neel line, and light flowing along it to your door. */}
+          <Layer id="pohnch-ahead-glow" type="line" layout={{ 'line-cap': 'round', 'line-join': 'round' }} paint={{ 'line-width': 18, 'line-color': colors.kesar, 'line-opacity': 0.28, 'line-blur': 8 }} />
+          <Layer id="pohnch-ahead-base" type="line" layout={{ 'line-cap': 'round', 'line-join': 'round' }} paint={{ 'line-width': 7, 'line-color': colors.neel, 'line-opacity': 0.85 }} />
+          <Layer id="pohnch-ahead-line" type="line" layout={{ 'line-cap': 'round', 'line-join': 'round' }} paint={{ 'line-width': 3.5, 'line-color': colors.kesarHi, 'line-opacity': 0.95, 'line-dasharray': dash }} />
         </GeoJSONSource>
       ) : null}
       {pins.map((p) => (

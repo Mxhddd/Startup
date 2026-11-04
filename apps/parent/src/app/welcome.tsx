@@ -7,7 +7,8 @@
 // v10 (canvas "Z10P-Welcome"): a starry neel ground; each picture sits in a pale jharoka arch, and the
 // words are set in Gulzar below it.
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ArchShape, Icon, LangSwitch, LineArt, PressableScale, StarPattern, TapButton, type IconName } from '@pohnch/ui/native';
+import { AppText, Gradient, Icon, LangSwitch, LineArt, PressableScale, Sky, TapButton, TiltLayer, WALLS, WallShape, skyMoodNow, useTilt, type IconName } from '@pohnch/ui/native';
+import { useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -32,10 +33,10 @@ function Mark({ icon }: { icon: IconName }) {
   const ripple = useAnimatedStyle(() => ({ opacity: 0.35 * (1 - ring.value), transform: [{ scale: 0.8 + ring.value * 0.7 }] }));
   return (
     <View style={{ width: 200, height: 160, alignItems: 'center', justifyContent: 'center' }} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Animated.View style={[{ position: 'absolute', width: 132, height: 132, borderRadius: 66, backgroundColor: colors.neelTint }, ripple]} />
-      <View style={{ width: 112, height: 112, borderRadius: 56, backgroundColor: colors.neelTint, alignItems: 'center', justifyContent: 'center' }}>
-        <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 10px 24px ${colors.neelGlow}` }}>
-          <Icon name={icon} size={32} color={colors.onBrand} strokeWidth={2.4} />
+      <Animated.View style={[{ position: 'absolute', width: 132, height: 132, borderRadius: 66, backgroundColor: 'rgba(250,246,238,0.22)' }, ripple]} />
+      <View style={{ width: 112, height: 112, borderRadius: 56, backgroundColor: 'rgba(250,246,238,0.14)', alignItems: 'center', justifyContent: 'center' }}>
+        <View style={{ width: 72, height: 72, borderRadius: 36, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center', boxShadow: `0px 10px 24px ${colors.kesarGlow}` }}>
+          <Icon name={icon} size={32} color={colors.onKesar} strokeWidth={2.4} />
         </View>
       </View>
     </View>
@@ -53,6 +54,9 @@ function Dot({ on }: { on: boolean }) {
 
 export default function Welcome() {
   const { t, dir } = useLang();
+  const { width, height } = useWindowDimensions();
+  const tilt = useTilt();
+  const mood = skyMoodNow();
   const insets = useSafeAreaInsets();
   const [i, setI] = useState(0);
   const [back, setBack] = useState(false);
@@ -82,9 +86,18 @@ export default function Welcome() {
 
   return (
     <GestureDetector gesture={fling}>
-      <View testID="welcome" style={{ flex: 1, backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(165deg, ${colors.headerTop} 0%, ${colors.neel} 55%, ${colors.headerBottom} 100%)`, paddingTop: insets.top + space.md, paddingBottom: insets.bottom + space.xl, paddingHorizontal: space.xl }}>
+      <View testID="welcome" style={{ flex: 1, backgroundColor: colors.headerBottom, paddingTop: insets.top + space.md, paddingBottom: insets.bottom + space.xl, paddingHorizontal: space.xl }}>
         <StatusBar style="light" />
-        <StarPattern />
+        {/* v11 (canvas "Z11P-Welcome"): a corridor of arches open to the sky; tilt the phone and the
+            sky, the far arch and the near arch move at different depths. */}
+        <View pointerEvents="none" style={{ position: 'absolute', left: -50, right: -50, top: -50, bottom: -50 }}>
+          <TiltLayer tilt={tilt} depth={8} style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }}><Sky height={height + 100} mood={mood} /></TiltLayer>
+          <TiltLayer tilt={tilt} depth={20} style={{ position: 'absolute', left: 0, top: 0 }}><WallShape w={width + 100} h={height + 100} spec={{ ...WALLS[1]!, hole: 0.5, top: 170 }} /></TiltLayer>
+          <TiltLayer tilt={tilt} depth={34} style={{ position: 'absolute', left: 0, top: 0 }}><WallShape w={width + 100} h={height + 100} spec={{ ...WALLS[2]!, hole: 0.72, top: 110 }} /></TiltLayer>
+          <View style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: height * 0.5 }}>
+            <Gradient stops={[[0, colors.headerBottom, 0], [0.45, colors.headerBottom, 0.85], [1, colors.headerBottom, 1]]} />
+          </View>
+        </View>
         <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', justifyContent: 'space-between', alignItems: 'center', minHeight: 48 }}>
           <LangSwitch tone="dark" />
           {!last ? (
@@ -95,12 +108,8 @@ export default function Welcome() {
         </View>
 
         <Animated.View key={slide} entering={enter.springify().damping(24).stiffness(180)} exiting={FadeOut.duration(140)} style={{ flex: 1, justifyContent: 'center', gap: space.xl }}>
-          <View style={{ alignItems: 'center' }}>
-            <ArchShape width={232} height={250} rise={130} color={colors.ghee}>
-              <View style={{ position: 'absolute', left: 0, right: 0, top: 70, alignItems: 'center' }}>
-                {slide === 'map' ? <LineArt width={190} /> : <Mark icon={slide === 'privacy' ? 'pin' : 'bell'} />}
-              </View>
-            </ArchShape>
+          <View style={{ alignItems: 'center', minHeight: 200, justifyContent: 'center' }}>
+            {slide === 'map' ? <LineArt width={200} color={colors.onBrand} /> : <Mark icon={slide === 'privacy' ? 'pin' : 'bell'} />}
           </View>
           <View style={{ gap: space.sm }}>
             <AppText variant="display" color={colors.onBrand} align="center" style={{ fontSize: 40 }} testID={`welcome-title-${slide}`}>{t(`welcome.${slide}.title`)}</AppText>

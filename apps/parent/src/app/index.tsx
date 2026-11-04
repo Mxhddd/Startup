@@ -4,7 +4,7 @@
 // the component gallery.
 import { karachiClock } from '@pohnch/core';
 import { colors, space, useLang } from '@pohnch/ui';
-import { Glass, Icon, LivingSky, MapSheet, PressableScale } from '@pohnch/ui/native';
+import { ArchMoment, Glass, Icon, LivingSky, MapSheet, PressableScale } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { View } from 'react-native';
@@ -23,6 +23,7 @@ export default function ParentHome() {
   const [open, setOpen] = useState(false);
   // Follow mode: on while the van moves; a pan stops it and shows the recentre button.
   const [following, setFollowing] = useState(true);
+  const [arch, setArch] = useState<{ step: string; letter: string; title: string; sub?: string } | null>(null);
   const [recenter, setRecenter] = useState(0);
   // 0 when the sheet peeks, 1 when it's open: the map sinks 3% and dims, so the sheet feels lifted off it.
   const sheet = useSharedValue(0);
@@ -73,8 +74,10 @@ export default function ParentHome() {
       </Animated.View>
 
       <MapSheet peek={peek} open={onboarding ? 360 : 640} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen} progress={sheet}>
-        <TripSheet expanded={open} onOpenTrip={() => setOpen((o) => !o)} progress={sheet} />
+        <TripSheet expanded={open} onOpenTrip={() => setOpen((o) => !o)} progress={sheet} onMoment={setArch} />
       </MapSheet>
+      {/* v11: the step as an arch of light over everything, then it settles away. */}
+      <ArchMoment visible={!!arch} tone={arch?.step === 'reached_school' ? 'kesar' : 'zamurrad'} letter={arch?.letter ?? ''} title={arch?.title ?? ''} sub={arch?.sub} onDone={() => setArch(null)} />
     </View>
   );
 }

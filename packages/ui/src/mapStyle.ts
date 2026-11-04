@@ -57,7 +57,8 @@ export function brandMapStyle<T extends MapStyleJson>(style: T, mood: MapMood = 
         'fill-extrusion-color': mapColors.building,
         'fill-extrusion-height': ['coalesce', ['get', 'render_height'], 8],
         'fill-extrusion-base': ['coalesce', ['get', 'render_min_height'], 0],
-        'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 15, 0, 16, 0.75],
+        'fill-extrusion-opacity': ['interpolate', ['linear'], ['zoom'], 14.5, 0, 15.5, 0.9],
+        'fill-extrusion-vertical-gradient': true,
       },
     };
     layers.splice(firstLabel < 0 ? layers.length : firstLabel, 0, building);

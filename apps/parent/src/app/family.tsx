@@ -10,7 +10,7 @@
 import { deleteMyAccount, parent } from '@pohnch/client';
 import { ApiError, normalisePkMobile, PILOT_WHATSAPP } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, ArchAvatar, ArchShape, EditSheet, Group, GroupRow, Icon, PressableScale, RowIcon, SectionCaption, Shimmer, TapButton, TextField, useMorphSource, type IconName } from '@pohnch/ui/native';
+import { AppText, ArchAvatar, ArchShape, EditSheet, Group, GroupRow, Icon, Niche, PressableScale, RowIcon, SectionCaption, Shimmer, TapButton, TextField, useArchWipe, type IconName } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState, type ComponentRef, type ReactNode } from 'react';
 import { Linking, ScrollView, View } from 'react-native';
@@ -42,27 +42,17 @@ const PORTRAIT = [
   () => ({ fill: colors.neel, ink: colors.onBrand }),
 ];
 
-/** A child as an arch portrait: the initial in a coloured arch inside a white one, the name below. */
-function ChildPortrait({ id, name, line, index, onPress, testID }: { id: string; name: string; line?: string; index: number; onPress: () => void; testID?: string }) {
-  const morph = useMorphSource(`child-${id}`);
+/** A child as a carved niche (v11): the initial in the child's colour, set back in a lit arch; tapping
+ * opens the child's page through an arch of light (useArchWipe). */
+function ChildPortrait({ name, line, index, onPress, testID }: { id: string; name: string; line?: string; index: number; onPress: () => void; testID?: string }) {
+  const wipe = useArchWipe();
+  const ref = useRef<ComponentRef<typeof View>>(null);
   const c = PORTRAIT[index % PORTRAIT.length]!();
-  const letter = name.slice(0, 1);
   return (
-    <PressableScale accessibilityRole="button" accessibilityLabel={line ? `${name}, ${line}` : name} scaleTo="big" testID={testID}
-      onPress={() => {
-        void morph.fly(<View style={{ flex: 1, borderRadius: 999, backgroundColor: c.fill, alignItems: 'center', justifyContent: 'center' }}><AppText bold color={c.ink} style={{ fontSize: 20 }}>{letter}</AppText></View>);
-        onPress();
-      }}>
-      <View style={{ width: TILE, alignItems: 'center', gap: 4 }}>
-        <ArchShape width={TILE} height={TILE_H} color={colors.white}>
-          <View style={{ position: 'absolute', left: 12, top: 14 }}>
-            <ArchShape width={TILE - 24} height={TILE_H - 26} color={c.fill} />
-          </View>
-          <View ref={morph.ref} collapsable={false} style={{ position: 'absolute', left: TILE / 2 - 20, top: TILE_H * 0.4, width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}>
-            <AppText bold color={c.ink} style={{ fontSize: 34, lineHeight: 48 }}>{letter}</AppText>
-          </View>
-        </ArchShape>
-        <AppText bold style={{ fontSize: 17 }} numberOfLines={1}>{name}</AppText>
+    <PressableScale accessibilityRole="button" accessibilityLabel={line ? `${name}, ${line}` : name} scaleTo="big" tilt testID={testID} onPress={() => wipe.open(ref.current, onPress)}>
+      <View ref={ref} collapsable={false} style={{ width: TILE, alignItems: 'center', gap: 4 }}>
+        <Niche letter={name.slice(0, 1)} fill={c.fill} ink={c.ink} width={TILE} height={TILE_H} delay={index * 900} />
+        <AppText bold style={{ fontSize: 17, marginTop: 4 }} numberOfLines={1}>{name}</AppText>
         {line ? <AppText variant="small" color={colors.ink2} numberOfLines={1} style={{ marginTop: -4, maxWidth: TILE }}>{line}</AppText> : null}
       </View>
     </PressableScale>

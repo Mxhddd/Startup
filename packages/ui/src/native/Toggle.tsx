@@ -15,7 +15,8 @@ export function Toggle({ value, onChange, label, testID }: { value: boolean; onC
   }, [value, v]);
   const track = useAnimatedStyle(() => ({ backgroundColor: interpolateColor(v.value, [0, 1], [colors.toggleOff, colors.zamurrad]) }));
   // "On" sits at the reading end: left in Urdu, right in English.
-  const knob = useAnimatedStyle(() => ({ transform: [{ translateX: (dir === 'rtl' ? -1 : 1) * v.value * 22 }] }));
+  // v11: the knob stretches a little as it travels (wider mid-way), like something soft.
+  const knob = useAnimatedStyle(() => ({ transform: [{ translateX: (dir === 'rtl' ? -1 : 1) * v.value * 22 }, { scaleX: 1 + 0.35 * Math.sin(Math.PI * Math.min(1, Math.max(0, v.value))) }] }));
   return (
     <PressableScale accessibilityRole="switch" accessibilityState={{ checked: value }} accessibilityLabel={label} onPress={() => { feel(value ? 'toggleOff' : 'toggleOn'); onChange(!value); }} scaleTo="chip" haptic="none" testID={testID} hitSlop={8}>
       <Animated.View style={[{ width: 56, height: 34, borderRadius: 17, padding: 3, boxShadow: 'inset 0px 2px 4px rgba(0,0,0,0.12)', alignItems: dir === 'rtl' ? 'flex-end' : 'flex-start' }, track]}>
