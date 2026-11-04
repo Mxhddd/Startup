@@ -419,3 +419,22 @@ On the user's instruction, the stage 2 pieces exist in code but are **off for ev
 Maestro: `parent-story.yaml`; `parent-stage2.yaml` and `driver-stage2.yaml` need the switch on for the test van. Playwright: the admin stage 2 test.
 
 Live: migrations `20261104000300` and `20261104000400` applied and recorded; no switch rows, so stage 2 is off.
+
+## v11 "Gehrai" (depth): immersive, moving, layered (4 November 2026)
+
+v10's look felt static and flat: one arch shape on a flat page, nothing moving but taps. Design first: the canvas page "v11 · Gehrai" has seven looping prototypes. Then the apps:
+
+| Part | Where | What it does |
+| --- | --- | --- |
+| Corridor header | `packages/ui/src/native/Corridor.tsx`, `apps/parent/src/components/Page.tsx` | Every parent page opens on a corridor of three arched walls (farther ones lighter and hazier) with a time-of-day sky behind: sun glow, stars at dawn and night, a warm rim on each doorway. Scrolling walks you through it (near arch grows past and fades, title settles into a slim frosted bar). |
+| Light on the page | `Depth.tsx` (`LivingGround`, `JaliLight`), `FloorLight` | The ground is lit by two soft lights that drift; light pools under the doorway; sunlight slides through a jali (an svg mask, so it blends). |
+| Niches | `Depth.tsx` (`Niche`), `family.tsx` | Children as carved mehrabs that float very gently. |
+| Arch transitions | `ArchWipe.tsx` (`ArchWipeProvider`, `useArchWipe`) | A page opens through an arch of neel light growing from what you tapped (the child niches today). |
+| Moments | `ArchMoment.tsx`, `app/index.tsx`, `TripSheet.tsx` (`onMoment`) | At your door, in the van, at school, home: a full-screen arch of light with rays, the initial and stars, then it settles. Tap to dismiss. |
+| Touch | `PressableScale` (`tilt`), `Group.tsx`, `Toggle.tsx` | Cards and rows lean toward the finger; the switch knob stretches as it travels. |
+| Tilt | `Depth.tsx` (`useTilt`, `TiltLayer`), `welcome.tsx`, `i/[token].tsx`, `story.tsx` | On brand screens the sky, arches and cards move at different depths as the phone tilts (expo-sensors device motion; never location). |
+| Home | `MapSheet.tsx`, `PohnchMap.tsx`, `mapStyle.ts` | Frosted glass sheet; the road ahead glows with light flowing to your door; camera tilted to 50 degrees; buildings lit with a vertical gradient. |
+| Driver (plain) | `apps/driver/src/components/Screen.tsx`, `app/index.tsx` | Only the header folds a little as you scroll. No ornament. |
+| Gradients | `Gradient.tsx` | svg gradients that draw the same on phones and the web (the web ignores `experimental_backgroundImage`). |
+
+Reduce Motion: no walk-through, drift, tilt, rays or arch wipe; fades only, sounds stay. New dependency: `expo-sensors` (both apps).
