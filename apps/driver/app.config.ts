@@ -31,6 +31,8 @@ const config: ExpoConfig = {
   },
   web: { favicon: './assets/favicon.png', output: 'single' },
   plugins: [
+    // Keeps the Android build within EAS's memory (phones' CPU types only, two workers).
+    '../../scripts/expo/withLeanGradle',
     'expo-router',
     'expo-font',
     // v9: alerts for the driver (a family asks to join; the van is verified).

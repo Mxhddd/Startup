@@ -364,3 +364,7 @@ Type check, unit tests (core 99, ui 19, server 62, client 3, messages 6), databa
 - The step row on the home-screen widgets.
 - "We're ready" sent from the alert without opening the app (it opens the app instead, which is reliable on every phone).
 - The sheet's inner list handing the drag to the sheet when it reaches the top.
+
+### Android builds and memory
+
+With Skia the first v9 builds on EAS died with "Gradle build daemon disappeared unexpectedly" (the build machine ran out of memory). `scripts/expo/withLeanGradle.js`, a config plugin in both apps, now builds native code only for phone CPUs (arm64-v8a and armeabi-v7a, no emulator types), runs at most two Gradle workers and sets Gradle's memory. To build for an x86 emulator locally, pass `-PreactNativeArchitectures=x86_64` to Gradle.

@@ -42,6 +42,8 @@ const config: ExpoConfig = {
   },
   web: { favicon: './assets/favicon.png', output: 'single' },
   plugins: [
+    // Keeps the Android build within EAS's memory (phones' CPU types only, two workers).
+    '../../scripts/expo/withLeanGradle',
     'expo-router',
     'expo-font',
     // The map: MapLibre with free OpenFreeMap tiles (no Google key needed).
