@@ -1,0 +1,15 @@
+# Driver v12: sunlight mode on and off from Help & account; the practice trip's seat check is in
+# driver-practice.yaml. Works without a server. Run: maestro test tests/maestro/driver-v12.yaml
+appId: pk.pohnch.driver
+---
+- launchApp
+- tapOn:
+    id: "nav-account"
+- assertVisible:
+    id: "sunlight"
+- tapOn:
+    id: "sunlight"
+- assertVisible:
+    id: "sunlight"
+- tapOn:
+    id: "sunlight"

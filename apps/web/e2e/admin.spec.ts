@@ -7,8 +7,11 @@ const b64 = (o: unknown) => Buffer.from(JSON.stringify(o)).toString('base64url')
 const jwt = `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub: USER, role: 'authenticated', exp: Math.floor(Date.now() / 1000) + 3600 })}.sig`;
 const session = { access_token: jwt, refresh_token: 'r', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user: { id: USER, aud: 'authenticated', role: 'authenticated' } };
 
+const notices: unknown[] = [];
+
 async function fakeSupabase(ctx: BrowserContext, opts: { loggedIn: boolean; admin: boolean }) {
   const calls: string[] = [];
+  notices.length = 0;
   if (opts.loggedIn) await ctx.addInitScript((s) => localStorage.setItem('sb-127-auth-token', JSON.stringify(s)), session);
   await ctx.route(`${SB}/**`, async (route) => {
     const u = new URL(route.request().url());
@@ -26,6 +29,12 @@ async function fakeSupabase(ctx: BrowserContext, opts: { loggedIn: boolean; admi
     if (u.pathname === '/functions/v1/app/admin.verify') return json({ ok: true });
     // v10 stage 2
     if (u.pathname === '/rest/v1/rpc/admin_flags') return json([]);
+    // v12
+    if (u.pathname === '/rest/v1/rpc/admin_speeding_today') return json([{ van_name: 'Rafiq bhai van', driver_name: 'Rafiq bhai', max_kmh: 63, fast_fixes: 4 }]);
+    if (u.pathname === '/functions/v1/app/admin.notice') {
+      notices.push(route.request().postDataJSON());
+      return json({ id: 'n1' });
+    }
     if (u.pathname === '/rest/v1/rpc/admin_help_alerts')
       return json([{ id: 'h1', van_name: 'Rafiq bhai van', driver_name: 'Rafiq bhai', lat: 24.9, lng: 67.1, created_at: new Date().toISOString(), resolved_at: null }]);
     if (u.pathname === '/rest/v1/rpc/admin_van_requests') return json([{ school_name: 'Green Valley', children: 5, lat: 24.9, lng: 67.1, oldest: new Date().toISOString() }]);
@@ -73,4 +82,15 @@ test('v10 stage 2: help alerts with the van on a map, the switch per van, reques
   await expect.poll(() => calls.includes('/rest/v1/rpc/admin_set_flag')).toBe(true);
   await page.getByTestId('help-row').getByRole('button').click();
   await expect.poll(() => calls.includes('/rest/v1/rpc/admin_resolve_help')).toBe(true);
+});
+
+test('v12: vans over 50 km/h today, and a team notice to one van', async ({ context, page }) => {
+  await fakeSupabase(context, { loggedIn: true, admin: true });
+  await page.goto('/admin');
+  await expect(page.getByTestId('speed-row')).toContainText('63');
+  await page.getByTestId('notice-van').selectOption('v-ok');
+  await page.getByTestId('notice-body').fill('Road closed at Nipa today');
+  await page.getByTestId('notice-send').click();
+  await expect(page.getByRole('status')).toBeVisible();
+  expect(notices).toEqual([{ vanId: 'v-ok', body: 'Road closed at Nipa today' }]);
 });

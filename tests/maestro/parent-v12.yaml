@@ -1,0 +1,23 @@
+# Parent v12: the get-ready minutes, Friday story and morning brief switches, and bigger text, in
+# notification settings. Works without a server. Run: maestro test tests/maestro/parent-v12.yaml
+appId: pk.pohnch.parent
+---
+- launchApp
+- tapOn: "مینو"
+- tapOn:
+    id: "open-settings"
+- scrollUntilVisible:
+    element:
+      id: "prep-minutes"
+- tapOn: "10 منٹ"
+- assertVisible:
+    id: "friday-toggle"
+- tapOn:
+    id: "brief-toggle"
+- scrollUntilVisible:
+    element:
+      id: "big-text"
+- tapOn:
+    id: "big-text"
+- tapOn:
+    id: "big-text"

@@ -20,4 +20,9 @@ appId: pk.pohnch.driver
     id: "stop-2-tap"
 - longPressOn:
     id: "finish-trip"
+# v12: every trip ends with the seat check.
+- assertVisible:
+    id: "seat-check"
+- longPressOn:
+    id: "seat-empty"
 - assertVisible: "بہت خوب! مشق مکمل۔"

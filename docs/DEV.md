@@ -438,3 +438,82 @@ v10's look felt static and flat: one arch shape on a flat page, nothing moving b
 | Gradients | `Gradient.tsx` | svg gradients that draw the same on phones and the web (the web ignores `experimental_backgroundImage`). |
 
 Reduce Motion: no walk-through, drift, tilt, rays or arch wipe; fades only, sounds stay. New dependency: `expo-sensors` (both apps).
+
+## v12: 20 new features and 20 design changes (4 November 2026)
+
+Built in phases: server and rules first, then the apps (safety and ETA, school life, family and driver extras), then the design changes. Roman Urdu was not chosen, so it isn't here.
+
+### How data moves (the new pieces)
+
+- **Database** (`supabase/migrations/20261104000500_v12.sql`, tested by `supabase/tests/database/170-v12.test.sql`). Every new table has row-level security:
+  - `run_absences`: off for one run only. The family writes it; the driver reads it. `private.off_for` makes the tracked-trip rule and the admin counts honour it.
+  - `run_changes`: a one-day start time. Only the Edge Function writes it (`run.change`), and it then pushes the families.
+  - `notices`: team notices. Only the Edge Function writes them (`admin.notice`), and it pushes the families and drivers.
+  - `signals`: quick signals. Families insert them; their van's driver reads them. They are fixed kinds, not free text, so this is not chat.
+  - `found_items`: the driver adds an item; the family sees it and marks it collected.
+  - `trips.seat_checked_at` and `confirm_seat_check`: the seat check at the end of a trip.
+  - `child_ride_minutes`: the median ride time from past runs.
+  - `admin_speeding_today`: fixes faster than 50 km/h, for the team only.
+- **Rules** (`packages/core/src/v12.ts`, tested in `v12.test.ts`). These are plain functions with no network. The screens only call them:
+  - `lateBy`, `blendEta`, `getReadyDue`
+  - `bestOrder` (nearest neighbour, then 2-opt)
+  - `PK_HOLIDAYS` / `upcomingHolidays`, `seasonFor`
+  - `onTimeStreak`, `stuckInTraffic`, `isRaining`
+  - `speedWarn`, `preTripDue`, `shiftTime`, `replayAt`, `nextReminder`, `lookAhead`
+- **App data** (`packages/client/src/{driver,parent}.ts`): v12 reads and writes. `packages/client/src/weather.ts` is the rain check: one fixed city-centre point on Open-Meteo, at most every 15 minutes, never a location (also in the privacy policy).
+- **Local alerts** (made on the phone, no server):
+  - parent: `notifications/LocalAlerts.tsx` (get ready, running late, Friday story, morning brief), with choices kept in `localPrefs.ts`;
+  - driver: `components/StartReminder.tsx`.
+
+### Features
+
+| Feature | Where | Notes |
+| --- | --- | --- |
+| Seat check | driver `RunScreen.tsx`, `trip.tsx` | Every trip ends with a hold on "the van is empty". In the morning "reached school" is sent first. |
+| Speed watch | `RunScreen.tsx`; web `AdminApp.tsx` (V12) | Over 50 km/h the trip screen shows a red line, and the driver hears a spoken nudge at most every 2 min. The team sees today's speeding. |
+| Pre-trip checklist | driver `components/PreTripCheck.tsx` | Once a day: doors, belts, fuel, phone. Kept on the phone. |
+| Late warning | parent `ParentStore` (`lateMin`), `DayCards.tsx`, `LocalAlerts.tsx` | Compared with the stop's time, or today's changed time. Shown as a banner plus one alert per trip. |
+| Learned ETA | `ParentStore` (`blendEta`) | Trusted after 3 past runs. Near the door, the live estimate wins. |
+| Get-ready alert | settings (prep minutes), `LocalAlerts.tsx` | 3/5/10/15 minutes, or off. |
+| One run off | parent `chutti.tsx`; driver `DriverStore` (`runOff`) | This morning, this afternoon, or tomorrow's. |
+| One-day time change | driver `DayCards.tsx` (`TimeCard`); parent sheet | Families get a push. "Back to usual" undoes it. |
+| Holidays | driver `HolidayCard` | Federal holidays for 2026 and 2027; moon dates say so. One tap gives the van the day off. |
+| Team notice | web admin; both apps | Lasts a day. Goes to one van or everyone. |
+| Rain mode | both apps, `useRain` | Banner, sky rain, and a one-tap "rain delay" on the trip (late reason `rain`). |
+| Quick signals | parent `QuickSignals`; driver `SignalsCard`, trip | "Sick today" also marks chutti. |
+| Lost and found | driver `FoundCard`; parent `FoundItems` | |
+| Hear the ETA | parent `voice.ts`, `TripSheet` | Tap the minutes. |
+| Ride replay | parent `components/Replay.tsx`, `history.tsx` | About 20 seconds, from the trip's own positions. |
+| Family view | parent `app/kids.tsx` | Shown only for families with more than one child. |
+| Friday story, morning brief | `LocalAlerts.tsx`, settings | |
+| Best stop order | driver `stops.tsx` | Offered only when it saves at least 0.3 km. |
+| Start reminder | driver `StartReminder.tsx` | 10 minutes before the first stop; skips days off. |
+| On-time streak | parent `story.tsx` | Chutti days don't break it. |
+| Stuck in traffic | driver `trip.tsx` | 5 minutes without moving away from a stop, then one tap. |
+
+### Design (packages/ui unless noted)
+
+- **Header and sky:**
+  - ink title reveal and overscroll stretch (`Corridor.tsx`);
+  - weather and seasons (`Weather.tsx`: `RainStreaks`, `Clouds`, `Moon`, `Lanterns`, `Bunting`; `Sky` takes `weather` and `season`).
+- **Trip sheet and map:**
+  - trip-state tint (`MapSheet` `accent`);
+  - van marker sheen, windows and brake lights;
+  - camera look-ahead (`lookAhead`);
+  - home pin drop (`DropIn` in `PohnchMap`);
+  - `RouteRibbon`;
+  - ArchMoment rays beating with the tone.
+- **Loading and empty states:**
+  - `StarSpinner`;
+  - `Shimmer arches`;
+  - `EmptyScene`.
+- **Readability:**
+  - `childColors` (one colour per child everywhere);
+  - big-text mode (`setTextScale`, read by `AppText`; parent settings);
+  - driver sunlight mode (`sunColors`, `applySunlight`; driver Help & account; contrast-tested).
+- **Celebration:** `StarBurst` on Friday's story.
+- **Not done:**
+  - **Widgets**: they keep the v10 art. Glance and WidgetKit can't draw the corridor's arches and gradients well, so this is noted rather than half-done.
+  - **Alternate app icons**: these need a native module and a store review step. Left for later, deliberately.
+
+Tests: core v12 (18), client rain check, ui theme (child colours, sunlight contrast, text scale), pgTAP 170, server push tests, Playwright admin v12, Maestro `driver-v12.yaml` and `parent-v12.yaml`, and the seat check in `driver-practice.yaml`.
