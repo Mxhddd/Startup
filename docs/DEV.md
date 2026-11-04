@@ -368,3 +368,54 @@ Type check, unit tests (core 99, ui 19, server 62, client 3, messages 6), databa
 ### Android builds and memory
 
 With Skia the first v9 builds on EAS died with "Gradle build daemon disappeared unexpectedly" (the build machine ran out of memory). `scripts/expo/withLeanGradle.js`, a config plugin in both apps, now builds native code only for phone CPUs (arm64-v8a and armeabi-v7a, no emulator types), runs at most two Gradle workers and sets Gradle's memory. To build for an x86 emulator locally, pass `-PreactNativeArchitectures=x86_64` to Gradle.
+
+## v10 "Jharoka": a layered, local look; stage 1 gaps; stage 2 behind a switch (4 November 2026)
+
+Design first: the canvas page "v10 · Jharoka (current)" (22 boards) and the Design System's new `inset`, `*-hi`, `elevation-1..3`, `arch` and `icon-duo` tokens.
+
+### Why it looked boxy, and what changed
+
+Every piece of content was the same white card on cream, with bordered fields, hairline-ruled lists and flat buttons. Now:
+
+| Part | Where | What it does |
+| --- | --- | --- |
+| The arch (jharoka) | `archPath()` and `humpPath()` in `packages/ui/src/theme.ts` (tested); `native/Arch.tsx` (`ArchShape`, `ArchAvatar`, `StarPattern`) | One pointed Mughal arch: parent page headers, child portraits and avatars, the join card, the week story, the van-at-your-door seal, widget art. The star pattern (7%) only in brand moments. |
+| Page header | `native/ArchHeader.tsx`, `apps/parent/src/components/Page.tsx` | Neel, lit from one corner, the pattern, a Gulzar title; the page rises into it at the centre. |
+| Groups, not ruled lists | `native/Group.tsx` (`Group`, `GroupRow`, `RowIcon`, `SectionCaption`) | One soft surface per group, rows separated by space; a kesar star names each group. |
+| Fields and choices | `TextField.tsx`, `ChoiceChip.tsx`, `Segmented.tsx`, `Toggle.tsx` | Filled, no borders; focus lifts the field with a glowing underline; a sliding segmented control. |
+| Buttons with depth | `TapButton.tsx` | Gradient face, top highlight, a lip on every tone; the old bordered "neutral" is a soft tinted button. |
+| Two-tone icons | `icons.tsx` (`duo`) | The line plus a nudged tint of the same shape; new icons: wallet, search, shield, star, chevron. |
+| Sheet | `MapSheet.tsx` | A small pointed arch rises from the home sheet's top edge round the handle. |
+| Driver (plain) | `apps/driver/src/components/Screen.tsx`, `app/index.tsx` | A soft curved header bottom, the same groups and buttons, a 2 x 2 group of actions; no arch or pattern anywhere in the driver app. |
+
+All new colour pairs have contrast tests, by day and by night (`theme.test.ts`).
+
+### Stage 1 gaps and delights
+
+- **"Tracked end to end"** (`20261104000300_trip_tracked_v2.sql`, pgTAP 150) now follows the brief: start tap, every rider, "reached school" in the morning, positions throughout (no gap over 5 minutes). Gate 1 counts this.
+- **Widgets**: the step row (left · in the van · there) on the iPhone and Android widgets.
+- **The week's story** (`apps/parent/src/app/story.tsx`, `weekStory` in core): a shareable picture of the child's week (first name only; no map, place or times), from This week.
+- **Driver's weekly record**: a ring on Today. **First-week tips**: three tips on the parent home for 7 days (`tipsDue` in core).
+
+Not done, and why:
+- An "Off today" button on the Android widget: `expo-widgets` hands an Android widget's button tap to the app only while it is running, so the button could silently do nothing.
+- "We're ready" from the alert without opening the app: there's no background route we can rely on for both platforms yet, so the button opens the app.
+- Android 16's "Live Update" chip: still needs its own Kotlin module.
+
+### Stage 2, built behind a switch (off until gate 1)
+
+On the user's instruction, the stage 2 pieces exist in code but are **off for everyone** (`app_flags` has no rows live). The team switches them on from the admin page, for everyone or one van, only after gate 1. With the switch off, every stage 2 database function refuses with `stage2_off` and the apps show nothing new.
+
+| Piece | Server (`20261104000400_stage2.sql`, pgTAP 160) | Apps |
+| --- | --- | --- |
+| The switch | `app_flags`, `flag_on`, `admin_set_flag`, `admin_flags` | `useStage2()` in both apps; admin page "Stage 2 switch" |
+| Pohnch Live | `live_entitlements`, `start_live_trial` (once per family), `live_status` | `plans.tsx`. A free month only: no payment until the company, NTN and bank accounts exist |
+| Find a van, ask for a seat | `vans_near` (verified vans with a stop near the home pin; driver's first name, reliability from tracked runs, rating from 5 up, fee, seats left; never riders' names or phones), `request_seat` (waiting membership, `trial_until` + 7 days) | `find.tsx` |
+| Request a van | `van_requests`, `request_van`, `request_progress` (same school within 2 km), `withdraw_van_request`, `admin_van_requests` (counts only) | `request.tsx`; admin list |
+| Ratings | `ratings` (one per family per van per month), `rate_van`; averages only from 5 | "Rate the van" on `fees.tsx` |
+| Fees | `vans.monthly_fee`, `vans.seats`, `fee_payments`, `set_van_fee`, `mark_fee_paid`, `van_fees`, `child_fees` | `fees.tsx` (parent), `earnings.tsx` (driver). Cash only; the 7% fee waits for in-app payments |
+| Help alert | `help_alerts`, `send_help_alert` (running trip only; the van's last position), `admin_help_alerts`, `admin_resolve_help` | the emergency hold on the driver's help sheet; admin page, first section |
+
+Maestro: `parent-story.yaml`; `parent-stage2.yaml` and `driver-stage2.yaml` need the switch on for the test van. Playwright: the admin stage 2 test.
+
+Live: migrations `20261104000300` and `20261104000400` applied and recorded; no switch rows, so stage 2 is off.
