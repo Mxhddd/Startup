@@ -17,6 +17,7 @@ import { Share, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, LinearTransition, interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
 import { parent as data } from '@pohnch/client';
 import { useParent } from '../state/ParentStore';
+import { FirstTips } from './FirstTips';
 
 const STEP_KEY = { left: 'left', picked: 'picked', reached_school: 'reachedSchool', left_school: 'leftSchool', dropped: 'dropped' } as const;
 const layout = LinearTransition.springify().damping(24).stiffness(200);
@@ -182,6 +183,7 @@ export function TripSheet({ onOpenTrip, expanded, progress }: { onOpenTrip: () =
 
   return (
     <View testID="trip-sheet" style={{ gap: space.lg }}>
+      <FirstTips />
       {offline ? (
         <Animated.View entering={FadeInDown} accessibilityRole="alert" style={{ backgroundColor: colors.night, borderRadius: radius.card, borderCurve: 'continuous', padding: space.md }}>
           <AppText color={colors.onBrand}>{t('parent.offline')}</AppText>

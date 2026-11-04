@@ -5,7 +5,8 @@
 import { parent, type ParentTrip } from '@pohnch/client';
 import { addDays, dayPartsOf, karachiClock, storyOf, timelineFor, type ParentEvent } from '@pohnch/core';
 import { colors, elevation, radius10, space, useLang } from '@pohnch/ui';
-import { AppText, ChoiceChip, SectionCaption, Shimmer, TimelineEvent } from '@pohnch/ui/native';
+import { AppText, ChoiceChip, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
@@ -84,6 +85,7 @@ export default function History() {
           );
         })
       )}
+      {van && child ? <TapButton tone="neutral" icon="share" label={t('story.link')} onConfirm={() => router.push('/story')} testID="open-story" /> : null}
     </Page>
   );
 }

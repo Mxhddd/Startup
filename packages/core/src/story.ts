@@ -28,3 +28,25 @@ export function storyOf(kind: 'morning' | 'afternoon', items: TimelineItem[]): {
   const minutes = start ? Math.max(1, Math.round((Date.parse(end.at) - Date.parse(start)) / 60_000)) : null;
   return { rows, minutes };
 }
+
+/** v10: one school day for the week story (a day with a morning run). */
+export type StoryDay = { date: string; minutes: number | null; rode: boolean };
+
+/**
+ * v10 "Week story": the child's week as a small chart for a share card. Only days with a morning run
+ * count. A bar's height is that day's ride against the longest (at least 0.18 so it shows); a day the
+ * child didn't ride is a short bar in another colour. Carries nothing but numbers: the card adds only
+ * the child's first name (no map, no place, no times of day).
+ */
+export function weekStory(days: StoryDay[]): { schoolDays: number; rode: number; avgMinutes: number | null; bars: { date: string; height: number; rode: boolean }[] } {
+  const rides = days.filter((d) => d.rode && d.minutes !== null).map((d) => d.minutes as number);
+  const longest = Math.max(1, ...rides);
+  const avg = rides.length ? Math.round(rides.reduce((a, b) => a + b, 0) / rides.length) : null;
+  const ordered = [...days].sort((a, b) => a.date.localeCompare(b.date));
+  return {
+    schoolDays: days.length,
+    rode: days.filter((d) => d.rode).length,
+    avgMinutes: avg,
+    bars: ordered.map((d) => ({ date: d.date, rode: d.rode, height: d.rode && d.minutes !== null ? Math.max(0.18, d.minutes / longest) : 0.18 })),
+  };
+}

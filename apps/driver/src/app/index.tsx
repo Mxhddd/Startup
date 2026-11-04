@@ -11,6 +11,7 @@ import { Redirect, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, View } from 'react-native';
+import Svg, { Circle } from 'react-native-svg';
 import Animated, { FadeIn, FadeInDown, FadeInUp } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocationDisclosure } from '../components/LocationDisclosure';
@@ -39,6 +40,31 @@ function NavTile({ label, href, icon, badge, tint = colors.neelTint, ink = color
       </View>
       <AppText bold style={{ flex: 1, fontSize: 16 }} numberOfLines={2}>{label}</AppText>
     </PressableScale>
+  );
+}
+
+/** v10: this week's record as a ring (tracked start to finish / trips done), with one plain tip. */
+function WeekScore({ tracked, done }: { tracked: number; done: number }) {
+  const { t, dir } = useLang();
+  const pct = Math.round((tracked / Math.max(1, done)) * 100);
+  const r = 26;
+  const c = 2 * Math.PI * r;
+  return (
+    <Animated.View entering={FadeInDown.springify().damping(22)} testID="week-line" accessibilityLabel={t('driver.week', { tracked, done })}
+      style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius10.group, backgroundColor: colors.white, boxShadow: elevation.e1 }}>
+      <View style={{ width: 64, height: 64, alignItems: 'center', justifyContent: 'center' }}>
+        <Svg width={64} height={64} style={{ position: 'absolute', transform: [{ rotate: '-90deg' }] }}>
+          <Circle cx={32} cy={32} r={r} stroke={colors.zamurradTint} strokeWidth={7} fill="none" />
+          <Circle cx={32} cy={32} r={r} stroke={colors.zamurrad} strokeWidth={7} fill="none" strokeLinecap="round" strokeDasharray={`${(c * pct) / 100} ${c}`} />
+        </Svg>
+        <AppText variant="number" color={colors.zamurradOnTint} style={{ fontSize: 16, lineHeight: 20 }}>{`${pct}%`}</AppText>
+      </View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <AppText bold style={{ fontSize: 16 }}>{t('driver.week.title')}</AppText>
+        <AppText variant="small" bold color={colors.zamurradOnTint}>{t('driver.week', { tracked, done })}</AppText>
+        <AppText variant="small" color={colors.ink2}>{tracked >= done ? t('driver.week.great') : t('driver.week.tip')}</AppText>
+      </View>
+    </Animated.View>
   );
 }
 
@@ -144,9 +170,7 @@ export default function DriverToday() {
                 <VanBadge status={d.van.switched_off_at ? 'off' : d.van.verified_at ? 'verified' : 'waiting'} />
               </View>
               {!d.van.verified_at ? <AppText variant="secondary">{t('driver.check.pending')}</AppText> : null}
-              {d.week && d.week.done > 0 ? (
-                <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 15 }} testID="week-line">{t('driver.week', { tracked: d.week.tracked, done: d.week.done })}</AppText>
-              ) : null}
+              {d.week && d.week.done > 0 ? <WeekScore tracked={d.week.tracked} done={d.week.done} /> : null}
 
               {!d.dayOff && childCount === 0 ? (
                 <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>

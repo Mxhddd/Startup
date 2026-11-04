@@ -20,6 +20,7 @@ export { moveId } from './reorder';
 export { scrubEvent, scrubText } from './scrub';
 export { PLAN_AHEAD_DAYS, monthGrid, canPlanDay, chuttiChanges, nextMonth } from './calendar';
 export { nudges, AT_STOP_M, NEAR_STOP_M, AT_SCHOOL_M, STOPPED_MPS, type NudgeInput } from './nudges';
-export { arrivedAt, waitClock, storyOf } from './story';
+export { arrivedAt, waitClock, storyOf, weekStory, type StoryDay } from './story';
 export { glidePosition, predicted, speedOf, MAX_AHEAD_MS, EASE_MS, type GlideState, type Fix as GlideFix } from './glide';
 export { homeState, type HomeState, type NextAction, type HomeInput } from './home';
+export { tipsDue, type TipsSaved } from './tips';
