@@ -5,7 +5,7 @@
 // How it is shared: the card is drawn as ordinary views, Skia takes a picture of them
 // (makeImageFromView), the picture is saved to the phone's cache and handed to the share sheet.
 import { parent } from '@pohnch/client';
-import { addDays, storyOf, timelineFor, weekStory, type StoryDay } from '@pohnch/core';
+import { addDays, onTimeStreak, storyOf, timelineFor, weekStory, type StoryDay } from '@pohnch/core';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, ArchShape, Icon, Shimmer, StarIcon, TapButton, TiltLayer, useTilt } from '@pohnch/ui/native';
 import { makeImageFromView } from '@shopify/react-native-skia';
@@ -58,6 +58,8 @@ export default function Story() {
 
   const s = days ? weekStory(days) : null;
   const labels = new Map((days ?? []).map((d) => [d.date, d.label]));
+  // v12: school days in a row the child rode (newest first; chutti days don't break it).
+  const streak = days ? onTimeStreak(days.map((d) => ({ rode: d.rode, off: p.absences.includes(d.date) }))) : 0;
 
   const share = async () => {
     const line = s ? `${t('story.title', { name })} · ${t('story.line', { n: s.rode, of: s.schoolDays })}` : t('story.title', { name });
@@ -111,6 +113,18 @@ export default function Story() {
             <AppText variant="number" color={colors.ink2} style={{ fontSize: 14, lineHeight: 26 }}>pohnch.pk</AppText>
           </View>
           </TiltLayer>
+          {streak >= 2 ? (
+            <Animated.View entering={FadeInDown.delay(300).springify().damping(20)} testID="streak-card"
+              style={{ alignSelf: 'stretch', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: 24, backgroundColor: colors.zamurradTint }}>
+              <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.zamurrad, alignItems: 'center', justifyContent: 'center' }}>
+                <AppText variant="number" color={colors.onFill} style={{ fontSize: 24, lineHeight: 30 }}>{String(streak)}</AppText>
+              </View>
+              <View style={{ flex: 1, gap: 2 }}>
+                <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 17 }}>{t('streak.title', { n: streak })}</AppText>
+                <AppText color={colors.zamurradOnTint} style={{ fontSize: 15 }}>{t('streak.body', { name })}</AppText>
+              </View>
+            </Animated.View>
+          ) : null}
           <View style={{ alignSelf: 'stretch', gap: space.sm }}>
             <TapButton size="next" tone="picked" icon="share" label={t('story.share')} onConfirm={share} testID="story-share" />
             <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, justifyContent: 'center', padding: 6, borderRadius: 16, backgroundColor: colors.white, boxShadow: elevation.e1 }}>

@@ -12,6 +12,7 @@ import { ScrollView, View } from 'react-native';
 import Animated, { FadeIn, FadeInDown } from 'react-native-reanimated';
 import { Page } from '../components/Page';
 import { useParent } from '../state/ParentStore';
+import { Replay } from '../components/Replay';
 
 const STEP_KEY = { left: 'left', picked: 'picked', reached_school: 'reachedSchool', left_school: 'leftSchool', dropped: 'dropped' } as const;
 type Day = { trips: ParentTrip[]; events: Record<string, ParentEvent[]> };
@@ -23,6 +24,7 @@ export default function History() {
   const [date, setDate] = useState(days[0] as string);
   const [day, setDay] = useState<Day | null>(null);
   const [failed, setFailed] = useState(false);
+  const [replay, setReplay] = useState<{ id: string; kind: 'morning' | 'afternoon' } | null>(null);
   const van = p.van;
   const child = p.child;
 
@@ -81,11 +83,13 @@ export default function History() {
                   <TimelineEvent key={i.step} index={k} step={STEP_KEY[i.step]} time={clock(i.at)} by={i.by ?? undefined} pending={!i.at} last={k === tl.items.length - 1} />
                 ))}
               </View>
+              {tr.status === 'ended' ? <TapButton tone="neutral" icon="route" label={t('replay.open')} onConfirm={() => setReplay({ id: tr.id, kind: tr.kind })} testID={`replay-${n}`} /> : null}
             </Animated.View>
           );
         })
       )}
       {van && child ? <TapButton tone="neutral" icon="share" label={t('story.link')} onConfirm={() => router.push('/story')} testID="open-story" /> : null}
+      <Replay tripId={replay?.id ?? null} title={replay ? t('replay.title', { run: t(replay.kind === 'morning' ? 'trip.morning' : 'trip.afternoon') }) : ''} onClose={() => setReplay(null)} />
     </Page>
   );
 }

@@ -19,6 +19,7 @@ import { AlertsCard } from '../components/AlertsCard';
 import { SetupChecklist } from '../components/SetupChecklist';
 import { PreTripCheck, preTripNeeded } from '../components/PreTripCheck';
 import { DriverNotes, FoundCard, HolidayCard, SignalsCard, TimeCard } from '../components/DayCards';
+import { StartReminder } from '../components/StartReminder';
 import { useDriver } from '../state/DriverStore';
 import { useStage2 } from '../state/stage2';
 
@@ -246,6 +247,7 @@ export default function DriverToday() {
           )}
         </Animated.View>
       ) : null}
+      {configured ? <StartReminder d={d} /> : null}
       <PreTripCheck
         visible={checkFor !== null}
         onClose={() => setCheckFor(null)}

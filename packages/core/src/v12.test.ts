@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { bestOrder, blendEta, getReadyDue, kmh, preTripDue, shiftTime, speedWarn, isRaining, karachiMinutes, lateBy, onTimeStreak, seasonFor, stuckInTraffic, upcomingHolidays } from './v12';
+import { bestOrder, blendEta, getReadyDue, kmh, nextReminder, preTripDue, replayAt, shiftTime, speedWarn, isRaining, karachiMinutes, lateBy, onTimeStreak, seasonFor, stuckInTraffic, upcomingHolidays } from './v12';
 
 // 07:00 in Karachi = 02:00 UTC.
 const at = (hhmm: string) => Date.parse(`2026-11-04T${hhmm}:00Z`) - 5 * 3600_000;
@@ -94,5 +94,43 @@ describe('one-day time change', () => {
     expect(shiftTime('07:10', -30)).toBe('06:40');
     expect(shiftTime('00:10', -30)).toBe('00:00');
     expect(shiftTime('13:45:00', 60)).toBe('14:45');
+  });
+});
+
+describe('ride replay', () => {
+  const path = [
+    { lat: 24.9, lng: 67.0, at: '2026-11-04T02:00:00Z' },
+    { lat: 24.91, lng: 67.0, at: '2026-11-04T02:10:00Z' },
+    { lat: 24.91, lng: 67.01, at: '2026-11-04T02:20:00Z' },
+  ];
+  it('moves along the recorded path by time, heading the way it went', () => {
+    expect(replayAt([], 0.5)).toBeNull();
+    const start = replayAt(path, 0)!;
+    expect(start.lat).toBeCloseTo(24.9);
+    const quarter = replayAt(path, 0.25)!;
+    expect(quarter.lat).toBeCloseTo(24.905);
+    expect(quarter.heading).toBeCloseTo(0); // north
+    const late = replayAt(path, 0.75)!;
+    expect(late.lng).toBeCloseTo(67.005);
+    expect(late.heading).toBeCloseTo(90); // east
+    expect(replayAt(path, 2)!.lng).toBeCloseTo(67.01);
+  });
+});
+
+describe('driver start reminder', () => {
+  // Wednesday 4 Nov 2026, 06:00 in Karachi.
+  const now = at('06:00');
+  it('reminds 10 minutes before the first stop, today if still ahead', () => {
+    expect(nextReminder('morning', '07:10', [], [], now)).toBe(at('07:00'));
+  });
+  it("skips a van day off and uses that day's changed time", () => {
+    const thu = Date.parse('2026-11-05T00:00:00Z') - 5 * 3600_000 + (7 * 60 + 20) * 60_000;
+    expect(nextReminder('morning', '07:10', ['2026-11-04'], [{ date: '2026-11-05', kind: 'morning', time: '07:30' }], now)).toBe(thu);
+  });
+  it('skips the weekend and gives nothing without a time', () => {
+    const fri = Date.parse('2026-11-06T09:00:00Z');
+    const mon = Date.parse('2026-11-09T00:00:00Z') - 5 * 3600_000 + (7 * 60) * 60_000;
+    expect(nextReminder('morning', '07:10', [], [], fri)).toBe(mon);
+    expect(nextReminder('morning', null, [], [], now)).toBeNull();
   });
 });

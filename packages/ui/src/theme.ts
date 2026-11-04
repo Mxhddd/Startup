@@ -249,3 +249,16 @@ export const karachiRegion = {
   latitudeDelta: 0.18,
   longitudeDelta: 0.18,
 } as const;
+
+/**
+ * v12: a child's own colours, by their place in the family (kesar, zamurrad, neel, then round again).
+ * The same child keeps the same colour everywhere: menu niches, family view, map pins and the story.
+ */
+export function childColors(index: number): { fill: string; ink: string; tint: string; text: string } {
+  const all = [
+    { fill: colors.kesar, ink: colors.onKesar, tint: colors.kesarTint, text: colors.onKesar },
+    { fill: colors.zamurrad, ink: colors.onFill, tint: colors.zamurradTint, text: colors.zamurradOnTint },
+    { fill: colors.neel, ink: colors.onBrand, tint: colors.neelTint, text: colors.link },
+  ];
+  return all[((index % all.length) + all.length) % all.length]!;
+}

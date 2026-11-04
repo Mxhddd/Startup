@@ -18,6 +18,7 @@ import Animated, { FadeIn, FadeInDown, LinearTransition, interpolate, useAnimate
 import { parent as data } from '@pohnch/client';
 import { useParent } from '../state/ParentStore';
 import { FirstTips } from './FirstTips';
+import { sayAloud } from '../voice';
 import { DayNotes, FoundItems, QuickSignals } from './DayCards';
 
 const STEP_KEY = { left: 'left', picked: 'picked', reached_school: 'reachedSchool', left_school: 'leftSchool', dropped: 'dropped' } as const;
@@ -71,7 +72,7 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
   /** v11: a fresh step, to show as a full-screen arch of light (home draws it over everything). */
   onMoment?: (m: { step: MomentStep; letter: string; title: string; sub?: string }) => void;
 }) {
-  const { t, dir } = useLang();
+  const { t, dir, lang } = useLang();
   const p = useParent();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   const name = p.child?.first_name ?? '';
@@ -182,7 +183,11 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
   const route = p.eta === 'door' ? 1 : typeof p.eta === 'number' && startedAt ? Math.min(1, Math.max(0.04, (p.now - startedAt) / (p.now + p.eta * 60_000 - startedAt))) : 0;
   const full = counting ? (
     <View style={{ gap: 10 }}>
-      <EtaPill minutes={p.eta as number | 'door'} to="home" stale={stale} lead={t(`parent.place.${place}`, { name })} clock={typeof p.eta === 'number' && !stale ? arrivalClock(p.now, p.eta) : undefined} />
+      {/* v12: tap the minutes to hear them. */}
+      <PressableScale accessibilityRole="button" accessibilityLabel={t('eta.hear')} haptic="tick" scaleTo="chip" testID="hear-eta"
+        onPress={() => sayAloud(p.eta === 'door' ? t('eta.say.door', { name }) : t('eta.say', { name, min: p.eta as number }), lang)}>
+        <EtaPill minutes={p.eta as number | 'door'} to="home" stale={stale} lead={t(`parent.place.${place}`, { name })} clock={typeof p.eta === 'number' && !stale ? arrivalClock(p.now, p.eta) : undefined} />
+      </PressableScale>
       <LiquidProgress value={route} color={stale ? colors.ink2 : colors.neel} testID="route-progress" />
     </View>
   ) : (

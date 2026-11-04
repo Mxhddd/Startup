@@ -183,3 +183,47 @@ export function shiftTime(t: string, minutes: number): string {
   const m = Math.min(23 * 60 + 59, Math.max(0, clockMinutes(t) + minutes));
   return `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 }
+
+/**
+ * Ride replay: where the van was at a point `f` (0..1) of the trip's time, between its recorded positions
+ * (straight-line in between), with the direction it was heading and how much of the path lies behind.
+ */
+export function replayAt(path: { lat: number; lng: number; at: string }[], f: number): { lat: number; lng: number; heading: number | null; at: number; index: number } | null {
+  if (path.length === 0) return null;
+  const first = path[0]!;
+  if (path.length === 1) return { lat: first.lat, lng: first.lng, heading: null, at: Date.parse(first.at), index: 0 };
+  const t0 = Date.parse(first.at);
+  const t1 = Date.parse(path[path.length - 1]!.at);
+  const t = t0 + Math.min(1, Math.max(0, f)) * (t1 - t0);
+  let i = 0;
+  while (i < path.length - 2 && Date.parse(path[i + 1]!.at) < t) i++;
+  const a = path[i]!;
+  const b = path[i + 1]!;
+  const ta = Date.parse(a.at);
+  const tb = Date.parse(b.at);
+  const k = tb > ta ? Math.min(1, Math.max(0, (t - ta) / (tb - ta))) : 1;
+  const dy = b.lat - a.lat;
+  const dx = (b.lng - a.lng) * Math.cos((a.lat * Math.PI) / 180);
+  const heading = dx === 0 && dy === 0 ? null : (Math.atan2(dx, dy) * 180) / Math.PI;
+  return { lat: a.lat + dy * k, lng: a.lng + (b.lng - a.lng) * k, heading: heading === null ? null : (heading + 360) % 360, at: t, index: i };
+}
+
+/** When (epoch ms) to remind for a run: the next school day's start minus 10 minutes, or null. */
+/** Driver start reminder. */
+export function nextReminder(kind: 'morning' | 'afternoon', usual: string | null, daysOff: string[], changes: { date: string; kind: string; time: string }[], now = Date.now()): number | null {
+  if (!usual) return null;
+  for (let i = 0; i < 8; i++) {
+    const date = addDaysUtc(karachiDateOf(now), i);
+    const wd = new Date(`${date}T00:00:00Z`).getUTCDay();
+    if (wd === 0 || wd === 6 || daysOff.includes(date)) continue;
+    const time = shiftTime(changes.find((c) => c.date === date && c.kind === kind)?.time ?? usual, -10);
+    const [h, m] = time.split(':').map(Number);
+    const at = Date.parse(`${date}T00:00:00Z`) - 5 * 3600_000 + ((h ?? 0) * 60 + (m ?? 0)) * 60_000;
+    if (at > now) return at;
+  }
+  return null;
+}
+
+
+const karachiDateOf = (ms: number) => new Date(ms + 5 * 3600_000).toISOString().slice(0, 10);
+const addDaysUtc = (date: string, n: number) => new Date(Date.parse(`${date}T00:00:00Z`) + n * 86400_000).toISOString().slice(0, 10);

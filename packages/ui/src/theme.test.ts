@@ -126,3 +126,17 @@ describe('v10 Jharoka', () => {
     expect(d).toContain('390 30 L390 40 Z');
   });
 });
+
+describe('child colours (v12)', () => {
+  it('keeps every child colour readable, and goes round after three', async () => {
+    const { childColors } = await import('./theme');
+    for (let i = 0; i < 3; i++) {
+      const c = childColors(i);
+      expect(contrast(c.fill, c.ink), `fill ${i}`).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(c.tint, c.text), `tint ${i}`).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(childColors(3)).toEqual(childColors(0));
+    expect(childColors(-1)).toEqual(childColors(2));
+  });
+});
+

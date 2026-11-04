@@ -5,7 +5,7 @@
 // Every control is at least 64 px tall (the driver rule).
 // Data: stops (row-level security lets only the van's driver change them); times are saved as HH:MM.
 import { driver, type Stop } from '@pohnch/client';
-import { nudgeTime, shortTime } from '@pohnch/core';
+import { bestOrder, nudgeTime, shortTime } from '@pohnch/core';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, EditSheet, Icon, PressableScale, TapButton, type IconName } from '@pohnch/ui/native';
 import { useEffect, useState } from 'react';
@@ -106,6 +106,9 @@ export default function Stops() {
     setOrder(null);
     if (ids && ids.join() !== d.stops.map((s) => s.id).join()) attempt(() => driver.reorderStops(van.id, ids));
   };
+  // v12: a shorter order (start at today's first stop, end at school), offered only if it saves 0.3 km or more.
+  const best = d.stops.length >= 3 ? bestOrder(d.stops.map((s) => ({ id: s.id, lat: s.lat, lng: s.lng })), d.school) : null;
+  const better = best && best.savedKm >= 0.3 && best.order.join() !== d.stops.map((s) => s.id).join() ? best : null;
   const saveTime = (time: string | null) => {
     if (!edit) return;
     const { stop, which } = edit;
@@ -125,6 +128,13 @@ export default function Stops() {
           <Icon name={reordering ? 'check' : 'grip'} size={22} color={reordering ? colors.ghee : colors.siyahi} strokeWidth={reordering ? 2.4 : 3.4} />
           <AppText bold color={reordering ? colors.ghee : colors.siyahi}>{reordering ? t('driver.stops.reorderDone') : t('driver.stops.reorder')}</AppText>
         </PressableScale>
+      ) : null}
+      {better && !reordering ? (
+        <Animated.View entering={FadeInDown.springify().damping(22)} testID="best-order" style={{ backgroundColor: colors.zamurradTint, borderRadius: 24, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
+          <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 18 }}>{t('driver.best.title', { km: better.savedKm.toFixed(1) })}</AppText>
+          <AppText color={colors.zamurradOnTint} style={{ fontSize: 16 }}>{better.order.map((id) => d.stops.find((s) => s.id === id)?.label ?? '').join(dir === 'rtl' ? ' ← ' : ' → ')}</AppText>
+          <TapButton tone="picked" icon="route" label={t('driver.best.use')} testID="best-order-use" onConfirm={() => attempt(() => driver.reorderStops(van.id, better.order))} />
+        </Animated.View>
       ) : null}
       {reordering ? (
         <Animated.View entering={FadeInDown.springify().damping(22)} style={{ gap: space.sm }}>

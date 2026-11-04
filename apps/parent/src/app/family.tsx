@@ -9,7 +9,7 @@
 // adding, removing and deleting go through the "app" Edge Function, which checks who is asking.
 import { deleteMyAccount, parent } from '@pohnch/client';
 import { ApiError, normalisePkMobile, PILOT_WHATSAPP } from '@pohnch/core';
-import { colors, radius, space, useLang } from '@pohnch/ui';
+import { childColors, colors, radius, space, useLang } from '@pohnch/ui';
 import { AppText, ArchAvatar, ArchShape, EditSheet, Group, GroupRow, Icon, Niche, PressableScale, RowIcon, SectionCaption, Shimmer, TapButton, TextField, useArchWipe, type IconName } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState, type ComponentRef, type ReactNode } from 'react';
@@ -35,19 +35,14 @@ function Section({ title, children }: { title: string; children: ReactNode }) {
 const TILE = 100;
 const TILE_H = 122;
 
-/** A child's colours, by place in the family (kesar, zamurrad, neel, then round again). */
-const PORTRAIT = [
-  () => ({ fill: colors.kesar, ink: colors.onKesar }),
-  () => ({ fill: colors.zamurrad, ink: colors.onFill }),
-  () => ({ fill: colors.neel, ink: colors.onBrand }),
-];
+
 
 /** A child as a carved niche (v11): the initial in the child's colour, set back in a lit arch; tapping
  * opens the child's page through an arch of light (useArchWipe). */
 function ChildPortrait({ name, line, index, onPress, testID }: { id: string; name: string; line?: string; index: number; onPress: () => void; testID?: string }) {
   const wipe = useArchWipe();
   const ref = useRef<ComponentRef<typeof View>>(null);
-  const c = PORTRAIT[index % PORTRAIT.length]!();
+  const c = childColors(index);
   return (
     <PressableScale accessibilityRole="button" accessibilityLabel={line ? `${name}, ${line}` : name} scaleTo="big" tilt testID={testID} onPress={() => wipe.open(ref.current, onPress)}>
       <View ref={ref} collapsable={false} style={{ width: TILE, alignItems: 'center', gap: 4 }}>
@@ -153,6 +148,11 @@ export default function Menu() {
           ))}
           <AddPortrait label={t('parent.addChild')} onPress={() => router.push('/child')} testID="menu-add-child" />
         </ScrollView>
+        {p.children.length > 1 ? (
+          <Group>
+            <MenuRow icon="family" iconTint={{ tint: colors.zamurradTint, ink: colors.zamurradOnTint }} title={t('kids.title')} line={t('kids.line')} onPress={() => router.push('/kids')} testID="open-kids" />
+          </Group>
+        ) : null}
       </Section>
 
       <Section title={members ? t('parent.menu.family', { n: family.length }) : t('parent.family.title')}>
