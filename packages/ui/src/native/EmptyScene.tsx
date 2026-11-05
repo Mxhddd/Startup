@@ -2,7 +2,7 @@
 // colours, above a calm line of words. Kinds: 'road' (no trips yet: a van waiting on an empty road under
 // the sky), 'stars' (nothing today: the night with the star), 'family' (no children yet: three empty
 // niches). Decoration only; the words carry the meaning.
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useReducedMotion, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
@@ -10,10 +10,9 @@ import { archPath, colors } from '../theme';
 import { AppText } from './AppText';
 import { STAR_PATH } from './icons';
 
-let eid = 0;
 
 export function EmptyScene({ kind = 'road', title, body, testID }: { kind?: 'road' | 'stars' | 'family'; title: string; body?: string; testID?: string }) {
-  const id = `es${++eid}`;
+  const id = `es${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const w = 168;
   const h = 196;
   const v = useSharedValue(0);

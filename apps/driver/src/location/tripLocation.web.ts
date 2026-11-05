@@ -10,3 +10,6 @@ export function onTripFix(cb: (f: Fix | null) => void): () => void {
   cb(null);
   return () => undefined;
 }
+export async function ensureTripLocation(): Promise<LocationStart> {
+  return 'failed';
+}

@@ -50,6 +50,8 @@ export function PreTripCheck({ visible, onDone, onClose }: { visible: boolean; o
               setTicked([]);
               onDone();
             }} />
+          {/* Audit: a way out on iPhone too (Android also has its back button). */}
+          <TapButton tone="quiet" label={t('common.cancel')} testID="pretrip-cancel" onConfirm={() => { setTicked([]); onClose(); }} />
         </View>
       </View>
     </Modal>

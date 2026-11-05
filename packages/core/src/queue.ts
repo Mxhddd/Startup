@@ -49,6 +49,10 @@ export function createQueue(store: QueueStore, send: Send, onChange?: (pending: 
     async pending() {
       return (await ready()).length;
     },
+    /** A copy of what is still waiting (e.g. to show queued taps on screen after a refresh). */
+    async list() {
+      return [...(await ready())];
+    },
     dropped: () => [...dropped],
     flush() {
       if (flushing) return flushing;

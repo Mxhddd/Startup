@@ -234,10 +234,13 @@ function V12({ supabase, vans, api, t }: { supabase: SupabaseClient; vans: VanRo
   const [speed, setSpeed] = useState<SpeedRow[]>([]);
   const [body, setBody] = useState('');
   const [van, setVan] = useState('');
-  const [sent, setSent] = useState<'idle' | 'sent' | 'error'>('idle');
+  const [sent, setSent] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  // Audit: a failed read shows an error, never a false "no van went over 50".
+  const [speedError, setSpeedError] = useState(false);
   const load = useCallback(async () => {
     const r = await supabase.rpc('admin_speeding_today');
-    setSpeed((r.data ?? []) as SpeedRow[]);
+    setSpeedError(!!r.error);
+    if (!r.error) setSpeed((r.data ?? []) as SpeedRow[]);
   }, [supabase]);
   useEffect(() => {
     load();
@@ -246,6 +249,8 @@ function V12({ supabase, vans, api, t }: { supabase: SupabaseClient; vans: VanRo
   }, [load]);
   const title: CSSProperties = { margin: '8px 0 0', fontSize: 22 };
   const send = async () => {
+    if (sent === 'sending') return; // one press, one notice
+    setSent('sending');
     try {
       await api('admin.notice', { vanId: van || null, body: body.trim() });
       setBody('');
@@ -257,7 +262,7 @@ function V12({ supabase, vans, api, t }: { supabase: SupabaseClient; vans: VanRo
   return (
     <>
       <h2 style={{ ...title, color: speed.length ? colors.dangerText : undefined }}>{t('admin.speed.title')}</h2>
-      {speed.length === 0 ? <p style={{ margin: 0 }} data-testid="speed-none">{t('admin.speed.none')}</p> : null}
+      {speedError ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{t('admin.error')}</p> : speed.length === 0 ? <p style={{ margin: 0 }} data-testid="speed-none">{t('admin.speed.none')}</p> : null}
       {speed.map((r) => (
         <div key={`${r.van_name}-${r.driver_name}`} data-testid="speed-row" style={{ ...card, borderInlineStart: `6px solid ${colors.shingarf}` }}>
           {t('admin.speed.row', { van: r.van_name, driver: r.driver_name, kmh: r.max_kmh, n: r.fast_fixes })}
@@ -274,7 +279,7 @@ function V12({ supabase, vans, api, t }: { supabase: SupabaseClient; vans: VanRo
         <textarea value={body} maxLength={240} rows={3} onChange={(e) => { setBody(e.target.value); setSent('idle'); }} aria-label={t('admin.notice.body')} placeholder={t('admin.notice.body')} data-testid="notice-body"
           style={{ fontSize: 16, padding: 12, borderRadius: 12, border: 'none', background: colors.inset, fontFamily: 'inherit', color: colors.siyahi, resize: 'vertical' }} />
         <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-          <button type="button" disabled={!body.trim()} style={{ ...btn(colors.neel, colors.white), opacity: body.trim() ? 1 : 0.5 }} onClick={send} data-testid="notice-send">{t('admin.notice.send')}</button>
+          <button type="button" disabled={!body.trim() || sent === 'sending'} style={{ ...btn(colors.neel, colors.white), opacity: body.trim() && sent !== 'sending' ? 1 : 0.5 }} onClick={send} data-testid="notice-send">{t('admin.notice.send')}</button>
           {sent === 'sent' ? <span role="status" style={{ color: colors.zamurradOnTint }}>{t('admin.notice.sent')}</span> : null}
           {sent === 'error' ? <span role="alert" style={{ color: colors.dangerText }}>{t('admin.error')}</span> : null}
         </div>

@@ -91,6 +91,15 @@ export default function DriverToday() {
     d.actions.startTrip(kind).catch(() => d.actions.refresh());
   };
 
+  // Audit: every hook runs before the redirect below (hooks after an early return crashed Today
+  // the moment a trip started).
+  // v11 (canvas "Z11D-Today"): the greeting folds a little as the list scrolls up (plain: no ornament).
+  const y = useSharedValue(0);
+  const onScroll = useAnimatedScrollHandler((e) => {
+    y.value = e.contentOffset.y;
+  });
+  const greet = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [0, 120], [1, 0.75], 'clamp'), transform: [{ scale: interpolate(y.value, [0, 120], [1, 0.84], 'clamp') }] }));
+
   if (configured && d.running) return <Redirect href="/trip" />;
 
   const nextKind = d.nextKind;
@@ -102,12 +111,6 @@ export default function DriverToday() {
   const hasMap = !!(configured && d.van && d.stops.length > 0);
   const canStart = configured && d.van && d.van.verified_at && !d.dayOff && childCount > 0;
 
-  // v11 (canvas "Z11D-Today"): the greeting folds a little as the list scrolls up (plain: no ornament).
-  const y = useSharedValue(0);
-  const onScroll = useAnimatedScrollHandler((e) => {
-    y.value = e.contentOffset.y;
-  });
-  const greet = useAnimatedStyle(() => ({ opacity: interpolate(y.value, [0, 120], [1, 0.75], 'clamp'), transform: [{ scale: interpolate(y.value, [0, 120], [1, 0.84], 'clamp') }] }));
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>

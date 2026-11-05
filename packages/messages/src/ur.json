@@ -772,5 +772,8 @@
   "kids.vanOff": "{name}: آج وین کی چھٹی ہے",
   "s2.free.price": "Rs 0",
   "parent.family.phoneHint": "03xx xxxxxxx",
-  "s2.req.opened": "اب کھلی ہے"
+  "s2.req.opened": "اب کھلی ہے",
+  "driver.seat.notYet": "ابھی نہیں، واپس سفر پر",
+  "holiday.undo": "اس دن وین چلے گی",
+  "driver.time.tell": "خاندانوں کو بتائیں: {time}"
 }

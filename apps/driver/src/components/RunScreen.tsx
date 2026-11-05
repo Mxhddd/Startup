@@ -58,6 +58,9 @@ export type RunScreenProps = {
   onArrive?: (undoText: string) => void;
   /** v12: the driver checked every seat ("the van is empty"). Asked before every trip ends. */
   onSeatCheck?: () => void;
+  /** Audit: the seat check's state, kept by the trip screen (remembered per trip); internal if not given. */
+  seat?: string | null;
+  onSeatChange?: (v: string | null) => void;
   /** v12: extra card(s) above the sheet's content (rain, notices, signals, stuck in traffic). */
   extra?: ReactNode;
   onLate: (r: LateReason) => void;
@@ -112,7 +115,9 @@ export function RunScreen(p: RunScreenProps) {
   const { height } = useWindowDimensions();
   const [help, setHelp] = useState(false);
   // v12: after the finish tap, the seat check stands between the driver and the end of the trip.
-  const [seat, setSeat] = useState<string | null>(null);
+  const [seatOwn, setSeatOwn] = useState<string | null>(null);
+  const seat = p.seat !== undefined ? p.seat : seatOwn;
+  const setSeat = (v: string | null) => (p.onSeatChange ? p.onSeatChange(v) : setSeatOwn(v));
   const step = p.kind === 'morning' ? 'picked' : 'dropped';
   const allDone = p.groups.every((g) => g.state !== 'waiting');
   const join = (names: string[]) => names.join(lang === 'ur' ? '، ' : ', ');
@@ -215,10 +220,14 @@ export function RunScreen(p: RunScreenProps) {
         <AllDoneSweep show={allDone && p.groups.length > 0} />
         {seat !== null ? (
           <Animated.View key="seat" entering={FadeInDown.springify().damping(20)} layout={layout} style={{ gap: 12 }} testID="seat-check">
+            {/* Reached school keeps its 5-second undo here too; undoing goes back to the trip. */}
+            {p.undo ? <MarkedPanel key={`ms${p.undo.at}`} text={p.undo.text} /> : null}
+            {p.undo ? <UndoBar key={`u${p.undo.at}`} text={t('undo.prompt')} tappedAt={p.undo.at} onUndo={() => { p.onUndo(); setSeat(null); }} onExpire={p.onUndoExpire} /> : null}
             <AppText bold style={{ fontSize: 24, lineHeight: 36 }}>{t('driver.seat.title')}</AppText>
             <AppText color={colors.ink2} style={{ fontSize: 17 }}>{t('driver.seat.body')}</AppText>
-            <TapButton testID="seat-empty" hold size="next" tone="picked" icon="check" label={t('driver.seat.confirm')} sublabel={t('driver.seat.hold')} feel="success"
+            <TapButton testID="seat-empty" hold size="next" tone="picked" icon="check" label={t('driver.seat.confirm')} feel="success"
               onConfirm={() => { p.onSeatCheck?.(); const text = seat; setSeat(null); p.onFinish(text); }} />
+            <TapButton testID="seat-not-yet" tone="quiet" label={t('driver.seat.notYet')} onConfirm={() => setSeat(null)} />
           </Animated.View>
         ) : null}
         {seat === null ? <>

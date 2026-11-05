@@ -7,10 +7,34 @@ import { addDays, ApiError, buildRun, createQueue, defaultRunKind, karachiDate, 
 import { randomUUID } from 'expo-crypto';
 import { useLang } from '@pohnch/ui';
 import { feel } from '@pohnch/ui/native';
-import { startTripLocation, stopTripLocation, type LocationStart } from '../location/tripLocation';
+import { ensureTripLocation, startTripLocation, stopTripLocation, type LocationStart } from '../location/tripLocation';
+import { clearTripLive } from '../notifications/tripLive';
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 
 const QUEUE_KEY = 'pohnch.driver.queue.v1';
+// Audit: trips ended on this phone (kept until the server agrees), so a trip ended without signal
+// never comes back as "running" and never restarts location.
+const ENDED_KEY = 'pohnch.driver.endedTrips.v1';
+async function endedTrips(): Promise<string[]> {
+  try {
+    return JSON.parse((await AsyncStorage.getItem(ENDED_KEY)) ?? '[]') as string[];
+  } catch {
+    return [];
+  }
+}
+
+/** Taps still waiting in the queue for this trip, as events, so a refresh doesn't hide them. */
+function queuedEvents(items: QueueItem[], tripId: string): EventRow[] {
+  const out: EventRow[] = [];
+  for (const it of items) {
+    if (it.action !== 'tap' || it.body.tripId !== tripId) continue;
+    const step = String(it.body.step);
+    const kids = Array.isArray(it.body.childIds) ? (it.body.childIds as string[]) : [];
+    if (kids.length) kids.forEach((childId) => out.push({ childId, step, undone: false }));
+    else out.push({ childId: null, step, undone: false });
+  }
+  return out;
+}
 
 export type UndoState = { clientId: string; text: string; at: number } | null;
 
@@ -95,31 +119,46 @@ function useDriverState() {
         driver.foundItems(van.id).catch(() => []),
       ]);
       const dayOff = daysOff.includes(today);
-      const running = trips.find((x) => x.status === 'running');
-      const [events, school, ready, week] = await Promise.all([
+      // A trip this phone has ended counts as ended, even before the server has heard.
+      const ended = await endedTrips();
+      const tripsSeen = trips.map((x) => (x.status === 'running' && ended.includes(x.id) ? { ...x, status: 'ended' as const } : x));
+      const running = tripsSeen.find((x) => x.status === 'running');
+      const [serverEvents, school, ready, week, waiting] = await Promise.all([
         running ? driver.eventsOf(running.id) : Promise.resolve([]),
         driver.schoolPoint(van.id).catch(() => null),
         running && !running.is_practice ? driver.readyOn(running.id).catch(() => []) : Promise.resolve([]),
         driver.weekTrips(van.id, addDays(today, -6)).catch(() => null),
+        queue.list(),
       ]);
+      // Taps still in the queue stay on screen (a refresh used to flip them back to "waiting").
+      const events = running ? [...serverEvents, ...queuedEvents(waiting, running.id)] : serverEvents;
       // Location follows the trip: on while one runs (also after the app restarts mid-trip), off otherwise.
       // Practice trips never share location.
+      // Audit: refresh never asks for permission again (only starting a trip does).
       if (running && !running.is_practice) {
-        setLocation(await startTripLocation(running.id, { title: t('location.notification.title'), body: t('location.notification.body') }));
+        setLocation(await ensureTripLocation(running.id, { title: t('location.notification.title'), body: t('location.notification.body') }));
       } else {
         await stopTripLocation();
         setLocation('off');
+        if (!running) void clearTripLive();
       }
-      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips, events, dayOff, daysOff, name, school, ready, week, runOff: { morning: offM, afternoon: offA }, signals, notices, changes, found });
+      setS({ loading: false, error: null, van, stops, riders: rs.riders, requests: rs.requests, absent, trips: tripsSeen, events, dayOff, daysOff, name, school, ready, week, runOff: { morning: offM, afternoon: offA }, signals, notices, changes, found });
     } catch (e) {
       setS((old) => ({ ...old, loading: false, error: e instanceof ApiError ? e.code : 'offline' }));
     }
-  }, [t]);
+  }, [t, queue]);
 
   useEffect(() => {
     refresh();
     queue.pending().then(setPending);
   }, [refresh, queue]);
+
+  // Audit: when the queue empties (signal came back), read the server again.
+  const lastPending = useRef(0);
+  useEffect(() => {
+    if (lastPending.current > 0 && pending === 0) void refresh();
+    lastPending.current = pending;
+  }, [pending, refresh]);
 
   // While anything waits in the queue, try again every 5 s.
   const retry = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -168,7 +207,9 @@ function useDriverState() {
 
     async startTrip(kind: 'morning' | 'afternoon') {
       if (!s.van) return;
-      await driver.driverApi.startTrip(s.van.id, kind, randomUUID());
+      const { tripId } = await driver.driverApi.startTrip(s.van.id, kind, randomUUID());
+      // Starting a trip is the one moment the app asks for location permission.
+      if (tripId) setLocation(await startTripLocation(tripId, { title: t('location.notification.title'), body: t('location.notification.body') }));
       await refresh();
     },
 
@@ -187,10 +228,12 @@ function useDriverState() {
       await queue.add({ id: clientId, action: 'tap', body: { tripId: running.id, step, childIds, clientId, happenedAt: new Date().toISOString() }, queuedAt: Date.now() });
     },
 
-    /** A van-wide step (reached school), then the morning run ends. */
+    /** A van-wide step (reached school), then the morning run ends. Sent once per trip. */
     async reachedSchool(text: string) {
       if (!running) return;
+      if (s.events.some((e) => e.childId === null && e.step === 'reached_school' && !e.undone)) return;
       const clientId = randomUUID();
+      setS((old) => ({ ...old, events: [...old.events, { childId: null, step: 'reached_school', undone: false }] }));
       setUndo({ clientId, text, at: Date.now() });
       await queue.add({ id: clientId, action: 'tap', body: { tripId: running.id, step: 'reached_school', clientId, happenedAt: new Date().toISOString() }, queuedAt: Date.now() });
     },
@@ -236,11 +279,23 @@ function useDriverState() {
       await driver.markCollected(id).catch(() => refresh());
     },
 
-    async endTrip() {
+    /**
+     * End the trip: location stops at once, the live notification goes, and the trip counts as ended on
+     * this phone straight away (kept on the phone until the server agrees), so no signal can't leave the
+     * driver stuck on a dead trip or restart location. The seat check is queued before the end.
+     */
+    async endTrip(seatChecked = false) {
       if (!running) return;
-      await stopTripLocation(); // stop sharing at once, even before the server hears about it
+      const id = running.id;
+      await stopTripLocation();
       setLocation('off');
-      await queue.add({ id: `end-${running.id}`, action: 'trip.end', body: { tripId: running.id }, queuedAt: Date.now() });
+      void clearTripLive();
+      setUndo(null);
+      const ended = await endedTrips();
+      await AsyncStorage.setItem(ENDED_KEY, JSON.stringify([...ended.filter((x) => x !== id), id].slice(-10))).catch(() => undefined);
+      setS((old) => ({ ...old, trips: old.trips.map((x) => (x.id === id ? { ...x, status: 'ended' as const } : x)) }));
+      if (seatChecked && !running.is_practice) await queue.add({ id: `seat-${id}`, action: 'trip.seatCheck', body: { tripId: id }, queuedAt: Date.now() });
+      await queue.add({ id: `end-${id}`, action: 'trip.end', body: { tripId: id }, queuedAt: Date.now() });
       await refresh();
     },
   };

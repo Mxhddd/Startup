@@ -772,5 +772,8 @@
   "kids.vanOff": "{name}: the van is off today",
   "s2.free.price": "Rs 0",
   "parent.family.phoneHint": "03xx xxxxxxx",
-  "s2.req.opened": "Open now"
+  "s2.req.opened": "Open now",
+  "driver.seat.notYet": "Not yet, back to the trip",
+  "holiday.undo": "The van runs that day after all",
+  "driver.time.tell": "Tell families: {time}"
 }

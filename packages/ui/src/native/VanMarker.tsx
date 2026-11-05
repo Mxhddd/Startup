@@ -29,8 +29,17 @@ export function shadowStretch(speed: number | null | undefined): number {
 }
 
 // Headlight beams: two soft cones ahead of the nose (the van faces up, nose at y = 17).
-const BEAMS = Skia.Path.MakeFromSVGString('M33 18 L18 -30 L40 -34 Z M47 18 L62 -30 L40 -34 Z')!;
-const NOSE = Skia.Path.MakeFromSVGString('M40 4 L46 13 L34 13 Z')!;
+// Made on first use, not when the file loads: on the web, Skia (CanvasKit) may not be ready yet.
+let paths: { beams: ReturnType<typeof Skia.Path.Make>; nose: ReturnType<typeof Skia.Path.Make> } | null = null;
+function vanPaths() {
+  if (!paths) {
+    paths = {
+      beams: Skia.Path.MakeFromSVGString('M33 18 L18 -30 L40 -34 Z M47 18 L62 -30 L40 -34 Z') ?? Skia.Path.Make(),
+      nose: Skia.Path.MakeFromSVGString('M40 4 L46 13 L34 13 Z') ?? Skia.Path.Make(),
+    };
+  }
+  return paths;
+}
 
 export function VanMarker({
   heading = 0,
@@ -158,7 +167,7 @@ export function VanMarker({
           </Circle>
           <Group transform={vanT}>
             <Group opacity={beams}>
-              <Path path={BEAMS}>
+              <Path path={vanPaths().beams}>
                 <LinearGradient start={vec(40, 18)} end={vec(40, -34)} colors={['rgba(255,236,170,0.75)', 'rgba(255,236,170,0)']} />
               </Path>
             </Group>
@@ -189,8 +198,8 @@ export function VanMarker({
             <RoundedRect x={52.5} y={25} width={4} height={6} r={2} color={body} />
             {!stale ? (
               <>
-                <Path path={NOSE} color={colors.white} style="stroke" strokeWidth={2} strokeJoin="round" />
-                <Path path={NOSE} color={colors.neel} />
+                <Path path={vanPaths().nose} color={colors.white} style="stroke" strokeWidth={2} strokeJoin="round" />
+                <Path path={vanPaths().nose} color={colors.neel} />
               </>
             ) : null}
           </Group>

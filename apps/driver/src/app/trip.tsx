@@ -14,7 +14,8 @@ import { useRef } from 'react';
 import { View } from 'react-native';
 import { useDriver } from '../state/DriverStore';
 import { useStage2 } from '../state/stage2';
-import { driver, stage2 } from '@pohnch/client';
+import { stage2 } from '@pohnch/client';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function Trip() {
   const { t } = useLang();
@@ -40,6 +41,24 @@ export default function Trip() {
     voiceOn().then(setVoice);
   }, []);
 
+  // Audit: the seat check is remembered per trip, so if the app restarts during the walk to the back
+  // seats it opens the seat check again (not the finish button, which would send "reached school" twice).
+  const runningId = d.running?.id ?? null;
+  const seatKey = runningId ? `pohnch.driver.seat.${runningId}` : null;
+  const [seat, setSeatState] = useState<string | null>(null);
+  useEffect(() => {
+    if (!seatKey) return;
+    AsyncStorage.getItem(seatKey).then((v) => setSeatState(v)).catch(() => undefined);
+  }, [seatKey]);
+  const setSeat = (v: string | null) => {
+    setSeatState(v);
+    if (!seatKey) return;
+    if (v === null) AsyncStorage.removeItem(seatKey).catch(() => undefined);
+    else AsyncStorage.setItem(seatKey, v).catch(() => undefined);
+  };
+  // "Rain delay" sent: remembered for the trip (it used to come back after every tap).
+  const [rainTold, setRainTold] = useState<string | null>(null);
+
   // Android: the live trip notification follows the screen (next stop, count, bar); gone at the end.
   const next = d.run.groups.find((g) => g.isNext && g.state === 'waiting');
   const liveKey = d.running ? `${d.running.id}:${d.progress.done}/${d.progress.total}:${next?.label ?? ''}` : '';
@@ -64,7 +83,7 @@ export default function Trip() {
   const fresh = d.signals.filter((s) => s.kind !== 'left_item' && Date.parse(s.at) > Date.now() - 30 * 60_000).slice(0, 1);
   const extra = (
     <View style={{ gap: space.sm }}>
-      {!d.running.is_practice ? <DriverNotes d={d} compact onRainDelay={() => d.actions.late('rain')} /> : null}
+      {!d.running.is_practice ? <DriverNotes d={d} compact told={rainTold === tripId} onRainDelay={() => { d.actions.late('rain'); setRainTold(tripId); }} /> : null}
       {fresh.map((s, i) => (
         <View key={`${s.childId}-${i}`} testID="trip-signal" style={{ minHeight: 48, justifyContent: 'center', paddingHorizontal: 14, borderRadius: radius10.row, backgroundColor: s.kind === 'sick_today' ? colors.kesarTint : colors.zamurradTint }}>
           <AppText bold color={s.kind === 'sick_today' ? colors.onKesar : colors.zamurradOnTint} style={{ fontSize: 17 }}>{`${name.get(s.childId) ?? ''}: ${t(`signal.${s.kind}`)}`}</AppText>
@@ -102,9 +121,8 @@ export default function Trip() {
       onUndoExpire={() => d.actions.clearUndo()}
       onLate={(r) => d.actions.late(r)}
       onArrive={(text) => void d.actions.reachedSchool(text)}
-      onSeatCheck={() => {
-        if (d.running && !d.running.is_practice) driver.confirmSeatCheck(d.running.id).catch(() => undefined);
-      }}
+      seat={seat}
+      onSeatChange={setSeat}
       onFinish={async () => {
         const trip = d.running;
         // The numbers for the "Trip complete" moment, taken before the trip closes.
@@ -112,7 +130,9 @@ export default function Trip() {
         const delivered = d.progress.done;
         // Go to the moment first, so Today never flashes in between; the trip ends behind it.
         if (trip && !trip.is_practice) router.replace({ pathname: '/done', params: { kind, children: String(delivered), ...(minutes ? { minutes: String(minutes) } : {}) } });
-        await d.actions.endTrip();
+        setSeat(null);
+        // The seat check was confirmed (that's how we got here); it is queued before the end.
+        await d.actions.endTrip(true);
       }}
       banner={d.running.is_practice ? t('driver.practice.note') : d.location === 'denied' || d.location === 'failed' ? t('location.off') : undefined}
     />

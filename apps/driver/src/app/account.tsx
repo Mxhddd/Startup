@@ -8,6 +8,7 @@ import { ApiError, PILOT_WHATSAPP } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
 import { AppText, EditSheet, TapButton, Toggle, soundsAreOn } from '@pohnch/ui/native';
 import { setSunlightMode, sunlightOn } from '../sunlight';
+import { cancelStartReminders } from '../components/StartReminder';
 import { saveSounds } from '../sounds';
 import { router } from 'expo-router';
 import { useState } from 'react';
@@ -19,7 +20,7 @@ const PRIVACY_URL = 'https://pohnch.pk/privacy';
 
 export default function Account() {
   const [sun, setSun] = useState(sunlightOn());
-  const { t } = useLang();
+  const { t, dir } = useLang();
   const d = useDriver();
   const [asking, setAsking] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -30,6 +31,7 @@ export default function Account() {
     setError(null);
     try {
       await deleteMyAccount();
+      await cancelStartReminders();
       setAsking(false);
       router.replace('/login');
     } catch (e) {
@@ -45,7 +47,7 @@ export default function Account() {
       <TapButton tone="quiet" label={t('parent.menu.privacy')} onConfirm={() => Linking.openURL(PRIVACY_URL)} testID="help-privacy" />
 
       {/* v9: the trip's sounds (a tone for each tap, a rising tick while holding). */}
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: space.md, minHeight: 64 }}>
+      <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, minHeight: 64 }}>
         <View style={{ flex: 1 }}>
           <AppText bold style={{ fontSize: 17 }}>{t('settings.sound.app')}</AppText>
           <AppText variant="small" color={colors.ink2}>{t('driver.account.soundsHint')}</AppText>
@@ -54,7 +56,7 @@ export default function Account() {
       </View>
 
       {/* v12: sunlight mode, for bright sun on the dashboard. */}
-      <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: space.md, minHeight: 64 }}>
+      <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, minHeight: 64 }}>
         <View style={{ flex: 1 }}>
           <AppText bold style={{ fontSize: 17 }}>{t('driver.sun.title')}</AppText>
           <AppText variant="small" color={colors.ink2}>{t('driver.sun.hint')}</AppText>

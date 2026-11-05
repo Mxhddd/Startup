@@ -79,6 +79,36 @@ export async function startTripLocation(tripId: string, notice: { title: string;
   }
 }
 
+/**
+ * Audit: keep a running trip's location going without asking for permission again (refresh calls
+ * this; only starting a trip asks). If it isn't allowed, says so; if already running, nothing changes.
+ */
+export async function ensureTripLocation(tripId: string, notice: { title: string; body: string }): Promise<LocationStart> {
+  const fg = await Location.getForegroundPermissionsAsync().catch(() => null);
+  if (!fg?.granted) return 'denied';
+  const active = await AsyncStorage.getItem(ACTIVE_TRIP).catch(() => null);
+  try {
+    if (active === tripId && (await Location.hasStartedLocationUpdatesAsync(LOCATION_TASK))) return 'started';
+  } catch {
+    // fall through and start it
+  }
+  await AsyncStorage.multiSet([[ACTIVE_TRIP, tripId], [LAST_SENT, '']]);
+  try {
+    await Location.startLocationUpdatesAsync(LOCATION_TASK, {
+      accuracy: Location.Accuracy.High,
+      timeInterval: 5000,
+      distanceInterval: 0,
+      activityType: Location.ActivityType.AutomotiveNavigation,
+      pausesUpdatesAutomatically: false,
+      showsBackgroundLocationIndicator: true,
+      foregroundService: { notificationTitle: notice.title, notificationBody: notice.body, notificationColor: '#1F2A5C', killServiceOnDestroy: false },
+    });
+    return 'started';
+  } catch {
+    return 'failed';
+  }
+}
+
 export async function stopTripLocation(): Promise<void> {
   setFix(null);
   await AsyncStorage.multiRemove([ACTIVE_TRIP, LAST_SENT]);

@@ -29,23 +29,22 @@ function Card({ tint, ink, icon, title, sub, children, testID }: { tint: string;
   );
 }
 
-export function DriverNotes({ d, onRainDelay, compact = false }: { d: DriverStore; onRainDelay?: () => void; compact?: boolean }) {
+export function DriverNotes({ d, onRainDelay, compact = false, told: toldProp }: { d: DriverStore; onRainDelay?: () => void; compact?: boolean; told?: boolean }) {
   const { t, dir } = useLang();
   const rain = useRain(!!d.van);
-  const [told, setTold] = useState(false);
-  // On the trip screen: one slim rain row with its button; notices stay on Today.
+  const [toldOwn, setTold] = useState(false);
+  const told = toldProp ?? toldOwn;
+  // On the trip screen: the rain line and, until sent, a hold-to-confirm "rain delay" (tells every
+  // family, so it holds like the other van-wide taps); notices stay on Today.
   if (compact) {
     if (!rain) return null;
     return (
-      <View testID="driver-rain" style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, minHeight: 64, paddingHorizontal: 14, borderRadius: radius10.row, backgroundColor: colors.neelTint }}>
-        <Icon name="cloud" size={22} color={colors.link} />
-        <AppText bold color={colors.link} style={{ flex: 1, fontSize: 16 }} numberOfLines={2}>{told ? t('rain.sent') : t('rain.short')}</AppText>
-        {onRainDelay && !told ? (
-          <PressableScale accessibilityRole="button" testID="rain-delay" onPress={() => { onRainDelay(); setTold(true); feel('confirm'); }}
-            faceStyle={{ minHeight: 48, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.neel, justifyContent: 'center' }}>
-            <AppText bold color={colors.ghee} style={{ fontSize: 15 }}>{t('rain.delay')}</AppText>
-          </PressableScale>
-        ) : null}
+      <View testID="driver-rain" style={{ gap: 8 }}>
+        <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 10, minHeight: 48 }}>
+          <Icon name="cloud" size={22} color={colors.link} />
+          <AppText bold color={colors.link} style={{ flex: 1, fontSize: 16 }} numberOfLines={2}>{told ? t('rain.sent') : t('rain.short')}</AppText>
+        </View>
+        {onRainDelay && !told ? <TapButton testID="rain-delay" hold tone="left" icon="cloud" label={t('rain.delay')} onConfirm={() => { onRainDelay(); setTold(true); feel('confirm'); }} /> : null}
       </View>
     );
   }
@@ -82,6 +81,7 @@ export function SignalsCard({ d }: { d: DriverStore }) {
 
 export function HolidayCard({ d }: { d: DriverStore }) {
   const { t } = useLang();
+  const [failed, setFailed] = useState(false);
   const today = karachiDate(new Date());
   const next = upcomingHolidays(today, 14).find((h) => h.date !== today || !d.dayOff);
   if (!next || !d.van) return null;
@@ -92,7 +92,15 @@ export function HolidayCard({ d }: { d: DriverStore }) {
   return (
     <Card testID="holiday-card" tint={colors.kesarTint} ink={colors.onKesar} icon="calendar"
       title={t(`holiday.${next.key}` as 'holiday.iqbal')} sub={[when, next.moon ? t('holiday.moon') : null, off ? t('holiday.off') : null].filter(Boolean).join(' · ')}>
-      {!off ? <TapButton tone="quiet" icon="calendar" label={t('holiday.dayOff')} testID="holiday-dayoff" onConfirm={() => d.actions.setDayOff(next.date, true)} /> : null}
+      {/* A whole-van day off tells every family: hold to confirm, only for a verified van, and it can be undone. */}
+      {!d.van.verified_at ? null : !off ? (
+        <TapButton tone="quiet" hold icon="calendar" label={t('holiday.dayOff')} testID="holiday-dayoff"
+          onConfirm={() => { setFailed(false); d.actions.setDayOff(next.date, true).catch(() => setFailed(true)); }} />
+      ) : (
+        <TapButton tone="quiet" label={t('holiday.undo')} testID="holiday-undo"
+          onConfirm={() => { setFailed(false); d.actions.setDayOff(next.date, false).catch(() => setFailed(true)); }} />
+      )}
+      {failed ? <AppText bold color={colors.dangerText}>{t('error.offline')}</AppText> : null}
     </Card>
   );
 }
@@ -102,11 +110,14 @@ const SHIFTS = [-30, -15, 15, 30, 60];
 export function TimeCard({ d }: { d: DriverStore }) {
   const { t, dir } = useLang();
   const [open, setOpen] = useState(false);
+  const [pick, setPick] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
   const kind = d.nextKind;
   if (!kind || !d.van || d.dayOff) return null;
   const today = karachiDate(new Date());
-  const first = [...d.stops].sort((a, b) => a.position - b.position)[0];
-  const usual = (kind === 'morning' ? first?.morning_time : first?.afternoon_time)?.slice(0, 5) ?? null;
+  // The run's start: its earliest stop time (the afternoon runs the stops in reverse).
+  const times = d.stops.map((x) => (kind === 'morning' ? x.morning_time : x.afternoon_time)?.slice(0, 5)).filter((x): x is string => !!x).sort();
+  const usual = times[0] ?? null;
   const changed = d.changes.find((c) => c.date === today && c.kind === kind)?.time ?? null;
   if (!usual) return null;
   const run = t(kind === 'morning' ? 'trip.morning' : 'trip.afternoon');
@@ -128,16 +139,22 @@ export function TimeCard({ d }: { d: DriverStore }) {
                 const time = shiftTime(usual, m);
                 return (
                   <PressableScale key={m} accessibilityRole="button" testID={`shift-${m}`} style={{ flexBasis: '30%', flexGrow: 1 }}
-                    onPress={() => { feel('confirm'); setOpen(false); d.actions.changeTime(kind, today, time).catch(() => feel('error')); }}
-                    faceStyle={{ minHeight: 64, borderRadius: radius10.row, backgroundColor: changed === time ? colors.neel : colors.white, alignItems: 'center', justifyContent: 'center' }}>
-                    <AppText variant="number" color={changed === time ? colors.ghee : colors.siyahi} style={{ fontSize: 20, lineHeight: 26 }}>{time.replace(/^0/, '')}</AppText>
-                    <AppText color={changed === time ? colors.mutedOnDark : colors.ink2} style={{ fontSize: 14 }}>{`${m > 0 ? '+' : '−'}${Math.abs(m)} ${t('min.short')}`}</AppText>
+                    onPress={() => { feel('tap'); setPick(time); }}
+                    faceStyle={{ minHeight: 64, borderRadius: radius10.row, backgroundColor: (pick ?? changed) === time ? colors.neel : colors.white, alignItems: 'center', justifyContent: 'center' }}>
+                    <AppText variant="number" color={(pick ?? changed) === time ? colors.ghee : colors.siyahi} style={{ fontSize: 20, lineHeight: 26 }}>{time.replace(/^0/, '')}</AppText>
+                    <AppText color={(pick ?? changed) === time ? colors.mutedOnDark : colors.ink2} style={{ fontSize: 14 }}>{`${m > 0 ? '+' : '−'}${Math.abs(m)} ${t('min.short')}`}</AppText>
                   </PressableScale>
                 );
               })}
             </View>
-            {changed ? <TapButton tone="quiet" label={t('driver.time.usual')} testID="time-usual" onConfirm={() => { setOpen(false); d.actions.changeTime(kind, today, null).catch(() => feel('error')); }} /> : null}
-            <TapButton label={t('common.cancel')} onConfirm={() => setOpen(false)} />
+            {/* Every family gets a push: pick a time, then hold to tell them. */}
+            {pick && pick !== changed ? (
+              <TapButton hold size="next" tone="left" icon="bell" label={t('driver.time.tell', { time: pick.replace(/^0/, '') })} testID="time-tell"
+                onConfirm={() => { setFailed(false); d.actions.changeTime(kind, today, pick).then(() => { setOpen(false); setPick(null); }).catch(() => { setFailed(true); feel('error'); }); }} />
+            ) : null}
+            {changed ? <TapButton tone="quiet" hold label={t('driver.time.usual')} testID="time-usual" onConfirm={() => { setFailed(false); d.actions.changeTime(kind, today, null).then(() => setOpen(false)).catch(() => { setFailed(true); feel('error'); }); }} /> : null}
+            {failed ? <AppText bold color={colors.dangerText}>{t('error.offline')}</AppText> : null}
+            <TapButton label={t('common.cancel')} onConfirm={() => { setOpen(false); setPick(null); }} />
           </View>
         </View>
       </Modal>
@@ -162,8 +179,8 @@ export function FoundCard({ d }: { d: DriverStore }) {
           <Icon name="bag" size={22} color={colors.zamurradOnTint} />
           <AppText bold color={colors.zamurradOnTint} style={{ flex: 1, fontSize: 16 }}>{t('found.driver', { name: name.get(f.childId) ?? '', what: t(`found.what.${f.what}`) })}</AppText>
           <PressableScale accessibilityRole="button" onPress={() => d.actions.markCollected(f.id)} testID="found-given"
-            faceStyle={{ minHeight: 48, paddingHorizontal: 14, borderRadius: radius.pill, backgroundColor: colors.zamurrad, justifyContent: 'center' }}>
-            <AppText bold color={colors.onFill} style={{ fontSize: 15 }}>{t('found.given')}</AppText>
+            faceStyle={{ minHeight: 64, paddingHorizontal: 16, borderRadius: radius.pill, backgroundColor: colors.zamurrad, justifyContent: 'center' }}>
+            <AppText bold color={colors.onFill} style={{ fontSize: 16 }}>{t('found.given')}</AppText>
           </PressableScale>
         </View>
       ))}

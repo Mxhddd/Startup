@@ -1,17 +1,16 @@
 // Loading placeholders that breathe: soft sand bars with a band of light gliding across them,
 // shaped like what is coming, so the screen never looks empty or frozen.
 // v12: `arches` draws arch-topped placeholders (for niches and portraits) with the same light band.
-import { useEffect } from 'react';
+import { useEffect, useId } from 'react';
 import { View, type DimensionValue } from 'react-native';
 import Animated, { Easing, useAnimatedProps, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import Svg, { ClipPath, Defs, G, LinearGradient, Path, Rect, Stop } from 'react-native-svg';
 import { archPath, colors } from '../theme';
 
 const ARect = Animated.createAnimatedComponent(Rect);
-let sid = 0;
 
 function ArchPlaceholder({ w, h, x }: { w: number; h: number; x: { value: number } }) {
-  const id = `sh${++sid}`;
+  const id = `sh${useId().replace(/[^a-zA-Z0-9]/g, '')}`;
   const props = useAnimatedProps(() => ({ x: -60 + x.value * (w + 120) }));
   return (
     <Svg width={w} height={h}>
