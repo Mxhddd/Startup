@@ -517,3 +517,19 @@ Built in phases: server and rules first, then the apps (safety and ETA, school l
   - **Alternate app icons**: these need a native module and a store review step. Left for later, deliberately.
 
 Tests: core v12 (18), client rain check, ui theme (child colours, sunlight contrast, text scale), pgTAP 170, server push tests, Playwright admin v12, Maestro `driver-v12.yaml` and `parent-v12.yaml`, and the seat check in `driver-practice.yaml`.
+
+## Code audit (5 November 2026)
+
+A full read of the server, both apps, the shared UI and the website found about 50 defects. All of them are fixed, with tests. The most serious:
+
+- **Live map (critical, present since B5).** The parent app asked `positions` for `lat`/`lng`, columns it doesn't have (the point is stored as PostGIS geography). On a real phone, the live map, ETA and trail would have failed during every trip; the web preview hid this because it uses a fake backend. Fix: a `position_points` view (security_invoker, so row-level security still applies) that turns the point into `lat`/`lng`.
+- **Driver Today crash (critical).** React hooks ran after an early `return <Redirect/>`, so the screen crashed the moment a trip started. Rule to remember: every hook goes above any early return.
+- **Seat check.** "Reached school" lost its 5-second undo and could be sent twice (two pushes). Now the panel keeps the undo, the server records a van-wide step only once per trip (`record_tap` returns 0 for a repeat), and the seat check goes through the offline queue (`trip.seatCheck`).
+- **Ending a trip offline.** The trip is marked ended on the phone at once and remembered, so a refresh can't restart location while `trip.end` waits in the queue.
+- **Live notification tokens** stuck to their first trip; now `register_live_token` moves the token to the current trip.
+- **One-run chutti** (morning or afternoon only) was ignored by pushes and the ETA list. The server now uses `private.off_for` everywhere, and writes go through `run_absence.set`, which refuses once that run's van has left.
+- **Switching children** in the parent app could mix two children's data; each refresh now carries a counter, and late answers are dropped.
+- **Tighter table rights:** families can no longer write directly to `run_absences`, `signals`, `found_items`, `ready_signals`, `live_activity_tokens`; only the columns a screen needs are granted. One signal of each kind per child per day (unique index).
+- **Offline queue:** removing (undoing) a tap while an earlier one was being sent could still send it. Fixed, with a test.
+
+Files: `supabase/migrations/20261105000100_audit.sql`, `supabase/tests/database/180-audit.test.sql` (24 checks), `packages/core/src/queue.ts`, `packages/core/src/v12.ts`, `apps/parent/src/state/ParentStore.tsx`, `apps/driver/src/state/DriverStore.tsx`, `apps/driver/src/components/RunScreen.tsx` and the day cards.
