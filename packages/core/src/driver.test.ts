@@ -66,6 +66,27 @@ describe('offline queue', () => {
     expect(await q.pending()).toBe(1);
   });
 
+  it('never sends a tap that was undone while an earlier one was being sent', async () => {
+    const sent: string[] = [];
+    let online = false;
+    let release: () => void = () => undefined;
+    const slow = new Promise<void>((r) => { release = r; });
+    const q = createQueue(memStore(), async (_a, b) => {
+      if (!online) throw new ApiError('offline', 0);
+      if (b.clientId === 'a') await slow;
+      sent.push(b.clientId as string);
+    });
+    await q.add(item('a'));
+    await q.add(item('b'));
+    online = true;
+    const flushing = q.flush();
+    await q.remove('b');
+    release();
+    await flushing;
+    expect(sent).toEqual(['a']);
+    expect(await q.pending()).toBe(0);
+  });
+
   it('lets an unsent tap be removed (undone while offline)', async () => {
     const q = createQueue(memStore(), async () => { throw new ApiError('offline', 0); });
     await q.add(item('a'));

@@ -29,7 +29,10 @@ export function lateBy(etaMinutes: number | null, now: number, planned: string |
  * close, the live estimate wins. Returns whole minutes, never negative; null if there's nothing to go on.
  */
 export function blendEta(live: number | null, learnedTotal: number | null, startedAt: number | null, now: number): number | null {
-  const learned = learnedTotal !== null && startedAt !== null ? Math.max(0, learnedTotal - (now - startedAt) / 60_000) : null;
+  // What's left of the usual ride. Once the van is behind its usual time there is nothing to learn from
+  // (it would pull the estimate toward 0), so only the live estimate counts.
+  const left = learnedTotal !== null && startedAt !== null ? learnedTotal - (now - startedAt) / 60_000 : null;
+  const learned = left !== null && left > 0 ? left : null;
   if (live === null) return learned === null ? null : Math.round(learned);
   if (learned === null) return Math.max(0, Math.round(live));
   // Weight history less as the live estimate gets small (close to the door).
@@ -110,13 +113,13 @@ export const PK_HOLIDAYS: { date: string; key: string; moon?: boolean }[] = [
   { date: '2027-11-09', key: 'iqbal' }, { date: '2027-12-25', key: 'quaid' },
 ];
 
-/** Holidays from today through the next `days` days (a weekday only: weekends have no runs anyway). */
+/** Holidays from today through the next `days` days (Monday to Friday only: weekends have no runs anyway). */
 export function upcomingHolidays(today: string, days = 14): { date: string; key: string; moon?: boolean }[] {
   const end = new Date(`${today}T00:00:00Z`).getTime() + days * 86400_000;
   return PK_HOLIDAYS.filter((h) => {
     const t = new Date(`${h.date}T00:00:00Z`).getTime();
     const wd = new Date(t).getUTCDay();
-    return h.date >= today && t <= end && wd !== 0;
+    return h.date >= today && t <= end && wd !== 0 && wd !== 6;
   });
 }
 
@@ -212,10 +215,10 @@ export function replayAt(path: { lat: number; lng: number; at: string }[], f: nu
 /** Driver start reminder. */
 export function nextReminder(kind: 'morning' | 'afternoon', usual: string | null, daysOff: string[], changes: { date: string; kind: string; time: string }[], now = Date.now()): number | null {
   if (!usual) return null;
-  for (let i = 0; i < 8; i++) {
+  for (let i = 0; i < 14; i++) {
     const date = addDaysUtc(karachiDateOf(now), i);
     const wd = new Date(`${date}T00:00:00Z`).getUTCDay();
-    if (wd === 0 || wd === 6 || daysOff.includes(date)) continue;
+    if (wd === 0 || wd === 6 || daysOff.includes(date) || PK_HOLIDAYS.some((h) => h.date === date)) continue;
     const time = shiftTime(changes.find((c) => c.date === date && c.kind === kind)?.time ?? usual, -10);
     const [h, m] = time.split(':').map(Number);
     const at = Date.parse(`${date}T00:00:00Z`) - 5 * 3600_000 + ((h ?? 0) * 60 + (m ?? 0)) * 60_000;

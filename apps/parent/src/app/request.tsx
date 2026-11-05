@@ -38,17 +38,24 @@ export default function Request() {
       setBusy(false);
     }
   };
-  // Asking is idempotent (one open request per child), so opening the page shows the request at once.
+  // Audit: opening the page no longer creates a request; the parent asks with the button.
   useEffect(() => {
-    void ask();
-  }, [child?.id]); // eslint-disable-line react-hooks/exhaustive-deps
+    setId(null);
+    setN(null);
+    setError(null);
+  }, [child?.id]);
 
   const count = n ?? 0;
   return (
     <Page title={t('s2.req.title')} sub={t('s2.req.sub')}>
       {error ? <AppText bold color={colors.dangerText}>{error}</AppText> : null}
-      {n === null && !error ? (
+      {n === null && busy ? (
         <Shimmer lines={[{ w: '100%', h: 200 }]} />
+      ) : n === null ? (
+        <View style={{ gap: 12 }} testID="request-start">
+          <AppText variant="secondary">{t('s2.req.body', { n: LAUNCH })}</AppText>
+          <TapButton size="next" tone="left" icon="plus" label={t('s2.req.start')} onConfirm={ask} testID="request-ask" />
+        </View>
       ) : n !== null ? (
         <Animated.View entering={FadeInDown.springify().damping(22)} style={{ backgroundColor: colors.white, borderRadius: 28, padding: 18, gap: 14, boxShadow: elevation.e1 }} testID="request-card">
           <AppText bold style={{ fontSize: 18 }}>{child?.school_name ?? ''}</AppText>
@@ -61,7 +68,7 @@ export default function Request() {
             ))}
           </View>
           <View style={{ flexDirection: row, justifyContent: 'space-between' }}>
-            <AppText bold color={count >= OPENS ? colors.zamurradOnTint : colors.ink2} style={{ fontSize: 14 }}>{t('s2.req.open')}{count >= OPENS ? ' ✓' : ''}</AppText>
+            <AppText bold color={count >= OPENS ? colors.zamurradOnTint : colors.ink2} style={{ fontSize: 14 }}>{count >= OPENS ? t('s2.req.opened') : t('s2.req.open')}</AppText>
             <AppText bold color={colors.ink2} style={{ fontSize: 14 }}>{t('s2.req.launch')}</AppText>
           </View>
           <AppText bold style={{ fontSize: 16 }}>{t('s2.req.progress', { n: count })}</AppText>

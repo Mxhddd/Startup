@@ -13,7 +13,7 @@ import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Page } from '../components/Page';
 import { useParent } from '../state/ParentStore';
 
-type Line = { key: 'off' | 'none' | 'waiting' | 'coming' | 'inVan' | 'atSchool' | 'home' | 'idle'; live: boolean };
+type Line = { key: 'off' | 'none' | 'waiting' | 'coming' | 'inVan' | 'atSchool' | 'home' | 'idle' | 'over' | 'vanOff'; live: boolean };
 
 async function lineFor(c: Child): Promise<Line> {
   const today = karachiDate(new Date());
@@ -23,13 +23,23 @@ async function lineFor(c: Child): Promise<Line> {
   if (m.status !== 'approved') return { key: 'waiting', live: false };
   const van = await parent.van(m.van_id);
   if (!van) return { key: 'none', live: false };
-  const trips = await parent.tripsToday(van.id);
+  const [trips, daysOff, runOff] = await Promise.all([
+    parent.tripsToday(van.id),
+    parent.vanDaysOff(van.id, today).catch(() => [] as string[]),
+    parent.runAbsences(c.id, today).catch(() => [] as { date: string; kind: 'morning' | 'afternoon' }[]),
+  ]);
+  if (daysOff.includes(today)) return { key: 'vanOff', live: false };
   const running = trips.find((x) => x.status === 'running');
   const shown = running ?? trips[trips.length - 1];
   if (!shown) return { key: 'idle', live: false };
+  // Off for this run only: say so rather than "on the way".
+  if (runOff.some((r) => r.date === today && r.kind === shown.kind)) return { key: 'off', live: false };
   const events = await parent.eventsOf(shown.id, { id: van.driver_id, name: null });
   const tl = timelineFor(shown.kind ?? defaultRunKind(new Date()), c.id, events);
-  return { key: childPlace(shown.kind, tl.items), live: !!running };
+  const place = childPlace(shown.kind, tl.items);
+  // A finished run that never picked the child up is over, not "on the way".
+  if (!running && place === 'coming') return { key: 'over', live: false };
+  return { key: place, live: !!running };
 }
 
 export default function Kids() {

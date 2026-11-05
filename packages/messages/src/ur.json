@@ -767,5 +767,10 @@
   "driver.sun.hint": "تیز دھوپ کے لیے زیادہ روشن اور واضح اسکرین۔",
   "settings.bigText.title": "بڑا متن",
   "settings.bigText.hint": "پہنچ کے سب الفاظ تھوڑے بڑے۔",
-  "rain.short": "بارش ہو رہی ہے"
+  "rain.short": "بارش ہو رہی ہے",
+  "kids.over": "{name}: آج کا سفر ختم ہو گیا",
+  "kids.vanOff": "{name}: آج وین کی چھٹی ہے",
+  "s2.free.price": "Rs 0",
+  "parent.family.phoneHint": "03xx xxxxxxx",
+  "s2.req.opened": "اب کھلی ہے"
 }

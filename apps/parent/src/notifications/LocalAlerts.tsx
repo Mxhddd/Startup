@@ -4,7 +4,7 @@
 // - Friday story: every Friday at 4 pm, opens the week's story;
 // - Morning brief: the next school morning, 30 minutes before the van's usual time (skipped on a
 //   chutti or a van day off). First names only; no place or location in any alert.
-import { addDays, getReadyDue, karachiDate } from '@pohnch/core';
+import { addDays, getReadyDue, karachiDate, PK_HOLIDAYS } from '@pohnch/core';
 import { useLang } from '@pohnch/ui';
 import * as Notifications from 'expo-notifications';
 import { useEffect, useRef, useState } from 'react';
@@ -68,7 +68,7 @@ export function LocalAlerts({ signedIn }: { signedIn: boolean }) {
 
   // Morning brief for the next school morning.
   const morning = p.stop?.morning_time?.slice(0, 5) ?? null;
-  const key = [signedIn, prefs.brief, name, morning, p.absences.join(), p.vanDaysOff.join(), lang].join('|');
+  const key = [signedIn, prefs.brief, name, morning, p.today, p.absences.join(), p.vanDaysOff.join(), p.runOff.map((r) => r.date + r.kind).join(), lang].join('|');
   useEffect(() => {
     if (!signedIn) return;
     (async () => {
@@ -76,13 +76,15 @@ export function LocalAlerts({ signedIn }: { signedIn: boolean }) {
       if (!prefs.brief || !morning || !name) return;
       const [h, m] = morning.split(':').map(Number);
       // The next weekday whose brief time hasn't passed (Karachi = UTC+5).
-      for (let i = 0; i < 7; i++) {
+      for (let i = 0; i < 14; i++) {
         const date = addDays(karachiDate(new Date()), i);
         const wd = new Date(`${date}T00:00:00Z`).getUTCDay();
         if (wd === 0 || wd === 6) continue;
         const at = Date.parse(`${date}T00:00:00Z`) - 5 * 3600_000 + ((h ?? 7) * 60 + (m ?? 0) - 30) * 60_000;
         if (at <= Date.now()) continue;
-        if (p.absences.includes(date) || p.vanDaysOff.includes(date)) return;
+        // Audit: skip days off (and public holidays) and keep looking, rather than giving up.
+        const runOffMorning = p.runOff.some((r) => r.date === date && r.kind === 'morning');
+        if (p.absences.includes(date) || p.vanDaysOff.includes(date) || runOffMorning || PK_HOLIDAYS.some((h) => h.date === date)) continue;
         await Notifications.scheduleNotificationAsync({
           identifier: BRIEF_ID,
           content: { title: t('notify.brief.title', { name }), body: t('notify.brief.body', { time: morning.replace(/^0/, '') }), data: { local: true } },

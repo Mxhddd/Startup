@@ -127,10 +127,11 @@ describe('driver start reminder', () => {
     const thu = Date.parse('2026-11-05T00:00:00Z') - 5 * 3600_000 + (7 * 60 + 20) * 60_000;
     expect(nextReminder('morning', '07:10', ['2026-11-04'], [{ date: '2026-11-05', kind: 'morning', time: '07:30' }], now)).toBe(thu);
   });
-  it('skips the weekend and gives nothing without a time', () => {
+  it('skips the weekend and public holidays, and gives nothing without a time', () => {
     const fri = Date.parse('2026-11-06T09:00:00Z');
-    const mon = Date.parse('2026-11-09T00:00:00Z') - 5 * 3600_000 + (7 * 60) * 60_000;
-    expect(nextReminder('morning', '07:10', [], [], fri)).toBe(mon);
+    // Monday 9 November is Iqbal Day, so the next run is Tuesday.
+    const tue = Date.parse('2026-11-10T00:00:00Z') - 5 * 3600_000 + (7 * 60) * 60_000;
+    expect(nextReminder('morning', '07:10', [], [], fri)).toBe(tue);
     expect(nextReminder('morning', null, [], [], now)).toBeNull();
   });
 });
@@ -145,5 +146,13 @@ describe('map camera look-ahead', () => {
     const fast = lookAhead(24.9, 67, 90, 30);
     expect(km({ lat: 24.9, lng: 67 }, fast)).toBeCloseTo(0.14, 2);
     expect(fast.pitch).toBe(58);
+  });
+});
+
+describe('learned ETA when the van is behind its usual time', () => {
+  it('uses only the live estimate once the usual ride time has passed', () => {
+    const now = at('07:30');
+    // Usually 12 minutes from leaving; it left 20 minutes ago and is still 15 minutes away.
+    expect(blendEta(15, 12, now - 20 * 60_000, now)).toBe(15);
   });
 });

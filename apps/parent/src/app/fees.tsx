@@ -22,6 +22,7 @@ export default function Fees() {
   const [stars, setStars] = useState(5);
   const [tags, setTags] = useState<string[]>([]);
   const [rated, setRated] = useState(false);
+  const [rateError, setRateError] = useState(false);
 
   useEffect(() => {
     if (!child) return;
@@ -74,7 +75,8 @@ export default function Fees() {
                 <ChoiceChip key={tag} label={t(`s2.tag.${tag}`)} on={tags.includes(tag)} onPress={() => setTags((x) => (x.includes(tag) ? x.filter((y) => y !== tag) : [...x, tag]))} />
               ))}
             </View>
-            <TapButton size="next" tone="left" icon="check" label={t('s2.rate.save')} onConfirm={async () => { if (p.van) { await stage2.rateVan(p.van.id, stars, tags).catch(() => undefined); setRated(true); } }} testID="rate-save" />
+            <TapButton size="next" tone="left" icon="check" label={t('s2.rate.save')} onConfirm={async () => { if (p.van) { try { await stage2.rateVan(p.van.id, stars, tags); setRated(true); setRateError(false); } catch { setRateError(true); } } }} testID="rate-save" />
+            {rateError ? <AppText bold color={colors.dangerText}>{t('error.offline')}</AppText> : null}
           </>
         )}
       </EditSheet>

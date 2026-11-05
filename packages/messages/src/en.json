@@ -767,5 +767,10 @@
   "driver.sun.hint": "Brighter screen with stronger contrast, for bright sun.",
   "settings.bigText.title": "Bigger text",
   "settings.bigText.hint": "All words in Pohnch a little larger.",
-  "rain.short": "Raining"
+  "rain.short": "Raining",
+  "kids.over": "{name}: today's trip is over",
+  "kids.vanOff": "{name}: the van is off today",
+  "s2.free.price": "Rs 0",
+  "parent.family.phoneHint": "03xx xxxxxxx",
+  "s2.req.opened": "Open now"
 }

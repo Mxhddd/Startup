@@ -38,11 +38,13 @@ export function createQueue(store: QueueStore, send: Send, onChange?: (pending: 
     },
     /** Remove an item not yet sent (e.g. undone while offline). Returns true if it was still waiting. */
     async remove(id: string) {
+      // In place, so a flush in progress sees it too (it holds the same array).
       const list = await ready();
-      const before = list.length;
-      items = list.filter((x) => x.id !== id);
+      const i = list.findIndex((x) => x.id === id);
+      if (i < 0) return false;
+      list.splice(i, 1);
       await changed();
-      return items.length < before;
+      return true;
     },
     async pending() {
       return (await ready()).length;
@@ -64,7 +66,9 @@ export function createQueue(store: QueueStore, send: Send, onChange?: (pending: 
               if (err.retryable) return { sent, stoppedOffline: true };
               dropped.push({ item: head, code: err.code });
             }
-            list.shift();
+            // Remove by id: the head may already have been taken out (undone) while it was being sent.
+            const at = list.findIndex((x) => x.id === head.id);
+            if (at >= 0) list.splice(at, 1);
             await changed();
           }
           return { sent, stoppedOffline: false };

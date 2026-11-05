@@ -73,7 +73,7 @@ const VanActivity = (p: VanActivityProps, env: LiveActivityEnvironment) => {
       {names.map((n, i) => (
         <HStack key={n} spacing={4}>
           <Circle modifiers={[frame({ width: 9, height: 9 }), foregroundStyle(i < (p.steps ?? 0) ? accent : 'rgba(250,246,238,0.25)')]} />
-          <Text modifiers={[font({ weight: i < (p.steps ?? 0) ? 'bold' : 'regular', size: 13 }), foregroundStyle(i < (p.steps ?? 0) ? ghee : muted), lineLimit(1)]}>{n}</Text>
+          <Text modifiers={[font({ weight: i < (p.steps ?? 0) ? 'bold' : 'regular', size: 14 }), foregroundStyle(i < (p.steps ?? 0) ? ghee : muted), lineLimit(1)]}>{n}</Text>
         </HStack>
       ))}
     </HStack>
@@ -92,7 +92,7 @@ const VanActivity = (p: VanActivityProps, env: LiveActivityEnvironment) => {
           {star(26, ground)}
           <Text modifiers={[font({ weight: 'bold', size: 15 }), foregroundStyle(ghee), lineLimit(1)]}>{p.lead}</Text>
           <Spacer />
-          <Text modifiers={[font({ weight: 'semibold', size: 13 }), foregroundStyle(muted)]}>Pohnch</Text>
+          <Text modifiers={[font({ weight: 'semibold', size: 14 }), foregroundStyle(muted)]}>Pohnch</Text>
         </HStack>
         <HStack alignment="lastTextBaseline" spacing={10}>
           {minutesBig(42)}
@@ -117,7 +117,7 @@ const VanActivity = (p: VanActivityProps, env: LiveActivityEnvironment) => {
     ),
     minimal: (
       <Gauge value={p.progress} modifiers={[gaugeStyle('circularCapacity'), tint(accent)]}>
-        <Text modifiers={[font({ weight: 'bold', size: 11 }), foregroundStyle(ghee)]}>{p.initial}</Text>
+        <Text modifiers={[font({ weight: 'bold', size: 14 }), foregroundStyle(ghee)]}>{p.initial}</Text>
       </Gauge>
     ),
     expandedLeading: (

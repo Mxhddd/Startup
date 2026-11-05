@@ -47,23 +47,32 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
 
   // Tapping any Pohnch notification (or its "Open trip" button) opens the map; "Off today" opens the
   // chutti calendar with today already chosen, for the child in the alert.
+  // Audit: the handler reads the latest store through a ref (it used to keep the first render's).
+  const storeRef = useRef(p);
+  storeRef.current = p;
   useEffect(() => {
-    const sub = Notifications.addNotificationResponseReceivedListener((r) => {
-      const data = r.notification.request.content.data as { children?: unknown; trip?: unknown } | undefined;
+    const handle = (r: Notifications.NotificationResponse) => {
+      const data = r.notification.request.content.data as { children?: unknown; trip?: unknown; url?: unknown } | undefined;
       if (r.actionIdentifier === 'ready') {
         // "We're ready" straight from the alert: tell the driver, then show the map.
         const kid = Array.isArray(data?.children) && typeof data.children[0] === 'string' ? data.children[0] : null;
-        if (kid && typeof data?.trip === 'string') parent.sayReady(data.trip, kid).then(() => p.actions.refresh()).catch(() => undefined);
+        if (kid && typeof data?.trip === 'string') parent.sayReady(data.trip, kid).then(() => storeRef.current.actions.refresh()).catch(() => undefined);
         router.navigate('/');
       } else if (r.actionIdentifier === 'chutti') {
-        const kids = (r.notification.request.content.data as { children?: unknown } | undefined)?.children;
-        const child = Array.isArray(kids) && typeof kids[0] === 'string' ? kids[0] : undefined;
+        const child = Array.isArray(data?.children) && typeof data.children[0] === 'string' ? data.children[0] : undefined;
         router.navigate({ pathname: '/chutti', params: { quick: 'today', ...(child ? { child } : {}) } });
-      } else if (typeof (data as { url?: unknown } | undefined)?.url === 'string' && String((data as { url: string }).url).startsWith('/')) {
+      } else if (typeof data?.url === 'string' && data.url.startsWith('/')) {
         // v12: local alerts that open a page (the Friday story).
-        router.navigate((data as { url: string }).url as '/story');
+        router.navigate(data.url as '/story');
       } else router.navigate('/');
-    });
+    };
+    const sub = Notifications.addNotificationResponseReceivedListener(handle);
+    // Audit: a tap that opened the app from closed arrives before this listener exists; handle it once.
+    Notifications.getLastNotificationResponseAsync()
+      .then((r) => {
+        if (r && Date.now() - r.notification.date < 60_000) handle(r);
+      })
+      .catch(() => undefined);
     // A new alert while the app is open, or coming back to the app: keep only the newest step alert.
     const got = Notifications.addNotificationReceivedListener(() => void tidyStepAlerts());
     const app = AppState.addEventListener('change', (s) => s === 'active' && void tidyStepAlerts());
@@ -106,7 +115,8 @@ export function TripNotifications({ signedIn }: { signedIn: boolean }) {
         startedAt,
         stopsAhead: p.stopsAhead,
         stale: p.signal?.stale ?? false,
-        secondsAgo: p.signal?.secondsAgo ?? 0,
+        // Audit: in 30-second steps, so a stale card isn't re-sent every second.
+        secondsAgo: Math.floor((p.signal?.secondsAgo ?? 0) / 30) * 30,
         lastStep,
         text,
       })

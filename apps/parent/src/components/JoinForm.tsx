@@ -4,7 +4,7 @@ import { ApiError, tokenFromInviteLink } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
 import { AppText, ChoiceChip, SectionCaption, TapButton, TextField } from '@pohnch/ui/native';
 import { router } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useParent } from '../state/ParentStore';
 
@@ -13,6 +13,10 @@ export function JoinForm({ initialToken }: { initialToken?: string }) {
   const p = useParent();
   const [link, setLink] = useState(initialToken ? `https://pohnch.pk/i/${initialToken}` : '');
   const [childId, setChildId] = useState<string | null>(p.child?.id ?? null);
+  // Audit: the store may still be loading on first render; pick up the child once it's known.
+  useEffect(() => {
+    if (!childId && p.child) setChildId(p.child.id);
+  }, [p.child?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 

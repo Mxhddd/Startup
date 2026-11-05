@@ -33,7 +33,7 @@ function stepTint(s: MomentStep) {
 }
 
 export default function Settings() {
-  const { t, lang, toggle } = useLang();
+  const { t, lang, toggle, dir } = useLang();
   const [prefs, setPrefs] = useState<NotificationPrefs | null>(null);
   const [allowed, setAllowed] = useState(true);
   const [undecided, setUndecided] = useState(false);
@@ -85,7 +85,7 @@ export default function Settings() {
     <Page title={t('settings.title')} sub={t('settings.hint')}>
 
       {!allowed ? (
-        <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 12, padding: 16, borderRadius: 28, borderCurve: 'continuous', backgroundColor: colors.kesarTint }}>
+        <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 28, borderCurve: 'continuous', backgroundColor: colors.kesarTint }}>
           <AppText bold style={{ flex: 1 }}>{t('settings.off')}</AppText>
           <PressableScale accessibilityRole="button" testID="alerts-allow"
             onPress={() => (undecided ? askForAlerts().then((ok) => { setAllowed(ok); setUndecided(false); if (ok) registerForPush().catch(() => undefined); }) : Linking.openSettings())} faceStyle={{ height: 44, paddingHorizontal: 16, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.night, justifyContent: 'center' }}>
@@ -134,7 +134,7 @@ export default function Settings() {
 
       {/* v9: every step's tone, to hear before it comes (the alert is its longer twin). */}
       <SectionCaption>{t('settings.sound.board')}</SectionCaption>
-      <View style={{ flexDirection: 'row-reverse', flexWrap: 'wrap', gap: 8 }}>
+      <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', flexWrap: 'wrap', gap: 8 }}>
         {ALERT_STEPS.map((s) => (
           <PressableScale key={s} accessibilityRole="button" accessibilityLabel={`${t('settings.sound.hear')} ${t(`settings.step.${s}`)}`} haptic="none"
             onPress={() => { feel(s); setPlaying(s); }} testID={`hear-${s}`}

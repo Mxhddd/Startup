@@ -8,7 +8,7 @@
 // - Under it, one quiet row: the driver, the plate, and three round actions.
 // - Further down (seen when the sheet is open): today's timeline.
 // - When a step happens while you watch, its moment plays in the head (a ring or a star burst).
-import { arrivalClock, childPlace, homeState, newMoment, waitClock, type MomentStep } from '@pohnch/core';
+import { ApiError, arrivalClock, childPlace, homeState, newMoment, waitClock, type MomentStep } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
 import { AbsentChip, AppText, RouteRibbon, StarSpinner, ArchAvatar, ArchShape, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
 import { router } from 'expo-router';
@@ -94,11 +94,22 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
     seen.current = { child: p.child?.id ?? null, items, arriving: p.timeline.arriving };
   }, [p.timeline, p.child?.id]);
 
-  const inviteDriver = async () => {
-    if (!p.child) return;
-    const { url } = await data.parentApi.inviteDriver(p.child.id);
-    await Share.share({ message: `${t('parent.inviteDriver.message')}\n${url}` });
+  // Audit: a tap that fails (no signal, or the van already left) says so instead of failing silently.
+  const [actionError, setActionError] = useState<string | null>(null);
+  const attempt = (fn: () => Promise<unknown>) => {
+    setActionError(null);
+    fn().catch((e: unknown) => {
+      const code = e instanceof ApiError ? e.code : 'offline';
+      setActionError(code === 'van_already_left' ? t('parent.chutti.locked') : code === 'offline' ? t('error.offline') : t('error.generic'));
+    });
   };
+  const toggleChutti = () => attempt(() => p.actions.toggleChutti(p.today));
+  const inviteDriver = () =>
+    attempt(async () => {
+      if (!p.child) return;
+      const { url } = await data.parentApi.inviteDriver(p.child.id);
+      await Share.share({ message: `${t('parent.inviteDriver.message')}\n${url}` });
+    });
 
   if (p.phase === 'notConfigured' || p.phase === 'error') {
     return (
@@ -127,6 +138,7 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
       <Onboard title={t('parent.notOnVan.title', { name })} body={t('parent.notOnVan.body')}>
         <TapButton tone="left" icon="route" label={t('parent.join')} onConfirm={() => router.push('/join')} testID="open-join" />
         <TapButton label={t('parent.inviteDriver')} icon="share" onConfirm={inviteDriver} testID="invite-driver" />
+        {actionError ? <AppText bold color={colors.dangerText}>{actionError}</AppText> : null}
       </Onboard>
     );
   }
@@ -274,11 +286,12 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
           label={p.absentToday ? t('parent.action.chuttiUndo') : t('parent.action.chutti')}
           on={p.absentToday}
           disabled={p.absentToday ? !canUndo : !canSetChutti}
-          onPress={() => p.actions.toggleChutti(p.today)}
+          onPress={toggleChutti}
           testID="chutti"
         />
         <CircleAction icon="family" label={t('parent.action.family')} onPress={() => router.push('/family')} testID="open-family" />
       </Animated.View>
+      {actionError ? <AppText bold color={colors.dangerText} testID="sheet-error">{actionError}</AppText> : null}
 
       {/* Planned days off: a quiet link while no trip is running. */}
       {!live && p.membership?.status === 'approved' ? (
@@ -302,7 +315,7 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
       {/* v9: the one obvious next thing for this state of the day (homeState in @pohnch/core). */}
       {next.action === 'offToday' && canSetChutti ? (
         <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout}>
-          <TapButton tone="quiet" icon="calendar" label={t('parent.chutti.offToday')} onConfirm={() => p.actions.toggleChutti(p.today)} testID="next-off-today" />
+          <TapButton tone="quiet" icon="calendar" label={t('parent.chutti.offToday')} onConfirm={toggleChutti} testID="next-off-today" />
         </Animated.View>
       ) : next.action === 'week' ? (
         <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout}>
@@ -320,7 +333,7 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
       {p.absentToday ? (
         <Animated.View layout={layout} style={{ gap: space.sm }}>
           <AppText bold>{t('parent.chutti.on', { name })}</AppText>
-          {p.canUndoChuttiToday ? <AbsentChip onUndo={() => p.actions.toggleChutti(p.today)} /> : <AppText variant="small" color={colors.ink2}>{t('parent.chutti.locked')}</AppText>}
+          {p.canUndoChuttiToday ? <AbsentChip onUndo={toggleChutti} /> : <AppText variant="small" color={colors.ink2}>{t('parent.chutti.locked')}</AppText>}
         </Animated.View>
       ) : (
         <Animated.View entering={FadeIn.duration(300)} layout={layout} style={{ gap: space.sm, paddingTop: space.xs }}>

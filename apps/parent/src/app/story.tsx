@@ -24,6 +24,8 @@ export default function Story() {
   const { t, dir } = useLang();
   const p = useParent();
   const [days, setDays] = useState<(StoryDay & { label: string })[] | null>(null);
+  // Audit: this week's chutti days (the store only holds today and later), so they don't break the streak.
+  const [pastOff, setPastOff] = useState<string[]>([]);
   const [failed, setFailed] = useState(false);
   const tilt = useTilt();
   const card = useRef<ComponentRef<typeof View>>(null);
@@ -49,7 +51,11 @@ export default function Story() {
         const wd = new Date(`${date}T12:00:00+05:00`).getUTCDay();
         out.push({ date, rode, minutes: story?.minutes ?? null, label: t(`dayShort.${wd}` as 'dayShort.0') });
       }
-      if (live) setDays(out);
+      const off = await parent.absenceDates(child.id, addDays(p.today, -7)).catch(() => [] as string[]);
+      if (live) {
+        setPastOff(off);
+        setDays(out);
+      }
     })().catch(() => live && setFailed(true));
     return () => {
       live = false;
@@ -59,7 +65,7 @@ export default function Story() {
   const s = days ? weekStory(days) : null;
   const labels = new Map((days ?? []).map((d) => [d.date, d.label]));
   // v12: school days in a row the child rode (newest first; chutti days don't break it).
-  const streak = days ? onTimeStreak(days.map((d) => ({ rode: d.rode, off: p.absences.includes(d.date) }))) : 0;
+  const streak = days ? onTimeStreak(days.map((d) => ({ rode: d.rode, off: pastOff.includes(d.date) }))) : 0;
 
   const share = async () => {
     const line = s ? `${t('story.title', { name })} · ${t('story.line', { n: s.rode, of: s.schoolDays })}` : t('story.title', { name });

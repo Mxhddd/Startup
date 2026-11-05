@@ -69,7 +69,7 @@ const LiveTrip = (p: LiveTripProps) => {
             {(p.marks ?? '').split('|').map((n, i) => (
               <Row key={n} horizontalArrangement={{ spacedBy: 4 }} verticalAlignment="center">
                 <Box modifiers={[size(9, 9), cornerRadius(5), background(i < (p.steps ?? 0) ? accent : '#E6E9F5')]} />
-                <Text color={i < (p.steps ?? 0) ? ink : ink2} maxLines={1} style={{ fontSize: 13, fontWeight: i < (p.steps ?? 0) ? '700' : '500' }}>{n}</Text>
+                <Text color={i < (p.steps ?? 0) ? ink : ink2} maxLines={1} style={{ fontSize: 14, fontWeight: i < (p.steps ?? 0) ? '700' : '500' }}>{n}</Text>
               </Row>
             ))}
           </Row>

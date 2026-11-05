@@ -134,9 +134,9 @@ export async function stopsAhead(childId: string): Promise<number | null> {
   return check(await db().supabase.rpc('stops_ahead', { p_child: childId })) as number | null;
 }
 
-export async function absenceDates(childId: string): Promise<string[]> {
+export async function absenceDates(childId: string, from: string = karachiDate(new Date())): Promise<string[]> {
   const rows = check(
-    await db().supabase.from('absences').select('service_date').eq('child_id', childId).gte('service_date', karachiDate(new Date())),
+    await db().supabase.from('absences').select('service_date').eq('child_id', childId).gte('service_date', from),
   ) as { service_date: string }[];
   return rows.map((r) => r.service_date);
 }

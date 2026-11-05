@@ -17,7 +17,7 @@ import { useParent } from '../state/ParentStore';
 import { takeInvite } from '../state/pendingInvite';
 
 export default function ChildPage() {
-  const { t } = useLang();
+  const { t, dir } = useLang();
   const p = useParent();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const existing = id ? p.children.find((c) => c.id === id) ?? null : null;
@@ -99,7 +99,7 @@ export default function ChildPage() {
           <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 36, experimental_backgroundImage: `linear-gradient(180deg, ${colors.ghee}, transparent)` }} />
           <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 36, experimental_backgroundImage: `linear-gradient(0deg, ${colors.ghee}, transparent)` }} />
         </View>
-        <View style={{ flexDirection: 'row-reverse', alignItems: 'center', gap: 6, paddingHorizontal: 6 }}>
+        <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, paddingHorizontal: 6 }}>
           <Icon name="shield" size={16} color={colors.zamurrad} />
           <AppText variant="small" color={colors.ink2} style={{ flex: 1 }}>{t('parent.child.pinHint')}</AppText>
         </View>
