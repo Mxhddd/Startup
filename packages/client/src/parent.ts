@@ -126,7 +126,7 @@ export type TrailPoint = { lat: number; lng: number; speed: number | null; recor
 /** The van's last ~2-3 minutes (newest first): speeds for the ETA, points for the trail on the map. */
 export async function recentPositions(tripId: string, limit = 30): Promise<TrailPoint[]> {
   return check(
-    await db().supabase.from('positions').select('lat, lng, speed, recorded_at').eq('trip_id', tripId).order('recorded_at', { ascending: false }).limit(limit),
+    await db().supabase.from('position_points').select('lat, lng, speed, recorded_at').eq('trip_id', tripId).order('recorded_at', { ascending: false }).limit(limit),
   ) as TrailPoint[];
 }
 
@@ -226,12 +226,8 @@ export async function setAlertLanguage(lang: 'ur' | 'en'): Promise<void> {
 
 /** Saves an iPhone Live Activity token so the server can update the card on a locked phone. */
 export async function registerActivityToken(t: { token: string; kind: 'update' | 'start' | 'android'; tripId?: string; childId?: string }): Promise<void> {
-  const { supabase } = db();
-  check(
-    await supabase
-      .from('live_activity_tokens')
-      .upsert({ token: t.token, kind: t.kind, trip_id: t.tripId ?? null, child_id: t.childId ?? null }, { onConflict: 'token', ignoreDuplicates: true }),
-  );
+  // The server moves the token to this trip (Android gives one token per phone, used for every trip).
+  check(await db().supabase.rpc('register_live_token', { p_token: t.token, p_kind: t.kind, p_trip: t.tripId ?? null, p_child: t.childId ?? null }));
 }
 
 // ---- v12
@@ -255,7 +251,8 @@ export async function sendSignal(childId: string, kind: SignalKind): Promise<voi
   const { supabase } = db();
   const uid = (await supabase.auth.getUser()).data.user?.id;
   if (!uid) return;
-  check(await supabase.from('signals').insert({ child_id: childId, kind, created_by: uid }));
+  // One of each kind a day: a second tap is simply ignored.
+  check(await supabase.from('signals').upsert({ child_id: childId, kind, created_by: uid }, { onConflict: 'child_id,service_date,kind', ignoreDuplicates: true }));
 }
 
 /** Signals this family already sent today for a child. */
@@ -265,15 +262,9 @@ export async function signalsToday(childId: string): Promise<SignalKind[]> {
   return rows.map((r) => r.kind);
 }
 
-/** Off for just one run: on = true adds, false removes. */
+/** Off for just one run: on = true adds, false removes. Through the server, which refuses once that run has started today. */
 export async function setRunAbsence(childId: string, date: string, kind: RunKind, on: boolean): Promise<void> {
-  const { supabase } = db();
-  if (on) {
-    const uid = (await supabase.auth.getUser()).data.user?.id;
-    check(await supabase.from('run_absences').upsert({ child_id: childId, service_date: date, kind, created_by: uid }, { onConflict: 'child_id,service_date,kind', ignoreDuplicates: true }));
-  } else {
-    check(await supabase.from('run_absences').delete().eq('child_id', childId).eq('service_date', date).eq('kind', kind));
-  }
+  await db().api('run_absence.set', { childId, date, kind, off: on });
 }
 
 export async function runAbsences(childId: string, from: string): Promise<{ date: string; kind: RunKind }[]> {
@@ -308,6 +299,6 @@ export async function collectFound(id: string): Promise<void> {
 
 /** One trip's positions in order, for the ride replay (only trips this family can see). */
 export async function tripPath(tripId: string): Promise<{ lat: number; lng: number; at: string }[]> {
-  const rows = check(await db().supabase.from('positions').select('lat, lng, recorded_at').eq('trip_id', tripId).order('recorded_at').limit(2000)) as { lat: number; lng: number; recorded_at: string }[];
+  const rows = check(await db().supabase.from('position_points').select('lat, lng, recorded_at').eq('trip_id', tripId).order('recorded_at').limit(1000)) as { lat: number; lng: number; recorded_at: string }[];
   return rows.map((r) => ({ lat: r.lat, lng: r.lng, at: r.recorded_at }));
 }

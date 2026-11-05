@@ -45,7 +45,7 @@ const KNOWN: Record<string, number> = {
   trip_not_running: 409, trip_already_running: 409, trip_already_done: 409, van_day_off: 409,
   already_decided: 409, child_already_on_a_van: 409, van_already_left: 409, family_full: 409,
   child_not_on_van: 422, children_required: 422, step_not_tappable: 422, van_step_has_no_children: 422,
-  stop_not_on_van: 422, position_out_of_range: 422, date_in_past: 422,
+  stop_not_on_van: 422, position_out_of_range: 422, date_in_past: 422, bad_date: 422, van_not_found: 404,
 };
 
 class DbError extends Error {}
@@ -193,11 +193,22 @@ export const actions: Record<string, Action> = {
   'run.change': async ({ actor, body, deps }) => {
     const van = uuid(body, 'vanId');
     const kind = oneOf(body, 'kind', ['morning', 'afternoon'] as const);
-    const date = typeof body.date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(body.date) ? body.date : (() => { throw new BadInput('date'); })();
+    const day = date(body, 'date');
     const time = body.time === null ? null : typeof body.time === 'string' && /^([01]\d|2[0-3]):[0-5]\d$/.test(body.time) ? body.time : (() => { throw new BadInput('time'); })();
-    await call(deps, 'set_run_change', { p_actor: actor, p_van: van, p_date: date, p_kind: kind, p_time: time });
-    const driver = typeof body.driverName === 'string' ? body.driverName.slice(0, 40) : '';
+    // The driver's name for the families' push comes from their profile, never from the phone.
+    const name = await call(deps, 'set_run_change', { p_actor: actor, p_van: van, p_date: day, p_kind: kind, p_time: time });
+    const driver = typeof name === 'string' ? name.slice(0, 40) : '';
     if (deps.notifyNotice) await deps.notifyNotice({ vanId: van, job: { kind: 'time', run: kind, time, driver } });
+    return { ok: true };
+  },
+  // Audit: off for one run, through the server (refused once that run has started today).
+  'run_absence.set': async ({ actor, body, deps }) => {
+    await call(deps, 'set_run_absence', { p_actor: actor, p_child: uuid(body, 'childId'), p_date: date(body, 'date'), p_kind: oneOf(body, 'kind', ['morning', 'afternoon'] as const), p_off: bool(body, 'off') });
+    return { ok: true };
+  },
+  // Audit: "the van is empty", queued on the phone like a tap so it survives no signal.
+  'trip.seatCheck': async ({ actor, body, deps }) => {
+    await call(deps, 'set_seat_checked', { p_actor: actor, p_trip: uuid(body, 'tripId') });
     return { ok: true };
   },
   // v12: the Pohnch team posts a notice for one van or everyone (closed roads, rain, strikes).
@@ -245,7 +256,7 @@ export const LIMITS: Record<string, [max: number, windowS: number]> = {
   'membership.decide': [200, HOUR], 'absence.set': [60, HOUR], 'absence.clear': [60, HOUR], 'dayoff.set': [30, DAY],
   'family.add': [10, DAY], 'family.removeMember': [20, DAY], 'account.delete': [5, DAY], 'van.leave': [20, HOUR], 'rider.remove': [60, HOUR],
   'admin.verify': [300, HOUR], 'admin.switchOff': [300, HOUR], 'admin.endTrip': [300, HOUR],
-  'run.change': [20, DAY], 'admin.notice': [30, DAY],
+  'run.change': [20, DAY], 'admin.notice': [30, DAY], 'run_absence.set': [60, HOUR], 'trip.seatCheck': [40, HOUR],
 };
 
 const json = (status: number, body: unknown) =>

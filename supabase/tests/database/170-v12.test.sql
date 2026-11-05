@@ -40,8 +40,10 @@ select is((select minutes from public.child_ride_minutes(tests.id('ali')) where 
 select throws_ok($$select * from public.child_ride_minutes(tests.id('hamza'))$$, 'P0001', 'not_your_child', 'not for someone else''s child');
 
 -- ---- one run off
-select lives_ok($$insert into public.run_absences (child_id, service_date, kind, created_by) values (tests.id('ali'), (now() at time zone 'Asia/Karachi')::date, 'afternoon', tests.id('pa'))$$, 'Ali is off this afternoon only');
-select throws_ok($$insert into public.run_absences (child_id, service_date, kind, created_by) values (tests.id('hamza'), (now() at time zone 'Asia/Karachi')::date, 'afternoon', tests.id('pa'))$$, '42501', null, 'not for someone else''s child');
+select tests.as_admin_db();
+select tests.as_service();
+select lives_ok($$select public.set_run_absence(tests.id('pa'), tests.id('ali'), (now() at time zone 'Asia/Karachi')::date, 'afternoon', true)$$, 'Ali is off this afternoon only');
+select throws_ok($$select public.set_run_absence(tests.id('pa'), tests.id('hamza'), (now() at time zone 'Asia/Karachi')::date, 'afternoon', true)$$, 'P0001', 'not_your_child', 'not for someone else''s child');
 select tests.as_admin_db();
 select is(private.off_for(tests.id('ali'), private.karachi_today(), 'afternoon'), true, 'off for the afternoon run');
 select is(private.off_for(tests.id('ali'), private.karachi_today(), 'morning'), false, 'still riding in the morning');

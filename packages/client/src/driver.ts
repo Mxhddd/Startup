@@ -219,7 +219,6 @@ export async function markCollected(id: string): Promise<void> {
 
 export const v12Api = {
   /** A one-day start time for a run (time "HH:MM", or null to go back to the usual time). Families are told. */
-  runChange: (vanId: string, kind: RunKind, date: string, time: string | null, driverName: string) =>
-    db().api('run.change', { vanId, kind, date, time, driverName }),
+  runChange: (vanId: string, kind: RunKind, date: string, time: string | null) => db().api('run.change', { vanId, kind, date, time }),
   rainDelay: (tripId: string, clientId: string) => db().api('late', { tripId, reason: 'rain', clientId }),
 };

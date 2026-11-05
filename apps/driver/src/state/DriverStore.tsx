@@ -223,7 +223,7 @@ function useDriverState() {
     /** v12: a one-day start time for a run (null = back to usual). Families are told by push. */
     async changeTime(kind: 'morning' | 'afternoon', date: string, time: string | null) {
       if (!s.van) return;
-      await driver.v12Api.runChange(s.van.id, kind, date, time, s.name ?? '');
+      await driver.v12Api.runChange(s.van.id, kind, date, time);
       await refresh();
     },
     async markFound(childId: string, what: driver.FoundItem['what']) {
