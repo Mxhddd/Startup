@@ -44,6 +44,9 @@ test('try it: a quick tap is not enough (hold to confirm), and "Off today" can b
 test('a promise sticker flips over to explain itself', async ({ page }) => {
   await page.goto('/en');
   const s = page.getByTestId('sticker-1');
+  const face = await s.locator('.f').boundingBox();
+  expect(face!.width).toBeGreaterThan(120);
+  expect(face!.height).toBeGreaterThan(100);
   await s.click();
   await expect(s).toHaveAttribute('aria-pressed', 'true');
   await expect(s).toContainText('never at other times');
