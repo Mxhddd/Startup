@@ -1,8 +1,8 @@
-// The inner pages (v13), in either language: drivers, safety, download, delete account, terms.
-// Each is a short paper-cut street with the title, then paper cards. Words from packages/messages.
+// The inner pages (v14), in either language: drivers, safety, download, delete account, terms. Each is
+// an editorial page on ivory paper: the van drawing, a big title, gilt rules, numbered steps, no boxes.
+// Words from packages/messages.
 import { PILOT_WHATSAPP } from '@pohnch/core';
 import { t, type Lang, type MessageKey } from '@pohnch/messages';
-import { PROMISES } from './Landing';
 import { href } from './_lib/links';
 import { PageHead } from './_components/PageHead';
 import { Shell } from './Shell';
@@ -10,113 +10,103 @@ import { Shell } from './Shell';
 const wa = `https://wa.me/${PILOT_WHATSAPP.waNumber}`;
 const k = (lang: Lang, key: string) => t(lang, key as MessageKey);
 const other = (lang: Lang, path: string) => (lang === 'ur' ? `/en${path}` : path);
+export const PROMISES = ['verified', 'trip', 'gone', 'names', 'seat', 'calm', 'help'] as const;
+const Arrow = () => <svg width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6h19M15 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
 export function DriversPage({ lang }: { lang: Lang }) {
-  const ur = lang === 'ur';
   return (
     <Shell lang={lang} otherHref={other(lang, '/drivers')}>
-      <PageHead title={k(lang, 'site.drv.title')} ur={ur} time="evening" />
-      <div className="wrap section" style={{ paddingTop: 40 }}>
-        <p className="lead">{k(lang, 'site.drv.lead')}</p>
-        <div className="cards">
-          {[1, 2, 3, 4].map((n) => (
-            <div key={n} className="card paper"><h3>{k(lang, `site.drv.f${n}.t`)}</h3><p>{k(lang, `site.drv.f${n}.b`)}</p></div>
-          ))}
+      <PageHead title={k(lang, 'site.drv.title')} lead={k(lang, 'site.drv.lead')} />
+      <div className="ed-wrap">
+        <hr />
+        <div className="facts">
+          {[1, 2, 3, 4].map((n) => <div key={n}><h3>{k(lang, `site.drv.f${n}.t`)}</h3><p>{k(lang, `site.drv.f${n}.b`)}</p></div>)}
         </div>
-        <h2 className="h2" style={{ fontSize: 30 }}>{k(lang, 'site.drv.how.title')}</h2>
-        <ol className="steps">{[1, 2, 3].map((n) => <li key={n}>{k(lang, `site.drv.how.${n}`)}</li>)}</ol>
-        <p style={{ marginTop: 28 }}><a className="key key-kesar" href={wa} rel="noreferrer" style={{ height: 60, padding: '0 24px', fontSize: 18 }}>{k(lang, 'site.drivers.cta')} <bdi dir="ltr" className="latin">{PILOT_WHATSAPP.display}</bdi></a></p>
+        <hr />
+        <h2>{k(lang, 'site.drv.how.title')}</h2>
+        <ol className="steps" style={{ marginTop: 24 }}>{[1, 2, 3].map((n) => <li key={n}>{k(lang, `site.drv.how.${n}`)}</li>)}</ol>
+        <div className="cta-row">
+          <a className="pill" href={wa} rel="noreferrer">{k(lang, 'site.drivers.cta')} <bdi dir="ltr" className="num">{PILOT_WHATSAPP.display}</bdi></a>
+          <a className="go" href={href(lang, '/')}>{k(lang, 'journey.again')}<Arrow /></a>
+        </div>
       </div>
     </Shell>
   );
 }
 
 export function SafetyPage({ lang }: { lang: Lang }) {
-  const ur = lang === 'ur';
   return (
     <Shell lang={lang} otherHref={other(lang, '/safety')}>
-      <PageHead title={k(lang, 'site.safety.title')} ur={ur} time="noon" />
-      <div className="wrap section" style={{ paddingTop: 40 }}>
-        <p className="lead">{k(lang, 'site.safety.lead')}</p>
-        <div className="cards">
-          {PROMISES.map((p) => (
-            <div key={p} className="card paper"><h3>{k(lang, `site.p.${p}`)}</h3><p>{k(lang, `site.p.${p}.b`)}</p></div>
-          ))}
+      <PageHead title={k(lang, 'site.safety.title')} lead={k(lang, 'site.safety.lead')} />
+      <div className="ed-wrap">
+        <hr />
+        <div className="facts">
+          {PROMISES.map((p) => <div key={p}><h3>{k(lang, `site.p.${p}`)}</h3><p>{k(lang, `site.p.${p}.b`)}</p></div>)}
         </div>
-        <div className="card pressed" style={{ maxWidth: 760 }}>
-          <h3>{k(lang, 'site.safety.never')}</h3>
-          <p style={{ color: 'var(--siyahi)' }}>{k(lang, 'privacy.never.body')}</p>
+        <hr />
+        <div className="prose">
+          <h2>{k(lang, 'site.safety.never')}</h2>
+          <p>{k(lang, 'privacy.never.body')}</p>
         </div>
-        <p style={{ marginTop: 24 }}><a href={href(lang, '/privacy')} style={{ color: 'var(--neel)', fontWeight: 800 }}>{k(lang, 'site.safety.policy')}</a></p>
+        <div className="cta-row"><a className="go" href={href(lang, '/privacy')}>{k(lang, 'site.safety.policy')}<Arrow /></a></div>
       </div>
     </Shell>
   );
 }
 
 export function DownloadPage({ lang }: { lang: Lang }) {
-  const ur = lang === 'ur';
-  const app = (name: string, dark: boolean) => (
-    <div className="app-card paper">
-      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-        <span className="app-icon lacquer" aria-hidden="true" style={{ display: 'grid', placeItems: 'center', background: dark ? undefined : 'linear-gradient(160deg,#F4BF66,#E8A33D)' }}>
-          <svg width="34" height="34" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" fill={dark ? '#E8A33D' : '#1F2A5C'} /><rect x="5" y="5" width="14" height="14" fill={dark ? '#E8A33D' : '#1F2A5C'} transform="rotate(45 12 12)" /><circle cx="12" cy="12" r="3.4" fill={dark ? '#1F2A5C' : '#F4BF66'} /></svg>
-        </span>
-        <b style={{ fontSize: 20 }}>{name}</b>
-      </div>
-      <div className="store">
-        <span className="key key-sand" aria-disabled="true" style={{ cursor: 'default' }}>{k(lang, 'site.dl.play')} <span className="badge-soon">{k(lang, 'site.dl.soon')}</span></span>
-        <span className="key key-sand" aria-disabled="true" style={{ cursor: 'default' }}>{k(lang, 'site.dl.apple')} <span className="badge-soon">{k(lang, 'site.dl.soon')}</span></span>
-      </div>
+  const app = (name: string) => (
+    <div>
+      <h3>{name}</h3>
+      <div className="stores"><span>{k(lang, 'site.dl.play')} · {k(lang, 'site.dl.apple')}</span><span className="soon">{k(lang, 'site.dl.soon')}</span></div>
     </div>
   );
   return (
     <Shell lang={lang} otherHref={other(lang, '/download')}>
-      <PageHead title={k(lang, 'site.dl.kicker')} ur={ur} time="morning" />
-      <div className="wrap section" style={{ paddingTop: 40 }}>
-        <p className="lead">{k(lang, 'site.dl.lead')}</p>
-        <div className="apps">{app(k(lang, 'site.dl.parentApp'), true)}{app(k(lang, 'site.dl.driverApp'), false)}</div>
-        <div className="card paper" style={{ marginTop: 28, maxWidth: 760 }}>
-          <h3>{k(lang, 'site.dl.steps.title')}</h3>
-          <ol className="steps" style={{ marginTop: 14 }}>{[1, 2, 3].map((n) => <li key={n}>{k(lang, `site.dl.step${n}`)}</li>)}</ol>
-          <p style={{ marginTop: 20 }}><a className="key key-green" href={wa} rel="noreferrer" style={{ height: 56, padding: '0 22px', fontSize: 17 }}>{k(lang, 'site.dl.join')}</a></p>
-        </div>
+      <PageHead title={k(lang, 'site.dl.kicker')} lead={k(lang, 'site.dl.lead')} />
+      <div className="ed-wrap">
+        <hr />
+        <div className="facts">{app(k(lang, 'site.dl.parentApp'))}{app(k(lang, 'site.dl.driverApp'))}</div>
+        <hr />
+        <h2>{k(lang, 'site.dl.steps.title')}</h2>
+        <ol className="steps" style={{ marginTop: 24 }}>{[1, 2, 3].map((n) => <li key={n}>{k(lang, `site.dl.step${n}`)}</li>)}</ol>
+        <div className="cta-row"><a className="pill" href={wa} rel="noreferrer">{k(lang, 'site.dl.join')}</a></div>
       </div>
     </Shell>
   );
 }
 
 export function DeletePage({ lang }: { lang: Lang }) {
-  const ur = lang === 'ur';
   return (
     <Shell lang={lang} otherHref={other(lang, '/delete-account')}>
-      <PageHead title={k(lang, 'site.del.title')} ur={ur} time="noon" />
-      <div className="wrap section prose" style={{ paddingTop: 40 }}>
-        <p className="lead">{k(lang, 'site.del.lead')}</p>
-        <ol className="steps" style={{ marginTop: 24 }}>
+      <PageHead title={k(lang, 'site.del.title')} lead={k(lang, 'site.del.lead')} />
+      <div className="ed-wrap">
+        <hr />
+        <ol className="steps">
           <li>{k(lang, 'site.del.parent')}</li>
           <li>{k(lang, 'site.del.driver')}</li>
-          <li>{k(lang, 'site.del.noApp')} <a href={wa} rel="noreferrer" style={{ color: 'var(--neel)', fontWeight: 800 }}><bdi dir="ltr" className="latin">{PILOT_WHATSAPP.display}</bdi></a></li>
+          <li><span>{k(lang, 'site.del.noApp')} <a href={wa} rel="noreferrer" style={{ fontWeight: 800 }}><bdi dir="ltr" className="num">{PILOT_WHATSAPP.display}</bdi></a></span></li>
         </ol>
-        <h2>{k(lang, 'site.del.what.title')}</h2>
-        <p>{k(lang, 'site.del.what')}</p>
-        <h2>{k(lang, 'site.del.keep.title')}</h2>
-        <p>{k(lang, 'site.del.keep')}</p>
+        <hr />
+        <div className="prose">
+          <section><h2>{k(lang, 'site.del.what.title')}</h2><p>{k(lang, 'site.del.what')}</p></section>
+          <section><h2>{k(lang, 'site.del.keep.title')}</h2><p>{k(lang, 'site.del.keep')}</p></section>
+        </div>
       </div>
     </Shell>
   );
 }
 
 export function TermsPage({ lang }: { lang: Lang }) {
-  const ur = lang === 'ur';
   return (
     <Shell lang={lang} otherHref={other(lang, '/terms')}>
-      <PageHead title={k(lang, 'site.terms.title')} ur={ur} time="evening" />
-      <article className="wrap section prose" style={{ paddingTop: 40 }}>
-        <p style={{ color: 'var(--ink2)', fontSize: 15 }}>{k(lang, 'site.terms.updated')}</p>
-        {[1, 2, 3, 4, 5, 6].map((n) => (
-          <section key={n}><h2>{k(lang, `site.terms.${n}.t`)}</h2><p>{k(lang, `site.terms.${n}.b`)}</p></section>
-        ))}
-      </article>
+      <PageHead title={k(lang, 'site.terms.title')} lead={k(lang, 'site.terms.updated')} />
+      <div className="ed-wrap">
+        <hr />
+        <article className="prose">
+          {[1, 2, 3, 4, 5, 6].map((n) => <section key={n}><h2>{k(lang, `site.terms.${n}.t`)}</h2><p>{k(lang, `site.terms.${n}.b`)}</p></section>)}
+        </article>
+      </div>
     </Shell>
   );
 }

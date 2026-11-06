@@ -13,7 +13,9 @@ test('the privacy policy reads in Urdu and English and says what is never kept',
 
 test('the home page links to the privacy policy', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('link', { name: 'پرائیویسی پالیسی' }).click();
+  await page.waitForFunction(() => (window as unknown as { __journey?: unknown }).__journey);
+  await page.keyboard.press('End');
+  await page.locator('#panel').getByRole('link', { name: 'پرائیویسی پالیسی' }).click();
   await expect(page).toHaveURL(/\/privacy$/);
 });
 

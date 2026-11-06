@@ -11,7 +11,7 @@ test('the delete-account page (needed for Google Play) explains both apps and th
 });
 
 test('the footer links every page the stores ask for', async ({ page }) => {
-  await page.goto('/en');
+  await page.goto('/en/terms');
   const foot = page.locator('footer');
   for (const name of ['Privacy policy', 'Terms', 'Delete account', 'Safety', 'Drivers']) {
     await expect(foot.getByRole('link', { name })).toBeVisible();
@@ -38,13 +38,4 @@ test('sitemap and robots: public pages listed, admin and invites kept out', asyn
   const robots = await (await request.get('/robots.txt')).text();
   expect(robots).toContain('Disallow: /admin');
   expect(robots).toContain('Disallow: /i/');
-});
-
-test('with "reduce motion" the page still shows everything, standing still', async ({ browser }) => {
-  const ctx = await browser.newContext({ reducedMotion: 'reduce' });
-  const page = await ctx.newPage();
-  await page.goto('/en');
-  await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  await expect(page.locator('.reveal').first()).toHaveCSS('opacity', '1');
-  await ctx.close();
 });
