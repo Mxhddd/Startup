@@ -295,3 +295,35 @@ export function childColors(index: number): { fill: string; ink: string; tint: s
   ];
   return all[((index % all.length) + all.length) % all.length]!;
 }
+
+/**
+ * v13 "Parat" (layers): three materials and one light. The light comes from the top left, so every
+ * shadow falls down and a little to the right. Values are CSS strings, shared by the website and the
+ * apps (the apps read the colours and turn the shadows into their own boxShadow).
+ */
+export const materials = {
+  /** Matte paper: cards, groups, the page ground in front of the street. */
+  paper: { fill: '#FFFDF9', rim: 'inset 0 1px 0 #FFFFFF' },
+  /** Frosted glass over the map and the street. */
+  glass: { fill: 'rgba(255,253,249,0.78)', blur: 22, rim: 'inset 0 1px 0 #FFFFFF, inset 0 0 0 1px rgba(255,255,255,0.55)' },
+  /** Deep lacquer: driver headers, the drivers band, the footer. Text on it is ghee or mutedOnDark. */
+  lacquer: { top: '#3A4A96', mid: '#1F2A5C', bottom: '#111840', gloss: 'rgba(255,255,255,0.22)' },
+  /** A surface pressed into the page (filled fields, done steps). */
+  pressed: { fill: '#F1EADD', shadow: 'inset 0 2px 4px rgba(31,42,92,0.14), inset 0 -1px 0 rgba(255,255,255,0.8)' },
+} as const;
+
+/** Elevations 1-3, all with the same light. */
+export const lift = {
+  1: '0 1px 2px rgba(31,42,92,0.08), 0 3px 8px -4px rgba(31,42,92,0.14)',
+  2: '0 1px 2px rgba(31,42,92,0.07), 0 6px 14px -6px rgba(31,42,92,0.16), 0 22px 36px -20px rgba(31,42,92,0.22)',
+  3: '0 2px 4px rgba(31,42,92,0.08), 0 14px 24px -10px rgba(31,42,92,0.22), 0 40px 60px -30px rgba(31,42,92,0.30)',
+} as const;
+
+/** The paper-cut Karachi street, tinted by the time of day: sky, far roofs, mid street, near plane. */
+export type StreetTime = 'morning' | 'noon' | 'evening' | 'night';
+export const streetColors: Record<StreetTime, { sky1: string; sky2: string; sun: string; far: string; mid: string; near: string; edge: string; haze: string }> = {
+  morning: { sky1: '#8FA9D6', sky2: '#F6D7AE', sun: '#FFE2A8', far: '#C9B7C4', mid: '#9A86A0', near: '#2B3A7E', edge: '#4A5AA8', haze: 'rgba(246,215,174,0.55)' },
+  noon: { sky1: '#7FA6D8', sky2: '#DCE8F2', sun: '#FFF4D6', far: '#B9C4D6', mid: '#7F8FB0', near: '#24316A', edge: '#3D4E9A', haze: 'rgba(220,232,242,0.55)' },
+  evening: { sky1: '#5A5E9E', sky2: '#F2A976', sun: '#FFC98A', far: '#B98D9A', mid: '#7A5F86', near: '#1F2550', edge: '#3B3F80', haze: 'rgba(242,169,118,0.45)' },
+  night: { sky1: '#0B1030', sky2: '#26306A', sun: '#F4E9C8', far: '#2A3366', mid: '#1B2250', near: '#0D1233', edge: '#2B3A7E', haze: 'rgba(38,48,106,0.5)' },
+};

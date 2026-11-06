@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { colors, stepColors, tap, type } from './theme';
+import { colors, materials, stepColors, streetColors, tap, type } from './theme';
 import { uiFont } from './lang';
 
 // WCAG contrast ratio between two hex colours.
@@ -161,5 +161,17 @@ describe('driver sunlight mode (v12)', () => {
     t.setTextScale(1);
     off();
     expect(told).toBe(2);
+  });
+
+  it('v13: text on lacquer and on paper passes 4.5:1, and the street title reads on every near plane', () => {
+    for (const c of [materials.lacquer.mid, materials.lacquer.bottom]) {
+      expect(contrast(colors.ghee, c)).toBeGreaterThanOrEqual(4.5);
+      expect(contrast(colors.mutedOnDark, c)).toBeGreaterThanOrEqual(4.5);
+    }
+    expect(contrast(colors.siyahi, materials.paper.fill)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(colors.ink2, materials.paper.fill)).toBeGreaterThanOrEqual(4.5);
+    for (const [time, s] of Object.entries(streetColors)) {
+      expect(contrast(colors.ghee, s.near), time).toBeGreaterThanOrEqual(4.5);
+    }
   });
 });

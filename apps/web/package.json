@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -p 3100",
     "typecheck": "tsc --noEmit",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test": "vitest run app/_lib"
   },
   "dependencies": {
     "@pohnch/core": "workspace:*",
@@ -23,6 +24,7 @@
     "@types/node": "^22.0.0",
     "@types/react": "~19.3.0",
     "@types/react-dom": "~19.3.0",
-    "typescript": "~6.0.3"
+    "typescript": "~6.0.3",
+    "vitest": "^5.0.5"
   }
 }
