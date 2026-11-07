@@ -23,6 +23,8 @@ const config: ExpoConfig = {
   },
   android: {
     package: 'pk.pohnch.driver',
+    // The tilt effect uses device motion only; expo-sensors also declares step counting, which this app never does (Google Play would ask for a health declaration).
+    blockedPermissions: ['android.permission.ACTIVITY_RECOGNITION'],
     adaptiveIcon: {
       backgroundColor: '#141A33',
       foregroundImage: './assets/android-icon-foreground.png',
