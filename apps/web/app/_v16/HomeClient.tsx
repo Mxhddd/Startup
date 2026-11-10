@@ -13,7 +13,7 @@ import { DriverKit, JoinForm, Proof, WaitingMap, useSummary, type Area } from '.
 import { countDoubt } from '../_lib/interest';
 import { callsAYear, clamp, hourOfClock, karachiHours, skyHex, span } from './hour';
 import { SECTIONS, pinned, scrollS, worldAt, type Ctx, type SectionId } from './scenes';
-import type { World } from './world3d';
+import type { Quality, World } from './world3d';
 import './home.css';
 
 export type HomeProps = {
@@ -83,68 +83,93 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
     const liteMode = isLite(); setLite(liteMode);
     const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
     let stopped = false, raf = 0, world: World | null = null;
-    let tops: number[] = [], hts: number[] = [], vh = innerHeight;
+    let tops: number[] = [], hts: number[] = [], vh = innerHeight, cw = innerWidth, ch = innerHeight;
+    const touch = matchMedia('(pointer: coarse)').matches;
     const secs = SECTIONS.map((id) => el.querySelector<HTMLElement>(`[data-sec="${id}"]`)!);
-    const measure = () => { vh = innerHeight; tops = secs.map((s) => s.getBoundingClientRect().top + scrollY); hts = secs.map((s) => s.offsetHeight); world?.resize(); };
+    // measure section positions only when the layout changes (never inside the frame loop)
+    const measure = () => {
+      vh = innerHeight; tops = secs.map((s) => s.getBoundingClientRect().top + scrollY); hts = secs.map((s) => s.offsetHeight);
+      // on phones the address bar showing/hiding changes the height while scrolling: don't rebuild the 3D canvas for that
+      const big = Math.abs(innerWidth - cw) > 2 || (!touch && Math.abs(innerHeight - ch) > 2) || Math.abs(innerHeight - ch) > 160;
+      if (big) { cw = innerWidth; ch = innerHeight; world?.resize(); }
+    };
     const ctx: Ctx = { liveHour: hourOfClock(karachiHours(new Date())), heroT: 0, uHome: 0.3, uFork: 0.55, routeAt: () => [0, 0] };
     const t0 = performance.now();
-    // Lenis: calm smoothing of wheel scrolling (off with reduced motion)
-    if (!reduce && !/[?&]nosmooth\b/.test(location.search)) void import('lenis').then(({ default: Lenis }) => { if (stopped) return; lenisRef.current = new Lenis({ lerp: 0.085, wheelMultiplier: 0.9, autoRaf: false }) as unknown as typeof lenisRef.current; });
+    // Lenis: calm smoothing of mouse-wheel scrolling (not on touch screens, not with reduced motion)
+    if (!reduce && !touch && !/[?&]nosmooth\b/.test(location.search)) void import('lenis').then(({ default: Lenis }) => { if (stopped) return; lenisRef.current = new Lenis({ lerp: 0.13, wheelMultiplier: 1, autoRaf: false }) as unknown as typeof lenisRef.current; });
+    // how much 3D this device gets: phones and small machines draw without post-processing
+    const n = navigator as Navigator & { deviceMemory?: number };
+    const cores = navigator.hardwareConcurrency ?? 4, mem = n.deviceMemory ?? 8;
+    const quality: Quality = touch || innerWidth < 760 || cores <= 4 || mem <= 4 ? 'low' : cores >= 8 && mem >= 8 ? 'high' : 'mid';
     // the 3D world loads after the page is on screen
     if (!liteMode) void import('./world3d').then((m) => {
       if (stopped || !canvas.current) return;
       try {
-        world = m.createWorld(canvas.current, { quality: innerWidth < 760 ? 'mid' : 'high' });
+        world = m.createWorld(canvas.current, { quality });
         const curve = m.routeCurve();
         ctx.routeAt = world.routeAt; ctx.uHome = m.routeU(m.HOME.x, m.HOME.z - 12, curve); ctx.uFork = m.routeU(m.FORK.x - 21, m.FORK.z, curve);
         el.classList.add('has3d');
       } catch { setLite(true); }
     });
-    let last = { eta: -1, calls: -1, off: false, sides: -1, morn: -1, lock: -1, flips: -1 };
+    let last = { eta: -1, calls: -1, off: false, sides: -1, morn: -1, lock: -1, flips: -1, scrolled: false, grey: -1, night: '' };
+    const lastP = SECTIONS.map(() => -1), lastVan = [-1, -1, -1];
+    let tPrev = performance.now();
     const frame = (now: number) => {
       if (stopped) return;
       lenisRef.current?.raf(now);
+      const dt = now - tPrev; tPrev = now;
       const y = scrollY;
-      if (!tops.length || Math.abs(secs[1]!.getBoundingClientRect().top + y - tops[1]!) > 2) measure();
       const S = scrollS(y, vh, tops, hts);
       ctx.heroT = (now - t0) / 1000 * TS;
       const st = worldAt(S, ctx);
       // skip drawing the 3D while a solid band (tools, privacy, drivers, questions) covers the whole screen
       const covered = COVER.some((id) => { const i = SECTIONS.indexOf(id); return tops[i]! <= y && tops[i]! + hts[i]! >= y + vh; });
-      if (!covered) world?.setState(st);
-      el.style.setProperty('--hour', st.hour.toFixed(3)); el.style.setProperty('--skyc', skyHex(st.hour));
-      el.dataset.night = st.hour > 2.5 ? '1' : '0';
-      // each pinned section's own progress
+      if (world && !covered) {
+        world.setState(st); world.tune(dt);
+        if (world.quality === 'low') { const g = Math.round(st.grey * 100) / 100; if (g !== last.grey) { last.grey = g; canvas.current!.style.filter = g > 0 ? `grayscale(${(g * 0.9).toFixed(2)}) brightness(${(1 + g * 0.04).toFixed(2)})` : ''; } }
+      }
+      el.style.setProperty('--skyc', skyHex(st.hour));
+      const night = st.hour > 2.5 ? '1' : '0'; if (night !== last.night) { last.night = night; el.dataset.night = night; }
+      // each section's own progress, written only for sections on screen and only when it changed
       const pp: Record<string, number> = {};
-      SECTIONS.forEach((id, i) => { pp[id] = HEIGHTS[id] > 1 ? pinned(y, vh, tops[i]!, hts[i]!) : clamp((y + vh - tops[i]!) / (hts[i]! + vh)); secs[i]!.style.setProperty('--p', pp[id]!.toFixed(4)); });
+      SECTIONS.forEach((id, i) => {
+        const top = tops[i]!, h = hts[i]!;
+        const v = HEIGHTS[id] > 1 ? pinned(y, vh, top, h) : clamp((y + vh - top) / (h + vh));
+        pp[id] = v;
+        const onScreen = top < y + vh * 1.5 && top + h > y - vh * 0.5;
+        if (onScreen && Math.abs(v - lastP[i]!) > 0.0005) { lastP[i] = v; secs[i]!.style.setProperty('--p', v.toFixed(4)); }
+      });
+      const vis = (id: SectionId) => { const i = SECTIONS.indexOf(id); return tops[i]! < y + vh && tops[i]! + hts[i]! > y; };
+      const moveVan = (k: number, ref: React.RefObject<PhoneHandle | null>, v: number) => { if (Math.abs(v - lastVan[k]!) > 0.001) { lastVan[k] = v; ref.current?.setVan(v); } };
       // hero: the van drives in, the minutes count down
       const eta = Math.max(2, Math.round(6 - clamp(ctx.heroT / 9) * 4)); if (eta !== last.eta) { last.eta = eta; setHeroEta(eta); }
-      heroPhone.current?.setVan(0.2 + clamp(ctx.heroT / 9) * 0.32);
+      if (vis('hero')) moveVan(0, heroPhone, 0.2 + clamp(ctx.heroT / 9) * 0.32);
       // calls: stack, then switch
       const nCalls = Math.min(6, Math.floor(span(pp.calls!, 0.05, 0.5) * 6.99)), off = pp.calls! > 0.58;
       if (nCalls !== last.calls || off !== last.off) { last.calls = nCalls; last.off = off; setCalls({ n: nCalls, off }); }
       // both sides: 3 steps
       const s2 = pp.sides! < 0.12 ? 0 : pp.sides! < 0.42 ? 1 : pp.sides! < 0.72 ? 2 : 3; if (s2 !== last.sides) { last.sides = s2; setSides(s2); }
-      sidesPhone.current?.setVan(0.04 + span(pp.sides!, 0.3, 0.75) * 0.5);
+      if (vis('sides')) moveVan(1, sidesPhone, 0.04 + span(pp.sides!, 0.3, 0.75) * 0.5);
       // the morning: 4 beads
       const m = pp.morning!; const s3 = m < 0.08 ? 0 : m < 0.3 ? 1 : m < 0.5 ? 2 : m < 0.86 ? 3 : 4; if (s3 !== last.morn) { last.morn = s3; setMorn(s3); }
-      mornPhone.current?.setVan(Math.min(1, 0.25 + span(m, 0.04, 0.92) * 0.75));
+      if (vis('morning')) moveVan(2, mornPhone, Math.min(1, 0.25 + span(m, 0.04, 0.92) * 0.75));
       // lock screen countdown
       const lp = Math.round(span(pp.lock!, 0.15, 0.8) * 50) / 50; if (lp !== last.lock) { last.lock = lp; setLockP(lp); }
       // promises: stickers turn over one by one
       const f = Math.floor(span(pp.promises!, 0.18, 0.92) * 7.99); if (f !== last.flips) { last.flips = f; setFlips(f); }
-      // signposts stand on the roundabout; stickers sit on the van's back
-      if (world && signRef.current) { const [px, yy] = world.project(-10, 0, 10); const x = innerWidth < 760 ? innerWidth / 2 : px; signRef.current.style.transform = `translate3d(${x.toFixed(1)}px, ${yy.toFixed(1)}px, 0)`; }
-      setScrolled(y > 40);
+      // signposts stand on the roundabout
+      if (world && signRef.current && vis('fork')) { const [px, yy] = world.project(-10, 0, 10); const x = innerWidth < 760 ? innerWidth / 2 : px; signRef.current.style.transform = `translate3d(${x.toFixed(1)}px, ${yy.toFixed(1)}px, 0)`; }
+      const sc = y > 40; if (sc !== last.scrolled) { last.scrolled = sc; setScrolled(sc); }
       raf = requestAnimationFrame(frame);
     };
     measure(); raf = requestAnimationFrame(frame);
     const onR = () => measure(); addEventListener('resize', onR);
+    const ro = new ResizeObserver(() => measure()); ro.observe(el);
     if (document.fonts) void document.fonts.ready.then(measure);
     // join section loads the waiting map
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); if (e.target.id === 'join') setJoinSeen(true); } }), { rootMargin: '0px 0px -12% 0px' });
     el.querySelectorAll('.rv, #join').forEach((n) => io.observe(n));
-    return () => { stopped = true; cancelAnimationFrame(raf); removeEventListener('resize', onR); io.disconnect(); world?.dispose(); lenisRef.current?.destroy(); lenisRef.current = null; };
+    return () => { stopped = true; cancelAnimationFrame(raf); removeEventListener('resize', onR); ro.disconnect(); io.disconnect(); world?.dispose(); lenisRef.current?.destroy(); lenisRef.current = null; };
   }, []);
 
   /* ---------- play the morning: the page scrolls itself through the story ---------- */

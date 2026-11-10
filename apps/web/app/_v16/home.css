@@ -21,7 +21,7 @@ html:has(.v16) { scroll-behavior: auto; overflow-x: clip; }
 html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 
 /* the 3D world and the painted sky behind everything */
-.v16 .world { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100lvh; z-index: 0; display: block; opacity: 0; transition: opacity 1.4s var(--calm); }
+.v16 .world { position: fixed; inset: 0; width: 100vw; height: 100vh; height: 100lvh; z-index: 0; display: block; will-change: transform; transform: translateZ(0); opacity: 0; transition: opacity 1.4s var(--calm); }
 .v16.has3d .world { opacity: 1; }
 .v16 .sky { position: fixed; inset: 0; z-index: -1; background: radial-gradient(120% 80% at 70% 10%, rgba(255,255,255,.35), transparent 60%), var(--skyc, #EDE3D0); }
 .v16.lite .sky::after { content: ""; position: absolute; inset: auto 0 0 0; height: 46vh; opacity: .55; background:
@@ -57,9 +57,9 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 
 /* ---------- top bar ---------- */
 .v16 .bar { position: fixed; z-index: 50; top: 0; left: 0; right: 0; display: flex; align-items: center; gap: 30px; padding: calc(16px + env(safe-area-inset-top, 0px)) max(28px, env(safe-area-inset-right, 0px)) 16px max(28px, env(safe-area-inset-left, 0px)); transition: background .6s var(--calm), box-shadow .6s, color .6s; color: var(--ink); }
-.v16 .bar.scrolled { background: color-mix(in srgb, var(--ivory) 88%, transparent); backdrop-filter: saturate(1.4) blur(14px); -webkit-backdrop-filter: saturate(1.4) blur(14px); box-shadow: 0 1px 0 rgba(184,134,47,.25); }
+.v16 .bar.scrolled { background: color-mix(in srgb, var(--ivory) 96%, transparent); box-shadow: 0 1px 0 rgba(184,134,47,.25); }
 .v16[data-night="1"] .bar { color: #F5EEE1; }
-.v16[data-night="1"] .bar.scrolled { background: color-mix(in srgb, var(--ink) 82%, transparent); }
+.v16[data-night="1"] .bar.scrolled { background: color-mix(in srgb, var(--ink) 94%, transparent); }
 .v16 .mark { display: inline-flex; align-items: baseline; gap: 10px; text-decoration: none; }
 .v16 .mark b { font: 400 32px/1 var(--font-display), serif; }
 .v16 .mark span { font: 800 18px var(--latin); letter-spacing: -.01em; }
@@ -81,7 +81,7 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 
 /* ---------- sections ---------- */
 .v16 .sec { position: relative; z-index: 1; }
-.v16 .stick { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; padding: 0 max(40px, env(safe-area-inset-right, 0px)) 0 max(40px, env(safe-area-inset-left, 0px)); }
+.v16 .stick { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; contain: layout paint; padding: 0 max(40px, env(safe-area-inset-right, 0px)) 0 max(40px, env(safe-area-inset-left, 0px)); }
 .v16 .wrap { max-width: 1200px; margin: 0 auto; padding-inline: max(28px, env(safe-area-inset-left, 0px)) max(28px, env(safe-area-inset-right, 0px)); }
 /* soft paper wash behind words that sit on the 3D city, so they always read */
 .v16 .copy { position: relative; z-index: 2; }
@@ -102,7 +102,7 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16 .play { margin-top: 26px; display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; padding: 0; font: 600 15px var(--text); color: var(--stone); cursor: pointer; }
 .v16 .play svg { width: 30px; height: 30px; padding: 8px; border-radius: 50%; box-shadow: inset 0 0 0 1px currentColor; transition: transform .5s var(--calm); }
 .v16 .play:hover svg { transform: scale(1.1); }
-.v16 .hero-phone { justify-self: center; --s: .95; transform: translateY(calc(var(--p, 0) * -60px)) rotate(-4deg); transition: transform .2s linear; }
+.v16 .hero-phone { justify-self: center; --s: .95; transform: translateY(calc(var(--p, 0) * -60px)) rotate(-4deg); }
 .v16[dir="rtl"] .hero-phone { transform: translateY(calc(var(--p, 0) * -60px)) rotate(4deg); }
 .v16 .cue { position: absolute; left: 50%; bottom: 30px; width: 24px; height: 38px; margin-left: -12px; border-radius: 12px; box-shadow: inset 0 0 0 1.5px var(--ink); opacity: calc(1 - var(--p, 0) * 4); }
 .v16 .cue i { position: absolute; left: 50%; top: 8px; width: 3px; height: 8px; margin-left: -1.5px; border-radius: 2px; background: var(--ink); animation: cue 1.8s var(--calm) infinite; }
@@ -172,7 +172,7 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16 .seg button[aria-pressed="true"] { background: var(--ink); color: #FBF7EF; }
 
 /* paper bands */
-.v16 .paper { background: color-mix(in srgb, var(--paper) 94%, transparent); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); padding-block: clamp(90px, 12vw, 160px); }
+.v16 .paper { background: var(--paper); padding-block: clamp(90px, 12vw, 160px); }
 .v16 .paper + .paper { padding-top: 0; }
 .v16 .rv { opacity: 0; transform: translateY(26px); transition: opacity 1s var(--calm), transform 1.2s var(--calm); transition-delay: calc(var(--k, 0) * 90ms); }
 .v16 .rv.in, .v16 .in .rv { opacity: 1; transform: none; }
@@ -221,7 +221,7 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16 .arm:hover { filter: drop-shadow(0 18px 16px rgba(16,22,47,.35)); }
 .v16 .arm.a1:hover { transform: rotate(-6deg) translateX(8px); } .v16 .arm.a2:hover { transform: rotate(4deg) translateX(8px); } .v16 .arm.a3:hover { transform: rotate(3deg) translateX(-8px); }
 .v16 .arm.chosen { outline: 3px solid var(--kesar); outline-offset: 3px; }
-.v16 .road { background: color-mix(in srgb, var(--paper) 95%, transparent); transition: padding .8s var(--calm); }
+.v16 .road { background: var(--paper); transition: padding .8s var(--calm); }
 .v16 .road.none { padding: 0; }
 .v16 .road:not(.none) { padding-block: 90px 110px; }
 .v16 .road .wrap > * { animation: rise 1s var(--calm) both; }
@@ -353,7 +353,7 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16 .playbar button { background: none; border: 0; color: inherit; font: inherit; text-decoration: underline; cursor: pointer; }
 
 /* ---------- the phones ---------- */
-.v16 .v-phone { position: relative; z-index: 2; width: calc(268px * var(--s)); height: calc(556px * var(--s)); flex: none; }
+.v16 .v-phone { position: relative; z-index: 2; will-change: transform; contain: layout paint; width: calc(268px * var(--s)); height: calc(556px * var(--s)); flex: none; }
 .v16 .v-phone .bezel { position: absolute; left: 0; top: 0; width: 268px; height: 556px; transform: scale(var(--s)); transform-origin: 0 0; border-radius: 46px; padding: 10px; background: linear-gradient(145deg, #2A3050, #0E1328); box-shadow: 0 60px 90px -50px rgba(16,22,47,.85), 0 0 0 1px rgba(255,255,255,.08) inset, 0 0 0 2px #0B0F22; }
 .v16 .v-phone .scr { position: relative; height: 100%; border-radius: 37px; overflow: hidden; background: #ECE3D2; font-family: var(--text); color: var(--ink); }
 .v16 .v-phone .island { position: absolute; z-index: 6; top: 9px; left: 50%; width: 86px; height: 25px; margin-left: -43px; border-radius: 14px; background: #0B0F22; display: flex; align-items: center; justify-content: space-between; padding: 0 9px; transition: width .7s var(--calm), margin .7s var(--calm); }
@@ -458,3 +458,4 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 /* lite (no 3D): the signpost stands at a fixed place in the fork scene */
 .v16:not(.has3d) .sign { transform: translate3d(62vw, 82vh, 0); }
 @media (max-width: 920px) { .v16:not(.has3d) .sign { transform: translate3d(50vw, 82vh, 0); } }
+.v16 .log li.tally::after { display: none; }

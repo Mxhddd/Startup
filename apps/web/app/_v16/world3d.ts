@@ -23,9 +23,13 @@ export type WorldState = {
   school: number;    // 0..1 glow on the school gate
   homePin: number;   // 0..1 how visible the "your home" pin is
 };
+export type Quality = 'high' | 'mid' | 'low';
 export type World = {
+  quality: Quality;
   setState: (s: WorldState) => void;
   resize: () => void;
+  /** Tell the world how long the last frame took (ms); it lowers or raises its resolution to stay smooth. */
+  tune: (frameMs: number) => void;
   project: (x: number, y: number, z: number) => [number, number, boolean];
   dispose: () => void;
   routeAt: (u: number) => [number, number];
@@ -89,32 +93,33 @@ export function skyAt(hour: number): Sky & { skyC: THREE.Color; fogC: THREE.Colo
 }
 
 /* ---------------- the post-processing: tilt-shift + colour (grey) + vignette ---------------- */
-const TiltShader = {
-  uniforms: { tDiffuse: { value: null }, amount: { value: 1 }, focus: { value: 0.55 }, band: { value: 0.18 }, dir: { value: new THREE.Vector2(1, 0) }, res: { value: new THREE.Vector2(1, 1) } },
+const PostShader = {
+  uniforms: { tDiffuse: { value: null }, res: { value: new THREE.Vector2(1, 1) }, focus: { value: 0.55 }, band: { value: 0.16 }, amount: { value: 1 }, grey: { value: 0 }, vig: { value: 0.2 }, night: { value: 0 } },
   vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-  fragmentShader: `uniform sampler2D tDiffuse; uniform float amount; uniform float focus; uniform float band; uniform vec2 dir; uniform vec2 res; varying vec2 vUv;
-  void main(){ float d = max(0.0, abs(vUv.y - focus) - band) * 2.6; float r = clamp(d, 0.0, 1.0) * amount * 3.2;
-    vec4 s = vec4(0.0); float wsum = 0.0;
-    for (int i = -4; i <= 4; i++) { float fi = float(i); float w = exp(-fi*fi/8.0); s += texture2D(tDiffuse, vUv + dir * fi * r / res) * w; wsum += w; }
-    gl_FragColor = s / wsum; }`,
-};
-const GradeShader = {
-  uniforms: { tDiffuse: { value: null }, grey: { value: 0 }, vig: { value: 0.22 }, night: { value: 0 } },
-  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.0); }',
-  fragmentShader: `uniform sampler2D tDiffuse; uniform float grey; uniform float vig; uniform float night; varying vec2 vUv;
-  void main(){ vec4 c = texture2D(tDiffuse, vUv); float l = dot(c.rgb, vec3(0.299,0.587,0.114));
-    vec3 g = mix(c.rgb, vec3(l) * vec3(0.96,0.98,1.03), grey * 0.92); g = mix(g, g * 0.92 + vec3(0.03,0.035,0.05), grey * 0.5);
+  fragmentShader: `uniform sampler2D tDiffuse; uniform vec2 res; uniform float focus; uniform float band; uniform float amount; uniform float grey; uniform float vig; uniform float night; varying vec2 vUv;
+  void main(){
+    float d = max(0.0, abs(vUv.y - focus) - band) * 2.4; float r = clamp(d, 0.0, 1.0) * amount * 5.0;
+    vec4 c = texture2D(tDiffuse, vUv);
+    if (r > 0.35) { vec4 s = c; for (int i = 0; i < 12; i++) { float fi = float(i); float a = fi * 2.39996; float rr = sqrt((fi + 0.5) / 12.0) * r; s += texture2D(tDiffuse, vUv + vec2(cos(a), sin(a)) * rr / res); } c = s / 13.0; }
+    float l = dot(c.rgb, vec3(0.299, 0.587, 0.114));
+    vec3 g = mix(c.rgb, vec3(l) * vec3(0.96, 0.98, 1.03), grey * 0.92); g = mix(g, g * 0.92 + vec3(0.03, 0.035, 0.05), grey * 0.5);
     float v = smoothstep(0.95, 0.25, distance(vUv, vec2(0.5))); g *= mix(1.0 - vig - night * 0.15, 1.0, v);
     gl_FragColor = vec4(g, c.a); }`,
 };
 
 /* ---------------- building the world ---------------- */
-export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: 'high' | 'mid' } = {}): World {
-  const q = opts.quality ?? 'high';
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: q === 'high', powerPreference: 'high-performance' });
-  renderer.setPixelRatio(Math.min(q === 'high' ? 1.75 : 1.25, window.devicePixelRatio || 1));
+export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: Quality } = {}): World {
+  const q: Quality = opts.quality ?? 'high';
+  // 'low' (phones): no post-processing pass at all, the page greys the canvas with a CSS filter instead
+  const post = q !== 'low';
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !post, powerPreference: 'high-performance', stencil: false });
+  const prCap = Math.min({ high: 1.5, mid: 1.25, low: 1.1 }[q], window.devicePixelRatio || 1);
+  let pr = prCap;
+  renderer.setPixelRatio(pr);
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
+  // the city never moves, so its shadows are drawn once and again only when the sun moves
+  renderer.shadowMap.autoUpdate = false;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
@@ -126,9 +131,9 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: 'high' 
   const hemi = new THREE.HemisphereLight('#ffffff', '#C9B48E', 1.2); scene.add(hemi);
   const sun = new THREE.DirectionalLight('#FFF4E2', 2.2);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(q === 'high' ? 2048 : 1024, q === 'high' ? 2048 : 1024);
-  const sc = sun.shadow.camera as THREE.OrthographicCamera; sc.left = -200; sc.right = 200; sc.top = 200; sc.bottom = -200; sc.near = 10; sc.far = 700;
-  sun.shadow.bias = -0.0006; sun.shadow.normalBias = 0.6; sun.shadow.radius = 4;
+  sun.shadow.mapSize.set(q === 'low' ? 1024 : 2048, q === 'low' ? 1024 : 2048);
+  const sc = sun.shadow.camera as THREE.OrthographicCamera; sc.left = -240; sc.right = 240; sc.top = 240; sc.bottom = -240; sc.near = 10; sc.far = 900;
+  sun.shadow.bias = -0.0008; sun.shadow.normalBias = 0.8;
   scene.add(sun); scene.add(sun.target);
 
   const mat = (color: string, extra: Partial<THREE.MeshStandardMaterialParameters> = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.92, metalness: 0, ...extra });
@@ -324,10 +329,13 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: 'high' 
     const star = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.25, bevelEnabled: false }), mat('#E8A33D', { roughness: 0.4, emissive: '#E8A33D', emissiveIntensity: 0.15 })); star.rotation.x = -Math.PI / 2; star.position.set(-0.4, 5.66, 0); vanBody.add(star);
     for (const s of [-1, 1]) { const hl = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.6, 0.9), headMatV); hl.position.set(5.02, 2.3, s * 1.5); vanBody.add(hl); const bl = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.8, 0.6), brakeMat); bl.position.set(-5.02, 2.6, s * 1.6); vanBody.add(bl); }
     const bumper = new THREE.Mesh(new RoundedBoxGeometry(0.6, 0.6, 4.4, 2, 0.2), mat('#2A2F45')); bumper.position.set(5.1, 1.2, 0); vanBody.add(bumper);
-    vanBody.traverse((o) => { if ((o as THREE.Mesh).isMesh) o.castShadow = true; });
+    // a soft blob shadow instead of a real one, so the city's shadow map never needs redrawing for the van
     const wheel = new THREE.CylinderGeometry(0.95, 0.95, 0.7, 16); const tyre = mat('#1E2130', { roughness: 0.8 });
-    for (const [x, z] of [[3.2, 2.05], [3.2, -2.05], [-3.2, 2.05], [-3.2, -2.05]] as const) { const w = new THREE.Mesh(wheel, tyre); w.rotation.x = Math.PI / 2; w.position.set(x, 0.95, z); w.castShadow = true; van.add(w); }
+    for (const [x, z] of [[3.2, 2.05], [3.2, -2.05], [-3.2, 2.05], [-3.2, -2.05]] as const) { const w = new THREE.Mesh(wheel, tyre); w.rotation.x = Math.PI / 2; w.position.set(x, 0.95, z); van.add(w); }
     van.add(vanBody); scene.add(van); }
+  { const c = document.createElement('canvas'); c.width = c.height = 64; const g = c.getContext('2d')!; const gr = g.createRadialGradient(32, 32, 4, 32, 32, 32); gr.addColorStop(0, 'rgba(16,22,47,.55)'); gr.addColorStop(1, 'rgba(16,22,47,0)'); g.fillStyle = gr; g.fillRect(0, 0, 64, 64);
+    const blob = new THREE.Mesh(new THREE.PlaneGeometry(15, 9), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+    blob.rotation.x = -Math.PI / 2; blob.position.set(1.2, 0.36, 1.2); van.add(blob); }
   // headlight beams at night (additive cone on the ground)
   const beamMat = new THREE.MeshBasicMaterial({ map: glowTex, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, opacity: 0 });
   const beam = new THREE.Mesh(new THREE.PlaneGeometry(22, 12), beamMat); beam.rotation.x = -Math.PI / 2; beam.position.set(14, 0.35, 0); van.add(beam);
@@ -337,26 +345,36 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: 'high' 
   const clouds: THREE.Sprite[] = [];
   for (let k = 0; k < 9; k++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, transparent: true, depthWrite: false, opacity: 0.55 })); s.scale.set(90 + rnd() * 60, 45, 1); s.position.set(-260 + rnd() * 520, 70 + rnd() * 30, -200 + rnd() * 320); scene.add(s); clouds.push(s); }
 
-  // post-processing
-  const composer = new EffectComposer(renderer);
-  composer.addPass(new RenderPass(scene, camera));
-  const tiltH = new ShaderPass(TiltShader); tiltH.uniforms.dir!.value = new THREE.Vector2(1, 0); composer.addPass(tiltH);
-  const tiltV = new ShaderPass(TiltShader); tiltV.uniforms.dir!.value = new THREE.Vector2(0, 1); composer.addPass(tiltV);
-  const grade = new ShaderPass(GradeShader); composer.addPass(grade);
-  composer.addPass(new OutputPass());
+  // post-processing (desktop): one pass for the tilt-shift blur and the colour, then the output pass
+  let composer: EffectComposer | null = null, postPass: ShaderPass | null = null;
+  if (post) {
+    const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.HalfFloatType, samples: q === 'high' ? 4 : 0 });
+    composer = new EffectComposer(renderer, rt);
+    composer.addPass(new RenderPass(scene, camera));
+    postPass = new ShaderPass(PostShader); composer.addPass(postPass);
+    composer.addPass(new OutputPass());
+  }
 
-  let W = 1, Hh = 1;
+  let W = 1, Hh = 1, dirty = true, lastKey = '', lastDraw = 0, lastShadow = -1;
+  if (!post) { renderer.toneMapping = THREE.ACESFilmicToneMapping; }
   function resize() {
     const r = canvas.getBoundingClientRect(); W = Math.max(1, r.width); Hh = Math.max(1, r.height);
-    renderer.setSize(W, Hh, false); composer.setSize(W, Hh); camera.aspect = W / Hh; camera.updateProjectionMatrix();
-    const pr = renderer.getPixelRatio(); for (const p of [tiltH, tiltV]) (p.uniforms.res!.value as THREE.Vector2).set(W * pr, Hh * pr);
+    renderer.setPixelRatio(pr); renderer.setSize(W, Hh, false);
+    if (composer) { composer.setPixelRatio(pr); composer.setSize(W, Hh); }
+    camera.aspect = W / Hh; camera.updateProjectionMatrix();
+    if (postPass) (postPass.uniforms.res!.value as THREE.Vector2).set(W * pr, Hh * pr);
+    dirty = true;
   }
   resize();
 
   const v3 = new THREE.Vector3(), tan = new THREE.Vector3();
   let lastNight = -1;
   function setState(s: WorldState) {
-    const p = s.pose, t = performance.now() / 1000;
+    const p = s.pose, now = performance.now(), t = now / 1000;
+    // draw only when something changed, plus the slow ambient life (clouds, the home pin) at ~24 fps
+    const key = [p.tx, p.tz, p.dist, p.az, p.el, p.fov ?? 0, s.hour, s.grey, s.lit, s.u, s.school, s.homePin, s.brake ? 1 : 0].map((v) => v.toFixed(3)).join('|');
+    if (!dirty && key === lastKey && now - lastDraw < 42) return;
+    const moving = key !== lastKey; lastKey = key; lastDraw = now; dirty = false;
     // camera: orbit around a target
     const cx = p.tx + Math.cos(p.az) * Math.cos(p.el) * p.dist, cz = p.tz + Math.sin(p.az) * Math.cos(p.el) * p.dist, cy = (p.ty ?? 0) + Math.sin(p.el) * p.dist;
     camera.position.set(cx, cy, cz); camera.lookAt(p.tx, p.ty ?? 0, p.tz);
@@ -366,7 +384,8 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: 'high' 
     scene.background = k.skyC; (scene.fog as THREE.Fog).color.copy(k.fogC);
     hemi.color.copy(k.topC); hemi.groundColor.copy(k.botC); hemi.intensity = k.hemiI;
     sun.color.copy(k.sunC); sun.intensity = k.sunI;
-    sun.position.set(p.tx + Math.cos(k.az) * Math.cos(k.el) * 300, Math.sin(k.el) * 300, p.tz + Math.sin(k.az) * Math.cos(k.el) * 300); sun.target.position.set(p.tx, 0, p.tz);
+    sun.position.set(-10 + Math.cos(k.az) * Math.cos(k.el) * 400, Math.sin(k.el) * 400, -20 + Math.sin(k.az) * Math.cos(k.el) * 400); sun.target.position.set(-10, 0, -20);
+    const sk = Math.round(s.hour * 40); if (sk !== lastShadow) { lastShadow = sk; renderer.shadowMap.needsUpdate = true; }
     const n = k.night;
     if (Math.abs(n - lastNight) > 0.002) {
       lastNight = n;
@@ -384,7 +403,7 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: 'high' 
     const u = clamp(s.u, 0, 1);
     curve.getPointAt(u, v3); curve.getTangentAt(Math.min(0.999, Math.max(0.001, u)), tan);
     van.position.set(v3.x, 0, v3.z); van.rotation.y = Math.atan2(-tan.z, tan.x);
-    vanBody.position.y = Math.sin(t * 9) * 0.04; vanBody.rotation.z = s.brake ? 0.03 : 0;
+    vanBody.position.y = moving ? Math.sin(t * 9) * 0.04 : 0; vanBody.rotation.z = s.brake ? 0.03 : 0;
     brakeMat.emissiveIntensity = s.brake ? 2.4 : 0.2 + n;
     gateMat.emissiveIntensity = 0.0 + s.school * 1.6;
     pin.visible = s.homePin > 0.01; pin.position.y = 13 + Math.sin(t * 1.6) * 0.6; pin.rotation.y = t * 0.6;
@@ -392,18 +411,29 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: 'high' 
     for (const c of clouds) { c.position.x += 0.02; if (c.position.x > 300) c.position.x = -300; }
     // tilt-shift band follows the target's place on screen; colour grade
     const [, fy] = project(p.tx, p.ty ?? 0, p.tz);
-    for (const ps of [tiltH, tiltV]) { ps.uniforms.focus!.value = 1 - fy / Hh; ps.uniforms.amount!.value = 1; }
-    grade.uniforms.grey!.value = clamp(s.grey); grade.uniforms.night!.value = n;
-    composer.render();
+    if (postPass && composer) {
+      postPass.uniforms.focus!.value = 1 - fy / Hh; postPass.uniforms.grey!.value = clamp(s.grey); postPass.uniforms.night!.value = n;
+      composer.render();
+    } else renderer.render(scene, camera);
   }
   function project(x: number, y: number, z: number): [number, number, boolean] {
     v3.set(x, y, z).project(camera);
     return [(v3.x * 0.5 + 0.5) * W, (-v3.y * 0.5 + 0.5) * Hh, v3.z < 1];
   }
   function routeAt(u: number): [number, number] { const p = curve.getPointAt(clamp(u)); return [p.x, p.z]; }
+  // keep the frame rate up: lower the resolution step by step when frames are slow, raise it back when there's room
+  let acc = 0, cnt = 0;
+  function tune(ms: number) {
+    if (ms > 200) return; // a background tab or a pause, not a slow frame
+    acc += ms; cnt++;
+    if (cnt < 45) return;
+    const avg = acc / cnt; acc = 0; cnt = 0;
+    const next = avg > 22 ? Math.max(0.6, pr - 0.15) : avg < 12 && pr < prCap ? Math.min(prCap, pr + 0.1) : pr;
+    if (Math.abs(next - pr) > 0.01) { pr = next; resize(); }
+  }
   function dispose() {
-    renderer.dispose(); composer.dispose();
+    renderer.dispose(); composer?.dispose();
     scene.traverse((o) => { const m = o as THREE.Mesh; m.geometry?.dispose?.(); const mm = m.material as THREE.Material | THREE.Material[] | undefined; if (Array.isArray(mm)) mm.forEach((x) => x.dispose()); else mm?.dispose?.(); });
   }
-  return { setState, resize, project, dispose, routeAt };
+  return { quality: q, setState, resize, tune, project, dispose, routeAt };
 }

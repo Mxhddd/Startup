@@ -26,11 +26,11 @@ export type PhoneHandle = { setVan: (k: number) => void };
 const ROUTE_D = 'M18 330 C 40 280 70 250 92 206 S 150 140 168 98 S 200 58 214 34';
 
 export const ParentPhone = forwardRef<PhoneHandle, ParentPhoneProps>(function ParentPhone({ w, mode, plat = 'ios', eta, step, title, alert, off, lockP = 0, className }, ref) {
-  const path = useRef<SVGPathElement>(null), van = useRef<SVGGElement>(null), home = useRef<SVGGElement>(null);
+  const path = useRef<SVGPathElement>(null), van = useRef<SVGGElement>(null), home = useRef<SVGGElement>(null), len = useRef(0);
   useImperativeHandle(ref, () => ({
     setVan(k: number) {
       const p = path.current, v = van.current; if (!p || !v) return;
-      const L = p.getTotalLength(), a = p.getPointAtLength(Math.max(0, Math.min(1, k)) * L), b = p.getPointAtLength(Math.min(L, Math.max(0, Math.min(1, k)) * L + 2));
+      const L = (len.current ||= p.getTotalLength()), a = p.getPointAtLength(Math.max(0, Math.min(1, k)) * L), b = p.getPointAtLength(Math.min(L, Math.max(0, Math.min(1, k)) * L + 2));
       v.setAttribute('transform', `translate(${a.x.toFixed(1)} ${a.y.toFixed(1)}) rotate(${(Math.atan2(b.y - a.y, b.x - a.x) * 57.3 + 90).toFixed(1)})`);
     },
   }), []);
