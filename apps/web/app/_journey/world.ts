@@ -55,7 +55,9 @@ function build() {
 export const { buildings, parks, trees } = build();
 
 /** The van's route: from its first stop, past your home, to school. */
-export const ROUTE: [number, number][] = [[380, 2200], [1800, 2200], [1800, 1600], [2500, 1600], [2500, 1000], [3955, 1000], [3955, 900]];
+/** The roundabout where the roads fork ("Interested yet?"): centre and radius of its ring road. */
+export const FORK_AT = { x: 2500, y: 1600, r: 120 };
+export const ROUTE: [number, number][] = [[380, 2200], [1800, 2200], [1800, 1600], [2380, 1600], [2415, 1515], [2500, 1480], [2500, 1000], [3955, 1000], [3955, 900]];
 const segs: { a: [number, number]; b: [number, number]; l: number; s: number }[] = [];
 let total = 0;
 for (let i = 0; i < ROUTE.length - 1; i++) {
@@ -78,5 +80,7 @@ export function along(u: number): { x: number; y: number; ang: number } {
   const s = segs[segs.length - 1]!;
   return { x: s.b[0], y: s.b[1], ang: 0 };
 }
+/** Where the route's corner number i is, from 0 (start) to 1 (school). */
+export const vertexU = (i: number): number => (segs[i] ? segs[i]!.s / total : 1);
 /** Where your home is along the route. */
 export const homeU = (HOME.x - 380) / total;
