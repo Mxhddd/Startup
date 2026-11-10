@@ -8,23 +8,27 @@
     "start": "next start -p 3100",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
-    "test": "vitest run app/_journey"
+    "test": "vitest run app/_journey app/_v16"
   },
   "dependencies": {
     "@pohnch/core": "workspace:*",
     "@pohnch/messages": "workspace:*",
     "@pohnch/ui": "workspace:*",
     "@supabase/supabase-js": "^2.118.0",
+    "gsap": "3.13.0",
+    "lenis": "1.3.26",
     "next": "16.4.3",
     "qrcode-generator": "1.4.4",
     "react": "19.3.0",
-    "react-dom": "19.3.0"
+    "react-dom": "19.3.0",
+    "three": "0.172.0"
   },
   "devDependencies": {
     "@playwright/test": "1.63.0",
     "@types/node": "^22.0.0",
     "@types/react": "~19.3.0",
     "@types/react-dom": "~19.3.0",
+    "@types/three": "0.172.0",
     "typescript": "~6.0.3",
     "vitest": "^5.0.5"
   }
