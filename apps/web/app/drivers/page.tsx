@@ -1,9 +1,12 @@
+// /drivers: generated from the v16 page list (English at the root, Urdu under /ur).
 import type { Metadata } from 'next';
 import { t } from '@pohnch/messages';
-import { DriversPage } from '../Pages';
+import { DriversPage16 } from '../_v16/Pages16';
+import { pageMeta } from '../_lib/meta';
 
-export const metadata: Metadata = { title: `${t('ur', 'site.drv.title')} · ${t('ur', 'app.parent.name')}`, description: t('ur', 'site.drv.lead'), alternates: { canonical: '/drivers', languages: { ur: '/drivers', en: '/en/drivers' } } };
+const L = 'en' as const;
+export const metadata: Metadata = pageMeta(L, '/drivers', `${t(L, 'site.drv.title')} · Pohnch`, t(L, 'site.drv.lead'));
 
 export default function Page() {
-  return <DriversPage lang="ur" />;
+  return <DriversPage16 lang={L} />;
 }

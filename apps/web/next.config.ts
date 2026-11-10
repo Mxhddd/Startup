@@ -4,6 +4,13 @@ const nextConfig: NextConfig = {
   // Our shared packages ship TypeScript source; Next compiles them.
   transpilePackages: ['@pohnch/ui', '@pohnch/messages', '@pohnch/core'],
   poweredByHeader: false,
+  async redirects() {
+    return [
+      // v16: English moved from /en to the root (Urdu is now under /ur). Old links keep working.
+      { source: '/en', destination: '/', permanent: true },
+      { source: '/en/:path*', destination: '/:path*', permanent: true },
+    ];
+  },
   async rewrites() {
     return [
       // Every invite link shows the same static page; the server never handles the token itself.

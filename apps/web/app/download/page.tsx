@@ -1,9 +1,12 @@
+// /download: generated from the v16 page list (English at the root, Urdu under /ur).
 import type { Metadata } from 'next';
 import { t } from '@pohnch/messages';
-import { DownloadPage } from '../Pages';
+import { DownloadPage16 } from '../_v16/Pages16';
+import { pageMeta } from '../_lib/meta';
 
-export const metadata: Metadata = { title: `${t('ur', 'site.dl.kicker')} · ${t('ur', 'app.parent.name')}`, description: t('ur', 'site.dl.lead'), alternates: { canonical: '/download', languages: { ur: '/download', en: '/en/download' } } };
+const L = 'en' as const;
+export const metadata: Metadata = pageMeta(L, '/download', `${t(L, 'site.dl.kicker')} · Pohnch`, t(L, 'site.dl.lead'));
 
 export default function Page() {
-  return <DownloadPage lang="ur" />;
+  return <DownloadPage16 lang={L} />;
 }

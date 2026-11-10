@@ -40,3 +40,7 @@ verify_jwt = true
 # Supabase signs hook calls itself; the function checks that signature.
 [functions.send-sms]
 verify_jwt = false
+
+[functions.interest]
+# public: called by website visitors without a login (the function holds the service key)
+verify_jwt = false

@@ -455,6 +455,20 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
   .v16 *, .v16 *::before, .v16 *::after { animation-duration: .01s !important; animation-iteration-count: 1 !important; transition-duration: .3s !important; }
 }
 
+/* lite (no 3D): still pictures of the same 3D scenes behind each pinned section */
+.v16.lite .sec .stick, .v16.lite .fork .fork-stage, .v16.lite .join { background-size: cover; background-position: center; }
+.v16.lite [data-sec=hero] .stick { background-image: url(/v16/lite-hero.webp); }
+.v16.lite [data-sec=calls] .stick { background-image: url(/v16/lite-calls.webp); }
+.v16.lite [data-sec=sides] .stick { background-image: url(/v16/lite-sides.webp); }
+.v16.lite [data-sec=morning] .stick, .v16.lite [data-sec=lock] .stick { background-image: url(/v16/lite-morning.webp); }
+.v16.lite .fork .fork-stage { background-image: url(/v16/lite-fork.webp); }
+.v16.lite [data-sec=promises] .stick { background-image: url(/v16/lite-sides.webp); }
+.v16.lite .join { background-image: linear-gradient(transparent 0, rgba(16,22,47,.7) 22vh, #10162F 40vh), url(/v16/lite-join.webp); background-size: 100% 100%, 100% 60vh; background-repeat: no-repeat; background-position: top; }
+@media (max-width: 760px) {
+  .v16.lite [data-sec=hero] .stick { background-image: url(/v16/lite-hero-960.webp); } .v16.lite [data-sec=calls] .stick { background-image: url(/v16/lite-calls-960.webp); }
+  .v16.lite [data-sec=sides] .stick, .v16.lite [data-sec=promises] .stick { background-image: url(/v16/lite-sides-960.webp); }
+  .v16.lite [data-sec=morning] .stick, .v16.lite [data-sec=lock] .stick { background-image: url(/v16/lite-morning-960.webp); } .v16.lite .fork .fork-stage { background-image: url(/v16/lite-fork-960.webp); }
+}
 /* lite (no 3D): the signpost stands at a fixed place in the fork scene */
 .v16:not(.has3d) .sign { transform: translate3d(62vw, 82vh, 0); }
 @media (max-width: 920px) { .v16:not(.has3d) .sign { transform: translate3d(50vw, 82vh, 0); } }

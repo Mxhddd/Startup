@@ -3,19 +3,17 @@ import { expect, test } from '@playwright/test';
 const TOKEN = 'AbCdEfGhIjKlMnOpQrStUvWxYz0123456789_-abcde';
 
 test('the privacy policy reads in Urdu and English and says what is never kept', async ({ page }) => {
-  await page.goto('/privacy');
+  await page.goto('/ur/privacy');
   await expect(page.locator('main')).toHaveAttribute('dir', 'rtl');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('پرائیویسی پالیسی');
-  await page.getByRole('link', { name: 'English' }).click();
-  await expect(page).toHaveURL(/\/en\/privacy$/);
+  await page.locator('.pbar .lang').click();
+  await expect(page).toHaveURL(/\/privacy$/);
   await expect(page.getByText(/never asks for it/)).toBeVisible();
 });
 
 test('the home page links to the privacy policy', async ({ page }) => {
-  await page.goto('/');
-  await page.waitForFunction(() => (window as unknown as { __journey?: unknown }).__journey);
-  await page.keyboard.press('End');
-  await page.locator('#panel').getByRole('link', { name: 'پرائیویسی پالیسی' }).click();
+  await page.goto('/?lite');
+  await page.locator('#questions footer').getByRole('link', { name: 'Privacy policy' }).click();
   await expect(page).toHaveURL(/\/privacy$/);
 });
 

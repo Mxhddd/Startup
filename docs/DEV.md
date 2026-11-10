@@ -61,6 +61,7 @@ Everything about the database, its security rules and the Edge Functions is expl
 2. `pnpm dlx supabase db push`: creates every table and rule from `supabase/migrations`.
 3. Dashboard > Database > Extensions: switch on **pg_cron** (for the 30-day position cleanup), then run `supabase db push` again.
 4. `pnpm dlx supabase functions deploy app` and `pnpm dlx supabase functions deploy send-sms --no-verify-jwt`.
+   The website's "Join the pilot" form uses a third, public function: `pnpm dlx supabase functions deploy interest --no-verify-jwt --use-api` (it holds the service key; sign-ups land in `pilot_interest`, readable only by the Pohnch team on /admin).
 5. `pnpm dlx supabase secrets set SITE_URL=https://pohnch.pk SMS_GATEWAY_URL=... SMS_GATEWAY_KEY=...`
 6. Dashboard > Authentication > Sign In / Providers > Phone: on. Authentication > Hooks > Send SMS: HTTPS, the `send-sms` function's URL; copy the secret it shows into `supabase secrets set SEND_SMS_HOOK_SECRET=...`.
 7. For trying it before the gateway exists: Authentication > Phone > "Test phone numbers": add your number with a fixed code.

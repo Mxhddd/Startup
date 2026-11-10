@@ -178,6 +178,7 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
 
       <V12 supabase={supabase} vans={vans} api={api} t={t} />
       <Stage2 supabase={supabase} vans={vans} t={t} />
+      <Interested supabase={supabase} t={t} />
 
       <h2 style={sectionTitle}>{t('admin.queue.title')}</h2>
       <p style={{ margin: 0, color: colors.ink2 }}>{t('admin.queue.hint')}</p>
@@ -361,5 +362,43 @@ function Stage2({ supabase, vans, t }: { supabase: SupabaseClient; vans: VanRow[
         </div>
       ))}
     </>
+  );
+}
+
+type InterestRow = { id: string; created_at: string; role: 'parent' | 'driver'; area: string; school: string | null; kids: number | null; driver_phone: string | null; whatsapp: string | null; lang: string; contacted_at: string | null };
+
+/**
+ * v16: "Join the pilot" sign-ups from pohnch.pk, newest first, with a WhatsApp link to reply and a
+ * "Contacted" mark; and how often each honest answer on the home page was opened (last 30 days).
+ */
+function Interested({ supabase, t }: { supabase: SupabaseClient; t: (k: MessageKey, v?: Vars) => string }) {
+  const [rows, setRows] = useState<InterestRow[]>([]);
+  const [doubts, setDoubts] = useState<{ n: number; opens: number }[]>([]);
+  const [error, setError] = useState(false);
+  const load = useCallback(async () => {
+    const [a, b] = await Promise.all([supabase.rpc('admin_interest'), supabase.rpc('admin_doubts')]);
+    setError(!!(a.error || b.error));
+    setRows((a.data as InterestRow[] | null) ?? []);
+    setDoubts((b.data as { n: number; opens: number }[] | null) ?? []);
+  }, [supabase]);
+  useEffect(() => { void load(); }, [load]);
+  const mark = async (id: string) => { await supabase.from('pilot_interest').update({ contacted_at: new Date().toISOString() }).eq('id', id); void load(); };
+  return (
+    <section style={{ ...card, display: 'grid', gap: 12 }} data-testid="admin-interest">
+      <h2 style={{ margin: 0, fontSize: 22 }}>{t('admin.interest.title', { n: rows.length })}</h2>
+      {error ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{t('admin.error')}</p> : rows.length === 0 ? <p style={{ margin: 0 }}>{t('admin.interest.empty')}</p> : null}
+      {rows.map((r) => (
+        <div key={r.id} style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', alignItems: 'center', paddingBlock: 8, borderTop: `1px solid ${colors.line}`, opacity: r.contacted_at ? 0.6 : 1 }}>
+          <b>{t(r.role === 'driver' ? 'admin.interest.driver' : 'admin.interest.parent')} · {t(`area.${r.area}` as MessageKey)}</b>
+          {r.school ? <span>{r.school}</span> : null}
+          {r.kids ? <span>{t('admin.interest.kids', { n: r.kids })}</span> : null}
+          {r.driver_phone ? <span>{t(`admin.interest.phone.${r.driver_phone}` as MessageKey)}</span> : null}
+          <span style={{ color: colors.ink2 }}><bdi dir="ltr">{new Date(r.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'short' })}</bdi></span>
+          {r.whatsapp ? <a href={`https://wa.me/${r.whatsapp.replace('+', '')}`} rel="noreferrer" style={{ color: colors.neel, fontWeight: 700 }}><bdi dir="ltr">{r.whatsapp}</bdi></a> : null}
+          {r.contacted_at ? <span>{t('admin.interest.contacted')}</span> : <button type="button" style={btn(colors.white, colors.neel)} onClick={() => mark(r.id)}>{t('admin.interest.mark')}</button>}
+        </div>
+      ))}
+      {doubts.length > 0 ? <p style={{ margin: 0, color: colors.ink2 }}>{t('admin.interest.doubts')} {doubts.map((d) => `${d.n}: ${d.opens}`).join(' · ')}</p> : null}
+    </section>
   );
 }

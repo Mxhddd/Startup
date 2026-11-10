@@ -16,7 +16,18 @@ export function Home({ lang, homeHref, otherHref }: { lang: Lang; homeHref: stri
   const w = webWords(lang);
   const qa: [string, string][] = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => [w[`qa.${n}.q`]!, w[`qa.${n}.a`]!]);
   const areas = AREA_IDS.map((id) => ({ id, label: t(lang, `area.${id}` as MessageKey), spot: id === 'other' ? null : AREA_SPOTS[id] }));
+  // structured data for search engines: the organisation, the app, and the questions with answers
+  const ld = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      { '@type': 'Organization', name: 'Pohnch', alternateName: 'پہنچ', url: 'https://pohnch.pk', logo: 'https://pohnch.pk/icon.svg', areaServed: 'Karachi', contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', telephone: `+${PILOT_WHATSAPP.waNumber}`, availableLanguage: ['ur', 'en'] } },
+      { '@type': 'MobileApplication', name: 'Pohnch', operatingSystem: 'Android, iOS', applicationCategory: 'TravelApplication', offers: { '@type': 'Offer', price: '0', priceCurrency: 'PKR' }, description: w['hero.p'] },
+      { '@type': 'FAQPage', inLanguage: lang, mainEntity: qa.map(([q, a]) => ({ '@type': 'Question', name: q, acceptedAnswer: { '@type': 'Answer', text: a } })) },
+    ],
+  };
   return (
+    <>
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(ld).replace(/</g, '\\u003c') }} />
     <HomeClient
       lang={lang}
       w={w}
@@ -28,5 +39,6 @@ export function Home({ lang, homeHref, otherHref }: { lang: Lang; homeHref: stri
       playUrl={STORE.playUrl}
       foot={{ privacy: t(lang, 'web.footer.privacy'), terms: t(lang, 'site.foot.terms'), delete: t(lang, 'site.foot.delete'), download: t(lang, 'site.nav.download'), contact: t(lang, 'site.foot.contact'), switchLang: t(lang, 'lang.switch') }}
     />
+    </>
   );
 }

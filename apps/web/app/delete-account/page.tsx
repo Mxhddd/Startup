@@ -1,9 +1,12 @@
+// /delete-account: generated from the v16 page list (English at the root, Urdu under /ur).
 import type { Metadata } from 'next';
 import { t } from '@pohnch/messages';
-import { DeletePage } from '../Pages';
+import { DeletePage16 } from '../_v16/Pages16';
+import { pageMeta } from '../_lib/meta';
 
-export const metadata: Metadata = { title: `${t('ur', 'site.del.title')} · ${t('ur', 'app.parent.name')}`, description: t('ur', 'site.del.lead'), alternates: { canonical: '/delete-account', languages: { ur: '/delete-account', en: '/en/delete-account' } } };
+const L = 'en' as const;
+export const metadata: Metadata = pageMeta(L, '/delete-account', `${t(L, 'site.del.title')} · Pohnch`, t(L, 'site.del.lead'));
 
 export default function Page() {
-  return <DeletePage lang="ur" />;
+  return <DeletePage16 lang={L} />;
 }

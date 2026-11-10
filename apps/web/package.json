@@ -8,7 +8,7 @@
     "start": "next start -p 3100",
     "typecheck": "tsc --noEmit",
     "test:e2e": "playwright test",
-    "test": "vitest run app/_journey app/_v16"
+    "test": "vitest run app"
   },
   "dependencies": {
     "@pohnch/core": "workspace:*",

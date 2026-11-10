@@ -38,7 +38,7 @@ Out: GPS hardware, location outside a trip, location from the parent app, chat, 
 
 ## Design rules
 
-- Urdu first and right-to-left; English is a switch. All text lives in `packages/messages/ur.json` and `en.json`; never hard-code text in components.
+- Urdu first and right-to-left; English is a switch. Exception (v16): the website pohnch.pk opens in English at `/` with Urdu at `/ur` (old `/en/...` links redirect); the apps stay Urdu first. All text lives in `packages/messages/ur.json` and `en.json`; never hard-code text in components.
 - Phone layout reference 360 × 780; must also work at 320 wide and on large iPhones. Driver tap targets at least 64 px tall; the next expected tap is the only big (104 px) button.
 - Brand and tokens: `design/BRAND.md` (v3 "Neel o Kesar", plus the map style). The canvas page "v5 · Map-first app (current)" is the reference; v4 and older pages are history.
 - Parent screens are map-first: the map fills the screen and a bottom sheet holds the trip. Driver screens are plain and high-contrast (no pattern or frames). The star pattern and ornamental frames are for brand moments, plans and print.

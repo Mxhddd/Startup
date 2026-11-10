@@ -18,6 +18,8 @@ export default function Invite() {
     <main style={{ minHeight: '100vh', background: colors.ghee, color: colors.siyahi, fontFamily: 'var(--font-urdu), var(--font-latin), sans-serif' }}>
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '28px 16px 48px', display: 'grid', gap: 20 }}>
         <img src="/pohnch-lockup.svg" alt="Pohnch" width={180} height={51} style={{ height: 'auto', justifySelf: 'center' }} />
+        {/* v16: a still of the miniature Karachi street with the van, above the invitation */}
+        <img src="/v16/download-960.webp" alt="" width={960} height={600} style={{ width: '100%', height: 'auto', borderRadius: 28, boxShadow: shadow.raised }} />
         {/* The invitation itself, as one card: a neel top with the headline, then the buttons. */}
         <article className="pohnch-rise" style={{ background: colors.white, borderRadius: 32, overflow: 'hidden', boxShadow: shadow.raised }}>
           <header style={{ background: colors.neel, backgroundImage: `linear-gradient(160deg, ${colors.neelRaised}, ${colors.neel})`, color: colors.ghee, padding: '28px 24px 26px', display: 'grid', gap: 14 }}>

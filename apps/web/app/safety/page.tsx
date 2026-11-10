@@ -1,9 +1,12 @@
+// /safety: generated from the v16 page list (English at the root, Urdu under /ur).
 import type { Metadata } from 'next';
 import { t } from '@pohnch/messages';
-import { SafetyPage } from '../Pages';
+import { SafetyPage16 } from '../_v16/Pages16';
+import { pageMeta } from '../_lib/meta';
 
-export const metadata: Metadata = { title: `${t('ur', 'site.safety.title')} · ${t('ur', 'app.parent.name')}`, description: t('ur', 'site.safety.lead'), alternates: { canonical: '/safety', languages: { ur: '/safety', en: '/en/safety' } } };
+const L = 'en' as const;
+export const metadata: Metadata = pageMeta(L, '/safety', `${t(L, 'site.safety.title')} · Pohnch`, t(L, 'site.safety.lead'));
 
 export default function Page() {
-  return <SafetyPage lang="ur" />;
+  return <SafetyPage16 lang={L} />;
 }
