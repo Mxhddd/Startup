@@ -30,6 +30,8 @@ export type World = {
   resize: () => void;
   /** Tell the world how long the last frame took (ms); it lowers or raises its resolution to stay smooth. */
   tune: (frameMs: number) => void;
+  /** Show the visitor's area ("Gulshan-e-Iqbal") on a street sign by your home; null hides it. */
+  setAreaLabel: (text: string | null, fontFamily: string, rtl: boolean) => void;
   project: (x: number, y: number, z: number) => [number, number, boolean];
   dispose: () => void;
   routeAt: (u: number) => [number, number];
@@ -345,6 +347,151 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: Quality
   const clouds: THREE.Sprite[] = [];
   for (let k = 0; k < 9; k++) { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, transparent: true, depthWrite: false, opacity: 0.55 })); s.scale.set(90 + rnd() * 60, 45, 1); s.position.set(-260 + rnd() * 520, 70 + rnd() * 30, -200 + rnd() * 320); scene.add(s); clouds.push(s); }
 
+  /* ---------------- the street sign with your area (v17) ---------------- */
+  const signCanvas = document.createElement('canvas'); signCanvas.width = 512; signCanvas.height = 150;
+  const signTex = new THREE.CanvasTexture(signCanvas); signTex.colorSpace = THREE.SRGBColorSpace; signTex.anisotropy = 4;
+  const sign = new THREE.Group();
+  { const post = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 7, 8), mat('#5A5F70')); post.position.y = 3.5; sign.add(post);
+    const board = new THREE.Mesh(new THREE.PlaneGeometry(11, 3.2), new THREE.MeshBasicMaterial({ map: signTex, side: THREE.DoubleSide }));
+    board.position.y = 7.6; sign.add(board);
+    sign.position.set(HOME.x + 16, 0, HOME.z - 5); sign.visible = false; scene.add(sign); }
+  function setAreaLabel(text: string | null, fontFamily: string, rtl: boolean) {
+    if (!text) { sign.visible = false; dirty = true; return; }
+    const g = signCanvas.getContext('2d')!;
+    g.clearRect(0, 0, 512, 150);
+    g.fillStyle = '#17705A'; g.beginPath(); g.roundRect(4, 4, 504, 142, 16); g.fill();
+    g.strokeStyle = '#F5EEE1'; g.lineWidth = 5; g.beginPath(); g.roundRect(14, 14, 484, 122, 10); g.stroke();
+    g.fillStyle = '#F5EEE1'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.direction = rtl ? 'rtl' : 'ltr';
+    let size = rtl ? 70 : 64; do { g.font = `700 ${size}px ${fontFamily}`; size -= 4; } while (g.measureText(text).width > 440 && size > 26);
+    g.fillText(text, 256, rtl ? 80 : 77);
+    signTex.needsUpdate = true; sign.visible = true; dirty = true;
+  }
+
+  /* ---------------- Karachi life (v17): kites, a chai stall, rickshaws and cars, children, crows ---------------- */
+  const life = mulberry(29);
+  // kites high above the rooftops, on thin strings to a roof (all kites one draw, all tails one, all strings one)
+  const KITE_COLS = ['#E8A33D', '#C2453A', '#17705A', '#2F6FB5', '#B04B8C', '#F2C14E', '#1F2A5C'];
+  const KITE_N = KITE_COLS.length;
+  const KITE_AT: [number, number][] = [[HOME.x - 18, HOME.z - 22], [HOME.x + 26, HOME.z - 30], [FORK.x - 70, FORK.z + 40], [FORK.x + 60, FORK.z - 70], [SCHOOL.x - 30, SCHOOL.z + 26], [SCHOOL.x + 14, SCHOOL.z + 8], [20, 40]];
+  const kites: { x: number; z: number; h: number; ph: number }[] = [];
+  const kiteGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 2.4, 0), new THREE.Vector3(1.7, 0, 0), new THREE.Vector3(0, -2.6, 0), new THREE.Vector3(-1.7, 0, 0)]);
+  kiteGeo.setIndex([0, 1, 2, 0, 2, 3]); kiteGeo.computeVertexNormals();
+  const kiteMesh = new THREE.InstancedMesh(kiteGeo, new THREE.MeshBasicMaterial({ color: '#ffffff', side: THREE.DoubleSide }), KITE_N);
+  const tailGeo = new THREE.PlaneGeometry(0.25, 2.2); tailGeo.translate(0, -3.6, 0);
+  const tailMesh = new THREE.InstancedMesh(tailGeo, new THREE.MeshBasicMaterial({ color: '#F5EEE1', side: THREE.DoubleSide }), KITE_N);
+  const stringPos = new Float32Array(KITE_N * 6);
+  const strings = new THREE.LineSegments(new THREE.BufferGeometry(), new THREE.LineBasicMaterial({ color: '#6E6450', transparent: true, opacity: 0.45 }));
+  strings.geometry.setAttribute('position', new THREE.BufferAttribute(stringPos, 3));
+  for (let k = 0; k < KITE_N; k++) {
+    kiteMesh.setColorAt(k, col.set(KITE_COLS[k]!));
+    // flown near the places the camera visits (home, the route, the roundabout, school), so they are in view
+    const [ax, az] = KITE_AT[k]!; const x = ax + (life() - 0.5) * 16, z = az + (life() - 0.5) * 16, h = 26 + life() * 12;
+    const b = blocks[Math.floor(life() * blocks.length)]!;
+    stringPos.set([b.x, b.h + 1, b.z, x, h, z], k * 6);
+    kites.push({ x, z, h, ph: life() * 6.28 });
+  }
+  for (const m of [kiteMesh, tailMesh, strings]) { m.frustumCulled = false; scene.add(m); }
+  const kq = new THREE.Quaternion(), ke = new THREE.Euler(), kv = new THREE.Vector3(), ks = new THREE.Vector3(1.8, 1.8, 1.8), km = new THREE.Matrix4();
+  function moveKites(t: number) {
+    kites.forEach((kt, k) => {
+      const sway = Math.sin(t * 0.9 + kt.ph);
+      kv.set(kt.x + sway * 4, kt.h + Math.cos(t * 1.3 + kt.ph) * 2, kt.z + Math.sin(t * 0.6 + kt.ph) * 3);
+      kq.setFromEuler(ke.set(0, Math.atan2(camera.position.x - kt.x, camera.position.z - kt.z), sway * 0.35));
+      // a kite close to the camera shrinks away, so none ever fills the screen
+      ks.setScalar(1.8 * clamp((camera.position.distanceTo(kv) - 70) / 90));
+      km.compose(kv, kq, ks); kiteMesh.setMatrixAt(k, km); tailMesh.setMatrixAt(k, km);
+      stringPos[k * 6 + 3] = kv.x; stringPos[k * 6 + 4] = kv.y - 4.7; stringPos[k * 6 + 5] = kv.z;
+    });
+    kiteMesh.instanceMatrix.needsUpdate = true; tailMesh.instanceMatrix.needsUpdate = true; strings.geometry.attributes.position!.needsUpdate = true;
+  }
+  // a chai stall by the roundabout: a cart, a striped awning, a kettle with a curl of steam
+  const steam: THREE.Sprite[] = [];
+  if (q !== 'low') {
+    const g = new THREE.Group();
+    const cart = new THREE.Mesh(new RoundedBoxGeometry(5, 2.4, 3, 2, 0.3), mat('#B5865A')); cart.position.y = 1.6; g.add(cart);
+    const stripe = document.createElement('canvas'); stripe.width = 64; stripe.height = 8; const sg = stripe.getContext('2d')!;
+    for (let k = 0; k < 8; k++) { sg.fillStyle = k % 2 ? '#F5EEE1' : '#C2453A'; sg.fillRect(k * 8, 0, 8, 8); }
+    const awn = new THREE.Mesh(new THREE.BoxGeometry(6.4, 0.3, 4.2), new THREE.MeshStandardMaterial({ map: new THREE.CanvasTexture(stripe), roughness: 0.8 })); awn.position.y = 5.2; awn.rotation.z = 0.08; g.add(awn);
+    for (const sx of [-2.8, 2.8]) { const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 3, 6), mat('#4A4E62')); pole.position.set(sx, 3.9, 1.6); g.add(pole); }
+    const kettle = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.6, 0.8, 10), mat('#C9CCD3', { metalness: 0.5, roughness: 0.35 })); kettle.position.set(1.2, 3.2, 0); g.add(kettle);
+    for (let k = 0; k < 2; k++) { const st = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 1.2, 8), mat('#8C7552')); st.position.set(-1 - k * 1.6, 0.6, 3); g.add(st); }
+    g.traverse((o) => { if ((o as THREE.Mesh).isMesh) o.castShadow = true; });
+    g.position.set(FORK.x + 24, 0, FORK.z - 14); g.rotation.y = 0.3; scene.add(g);
+    for (let k = 0; k < 3; k++) { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: cloudTex, transparent: true, depthWrite: false, opacity: 0.5 })); sp.scale.set(1.6, 1.6, 1); scene.add(sp); steam.push(sp); }
+  }
+  // rickshaws (green and yellow) and small cars, driving back and forth on roads the van doesn't use
+  const LANES: [number, number, number, number][] = [[110, -200, 110, 150], [-250, -110, 250, -110], [-70, -200, -70, 40], [30, 10, 250, 10]];
+  const traffic: { lane: number; off: number; speed: number; ph: number; car: boolean }[] = [];
+  for (let k = 0; k < 12; k++) traffic.push({ lane: k % 4, off: (k % 2 ? 2.8 : -2.8), speed: 0.018 + life() * 0.02, ph: life(), car: k >= 6 });
+  const rickBody = new THREE.InstancedMesh(new RoundedBoxGeometry(4, 2.6, 2.6, 2, 0.5), mat('#2E8B57'), 6);
+  const rickRoof = new THREE.InstancedMesh(new RoundedBoxGeometry(3.6, 0.5, 2.8, 2, 0.2), mat('#F2C14E'), 6);
+  const carBody = new THREE.InstancedMesh(new RoundedBoxGeometry(5.6, 1.5, 2.6, 2, 0.4), mat('#ffffff', { roughness: 0.5 }), 6);
+  const carTop = new THREE.InstancedMesh(new RoundedBoxGeometry(3, 1.1, 2.3, 2, 0.35), mat('#2A3150', { roughness: 0.3 }), 6);
+  const CAR_COLS = ['#D9D4C7', '#9E2A1F', '#4A6FA5', '#E8E2D4', '#3A3D52', '#B8862F'];
+  CAR_COLS.forEach((c, k) => carBody.setColorAt(k, col.set(c)));
+  for (const m of [rickBody, rickRoof, carBody, carTop]) { m.castShadow = q !== 'low'; scene.add(m); }
+  const tq = new THREE.Quaternion(), tv = new THREE.Vector3(), ts3 = new THREE.Vector3(1, 1, 1), yAxis = new THREE.Vector3(0, 1, 0);
+  function moveTraffic(t: number) {
+    let r = 0, c = 0;
+    for (const v of traffic) {
+      const [x0, z0, x1, z1] = LANES[v.lane]!; const k = (Math.sin((t * v.speed + v.ph) * Math.PI * 2) + 1) / 2;
+      const dir = Math.cos((t * v.speed + v.ph) * Math.PI * 2) >= 0 ? 1 : -1;
+      const horiz = z0 === z1, x = x0 + (x1 - x0) * k + (horiz ? 0 : v.off), z = z0 + (z1 - z0) * k + (horiz ? v.off : 0);
+      tq.setFromAxisAngle(yAxis, horiz ? (dir > 0 ? 0 : Math.PI) : (dir > 0 ? -Math.PI / 2 : Math.PI / 2));
+      if (!v.car) { tv.set(x, 2.1, z); m4.compose(tv, tq, ts3); rickBody.setMatrixAt(r, m4); tv.set(x, 3.6, z); m4.compose(tv, tq, ts3); rickRoof.setMatrixAt(r, m4); r++; }
+      else { tv.set(x, 1.5, z); m4.compose(tv, tq, ts3); carBody.setMatrixAt(c, m4); tv.set(x - 0.2, 2.7, z); m4.compose(tv, tq, ts3); carTop.setMatrixAt(c, m4); c++; }
+    }
+    for (const m of [rickBody, rickRoof, carBody, carTop]) m.instanceMatrix.needsUpdate = true;
+  }
+  // children at the school gate: small rounded figures with backpacks, walking in as the van arrives
+  const KIDS = 10;
+  const kidBody = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.75, 1.5, 4, 8), mat('#F5F1E6'), KIDS);
+  const kidHead = new THREE.InstancedMesh(new THREE.SphereGeometry(0.6, 10, 8), mat('#8C6A4F'), KIDS);
+  const kidBag = new THREE.InstancedMesh(new RoundedBoxGeometry(1.1, 1.2, 0.6, 2, 0.2), mat('#ffffff'), KIDS);
+  const BAGS = ['#C2453A', '#2F6FB5', '#E8A33D', '#17705A', '#B04B8C'];
+  const kidSpots = Array.from({ length: KIDS }, (_, k) => ({ x: SCHOOL.x - 7 + (k % 5) * 3.4 + life(), z: SCHOOL.z + 13 + Math.floor(k / 5) * 3 + life(), d: life() * 0.35 }));
+  kidSpots.forEach((_, k) => kidBag.setColorAt(k, col.set(BAGS[k % BAGS.length]!)));
+  for (const m of [kidBody, kidHead, kidBag]) { m.castShadow = q !== 'low'; scene.add(m); }
+  function moveKids(school: number, t: number) {
+    const on = school > 0.02; kidBody.visible = kidHead.visible = kidBag.visible = on; if (!on) return;
+    kidSpots.forEach((p, k) => {
+      const w2 = clamp((school - p.d) / 0.65), x = p.x + (SCHOOL.x - p.x) * w2 * 0.6, z = p.z - w2 * 18, bob = Math.abs(Math.sin(t * 6 + k)) * 0.25 * (w2 > 0 && w2 < 1 ? 1 : 0);
+      const fade = w2 >= 1 ? 0 : 1;
+      tv.set(x, 1.5 + bob, z); m4.compose(tv, tq.identity(), ts3.setScalar(fade)); kidBody.setMatrixAt(k, m4);
+      tv.set(x, 3.3 + bob, z); m4.compose(tv, tq, ts3); kidHead.setMatrixAt(k, m4);
+      tv.set(x, 2.2 + bob, z + 0.75); m4.compose(tv, tq, ts3); kidBag.setMatrixAt(k, m4);
+      ts3.set(1, 1, 1);
+    });
+    for (const m of [kidBody, kidHead, kidBag]) m.instanceMatrix.needsUpdate = true;
+  }
+  // crows sitting on water tanks; one at a time hops to the next tank (bodies, heads and wings: three draws)
+  const crowMat = new THREE.MeshStandardMaterial({ color: '#1B1E2B', roughness: 0.7 });
+  const crowSpots = q === 'low' ? [] : tanksArr.filter((_, k) => k % 9 === 0).slice(0, 7).map(([x, y, z]) => new THREE.Vector3(x, y + 2.1, z));
+  const CN = Math.max(1, crowSpots.length);
+  const crowBodyGeo = new THREE.SphereGeometry(0.5, 8, 6); crowBodyGeo.scale(1.5, 0.9, 0.9);
+  const crowHeadGeo = new THREE.SphereGeometry(0.32, 8, 6); crowHeadGeo.translate(0.7, 0.35, 0);
+  const wingGeo = new THREE.PlaneGeometry(1.4, 0.6); wingGeo.rotateX(Math.PI / 2);
+  const crowBody = new THREE.InstancedMesh(crowBodyGeo, crowMat, CN), crowHead = new THREE.InstancedMesh(crowHeadGeo, crowMat, CN), crowWing = new THREE.InstancedMesh(wingGeo, crowMat, CN * 2);
+  for (const m of [crowBody, crowHead, crowWing]) { m.visible = crowSpots.length > 0; m.frustumCulled = false; scene.add(m); }
+  const cp = new THREE.Vector3(), cq = new THREE.Quaternion(), wq = new THREE.Quaternion(), xAxis = new THREE.Vector3(1, 0, 0), one = new THREE.Vector3(1, 1, 1), cm = new THREE.Matrix4(), wm = new THREE.Matrix4(), wo = new THREE.Vector3();
+  function moveCrows(t: number) {
+    if (!crowSpots.length) return;
+    const cyc = 6, i = Math.floor(t / cyc) % crowSpots.length, k = (t % cyc) / cyc;
+    crowSpots.forEach((home, j) => {
+      let flap = 0;
+      if (j === i && k < 0.35 && crowSpots.length > 1) {
+        const to = crowSpots[(j + 1) % crowSpots.length]!, f = k / 0.35;
+        cp.lerpVectors(home, to, f); cp.y += Math.sin(Math.PI * f) * 14; flap = Math.sin(t * 22) * 0.9;
+      } else cp.copy(home);
+      cm.compose(cp, cq, one); crowBody.setMatrixAt(j, cm); crowHead.setMatrixAt(j, cm);
+      for (const sz of [-1, 1]) {
+        wq.setFromAxisAngle(xAxis, flap * sz); wo.set(cp.x - 0.1, cp.y + 0.25, cp.z + sz * 0.5);
+        wm.compose(wo, wq, one); crowWing.setMatrixAt(j * 2 + (sz > 0 ? 1 : 0), wm);
+      }
+    });
+    for (const m of [crowBody, crowHead, crowWing]) m.instanceMatrix.needsUpdate = true;
+  }
+
   // post-processing (desktop): one pass for the tilt-shift blur and the colour, then the output pass
   let composer: EffectComposer | null = null, postPass: ShaderPass | null = null;
   if (post) {
@@ -397,6 +544,10 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: Quality
       for (const c of clouds) (c.material as THREE.SpriteMaterial).opacity = 0.55 * (1 - n);
     }
     routeMat.emissiveIntensity = 0.1 + 1.1 * n;
+    // Karachi life
+    moveKites(t);
+    steam.forEach((sp, k) => { const f = ((t * 0.5 + k / 3) % 1); sp.position.set(FORK.x + 25.2 + Math.sin(t + k) * 0.5, 4 + f * 5, FORK.z - 13.6); (sp.material as THREE.SpriteMaterial).opacity = 0.45 * (1 - f) * (1 - n * 0.5); sp.scale.setScalar(1.2 + f * 2); });
+    moveTraffic(t); moveKids(s.school, t); moveCrows(t);
     // the route, drawn as far as lit
     const lit = clamp(s.lit); routeGeo.setDrawRange(0, Math.floor(routeIdx * lit / 3) * 3); routeMesh.visible = lit > 0.002;
     // the van on its route, a gentle sway while moving, brake lights when stopping
@@ -435,5 +586,5 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: Quality
     renderer.dispose(); composer?.dispose();
     scene.traverse((o) => { const m = o as THREE.Mesh; m.geometry?.dispose?.(); const mm = m.material as THREE.Material | THREE.Material[] | undefined; if (Array.isArray(mm)) mm.forEach((x) => x.dispose()); else mm?.dispose?.(); });
   }
-  return { quality: q, setState, resize, tune, project, dispose, routeAt };
+  return { quality: q, setState, resize, tune, setAreaLabel, project, dispose, routeAt };
 }

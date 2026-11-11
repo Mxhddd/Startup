@@ -10,11 +10,62 @@ const stubInterest = (page: Page, status = 200, seen: string[] = []) => page.rou
   await route.fulfill({ status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: route.request().method() === 'GET' ? '{"areas":{},"proof":null}' : status === 200 ? '{"ok":true}' : '{"error":"server"}' });
 });
 
-test('the first screen says what Pohnch is, in English, with one clear action', async ({ page }) => {
+test('the intro plays on a first visit, can be skipped, and is short on the next visit', async ({ page }) => {
+  await page.goto('/?lite');
+  const intro = page.getByTestId('intro');
+  await expect(intro).toBeVisible();
+  await page.keyboard.press('Space');
+  await expect(intro).toHaveCount(0, { timeout: 3000 });
+  await page.reload();
+  await expect(page.locator('.intro.short')).toHaveCount(1);
+  await expect(page.getByTestId('intro')).toHaveCount(0, { timeout: 3000 });
+});
+
+test('with reduced motion there is no intro', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.goto('/?lite');
+  await expect(page.getByTestId('intro')).toHaveCount(0);
+});
+
+test('the front door sums Pohnch up for parents and for drivers, in English', async ({ page }) => {
   await page.goto('/?lite');
   await expect(page.locator('html')).toHaveAttribute('lang', 'en');
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('Your child’s school van.');
-  await expect(page.locator('.hero-copy').getByRole('link', { name: 'Join the pilot' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your child’s school van, live.');
+  await expect(page.getByTestId('door-parent').locator('li')).toHaveCount(3);
+  await expect(page.getByTestId('door-driver').locator('li')).toHaveCount(3);
+  await expect(page.locator('.bar').getByRole('link', { name: 'Join the pilot' })).toBeAttached();
+});
+
+test('For parents asks where you live, starts the story, and fills the join form with your area', async ({ page }) => {
+  await page.goto('/?lite');
+  await page.getByRole('button', { name: /Show me how it works/ }).click();
+  await expect(page.getByRole('dialog', { name: 'Where do you live?' })).toBeVisible();
+  await page.getByRole('button', { name: 'Gulshan-e-Iqbal' }).click();
+  await expect(page).toHaveURL(/#parents$/);
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(300);
+  await page.evaluate(() => document.querySelector('#join')!.scrollIntoView());
+  await expect(page.getByTestId('join-area')).toHaveValue('gulshan');
+});
+
+test('Skip goes straight into the story without an area', async ({ page }) => {
+  await page.goto('/?lite');
+  await page.getByRole('button', { name: /Show me how it works/ }).click();
+  await page.getByRole('button', { name: 'Skip', exact: true }).click();
+  await expect.poll(() => page.evaluate(() => scrollY)).toBeGreaterThan(300);
+  await page.evaluate(() => document.querySelector('#join')!.scrollIntoView());
+  await expect(page.getByTestId('join-area')).toHaveValue('');
+});
+
+test('For drivers opens the drivers page', async ({ page }) => {
+  await page.goto('/?lite');
+  await page.getByRole('link', { name: /See the driver app/ }).click();
+  await expect(page).toHaveURL(/\/drivers$/);
+});
+
+test('the fork has two signposts (drivers chose at the front door) and the site counts visits', async ({ page }) => {
+  await page.goto('/?lite');
+  await expect(page.locator('.sign .arm')).toHaveCount(2);
+  await expect(page.locator('script[src*="insights"], script[src*="vercel-scripts"]')).toHaveCount(1);
 });
 
 test('the 7 am calls are struck through as you scroll, and the steps follow the scroll', async ({ page }) => {
@@ -38,8 +89,8 @@ test('the fork opens the road you pick, and opening an honest answer is counted'
   await page.getByRole('button', { name: 'Is it safe?' }).click();
   await expect(page.locator('#road').getByText(/checks every driver’s ID and van/)).toBeVisible();
   await expect.poll(() => seen.some((s) => s.includes('"kind":"doubt"'))).toBe(true);
-  await page.getByRole('button', { name: /I drive a van/ }).click();
-  await expect(page.locator('#road').getByText('Fewer calls. One button. Free, always.')).toBeVisible();
+  await page.getByRole('button', { name: /Yes, I want this/ }).click();
+  await expect(page.locator('#road').getByText('Here’s how it starts.')).toBeVisible();
 });
 
 test('joining the pilot sends the form and says thank you', async ({ page }) => {
@@ -70,7 +121,10 @@ test('Urdu lives under /ur, right to left, with a way back to English', async ({
   await page.goto('/ur?lite');
   await expect(page.locator('main.v16')).toHaveAttribute('dir', 'rtl');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('اسکول وین');
-  await page.locator('.bar .lang').click();
+  await expect(page.getByTestId('door-parent')).toContainText('والدین کے لیے');
+  // on phones the language switch sits in the menu (the top bar keeps the small join button)
+  await page.locator('.menub').click();
+  await page.locator('#menu a[hreflang], #menu a[href="/"]').last().click();
   await expect(page).toHaveURL(/\/$/);
 });
 

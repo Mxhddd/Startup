@@ -4,7 +4,7 @@ import { AREA_IDS, AREA_SPOTS, PILOT_WHATSAPP, STORE } from '@pohnch/core';
 import { en, t, type Lang, type MessageKey } from '@pohnch/messages';
 import { href } from '../_lib/links';
 import { HomeClient } from './HomeClient';
-import { QUOTES } from './quotes';
+import { QUOTES, quoteFor } from './quotes';
 
 export function webWords(lang: Lang): Record<string, string> {
   const out: Record<string, string> = {};
@@ -34,6 +34,7 @@ export function Home({ lang, homeHref, otherHref }: { lang: Lang; homeHref: stri
       areas={areas}
       qa={qa}
       quotes={QUOTES.map((q) => ({ name: q.name, text: q[lang] }))}
+      doorQuotes={{ parent: quoteFor(QUOTES, 'parent', lang), driver: quoteFor(QUOTES, 'driver', lang) }}
       links={{ home: homeHref, other: otherHref, drivers: href(lang, '/drivers'), safety: href(lang, '/safety'), privacy: href(lang, '/privacy'), terms: href(lang, '/terms'), delete: href(lang, '/delete-account'), download: href(lang, '/download') }}
       wa={{ href: `https://wa.me/${PILOT_WHATSAPP.waNumber}`, display: PILOT_WHATSAPP.display }}
       playUrl={STORE.playUrl}

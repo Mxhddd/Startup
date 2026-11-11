@@ -186,7 +186,7 @@ function Doc({ lang, sections, summary }: { lang: Lang; sections: { id: string; 
   );
 }
 
-const PRIVACY = ['collect', 'never', 'who', 'keep', 'pilot', 'safe', 'contact'] as const;
+const PRIVACY = ['collect', 'never', 'who', 'keep', 'pilot', 'analytics', 'safe', 'contact'] as const;
 export function PrivacyPage16({ lang }: { lang: Lang }) {
   const summary = (
     <div className="summary">

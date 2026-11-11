@@ -14,11 +14,14 @@ export type Area = { id: AreaId; label: string; spot: [number, number] | null };
 const fill = (s: string | undefined, vars: Record<string, string | number>) => (s ?? '').replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
 
 /* ---------------- Join the pilot ---------------- */
-export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa }: {
+export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialArea }: {
   w: Words; lang: 'ur' | 'en'; areas: Area[]; role: 'parent' | 'driver'; setRole: (r: 'parent' | 'driver') => void; onJoined: (area: AreaId) => void; wa: string;
+  /** The area picked at the front door ("Where do you live?"), already chosen in the form. */
+  initialArea?: AreaId | null;
 }) {
   const id = useId();
   const [area, setArea] = useState('');
+  useEffect(() => { if (initialArea) setArea((cur) => cur || initialArea); }, [initialArea]);
   const [school, setSchool] = useState('');
   const [kids, setKids] = useState(1);
   const [driverPhone, setDriverPhone] = useState<'yes' | 'no' | 'unknown'>('unknown');

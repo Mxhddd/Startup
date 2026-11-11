@@ -534,3 +534,23 @@ A full read of the server, both apps, the shared UI and the website found about 
 - **Offline queue:** removing (undoing) a tap while an earlier one was being sent could still send it. Fixed, with a test.
 
 Files: `supabase/migrations/20261105000100_audit.sql`, `supabase/tests/database/180-audit.test.sql` (24 checks), `packages/core/src/queue.ts`, `packages/core/src/v12.ts`, `apps/parent/src/state/ParentStore.tsx`, `apps/driver/src/state/DriverStore.tsx`, `apps/driver/src/components/RunScreen.tsx` and the day cards.
+
+## Website v17: logo intro, front door, Karachi life (11 November 2026)
+
+The home page (`apps/web/app/_v16/`) now opens in three steps:
+
+| Step | File | What it does |
+| --- | --- | --- |
+| Logo intro | `Intro.tsx`, rules in `introRules.ts` | The route dots travel into the star, پہنچ writes itself, "Pohnch" rises with a gold glint, then the layer opens. Full (about 2.6 s) on the first visit, 0.6 s after that, none with reduced motion; any tap, scroll or key skips it. The only thing stored is `pohnch.intro.seen` in the visitor's own browser. |
+| Front door | `FrontDoor.tsx` | "For parents" and "For drivers", 3 points each, plus a quote once `quotes.ts` has a real one (each quote now has a `role`). Drivers go to `/drivers`. Parents are asked "Where do you live?" (optional), then the story starts. |
+| Your area | `HomeClient.tsx`, `world3d.ts` (`setAreaLabel`), `Panel.tsx` (`initialArea`) | The chosen area shows on a green street sign next to the home in the 3D city, pulses on the waiting map and is already picked in the join form. Not remembered between visits. |
+
+Also new:
+- **The fork** has two signposts ("Yes" and "Not sure yet").
+- **Karachi life in the 3D city:** kites (one draw for all), rickshaws and cars (instanced), children walking into school, crows on water tanks and a chai stall (not on phones).
+- **"Reached school":** پہنچ گئے writes itself in gold as the van reaches school (`.reached`, driven by the section's scroll).
+- **Cross-page transitions:** pure CSS (`@view-transition`).
+- **Vercel Web Analytics:** `<Analytics />` in `app/layout.tsx`, page views only, no cookies; the privacy page says so. Turn it on once in Vercel: Project > Analytics > Enable.
+- **Phone top bar:** it keeps a small "Join the pilot"; the language switch moves into the menu.
+
+Tests: `app/_v16/v17.test.ts` and the intro and front-door tests in `e2e/home.spec.ts`. Videos for review use `?timescale=0.125`, which also slows the intro's timers.

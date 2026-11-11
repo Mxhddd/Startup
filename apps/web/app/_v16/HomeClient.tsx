@@ -15,6 +15,8 @@ import { callsAYear, clamp, hourOfClock, karachiHours, skyHex, span } from './ho
 import { SECTIONS, pinned, scrollS, worldAt, type Ctx, type SectionId } from './scenes';
 import type { Quality, World } from './world3d';
 import { CallsCounter, HoldDemo, OffDemo, SignalDemo, TS } from './Demos';
+import { FrontDoor } from './FrontDoor';
+import { Intro } from './Intro';
 import './home.css';
 
 export type HomeProps = {
@@ -23,6 +25,7 @@ export type HomeProps = {
   areas: Area[];
   qa: [string, string][];
   quotes: { name: string; text: string }[];
+  doorQuotes: { parent: { name: string; text: string } | null; driver: { name: string; text: string } | null };
   links: { home: string; other: string; drivers: string; safety: string; privacy: string; terms: string; delete: string; download: string };
   wa: { href: string; display: string };
   playUrl: string | null;
@@ -44,19 +47,20 @@ function isLite(): boolean {
   return false;
 }
 
-export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foot }: HomeProps) {
+export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, playUrl, foot }: HomeProps) {
   const root = useRef<HTMLElement>(null), canvas = useRef<HTMLCanvasElement>(null);
-  const heroPhone = useRef<PhoneHandle>(null), sidesPhone = useRef<PhoneHandle>(null), mornPhone = useRef<PhoneHandle>(null), offPhone = useRef<PhoneHandle>(null);
+  const worldRef = useRef<World | null>(null);
+  const sidesPhone = useRef<PhoneHandle>(null), mornPhone = useRef<PhoneHandle>(null), offPhone = useRef<PhoneHandle>(null);
   const signRef = useRef<HTMLDivElement>(null), stickRef = useRef<HTMLDivElement>(null);
   const [lite, setLite] = useState(false);
-  const [heroEta, setHeroEta] = useState(6);
+  const [area, setArea] = useState<AreaId | null>(null);
   const [calls, setCalls] = useState({ n: 0, off: false });
   const [sides, setSides] = useState(0);
   const [morn, setMorn] = useState(0);
   const [lockP, setLockP] = useState(0);
   const [plat, setPlat] = useState<'ios' | 'android'>('ios');
   const [flips, setFlips] = useState(0);
-  const [road, setRoad] = useState<'yes' | 'unsure' | 'driver' | null>(null);
+  const [road, setRoad] = useState<'yes' | 'unsure' | null>(null);
   const [open, setOpen] = useState<Set<number>>(new Set());
   const [calc, setCalc] = useState(4);
   const [role, setRole] = useState<'parent' | 'driver'>('parent');
@@ -107,6 +111,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
         world = m.createWorld(canvas.current, { quality });
         const curve = m.routeCurve();
         ctx.routeAt = world.routeAt; ctx.uHome = m.routeU(m.HOME.x, m.HOME.z - 12, curve); ctx.uFork = m.routeU(m.FORK.x - 21, m.FORK.z, curve);
+        worldRef.current = world;
         el.classList.add('has3d');
       } catch { setLite(true); }
     });
@@ -140,9 +145,6 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
       });
       const vis = (id: SectionId) => { const i = SECTIONS.indexOf(id); return tops[i]! < y + vh && tops[i]! + hts[i]! > y; };
       const moveVan = (k: number, ref: React.RefObject<PhoneHandle | null>, v: number) => { if (Math.abs(v - lastVan[k]!) > 0.001) { lastVan[k] = v; ref.current?.setVan(v); } };
-      // hero: the van drives in, the minutes count down
-      const eta = Math.max(2, Math.round(6 - clamp(ctx.heroT / 9) * 4)); if (eta !== last.eta) { last.eta = eta; setHeroEta(eta); }
-      if (vis('hero')) moveVan(0, heroPhone, 0.2 + clamp(ctx.heroT / 9) * 0.32);
       // calls: stack, then switch
       const nCalls = Math.min(6, Math.floor(span(pp.calls!, 0.05, 0.5) * 6.99)), off = pp.calls! > 0.58;
       if (nCalls !== last.calls || off !== last.off) { last.calls = nCalls; last.off = off; setCalls({ n: nCalls, off }); }
@@ -193,7 +195,20 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
   }, [playing]);
 
   const go = (sel: string) => (e: React.MouseEvent) => { e.preventDefault(); setMenu(false); scrollTo(sel); };
-  const pickRoad = (r: 'yes' | 'unsure' | 'driver') => { setRoad(r); if (r === 'driver') setRole('driver'); setTimeout(() => scrollTo('#road'), 60); };
+  const pickRoad = (r: 'yes' | 'unsure') => { setRoad(r); setTimeout(() => scrollTo('#road'), 60); };
+  // "For parents": remember the area for this visit only, put it on a street sign in the city, start the story
+  const startParents = (a: AreaId | null) => {
+    setArea(a);
+    try { history.replaceState(null, '', '#parents'); } catch { /* not important */ }
+    setTimeout(() => scrollTo('[data-sec="calls"]'), 80);
+  };
+  useEffect(() => {
+    const label = area ? areas.find((x) => x.id === area)?.label ?? null : null;
+    const font = getComputedStyle(document.documentElement).getPropertyValue(lang === 'ur' ? '--font-urdu' : '--font-latin').trim() || 'sans-serif';
+    let tries = 0; let t: ReturnType<typeof setTimeout>;
+    const apply = () => { if (worldRef.current) worldRef.current.setAreaLabel(label, font, lang === 'ur'); else if (tries++ < 40) t = setTimeout(apply, 250); };
+    apply(); return () => clearTimeout(t);
+  }, [area, areas, lang]);
   const flipDoubt = (n: number) => setOpen((s) => { const x = new Set(s); if (x.has(n)) x.delete(n); else { x.add(n); countDoubt(n); } return x; });
   const cta = playUrl
     ? <a className="btn" href={playUrl} rel="noreferrer">{w.ctaPlay}</a>
@@ -206,6 +221,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
 
   return (
     <main ref={root} className={`v16 ${lite ? 'lite' : ''} ${menu ? 'menu-open' : ''}`} lang={lang} dir={dir} data-lang={lang}>
+      <Intro skipLabel={w['intro.skip'] ?? ''} />
       <canvas ref={canvas} className="world" aria-hidden="true" />
       <div className="sky" aria-hidden="true" />
 
@@ -231,18 +247,10 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
         <a href={links.other}>{foot.switchLang}</a>
       </nav>
 
-      {/* ---------- hero ---------- */}
+      {/* ---------- the front door: for parents / for drivers ---------- */}
       <section className="sec hero" data-sec="hero" style={{ height: '125vh' }} aria-labelledby="h-hero">
         <div className="stick">
-          <div className="hero-copy">
-            <p className="kick">{w['hero.k']}</p>
-            <h1 id="h-hero"><span className="l1">{w['hero.h1']}</span> <span className="l2">{w['hero.h2']}</span></h1>
-            <p className="lede">{w['hero.p']}</p>
-            <div className="acts">{cta}<a className="link" href="#how" onClick={go('#how')}>{w['hero.more']}<Arrow /></a></div>
-            <ul className="facts">{[1, 2, 3, 4].map((n) => <li key={n}>{w[`hero.f${n}`]}</li>)}</ul>
-            <button className="play" type="button" onClick={() => setPlaying(true)}><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 2l9 5-9 5z" fill="currentColor" /></svg>{w.play}</button>
-          </div>
-          <ParentPhone ref={heroPhone} className="hero-phone" w={w} mode="map" eta={heroEta} step={0} title={w['morning.1h'] ?? ''} />
+          <FrontDoor w={w} areas={areas} driversHref={links.drivers} quotes={doorQuotes} onParents={startParents} onPlay={() => { startParents(null); setTimeout(() => setPlaying(true), 900); }} />
           <div className="cue" aria-hidden="true"><i /></div>
         </div>
       </section>
@@ -293,6 +301,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
             <p className={`fin ${morn >= 4 ? 'on' : ''}`}>{w['morning.end']}</p>
           </div>
           <ParentPhone ref={mornPhone} className="mp" w={w} mode="map" eta={morn <= 1 ? 6 - morn * 3 : null} step={Math.max(0, morn - 1)} title={morningAlert ?? w['morning.1h'] ?? ''} alert={morningAlert} />
+          <div className="reached" aria-hidden="true"><b lang="ur">{w.reached}</b></div>
         </div>
       </section>
 
@@ -334,7 +343,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
           </div>
           <div className="sign" ref={signRef}>
             <span className="pole" aria-hidden="true" />
-            {(['yes', 'unsure', 'driver'] as const).map((r, k) => (
+            {(['yes', 'unsure'] as const).map((r, k) => (
               <button key={r} type="button" className={`arm a${k + 1} ${road === r ? 'chosen' : ''}`} aria-pressed={road === r} aria-controls="road" onClick={() => pickRoad(r)}><b>{w[`fork.${r}`]}</b><small>{w[`fork.${r}.s`]}</small></button>
             ))}
           </div>
@@ -357,14 +366,6 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
                 </button>))}
               </div>
               <div className="acts"><b className="ask">{w['unsure.ask']}</b>{cta}<a className="link" href={`${wa.href}?text=${encodeURIComponent(w['unsure.waText'] ?? '')}`} rel="noreferrer">{w['unsure.no']}<Arrow /></a></div>
-            </div>
-          )}
-          {road === 'driver' && (
-            <div className="wrap">
-              <h3>{w['drv.h']}</h3>
-              <CallsCounter label={w['drv.c'] ?? ''} />
-              <ol className="miles">{[1, 2, 3].map((n) => <li key={n} style={{ ['--k' as string]: n }}><span className="stone num" aria-hidden="true">{n}</span><p>{w[`drv.${n}`]}</p></li>)}</ol>
-              <div className="acts"><a className="btn" href="#join" onClick={(e) => { setRole('driver'); go('#join')(e); }}>{w['drv.go']}</a><a className="link" href={links.drivers}>{w['drv.more']}<Arrow /></a></div>
             </div>
           )}
         </div>
@@ -439,9 +440,9 @@ export function HomeClient({ lang, w, areas, qa, quotes, links, wa, playUrl, foo
               <p>{w['join.lead']}</p>
               <a className="link" href={share} target="_blank" rel="noreferrer"><WaIcon />{w['share.btn']}<Arrow /></a>
             </div>
-            <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={wa.href} />
+            <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={wa.href} initialArea={area} />
           </div>
-          <div className="waitwrap"><h3>{w['wait.title']}</h3><WaitingMap w={w} areas={areas} summary={summary} mine={mine} /></div>
+          <div className="waitwrap"><h3>{w['wait.title']}</h3><WaitingMap w={w} areas={areas} summary={summary} mine={mine ?? area} /></div>
           <div className="two">
             <div><h3>{w['kit.title']}</h3><p>{w['kit.lead']}</p><DriverKit w={w} lang={lang} /></div>
             <div className="why"><h3>{w['why.title']}</h3><blockquote>{w['why.body']}</blockquote><cite>{w['why.sign']}</cite><Proof w={w} proof={summary.proof} /></div>
