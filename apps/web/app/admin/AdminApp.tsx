@@ -80,7 +80,8 @@ function Login({ supabase, t, lang, turnstileKey }: { supabase: SupabaseClient; 
     // only existing team accounts get a code (the page never creates accounts); the bot check's token goes along
     const { error: err } = await supabase.auth.signInWithOtp({ phone: e164, options: { shouldCreateUser: false, ...(human ? { captchaToken: human } : {}) } });
     setRound((n) => n + 1);
-    if (err) return setError(t('error.generic'));
+    // a 5xx (or a hook error) means Supabase couldn't hand the code to an SMS sender: say so plainly
+    if (err) return setError(t((err.status ?? 0) >= 500 || /hook|sms/i.test(err.message) ? 'admin.login.noSms' : 'error.generic'));
     setError(null);
     setSent(e164);
   };

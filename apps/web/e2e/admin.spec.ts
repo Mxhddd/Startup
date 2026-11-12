@@ -105,3 +105,12 @@ test('v20: a team member with only the phone code is asked for the authenticator
   await expect(page.getByTestId('admin-mfa')).toContainText('آتھنٹیکیٹر'); // the team page opens in Urdu
   expect(calls.filter((c) => c.includes('/rpc/'))).toEqual([]);
 });
+
+test('v20: when the login code cannot be sent by SMS, the page says so plainly', async ({ context, page }) => {
+  await fakeSupabase(context, { loggedIn: false, admin: false });
+  await context.route(`${SB}/auth/v1/otp**`, (route) => route.fulfill({ status: 500, contentType: 'application/json', body: JSON.stringify({ code: 500, error_code: 'hook_timeout', msg: 'Error running hook URI' }) }));
+  await page.goto('/admin');
+  await page.locator('#phone').fill('03001234567');
+  await page.getByTestId('admin-login').getByRole('button').click();
+  await expect(page.getByTestId('admin-login').getByRole('alert')).toContainText(/SMS/);
+});

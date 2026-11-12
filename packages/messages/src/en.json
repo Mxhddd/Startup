@@ -92,6 +92,7 @@
   "error.tooMany": "Too many tries. Wait a little and try again.",
   "error.notConfigured": "Pohnch isn't connected to its server yet (developer setup pending).",
   "error.generic": "Something went wrong. Try again.",
+  "admin.login.noSms": "Couldn't send the code: text messages aren't set up for this number yet. Ask the Pohnch team.",
   "driver.setup.title": "Set up your van",
   "driver.setup.hint": "Parents will see these.",
   "driver.van.name": "Van name",
