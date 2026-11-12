@@ -30,6 +30,9 @@ jobs:
         env:
           DATABASE_URL: postgres://postgres@localhost:54329/postgres
       - run: pnpm build:web
+        env:
+          # the browser tests answer Supabase themselves, so this build leaves Cloudflare's bot check out
+          NEXT_PUBLIC_TURNSTILE_SITE_KEY: ""
       - name: Build the app bundles and check that nothing secret or personal is inside
         run: |
           pnpm bundle:apps

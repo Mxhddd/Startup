@@ -3,11 +3,11 @@
 // function holds the service key; the website only knows the public project URL. Nothing here is
 // logged, and failures are quiet (the form shows its own error).
 import { INTEREST_URL, type AreaMeter, type Interest } from '@pohnch/core';
+import { SUPABASE_URL } from './publicConfig';
 
 // The project URL when the build has one (tests point it at a stub), else the public endpoint.
 const base = (): string => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  return url ? `${url.replace(/\/$/, '')}/functions/v1/interest` : INTEREST_URL;
+  return SUPABASE_URL ? `${SUPABASE_URL}/functions/v1/interest` : INTEREST_URL;
 };
 
 /** areas: exact family counts for areas with 3+; meter (v19): bands and a status per area; proof: pilot numbers once they mean something.

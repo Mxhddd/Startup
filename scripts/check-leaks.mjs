@@ -84,6 +84,9 @@ const SECRET_PATTERNS = [
   [/sntrys_[A-Za-z0-9_+/=]{20,}/, 'a Sentry auth token'],
   [/-----BEGIN [A-Z ]*PRIVATE KEY-----/, 'a private key'],
   [/whsec_[A-Za-z0-9+/=]{16,}/, 'a webhook secret'],
+  [/(?<![A-Za-z0-9])sb_secret_[A-Za-z0-9_-]{20,}/, 'a Supabase secret key'],
+  [/0x4AAAAAA[A-Za-z0-9_-]{24,}/, 'a Cloudflare Turnstile secret (site keys are shorter)'],
+  [/cfat_[A-Za-z0-9_-]{20,}|TURNSTILE_SECRET\s*[:=]\s*['"][^'"]+/, 'a Cloudflare token or a written-in Turnstile secret'],
 ];
 const ALLOWED_PHONES = new Set(['03001478729', '923001478729', '+923001478729']); // the public pilot WhatsApp
 const PHONE = /(?<![0-9])(?:\+?92|0)3\d{2}[ -]?\d{7}(?![0-9])/g;

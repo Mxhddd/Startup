@@ -17,7 +17,7 @@ What protects Pohnch, in plain words, and what to do if something goes wrong.
   - /admin gets a stricter CSP: no page counter, and it is never cached or indexed.
 - **Invite links** (`/i/<token>`) are never cached, never sent on as a referrer, and the page counter records them as `/i/[token]` (`app/_lib/SafeAnalytics.tsx`). It never counts /admin or /invite.
 - **The admin page refuses to start** if the key it was given is not a public key (`app/admin/publicKey.ts`). This stops a service key put in the wrong setting from reaching browsers.
-- **Bot check:** the join and school forms and the admin login carry a Cloudflare Turnstile token. The `interest` function checks it with Cloudflare once `TURNSTILE_SECRET` is set.
+- **Bot check:** the join and school forms and the admin login carry a Cloudflare Turnstile token. The `interest` function checks it with Cloudflare (`TURNSTILE_SECRET` is set on the live project, widget "Pohnch": pohnch.pk, www.pohnch.pk, vercel.app previews, localhost).
 
 ## The sign-up function (`interest`)
 
@@ -46,7 +46,8 @@ The `pg_cron` jobs, checked on the live project:
 
 - **Where they live:** the service-role key, Turnstile secret, IP-hash salt, SMS gateway key and Expo token live only as Supabase function secrets.
 - **Never** in the apps, the website bundle, the repo or logs. `pnpm check:leaks` checks the source, git and the built bundles, and fails on any `NEXT_PUBLIC_*SECRET/SERVICE*` name.
-- The website's public settings are `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` and `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. All three are safe to be public.
+- The website's public settings are `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (the publishable key) and `NEXT_PUBLIC_TURNSTILE_SITE_KEY`. All three are safe to be public, so pohnch.pk's own values are built in (`apps/web/app/_lib/publicConfig.ts`); Vercel settings with the same names override them. A unit test checks the built-in Supabase key is the publishable one.
+- The leak check also fails on a Supabase secret key (`sb_secret_…`), a Turnstile secret or a Cloudflare token anywhere in the source, git or bundles.
 
 ## If something leaks
 

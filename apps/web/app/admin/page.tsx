@@ -6,14 +6,12 @@
 import type { Metadata } from 'next';
 import { AdminApp } from './AdminApp';
 import { isPublicKey } from './publicKey';
+import { SUPABASE_PUBLIC_KEY, SUPABASE_URL, TURNSTILE_SITE_KEY } from '../_lib/publicConfig';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: 'Pohnch team', robots: { index: false, follow: false } };
 
 export default function AdminPage() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL ?? '';
-  const raw = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '';
-  const anonKey = isPublicKey(raw) ? raw : '';
-  const turnstile = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
-  return <AdminApp url={anonKey ? url : ''} anonKey={anonKey} turnstileKey={turnstile} />;
+  const anonKey = isPublicKey(SUPABASE_PUBLIC_KEY) ? SUPABASE_PUBLIC_KEY : '';
+  return <AdminApp url={anonKey ? SUPABASE_URL : ''} anonKey={anonKey} turnstileKey={TURNSTILE_SITE_KEY} />;
 }

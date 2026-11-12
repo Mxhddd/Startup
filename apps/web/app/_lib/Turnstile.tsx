@@ -25,7 +25,8 @@ function loadTurnstile(): Promise<void> {
   return window.__pohnchTurnstile;
 }
 
-export const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? '';
+import { TURNSTILE_SITE_KEY } from './publicConfig';
+export { TURNSTILE_SITE_KEY };
 
 /** Renders the check and reports its token ('' when it expires or fails). Change `round` to ask again
  *  (each token can be used once). */
