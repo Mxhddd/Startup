@@ -1,5 +1,5 @@
 // The `interest` Edge Function's logic (website "Join the pilot"), kept free of Deno so it can be tested.
-//  GET  ?summary=1           -> { areas: {gulshan: 12}, proof: null | {vans, trips, alerts} } (cached 5 min)
+//  GET  ?summary=1           -> { areas: {gulshan: 12}, meter: {gulshan: {f,d,s,m}}, proof: null | {vans, trips, alerts} } (cached 5 min)
 //  POST {kind:'join', ...}    -> 200 {ok:true} | 400 {error:field} | 429 {error:'limited'}
 //  POST {kind:'doubt', n}     -> 200 {ok:true} (counts one opening of honest answer n)
 // The checks mirror packages/core/src/interest.ts (a test keeps the two in step). The hidden `website`
@@ -54,7 +54,7 @@ export async function handleInterest(method: string, url: URL, headers: Headers,
   if (method === 'GET' && url.searchParams.has('summary')) {
     const { data, error } = await deps.rpc('interest_summary');
     if (error) return reply(500, { error: 'server' });
-    return reply(200, data ?? { areas: {}, proof: null }, { 'cache-control': 'public, max-age=300' });
+    return reply(200, data ?? { areas: {}, meter: {}, proof: null }, { 'cache-control': 'public, max-age=300' });
   }
   if (method !== 'POST') return reply(405, { error: 'method' });
   if (bodyText.length > 2000) return reply(413, { error: 'size' });

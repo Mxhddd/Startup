@@ -17,7 +17,7 @@ import { buildLife } from './world/life';
 import { HOME } from './world/map';
 import { PostShader } from './world/post';
 import { skyAt } from './world/sky';
-import { NO_WORDS, cloudTex, forgetPainted, streetSign, whenFontsReady, type WorldWords } from './world/textures';
+import { NO_WORDS, cloudTex, forgetPainted, onRepaint, streetSign, whenFontsReady, type WorldWords } from './world/textures';
 import type { Quality, World, WorldState } from './world/types';
 import { buildVan } from './world/van';
 
@@ -80,6 +80,7 @@ export function createWorld(canvas: HTMLCanvasElement, opts: { quality?: Quality
   }
   // painted words wait for the site's fonts
   whenFontsReady(() => { if (signText) setAreaLabel(...signText); dirty = true; });
+  onRepaint(() => { dirty = true; });
 
   // post-processing (desktop): one pass for the tilt-shift blur and the colour, then the output pass
   let composer: EffectComposer | null = null, postPass: ShaderPass | null = null;

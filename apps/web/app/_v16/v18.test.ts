@@ -2,7 +2,8 @@
 import { describe, expect, it } from 'vitest';
 import { en, ur } from '@pohnch/messages';
 import { hhmm, karachiClock, nowKey } from './hour';
-import { chamakTile, roundelSvg, truckVars } from './truckart';
+import { truckVars } from './truckart';
+import { chamakTile, jhalarTile, panelSvg, roseSvg, vineTile } from './truckartSvg';
 import { LINE_COUNT, SHOP_COUNT, worldWords } from './worldWords';
 
 describe('Right now in Karachi', () => {
@@ -37,13 +38,22 @@ describe('Right now in Karachi', () => {
 });
 
 describe('truck art', () => {
-  it('draws the same pattern from the same seed (server and browser agree)', () => {
-    expect(chamakTile(3, 16)).toBe(chamakTile(3, 16));
-    expect(chamakTile(3, 16)).not.toBe(chamakTile(4, 16));
-    expect(roundelSvg(32)).toBe(roundelSvg(32));
+  it('draws the same motifs from the same inputs (server and browser agree)', () => {
+    expect(chamakTile(16, 3)).toBe(chamakTile(16, 3));
+    expect(chamakTile(16, 3)).not.toBe(chamakTile(16, 1));
+    expect(roseSvg(40)).toBe(roseSvg(40));
+    expect(panelSvg(640, 230, { birds: true })).toBe(panelSvg(640, 230, { birds: true }));
+  });
+  it('is real truck art: black outlines, roses, fringe with bells, foil tiles', () => {
+    const panel = panelSvg(640, 230, { birds: true });
+    expect(panel).toContain('stroke="#0E1022"');           // outlines
+    expect(panel).toContain('#C2185B');                     // gulabi roses
+    expect(jhalarTile(26)).toContain('<circle');            // bells
+    expect(chamakTile(18)).toContain('linearGradient');     // foil
+    expect(vineTile(28)).toContain('#A7D47E');              // the vine's stem
   });
   it('never uses shingarf red for decoration', () => {
-    const all = [chamakTile(1), chamakTile(4), chamakTile(7), roundelSvg()].join('').toUpperCase();
+    const all = [chamakTile(18), chamakTile(12, 2), roseSvg(40), vineTile(28), jhalarTile(26), panelSvg(640, 230, { birds: true }), panelSvg(300, 300, { ground: '#1F2A5C' })].join('').toUpperCase();
     expect(all).not.toContain('#A8321F');
     expect(all).not.toContain('#B5402E');
   });

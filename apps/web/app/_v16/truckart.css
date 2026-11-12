@@ -9,12 +9,13 @@
 .glints i:nth-child(3n) { top: 42%; }
 @keyframes twinkle { 0%, 70%, 100% { opacity: 0; scale: .3; rotate: 0deg; } 80% { opacity: 1; scale: 1; rotate: 45deg; } 90% { opacity: .2; scale: .6; } }
 
-/* a couplet panel: one Pohnch line in a painted frame */
-.couplet { position: relative; margin: 0; border-radius: 16px; overflow: hidden; background: #FAF6EE; color: #141A33; box-shadow: 0 24px 50px -30px rgba(0,0,0,.6); }
-.couplet .cp-in { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 16px 22px; }
-.couplet blockquote { margin: 0; display: grid; justify-items: center; gap: 2px; text-align: center; }
-.couplet blockquote b { font: 400 clamp(30px, 3.6vw, 46px)/1.55 var(--font-display), serif; color: #1F2A5C; }
-.couplet blockquote span { font: 700 14px/1.4 var(--font-latin), sans-serif; letter-spacing: .02em; color: #4A4F66; }
+/* a couplet panel (v19): the painted panel keeps its proportions; the words sit in its clear middle */
+.couplet { position: relative; margin: 0; width: 100%; aspect-ratio: 640 / 230; container-type: inline-size; filter: drop-shadow(0 24px 30px rgba(0,0,0,.28)); }
+.couplet .cp-art { position: absolute; inset: 0; background-size: 100% 100%; background-repeat: no-repeat; }
+.couplet blockquote { position: absolute; inset: 30% 21% 24% 21%; margin: 0; display: grid; place-content: center; justify-items: center; gap: 0; text-align: center; }
+.couplet.birds blockquote { inset-inline: 30%; }
+.couplet blockquote b { font: 400 clamp(20px, 6.4cqw, 46px)/1.45 var(--font-display), serif; color: #1F2A5C; white-space: nowrap; }
+.couplet blockquote span { font: 700 max(14px, 2.3cqw)/1.3 var(--font-latin), sans-serif; letter-spacing: .02em; color: #4A4F66; }
 
 /* the night footer */
 .sitefoot { position: relative; display: block; margin: 0; padding: 0 0 calc(40px + env(safe-area-inset-bottom, 0px)); border: 0; background: #10173A; color: #F5EEE1; overflow: hidden; }
@@ -24,7 +25,8 @@
 .sitefoot .fkite { transform-box: fill-box; transform-origin: 50% 100%; animation: fsway 7s ease-in-out infinite alternate; animation-delay: calc(var(--k) * -2.3s); }
 @keyframes fsway { from { transform: rotate(-4deg) translateY(0); } to { transform: rotate(5deg) translateY(-6px); } }
 .sitefoot .fwrap { width: min(1180px, 100% - 40px); margin: 0 auto; }
-.sitefoot .fline { width: min(640px, 100%); margin: 44px auto 54px; }
+.sitefoot .fjhalar { margin-top: -1px; }
+.sitefoot .fline { width: min(720px, 100%); margin: 30px auto 54px; }
 .sitefoot .fgrid { display: grid; grid-template-columns: 1.5fr repeat(4, 1fr); gap: 34px 30px; padding-top: 34px; border-top: 1px solid rgba(245,238,225,.16); }
 .sitefoot .fl { display: grid; gap: 10px; align-content: start; }
 .sitefoot .mark { display: inline-flex; align-items: baseline; gap: 10px; }

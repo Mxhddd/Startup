@@ -5,8 +5,9 @@
 // (w = every web.* word in one language); data goes through _lib/interest.ts.
 import { useEffect, useId, useRef, useState } from 'react';
 import qrcode from 'qrcode-generator';
-import { checkInterest, type AreaId } from '@pohnch/core';
+import { checkInterest, type AreaId, type AreaMeter } from '@pohnch/core';
 import { fetchSummary, sendInterest, type Summary } from '../_lib/interest';
+import { meterLine } from './areaMeter';
 
 export type Words = Record<string, string>;
 export type Area = { id: AreaId; label: string; spot: [number, number] | null };
@@ -14,10 +15,12 @@ export type Area = { id: AreaId; label: string; spot: [number, number] | null };
 const fill = (s: string | undefined, vars: Record<string, string | number>) => (s ?? '').replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
 
 /* ---------------- Join the pilot ---------------- */
-export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialArea }: {
+export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialArea, meter }: {
   w: Words; lang: 'ur' | 'en'; areas: Area[]; role: 'parent' | 'driver'; setRole: (r: 'parent' | 'driver') => void; onJoined: (area: AreaId) => void; wa: string;
   /** The area picked at the front door ("Where do you live?"), already chosen in the form. */
   initialArea?: AreaId | null;
+  /** v19: the live area meter, to show where the family or driver now stands after joining. */
+  meter?: Record<string, AreaMeter>;
 }) {
   const id = useId();
   const [area, setArea] = useState('');
@@ -48,6 +51,7 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
         {/* a few kites lift off for the family who just joined (hidden with reduced motion) */}
         <span className="kiteburst" aria-hidden="true">{['#E8A33D', '#C46A8A', '#A7D47E', '#FAF6EE', '#17705A'].map((c, k) => <i key={c} style={{ ['--k' as string]: k, ['--c' as string]: c }} />)}</span>
         <h3>{w['join.sent']}</h3>
+        {area && area !== 'other' && <p className="joinmeter" data-testid="join-meter"><b>{(w['meter.thanks'] ?? '').replace('{area}', areas.find((a) => a.id === area)?.label ?? '')}</b> {meterLine(w, areas.find((a) => a.id === area)?.label ?? '', meter?.[area])}</p>}
         <p>{w['join.sentB']} <a href={wa} rel="noreferrer">WhatsApp</a></p>
       </div>
     );
@@ -107,7 +111,7 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
 /* ---------------- Families waiting near you ---------------- */
 export function WaitingMap({ w, areas, summary, mine }: { w: Words; areas: Area[]; summary: Summary; mine: AreaId | null }) {
   const shown = areas.filter((a) => a.spot);
-  const any = Object.keys(summary.areas).length > 0;
+  const any = Object.keys(summary.meter).length > 0;
   return (
     <div className="waitmap">
       <div className="mb">
@@ -120,26 +124,29 @@ export function WaitingMap({ w, areas, summary, mine }: { w: Words; areas: Area[
         <g stroke="rgba(245,238,225,.08)" strokeWidth="1">{[80, 160, 240, 320].map((y) => <line key={y} x1="0" x2="600" y1={y} y2={y} />)}{[100, 200, 300, 400, 500].map((x) => <line key={x} y1="0" y2="380" x1={x} x2={x} />)}</g>
         <path d="M40 330 L560 60" stroke="rgba(245,238,225,.12)" strokeWidth="3" />
         {shown.map((a) => {
-          const [fx, fy] = a.spot!; const x = fx * 600, y = fy * 380; const n = summary.areas[a.id] ?? 0; const me = mine === a.id;
-          const r = n ? 10 + Math.sqrt(n) * 4 : 0;
+          const [fx, fy] = a.spot!; const x = fx * 600, y = fy * 380; const m = summary.meter[a.id]; const me = mine === a.id;
+          const r = m?.f === '10+' ? 13 : m?.f === '3-9' ? 9.5 : m ? 6.5 : 0, ready = m?.s === 'ready';
           return (
-            <g key={a.id} className={me ? 'me' : undefined}>
-              {n > 0 && <circle cx={x} cy={y} r={r * 2.2} fill="url(#glow)" />}
-              {n || me
-                ? <g className="ppin"><path d={`M${x} ${y - 9}l6 9-6 9-6-9z`} fill="#E8A33D" /><path d={`M${x} ${y - 5}l3 5-3 5-3-5z`} fill="#17705A" /><circle cx={x} cy={y} r="1.6" fill="#FAF6EE" /></g>
+            <g key={a.id} className={`${me ? 'me' : ''} ${m ? `st-${m.s}` : ''}`} data-area={a.id}>
+              {m && <circle cx={x} cy={y} r={r * 2.4} fill="url(#glow)" />}
+              {m || me
+                ? <g className="ppin"><path d={`M${x} ${y - r - 3}l${r * 0.7 + 3} ${r + 3}-${r * 0.7 + 3} ${r + 3}-${r * 0.7 + 3}-${r + 3}z`} fill={ready ? '#17705A' : '#E8A33D'} stroke="#0E1022" strokeWidth="1.2" /><circle cx={x} cy={y} r={Math.max(1.6, r * 0.28)} fill="#FAF6EE" /></g>
                 : <circle cx={x} cy={y} r={3} fill="rgba(245,238,225,.35)" />}
-              {me && <circle className="ring" cx={x} cy={y} r="10" fill="none" stroke="#F6C46E" strokeWidth="2" />}
+              {m?.d === 'yes' && <g transform={`translate(${x + r + 8} ${y - r - 4})`}><rect x="-7" y="-5" width="14" height="10" rx="3" fill="#1F2A5C" stroke="#F5EEE1" strokeWidth="1.2" /><circle cx="0" cy="0" r="1.8" fill="#E8A33D" /></g>}
+              {me && <circle className="ring" cx={x} cy={y} r={r + 10} fill="none" stroke="#F6C46E" strokeWidth="2" />}
             </g>
           );
         })}
       </svg>
       {/* labels are HTML so they stay readable (15 px+) at every width */}
-      {shown.filter((a) => (summary.areas[a.id] ?? 0) > 0 || mine === a.id).map((a) => {
-        const n = summary.areas[a.id] ?? 0;
-        return <span key={a.id} className="lbl" style={{ left: `${a.spot![0] * 100}%`, top: `${(a.spot![1] * 380 / 420) * 100}%` }}>{a.label}{n > 0 ? ` · ${fill(w['wait.n'], { n })}` : ''}</span>;
+      {shown.filter((a) => summary.meter[a.id] || mine === a.id).map((a) => {
+        const m = summary.meter[a.id];
+        return <span key={a.id} className="lbl" style={{ left: `${a.spot![0] * 100}%`, top: `${(a.spot![1] * 380 / 420) * 100}%` }}>{a.label}{m?.f ? ` · ${w[`meter.f.${m.f}`]}` : ''}</span>;
       })}
       </div>
       <p className="cap">{mine ? w['wait.you'] : any ? w['wait.lead'] : w['wait.empty']}</p>
+      <div className="legend"><span className="lg ready">{w['meter.legend.ready']}</span><span className="lg forming">{w['meter.legend.forming']}</span><span className="lg driver">{w['meter.legend.driver']}</span></div>
+      <p className="how">{w['meter.how']}</p>
     </div>
   );
 }
@@ -190,7 +197,7 @@ export function Proof({ w, proof }: { w: Words; proof: Summary['proof'] }) {
 
 /** Loads the waiting-map counts and pilot numbers once the panel is on screen. */
 export function useSummary(open: boolean): Summary {
-  const [s, setS] = useState<Summary>({ areas: {}, proof: null });
+  const [s, setS] = useState<Summary>({ areas: {}, meter: {}, proof: null });
   const asked = useRef(false);
   useEffect(() => {
     if (!open || asked.current) return;

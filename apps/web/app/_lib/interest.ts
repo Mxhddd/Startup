@@ -2,7 +2,7 @@
 // the waiting-map counts and the pilot numbers, and counts which honest answers people open. The
 // function holds the service key; the website only knows the public project URL. Nothing here is
 // logged, and failures are quiet (the form shows its own error).
-import { INTEREST_URL, type Interest } from '@pohnch/core';
+import { INTEREST_URL, type AreaMeter, type Interest } from '@pohnch/core';
 
 // The project URL when the build has one (tests point it at a stub), else the public endpoint.
 const base = (): string => {
@@ -10,7 +10,8 @@ const base = (): string => {
   return url ? `${url.replace(/\/$/, '')}/functions/v1/interest` : INTEREST_URL;
 };
 
-export type Summary = { areas: Record<string, number>; proof: { vans: number; trips: number; alerts: number } | null };
+/** areas: exact family counts for areas with 3+; meter (v19): bands and a status per area; proof: pilot numbers once they mean something. */
+export type Summary = { areas: Record<string, number>; meter: Record<string, AreaMeter>; proof: { vans: number; trips: number; alerts: number } | null };
 
 /** Sends the join form. Resolves true when the server saved it. The hidden field `website` is the bot trap. */
 export async function sendInterest(value: Interest, lang: 'ur' | 'en', website: string): Promise<boolean> {
@@ -26,12 +27,12 @@ export async function sendInterest(value: Interest, lang: 'ur' | 'en', website: 
 /** The counts per area (only areas with 3 or more) and the pilot numbers (null until they mean something). */
 export async function fetchSummary(): Promise<Summary> {
   const url = base();
-  const empty: Summary = { areas: {}, proof: null };
+  const empty: Summary = { areas: {}, meter: {}, proof: null };
   try {
     const res = await fetch(`${url}?summary=1`, { method: 'GET' });
     if (!res.ok) return empty;
     const j = (await res.json()) as Partial<Summary>;
-    return { areas: j.areas && typeof j.areas === 'object' ? j.areas : {}, proof: j.proof ?? null };
+    return { areas: j.areas && typeof j.areas === 'object' ? j.areas : {}, meter: j.meter && typeof j.meter === 'object' ? j.meter : {}, proof: j.proof ?? null };
   } catch {
     return empty;
   }

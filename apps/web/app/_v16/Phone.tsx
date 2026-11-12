@@ -6,7 +6,8 @@
 // - DriverPhone: Pohnch Driver (today's stops, Start trip, the big "Got in" tap).
 // The page moves the van on the mini map with setVan() (every frame, no re-render); everything else
 // comes in as props when it changes.
-import { forwardRef, useEffect, useImperativeHandle, useRef } from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { TS } from './timescale';
 
 export type Words = Record<string, string>;
 export type ParentPhoneProps = {
@@ -84,9 +85,29 @@ export const ParentPhone = forwardRef<PhoneHandle, ParentPhoneProps>(function Pa
   );
 });
 
-export function DriverPhone({ w, started, tapped, className }: { w: Words; started: boolean; tapped: boolean; className?: string }) {
+/** Hold-to-confirm, as on the real driver app: ~0.6 s of holding (pointer, Enter or Space) calls onDone. */
+function GotIn({ label, hint, onDone }: { label: string; hint: string; onDone: () => void }) {
+  const [h, setH] = useState(0); const raf = useRef(0), t0 = useRef(0), fired = useRef(false);
+  useEffect(() => () => cancelAnimationFrame(raf.current), []);
+  const begin = (e: React.PointerEvent | React.KeyboardEvent) => {
+    if ('pointerId' in e) { try { (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId); } catch { /* ignore */ } }
+    fired.current = false; t0.current = performance.now(); cancelAnimationFrame(raf.current);
+    const step = () => { const k = Math.min(1, (performance.now() - t0.current) / (600 / TS)); setH(k); if (k >= 1) { if (!fired.current) { fired.current = true; onDone(); } return; } raf.current = requestAnimationFrame(step); };
+    raf.current = requestAnimationFrame(step);
+  };
+  const end = () => { cancelAnimationFrame(raf.current); if (!fired.current) setH(0); };
   return (
-    <div className={`v-phone driver ${started ? 'started' : ''} ${tapped ? 'tapped' : ''} ${className ?? ''}`} aria-hidden="true">
+    <button type="button" className="dtap holdable" style={{ ['--h' as string]: h }} aria-label={`${label} · ${hint}`} data-testid="gotin"
+      onPointerDown={begin} onPointerUp={end} onPointerCancel={end} onPointerLeave={end} onContextMenu={(e) => e.preventDefault()}
+      onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); begin(e); } }} onKeyUp={end}>
+      <i className="fill" aria-hidden="true" /><span>{label}</span><small>{hint}</small>
+    </button>
+  );
+}
+
+export function DriverPhone({ w, started, tapped, className, onHold }: { w: Words; started: boolean; tapped: boolean; className?: string; onHold?: () => void }) {
+  return (
+    <div className={`v-phone driver ${started ? 'started' : ''} ${tapped ? 'tapped' : ''} ${onHold ? 'waiting' : ''} ${className ?? ''}`} aria-hidden={onHold ? undefined : true}>
       <div className="bezel">
         <div className="scr">
           <div className="island" />
@@ -96,7 +117,7 @@ export function DriverPhone({ w, started, tapped, className }: { w: Words; start
           <div className="dstops">
             <div className="ds done"><i /><span>{(w['sides.stop'] ?? '').replace('2', '1')}</span></div>
             <div className="ds cur"><i /><span>{w['sides.stop']}</span></div>
-            <div className="dtap"><span>{tapped ? '✓ ' : ''}{w['sides.tap']}</span></div>
+            {onHold ? <GotIn label={w['sides.tap'] ?? ''} hint={w['try.hold.s'] ?? ''} onDone={onHold} /> : <div className="dtap"><span>{tapped ? '✓ ' : ''}{w['sides.tap']}</span></div>}
             <div className="ds"><i /><span>{(w['sides.stop'] ?? '').replace('2', '3')}</span></div>
           </div>
         </div>

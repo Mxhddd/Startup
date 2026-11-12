@@ -71,3 +71,24 @@ export function visibleCounts(counts: Partial<Record<string, number>>): Partial<
   }
   return out;
 }
+
+/* ---------- v19: the live area meter ---------- */
+/** A van can start in an area once this many families wait there and a driver is interested. */
+export const VAN_FAMILIES = 8;
+export type FamilyBand = 'few' | '3-9' | '10+';
+export type AreaStatus = 'forming' | 'needs-driver' | 'needs-families' | 'ready';
+/** What the website may show about one area: bands and a status, never exact numbers. */
+export type AreaMeter = { f: FamilyBand | null; d: 'none' | 'yes'; s: AreaStatus; m: 'few' | 'several' | null };
+
+export function familyBand(n: number): FamilyBand | null {
+  if (n <= 0) return null;
+  if (n < 3) return 'few';
+  return n < 10 ? '3-9' : '10+';
+}
+/** The meter for an area from its exact counts (the database runs the same rule; a test keeps them equal). */
+export function areaMeter(families: number, drivers: number): AreaMeter {
+  const enough = families >= VAN_FAMILIES, driver = drivers > 0;
+  const s: AreaStatus = enough && driver ? 'ready' : enough ? 'needs-driver' : driver ? 'needs-families' : 'forming';
+  const short = VAN_FAMILIES - families;
+  return { f: familyBand(families), d: driver ? 'yes' : 'none', s, m: enough ? null : short <= 3 ? 'few' : 'several' };
+}

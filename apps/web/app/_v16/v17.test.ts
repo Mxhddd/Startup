@@ -1,19 +1,14 @@
 import { describe, expect, it } from 'vitest';
-import { introMode, markSeen, readSeen } from './introRules';
+import { INTRO_OPEN_AT, INTRO_OPEN_MS, introMode } from './introRules';
 import { quoteFor, type Quote } from './quotes';
 
-describe('the opening logo moment', () => {
-  it('plays in full on the first visit, short after that, never with reduced motion', () => {
-    expect(introMode(false, false)).toBe('full');
-    expect(introMode(false, true)).toBe('short');
-    expect(introMode(true, false)).toBe('none');
+describe('the opening logo moment (v19)', () => {
+  it('plays in full on every visit, never with reduced motion', () => {
+    expect(introMode(false)).toBe('full');
+    expect(introMode(true)).toBe('none');
   });
-  it('remembers a visit, and falls back to the full version when storage is blocked', () => {
-    const m = new Map<string, string>(); const s = { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v) };
-    expect(readSeen(s)).toBe(false); markSeen(s); expect(readSeen(s)).toBe(true);
-    const blocked = { getItem: () => { throw new Error('blocked'); }, setItem: () => { throw new Error('blocked'); } };
-    expect(readSeen(blocked)).toBe(false); expect(() => markSeen(blocked)).not.toThrow();
-    expect(readSeen(null)).toBe(false);
+  it('lasts about 4 seconds before the city shows', () => {
+    expect(INTRO_OPEN_AT + INTRO_OPEN_MS).toBe(4000);
   });
 });
 

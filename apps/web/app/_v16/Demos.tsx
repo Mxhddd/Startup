@@ -6,7 +6,8 @@ import { useEffect, useRef, useState } from 'react';
 import { ParentPhone, type PhoneHandle, type Words } from './Phone';
 
 // slow motion for recording videos on slow test machines (?timescale=0.125); 1 for everyone else
-export const TS = typeof location === 'undefined' ? 1 : Number(new URLSearchParams(location.search).get('timescale') ?? 1) || 1;
+import { TS } from './timescale';
+export { TS };
 
 /* ---------------- try it: three small working demos ---------------- */
 export function OffDemo({ w, phone }: { w: Words; phone: React.RefObject<PhoneHandle | null> }) {

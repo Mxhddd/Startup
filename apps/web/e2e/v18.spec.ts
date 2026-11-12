@@ -1,4 +1,4 @@
-// v18 "Karachi, hand-painted": the clock line, the new pages (Our story, Pilot progress, For schools),
+// v18 "Karachi, hand-painted": the new pages (Our story, Pilot progress, For schools),
 // the school interest form, the night footer, the page scenes' stills, and calm with reduced motion.
 import { expect, test, type Page } from '@playwright/test';
 
@@ -7,17 +7,6 @@ const stub = (page: Page, opts: { status?: number; summary?: string; seen?: stri
   const get = route.request().method() === 'GET';
   await route.fulfill({ status: get ? 200 : (opts.status ?? 200), contentType: 'application/json', headers: { 'access-control-allow-origin': '*' },
     body: get ? (opts.summary ?? '{"areas":{},"proof":null}') : (opts.status ?? 200) === 200 ? '{"ok":true}' : '{"error":"server"}' });
-});
-
-test('the front door says what school vans are doing right now in Karachi, by the clock', async ({ page }) => {
-  // 07:12 on a Monday in Karachi = 02:12 UTC
-  await page.clock.setFixedTime(new Date('2026-11-09T02:12:00Z'));
-  await page.goto('/?lite');
-  const line = page.locator('.nowline');
-  await expect(line).toContainText('Right now in Karachi');
-  await expect(line).toContainText('07:12');
-  await expect(line).toContainText('Morning run: vans are picking children up.');
-  await expect(line).toContainText('This follows the clock, not live vans.');
 });
 
 test('the new pages open in both languages, each with its own scene, and nothing scrolls sideways', async ({ page }) => {

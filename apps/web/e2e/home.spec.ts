@@ -1,4 +1,4 @@
-// The v16 home page: what Pohnch is on the first screen, the scroll story, the fork, the join form
+// The v16 home page: what Pohnch is on the first screen, the scroll story, the hub, the join form
 // (with the server stubbed), both languages, lite mode, the 3D, and no sideways scrolling.
 import { expect, test, type Page } from '@playwright/test';
 
@@ -10,15 +10,16 @@ const stubInterest = (page: Page, status = 200, seen: string[] = []) => page.rou
   await route.fulfill({ status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: route.request().method() === 'GET' ? '{"areas":{},"proof":null}' : status === 200 ? '{"ok":true}' : '{"error":"server"}' });
 });
 
-test('the intro plays on a first visit, can be skipped, and is short on the next visit', async ({ page }) => {
+test('the intro plays in full on every visit and can be skipped', async ({ page }) => {
   await page.goto('/?lite');
   const intro = page.getByTestId('intro');
   await expect(intro).toBeVisible();
   await page.keyboard.press('Space');
   await expect(intro).toHaveCount(0, { timeout: 3000 });
   await page.reload();
-  await expect(page.locator('.intro.short')).toHaveCount(1);
-  await expect(page.getByTestId('intro')).toHaveCount(0, { timeout: 3000 });
+  await expect(page.getByTestId('intro')).toBeVisible();
+  await expect(page.locator('.intro.short')).toHaveCount(0);
+  await expect(page.getByTestId('intro')).toHaveCount(0, { timeout: 8000 });
 });
 
 test('with reduced motion there is no intro', async ({ page }) => {
@@ -62,10 +63,11 @@ test('For drivers opens the drivers page', async ({ page }) => {
   await expect(page).toHaveURL(/\/drivers$/);
 });
 
-test('the fork has two signposts (drivers chose at the front door) and the site counts visits', async ({ page }) => {
+test('the site counts visits, and the old fork, promises and Play are gone', async ({ page }) => {
   await page.goto('/?lite');
-  await expect(page.locator('.sign .arm')).toHaveCount(2);
   await expect(page.locator('script[src*="insights"], script[src*="vercel-scripts"]')).toHaveCount(1);
+  for (const sec of ['fork', 'promises', 'never', 'calc', 'band', 'faq', 'try']) await expect(page.locator(`[data-sec=${sec}]`)).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Play the morning/ })).toHaveCount(0);
 });
 
 test('the 7 am calls are struck through as you scroll, and the steps follow the scroll', async ({ page }) => {
@@ -80,17 +82,17 @@ test('the 7 am calls are struck through as you scroll, and the steps follow the 
   await expect(page.locator('.tl li.on')).toHaveCount(1);
 });
 
-test('the fork opens the road you pick, and opening an honest answer is counted', async ({ page }) => {
+test('the hub opens a topic at a time, and opening an honest answer is counted', async ({ page }) => {
   const seen: string[] = [];
   await stubInterest(page, 200, seen);
   await page.goto('/?lite');
-  await toSection(page, '[data-sec=fork]');
-  await page.getByRole('button', { name: /Not sure yet/ }).click();
-  await page.getByRole('button', { name: 'Is it safe?' }).click();
-  await expect(page.locator('#road').getByText(/checks every driver’s ID and van/)).toBeVisible();
+  await toSection(page, '#hub');
+  await expect(page.getByTestId('hub-how')).toContainText('Here’s how it starts.');
+  await page.getByRole('button', { name: 'Questions', exact: true }).click();
+  await expect(page.getByTestId('hub-how')).toBeHidden();
+  await page.getByTestId('hub-questions').getByText('Is it safe?').click();
+  await expect(page.getByTestId('hub-questions').getByText(/checks every driver’s ID and van/)).toBeVisible();
   await expect.poll(() => seen.some((s) => s.includes('"kind":"doubt"'))).toBe(true);
-  await page.getByRole('button', { name: /Yes, I want this/ }).click();
-  await expect(page.locator('#road').getByText('Here’s how it starts.')).toBeVisible();
 });
 
 test('joining the pilot sends the form and says thank you', async ({ page }) => {
@@ -149,7 +151,7 @@ test('the 3D city loads on a capable browser, with no page errors', async ({ pag
 test('nothing scrolls sideways', async ({ page }) => {
   for (const path of ['/?lite', '/ur?lite']) {
     await page.goto(path);
-    for (const sel of ['[data-sec=hero]', '[data-sec=fork]', '#join', '#questions']) {
+    for (const sel of ['[data-sec=hero]', '[data-sec=sides]', '#hub', '#join']) {
       await toSection(page, sel);
       expect(await page.evaluate(() => document.documentElement.scrollWidth - innerWidth)).toBeLessThanOrEqual(0);
     }

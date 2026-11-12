@@ -11,15 +11,17 @@ import type { AreaId } from '@pohnch/core';
 import { ParentPhone, DriverPhone, type PhoneHandle, type Words } from './Phone';
 import { DriverKit, JoinForm, Proof, WaitingMap, useSummary, type Area } from './Panel';
 import { countDoubt } from '../_lib/interest';
-import { callsAYear, clamp, hourOfClock, karachiHours, skyHex, span } from './hour';
-import { SECTIONS, pinned, scrollS, worldAt, type Ctx, type SectionId } from './scenes';
+import { callsAYear, clamp, hourOfClock, karachiClock, karachiHours, skyHex, span } from './hour';
+import { SECTIONS, dialStart, pinned, scrollS, worldAt, type Ctx, type SectionId } from './scenes';
+import { Hub, HUB_HASH, type HubTopic } from './Hub';
 import type { Quality, World, WorldWords } from './world3d';
 import { CallsCounter, HoldDemo, OffDemo, SignalDemo, TS } from './Demos';
 import { FrontDoor } from './FrontDoor';
 import { Intro } from './Intro';
 import { initDelight, useCountUp } from './delight';
 import { SiteFooter } from './Footer';
-import { Chamak, Glints, truckVars } from './truckart';
+import { Glints, Roundel, truckVars } from './truckart';
+import { panelSvg, svgUri, TC } from './truckartSvg';
 import './home.css';
 
 export type HomeProps = {
@@ -37,8 +39,10 @@ export type HomeProps = {
   worldWords: WorldWords;
 };
 
-const COVER: SectionId[] = ['try', 'never', 'calc', 'band', 'faq'];
-const HEIGHTS: Record<SectionId, number> = { hero: 1.25, calls: 2.8, sides: 3.2, morning: 4.2, lock: 2.6, try: 0, fork: 0, promises: 3.2, never: 0, calc: 0, band: 0, join: 0, faq: 0 };
+// v19: about 30% tighter than v18 (calls 2.8, sides 3.2, morning 4.2, lock 2.6 screens)
+const COVER: SectionId[] = ['hub'];
+const HEIGHTS: Record<SectionId, number> = { hero: 1.25, calls: 2.0, sides: 2.4, morning: 3.0, lock: 1.8, hub: 0, join: 0 };
+const fill = (t: string | undefined, v: Record<string, string | number>) => Object.entries(v).reduce((a, [k, x]) => a.replace(`{${k}}`, String(x)), t ?? '');
 const Arrow = () => <svg className="arr" width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6h19M15 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 const WaIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M9 9.5c.3 1.7 2 3.7 4.5 4.5l1.2-1.2 1.8.8-.3 1.6c-3.5.4-7.8-3.5-7.6-7.2l1.6-.3.8 1.8z" fill="currentColor" /></svg>;
 
@@ -56,7 +60,6 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
   const root = useRef<HTMLElement>(null), canvas = useRef<HTMLCanvasElement>(null);
   const worldRef = useRef<World | null>(null);
   const sidesPhone = useRef<PhoneHandle>(null), mornPhone = useRef<PhoneHandle>(null), offPhone = useRef<PhoneHandle>(null);
-  const signRef = useRef<HTMLDivElement>(null), stickRef = useRef<HTMLDivElement>(null);
   const [lite, setLite] = useState(false);
   const [area, setArea] = useState<AreaId | null>(null);
   const [calls, setCalls] = useState({ n: 0, off: false });
@@ -64,19 +67,33 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
   const [morn, setMorn] = useState(0);
   const [lockP, setLockP] = useState(0);
   const [plat, setPlat] = useState<'ios' | 'android'>('ios');
-  const [flips, setFlips] = useState(0);
-  const [road, setRoad] = useState<'yes' | 'unsure' | null>(null);
-  const [open, setOpen] = useState<Set<number>>(new Set());
+  // v19 "you play the driver": the parent's phone lights only once Got in is held (or the reader scrolls on)
+  const [driverTapped, setDriverTapped] = useState(false);
+  const tappedRef = useRef(false);
+  const tapNow = useCallback(() => { tappedRef.current = true; setDriverTapped(true); }, []);
+  const [hubOpen, setHubOpen] = useState<string | null>('how');
   const [calc, setCalc] = useState(4);
   const [role, setRole] = useState<'parent' | 'driver'>('parent');
   const [mine, setMine] = useState<AreaId | null>(null);
   const [menu, setMenu] = useState(false);
-  const [playing, setPlaying] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [joinSeen, setJoinSeen] = useState(false);
-  const summary = useSummary(joinSeen);
+  const [, setJoinSeen] = useState(false);
+  // v19 "A school day": the minute the dial shows (null until the page knows Karachi's time)
+  const [dayMin, setDayMin] = useState<number | null>(null);
+  const [dayNight, setDayNight] = useState(false);
+  const [nowMin, setNowMin] = useState<number | null>(null);
+  const dayRef = useRef<number | null>(null), dialTouched = useRef(false);
+  useEffect(() => {
+    const tick = () => {
+      const k = karachiClock(new Date()), n = k.h * 60 + k.m; setNowMin(n);
+      if (dialTouched.current) return;
+      const st = dialStart(n, k.day); setDayNight(st.night); setDayMin(st.min); dayRef.current = st.min;
+    };
+    tick(); const t = setInterval(tick, 60000); return () => clearInterval(t);
+  }, []);
+  const onDay = (m: number) => { dialTouched.current = true; setDayMin(m); dayRef.current = m; };
+  const summary = useSummary(true);
   const lenisRef = useRef<{ scrollTo: (t: number | string | HTMLElement, o?: Record<string, unknown>) => void; scroll: number; raf: (t: number) => void; destroy: () => void } | null>(null);
-  const playRef = useRef(false);
 
   const scrollTo = useCallback((target: string | number) => {
     const l = lenisRef.current;
@@ -101,8 +118,12 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       const big = Math.abs(innerWidth - cw) > 2 || (!touch && Math.abs(innerHeight - ch) > 2) || Math.abs(innerHeight - ch) > 160;
       if (big) { cw = innerWidth; ch = innerHeight; world?.resize(); }
     };
-    const ctx: Ctx = { liveHour: hourOfClock(karachiHours(new Date())), heroT: 0, uHome: 0.3, uFork: 0.55, routeAt: () => [0, 0] };
+    const ctx: Ctx = { liveHour: hourOfClock(karachiHours(new Date())), heroT: 0, uHome: 0.3, uFork: 0.55, routeAt: () => [0, 0], flyT: -1 };
     const t0 = performance.now();
+    // v19: the fly-in starts when the intro opens (never with reduced motion)
+    let flyStart = 0;
+    const onOpen = () => { flyStart = performance.now(); };
+    addEventListener('pohnch:intro-open', onOpen);
     // Lenis: calm smoothing of mouse-wheel scrolling (not on touch screens, not with reduced motion)
     if (!reduce && !touch && !/[?&]nosmooth\b/.test(location.search)) void import('lenis').then(({ default: Lenis }) => { if (stopped) return; lenisRef.current = new Lenis({ lerp: 0.13, wheelMultiplier: 1, autoRaf: false }) as unknown as typeof lenisRef.current; });
     // how much 3D this device gets: phones and small machines draw without post-processing
@@ -120,7 +141,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
         el.classList.add('has3d');
       } catch { setLite(true); }
     });
-    let last = { eta: -1, calls: -1, off: false, sides: -1, morn: -1, lock: -1, flips: -1, scrolled: false, grey: -1, night: '', story: -1 };
+    let last = { eta: -1, calls: -1, off: false, sides: -1, morn: -1, lock: -1, scrolled: false, grey: -1, night: '', story: -1 };
     const lastP = SECTIONS.map(() => -1), lastVan = [-1, -1, -1];
     let tPrev = performance.now();
     const frame = (now: number) => {
@@ -129,7 +150,10 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       const dt = now - tPrev; tPrev = now;
       const y = scrollY;
       const S = scrollS(y, vh, tops, hts);
-      ctx.heroT = (now - t0) / 1000 * TS;
+      if (!flyStart && now - t0 > 6000 / TS) flyStart = now; // the intro's signal never came: fly in anyway
+      ctx.flyT = reduce ? Infinity : flyStart ? (now - flyStart) / 1000 * TS : -1;
+      ctx.heroT = flyStart ? Math.max(0, ctx.flyT) : (now - t0) / 1000 * TS;
+      ctx.dayMin = dayRef.current;
       const st = worldAt(S, ctx);
       // skip drawing the 3D while a solid band (tools, privacy, drivers, questions) covers the whole screen
       const covered = COVER.some((id) => { const i = SECTIONS.indexOf(id); return tops[i]! <= y && tops[i]! + hts[i]! >= y + vh; });
@@ -153,21 +177,19 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       // calls: stack, then switch
       const nCalls = Math.min(6, Math.floor(span(pp.calls!, 0.05, 0.5) * 6.99)), off = pp.calls! > 0.58;
       if (nCalls !== last.calls || off !== last.off) { last.calls = nCalls; last.off = off; setCalls({ n: nCalls, off }); }
-      // both sides: 3 steps
-      const s2 = pp.sides! < 0.12 ? 0 : pp.sides! < 0.42 ? 1 : pp.sides! < 0.72 ? 2 : 3; if (s2 !== last.sides) { last.sides = s2; setSides(s2); }
-      if (vis('sides')) moveVan(1, sidesPhone, 0.04 + span(pp.sides!, 0.3, 0.75) * 0.5);
+      // both sides: 3 steps. Step 3 waits for the reader to hold Got in; scrolling on taps it for them
+      const s2 = pp.sides! < 0.1 ? 0 : pp.sides! < 0.35 ? 1 : pp.sides! < 0.6 ? 2 : 3; if (s2 !== last.sides) { last.sides = s2; setSides(s2); }
+      if (s2 < 3 && tappedRef.current) { tappedRef.current = false; setDriverTapped(false); }
+      if (pp.sides! > 0.92 && !tappedRef.current) { tappedRef.current = true; setDriverTapped(true); }
+      if (vis('sides')) moveVan(1, sidesPhone, 0.04 + span(pp.sides!, 0.25, 0.6) * 0.5);
       // the morning: 4 beads
       const m = pp.morning!; const s3 = m < 0.08 ? 0 : m < 0.3 ? 1 : m < 0.5 ? 2 : m < 0.86 ? 3 : 4; if (s3 !== last.morn) { last.morn = s3; setMorn(s3); }
       if (vis('morning')) moveVan(2, mornPhone, Math.min(1, 0.25 + span(m, 0.04, 0.92) * 0.75));
       // lock screen countdown
       const lp = Math.round(span(pp.lock!, 0.15, 0.8) * 50) / 50; if (lp !== last.lock) { last.lock = lp; setLockP(lp); }
-      // promises: stickers turn over one by one
-      const f = Math.floor(span(pp.promises!, 0.18, 0.92) * 7.99); if (f !== last.flips) { last.flips = f; setFlips(f); }
-      // signposts stand on the roundabout
-      if (world && signRef.current && vis('fork')) { const [px, yy] = world.project(-10, 0, 10); const x = innerWidth < 760 ? innerWidth / 2 : px; signRef.current.style.transform = `translate3d(${x.toFixed(1)}px, ${yy.toFixed(1)}px, 0)`; signRef.current.classList.add('placed'); }
       const sc = y > 40; if (sc !== last.scrolled) { last.scrolled = sc; setScrolled(sc); }
-      // the star in the top bar fills as you read the story (up to the tools)
-      const iTry = SECTIONS.indexOf('try'), story = Math.round(clamp(y / Math.max(1, tops[iTry]! - vh * 0.5)) * 200) / 200;
+      // the star in the top bar fills as you read the story (up to the hub)
+      const iHub = SECTIONS.indexOf('hub'), story = Math.round(clamp(y / Math.max(1, tops[iHub]! - vh * 0.5)) * 200) / 200;
       if (story !== last.story) { last.story = story; el.style.setProperty('--story', String(story)); }
       raf = requestAnimationFrame(frame);
     };
@@ -179,32 +201,16 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); if (e.target.id === 'join') setJoinSeen(true); } }), { rootMargin: '0px 0px -12% 0px' });
     el.querySelectorAll('.rv, #join').forEach((n) => io.observe(n));
     const undoDelight = initDelight(el);
-    return () => { stopped = true; cancelAnimationFrame(raf); removeEventListener('resize', onR); ro.disconnect(); io.disconnect(); undoDelight(); world?.dispose(); lenisRef.current?.destroy(); lenisRef.current = null; };
+    return () => { stopped = true; cancelAnimationFrame(raf); removeEventListener('pohnch:intro-open', onOpen); removeEventListener('resize', onR); ro.disconnect(); io.disconnect(); undoDelight(); world?.dispose(); lenisRef.current?.destroy(); lenisRef.current = null; };
   }, []);
 
-  /* ---------- play the morning: the page scrolls itself through the story ---------- */
-  useEffect(() => {
-    if (!playing) return;
-    playRef.current = true;
-    const end = (document.querySelector<HTMLElement>('[data-sec="try"]')?.offsetTop ?? 0) - 40;
-    const start = scrollY, dist = end - start, dur = Math.max(8000, dist * 6), t0 = performance.now();
-    let raf = 0;
-    const stop = () => { playRef.current = false; setPlaying(false); };
-    const tick = (now: number) => {
-      if (!playRef.current) return;
-      const k = clamp((now - t0) / dur), y = start + dist * k;
-      if (lenisRef.current) lenisRef.current.scrollTo(y, { immediate: true }); else window.scrollTo(0, y);
-      if (k >= 1) { stop(); return; }
-      raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    const userStop = () => stop();
-    addEventListener('wheel', userStop, { passive: true }); addEventListener('touchstart', userStop, { passive: true }); addEventListener('keydown', userStop);
-    return () => { playRef.current = false; cancelAnimationFrame(raf); removeEventListener('wheel', userStop); removeEventListener('touchstart', userStop); removeEventListener('keydown', userStop); };
-  }, [playing]);
 
-  const go = (sel: string) => (e: React.MouseEvent) => { e.preventDefault(); setMenu(false); scrollTo(sel); };
-  const pickRoad = (r: 'yes' | 'unsure') => { setRoad(r); setTimeout(() => scrollTo('#road'), 60); };
+  // a link to a hub topic (#safety, #questions...) opens that topic and scrolls to the hub
+  const go = (sel: string) => (e: React.MouseEvent) => { e.preventDefault(); setMenu(false); const t = HUB_HASH[sel]; if (t) { setHubOpen(t); setTimeout(() => scrollTo('#hub'), 40); } else scrollTo(sel); };
+  useEffect(() => {
+    const open = () => { const t = HUB_HASH[location.hash]; if (t) { setHubOpen(t); setTimeout(() => document.getElementById('hub')?.scrollIntoView(), 120); } };
+    open(); addEventListener('hashchange', open); return () => removeEventListener('hashchange', open);
+  }, []);
   // "For parents": remember the area for this visit only, put it on a street sign in the city, start the story
   const startParents = (a: AreaId | null) => {
     setArea(a);
@@ -218,15 +224,67 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
     const apply = () => { if (worldRef.current) worldRef.current.setAreaLabel(label, font, lang === 'ur'); else if (tries++ < 40) t = setTimeout(apply, 250); };
     apply(); return () => clearTimeout(t);
   }, [area, areas, lang]);
-  const flipDoubt = (n: number) => setOpen((s) => { const x = new Set(s); if (x.has(n)) x.delete(n); else { x.add(n); countDoubt(n); } return x; });
   const cta = playUrl
     ? <a className="btn" href={playUrl} rel="noreferrer">{w.ctaPlay}</a>
     : <a className="btn" href="#join" onClick={go('#join')}>{w.cta}</a>;
   const share = `https://wa.me/?text=${encodeURIComponent(w['share.text'] ?? '')}`;
   const dir = lang === 'ur' ? 'rtl' : 'ltr';
-  const morningAlert = [null, w['morning.1h'], w['morning.2h'], w['sides.alert'], w['morning.4h']][morn] ?? null;
+  // v19: with an area picked, the story names it ("6 min to your door in Gulshan-e-Iqbal")
+  const areaLabel = area ? areas.find((x) => x.id === area)?.label ?? null : null;
+  const leftWord = areaLabel ? fill(w['area.left'], { area: areaLabel }) : w['morning.1h'];
+  const etaWord = (m: number) => areaLabel ? fill(w['area.eta'], { m, area: areaLabel }) : null;
+  const morningAlert = [null, leftWord, w['morning.2h'], w['sides.alert'], w['morning.4h']][morn] ?? null;
+  const sidesOn = driverTapped && sides >= 3;
   const callTimes = ['6:49', '6:51', '6:52', '6:54', '6:55', '6:57'];
   const yearly = useCountUp(callsAYear(calc));
+  const arrivalArt = svgUri(panelSvg(760, 300, { ground: TC.neel, seed: 4 }));
+  // the questions: the FAQ plus the honest answers that aren't already in it (safe? won't use an app? who are you?)
+  const doubt = (n: number) => <details key={`d${n}`} onToggle={(e) => { if ((e.currentTarget as HTMLDetailsElement).open) countDoubt(n); }}><summary>{w[`d.${n}`]}</summary><p>{w[`d.${n}.b`]}</p></details>;
+  const topics: HubTopic[] = [
+    { id: 'how', label: w['hub.t.how'] ?? '', content: <>
+      <h3>{w['yes.h']}</h3>
+      <ol className="miles">{[1, 2, 3].map((n) => <li key={n} style={{ ['--k' as string]: n }}><span className="stone num" aria-hidden="true">{n}</span><b>{w[`yes.${n}t`]}</b><p>{w[`yes.${n}p`]}</p></li>)}</ol>
+      <p className="need">{w['yes.need']}</p>
+      <div className="acts">{cta}</div>
+    </> },
+    { id: 'try', label: w['hub.t.try'] ?? '', content: <>
+      <h3>{w['try.h']}</h3>
+      <div className="demos"><OffDemo w={w} phone={offPhone} /><HoldDemo w={w} /><SignalDemo w={w} /></div>
+    </> },
+    { id: 'safety', label: w['hub.t.safety'] ?? '', content: <>
+      <h3>{w['prom.h']}</h3>
+      <ul className="promlist">{[1, 2, 3, 4, 5, 6, 7].map((n) => <li key={n} style={{ ['--k' as string]: n }}><Roundel size={34} /><div><b>{w[`p${n}`]}</b><p>{w[`p${n}.b`]}</p></div></li>)}</ul>
+      <p className="hubhelp"><b>{w['sf.help.t']}</b> {w['sf.help.p']}</p>
+      <a className="link" href={links.safety}>{w['prom.all']}<Arrow /></a>
+    </> },
+    { id: 'privacy', label: w['hub.t.privacy'] ?? '', content: <>
+      <h3>{w['never.h']}</h3>
+      <ul className="nolist">{[1, 2, 3, 4].map((n) => <li key={n} className="in" style={{ ['--k' as string]: n }}><span>{w[`never.${n}`]}</span></li>)}</ul>
+      <p className="note">{w['never.p']}</p>
+      <a className="link" href={links.privacy}>{w['never.more']}<Arrow /></a>
+    </> },
+    { id: 'cost', label: w['hub.t.cost'] ?? '', content: <>
+      <p className="hubfree">{w['hub.free']}</p>
+      <h3>{w['calc.h']}</h3>
+      <div className="calcbox">
+        <label className="slider"><span className="sr">{w['calc.label']}</span><input type="range" min={0} max={10} step={1} value={calc} onChange={(e) => setCalc(Number(e.target.value))} aria-valuetext={String(calc)} /><b className="num">{calc}</b></label>
+        {calc > 0 ? (
+          <p className="out"><b className="big num">{yearly.toLocaleString('en')}</b><span>{w['calc.out']}</span><small>{(w['calc.how'] ?? '').replace('{c}', String(calc))}</small></p>
+        ) : <p className="out"><span>{w['calc.zero']}</span></p>}
+      </div>
+    </> },
+    { id: 'drivers', label: w['hub.t.drivers'] ?? '', content: <>
+      <h3>{w['band.h']}</h3>
+      <p>{w['band.p']}</p>
+      <ol className="miles">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{w[`drv.${n}`]}</p></li>)}</ol>
+      <div className="acts"><a className="btn" href="#join" onClick={(e) => { setRole('driver'); go('#join')(e); }}>{w['drv.go']}</a><a className="link" href={links.drivers}>{w['drv.more']}<Arrow /></a></div>
+    </> },
+    { id: 'questions', label: w['hub.t.questions'] ?? '', content: <>
+      <h3>{w['faq.title']}</h3>
+      <div className="qa">{doubt(1)}{qa.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}{doubt(3)}{doubt(6)}</div>
+      <div className="acts"><a className="link" href={`${wa.href}?text=${encodeURIComponent(w['unsure.waText'] ?? '')}`} rel="noreferrer">{w['unsure.no']}<Arrow /></a></div>
+    </> },
+  ];
 
   return (
     <main ref={root} className={`v16 ${lite ? 'lite' : ''} ${menu ? 'menu-open' : ''}`} lang={lang} dir={dir} data-lang={lang} style={truckVars()}>
@@ -261,7 +319,8 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       {/* ---------- the front door: for parents / for drivers ---------- */}
       <section className="sec hero" data-sec="hero" style={{ height: '125vh' }} aria-labelledby="h-hero">
         <div className="stick">
-          <FrontDoor w={w} areas={areas} driversHref={links.drivers} quotes={doorQuotes} onParents={startParents} onPlay={() => { startParents(null); setTimeout(() => setPlaying(true), 900); }} />
+          <FrontDoor w={w} areas={areas} driversHref={links.drivers} quotes={doorQuotes} onParents={startParents} onArea={setArea}
+            day={{ min: dayMin, night: dayNight, nowMin, onDay }} area={area} meter={area ? summary.meter[area] : undefined} />
           <div className="cue" aria-hidden="true"><i /></div>
         </div>
       </section>
@@ -290,12 +349,13 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
             <h2 id="h-sides">{w['sides.h']}</h2>
           </div>
           <div className="pair">
-            <DriverPhone w={w} started={sides >= 1} tapped={sides >= 3} className="dp" />
+            <DriverPhone w={w} started={sides >= 1} tapped={sidesOn} className="dp" onHold={sides >= 3 && !driverTapped ? tapNow : undefined} />
             <div className="link-beam" aria-hidden="true"><i /></div>
-            <ParentPhone ref={sidesPhone} className="pp" w={w} mode="map" eta={sides >= 3 ? null : 6 - sides} step={sides >= 3 ? 2 : 0} title={sides >= 3 ? w['sides.alert'] ?? '' : w['morning.1h'] ?? ''} alert={sides >= 3 ? w['sides.alert'] : sides >= 1 ? w['morning.1h'] : null} />
+            <ParentPhone ref={sidesPhone} className="pp" w={w} mode="map" eta={sidesOn ? null : Math.max(1, 6 - sides)} step={sidesOn ? 2 : 0} title={sidesOn ? w['sides.alert'] ?? '' : leftWord ?? ''} alert={sidesOn ? w['sides.alert'] : sides >= 1 ? leftWord : null} />
           </div>
+          <p className={`youdrive ${sides >= 3 ? 'on' : ''} ${sidesOn ? 'done' : ''}`} aria-live="polite" data-testid="youdrive">{sides >= 3 ? (sidesOn ? w['sides.youDone'] : w['sides.you']) : ''}</p>
           <ol className="steps">
-            {[1, 2, 3].map((n) => <li key={n} className={sides === n ? 'on' : sides > n ? 'past' : ''}><span className="num">{n}</span><div><b>{w[`sides.${n}t`]}</b><p>{w[`sides.${n}p`]}</p></div></li>)}
+            {[1, 2, 3].map((n) => <li key={n} className={sides === n ? 'on' : sides > n ? 'past' : ''}><span className="num">{n}</span><div><b>{w[`sides.${n}t`]}</b><p>{n === 2 ? etaWord(6) ?? w['sides.2p'] : w[`sides.${n}p`]}</p></div></li>)}
           </ol>
         </div>
       </section>
@@ -307,12 +367,20 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
             <p className="kick">{w['morning.k']}</p>
             <h2 id="h-morning">{w['morning.h']}</h2>
             <ol className="tl">
-              {[1, 2, 3, 4].map((n) => <li key={n} className={morn >= n ? 'on' : ''}><span className="t num">{w[`morning.${n}t`]}</span><i className={`b b${n}`} /><div><b>{w[`morning.${n}h`]}</b><p>{w[`morning.${n}p`]}</p></div></li>)}
+              {[1, 2, 3, 4].map((n) => <li key={n} className={morn >= n ? 'on' : ''}><span className="t num">{w[`morning.${n}t`]}</span><i className={`b b${n}`} /><div><b>{n === 1 ? leftWord : w[`morning.${n}h`]}</b><p>{n === 1 ? etaWord(6) ?? w['morning.1p'] : w[`morning.${n}p`]}</p></div></li>)}
             </ol>
             <p className={`fin ${morn >= 4 ? 'on' : ''}`}>{w['morning.end']}</p>
           </div>
           <ParentPhone ref={mornPhone} className="mp" w={w} mode="map" eta={morn <= 1 ? 6 - morn * 3 : null} step={Math.max(0, morn - 1)} title={morningAlert ?? w['morning.1h'] ?? ''} alert={morningAlert} />
-          <div className="reached" aria-hidden="true"><Chamak seed={5} h={14} className="rb rb1" /><b lang="ur">{w.reached}</b><Chamak seed={8} h={14} className="rb rb2" /><Glints n={5} /></div>
+          {/* v19 the arrival: the city dims, a painted panel rises and پہنچ گئے is written stroke by stroke */}
+          <div className="arrive" aria-hidden="true" data-testid="arrive">
+            <div className="arrpanel">
+              <span className="arrart" style={{ backgroundImage: arrivalArt }} />
+              <svg className="arrword" viewBox="0 0 760 300" overflow="visible"><text x="380" y="210" textAnchor="middle" lang="ur">{w.reached}</text></svg>
+              <Glints n={6} />
+            </div>
+            <small className="arrsub">{w['reached.sub']}</small>
+          </div>
         </div>
       </section>
 
@@ -331,117 +399,14 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
         </div>
       </section>
 
-      {/* ---------- 5. try it ---------- */}
-      <section className="sec try paper" data-sec="try" aria-labelledby="h-try">
-        <div className="wrap">
-          <p className="kick rv">{w['try.k']}</p>
-          <h2 id="h-try" className="rv">{w['try.h']}</h2>
-          <div className="demos">
-            <OffDemo w={w} phone={offPhone} />
-            <HoldDemo w={w} />
-            <SignalDemo w={w} />
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- 6. the fork ---------- */}
-      <section className="sec fork" data-sec="fork" aria-labelledby="h-fork">
-        <div className="fork-stage">
-          <div className="copy">
-            <p className="kick">{w['fork.k']}</p>
-            <h2 id="h-fork">{w['fork.h']}</h2>
-            <p>{w['fork.p']}</p>
-          </div>
-          <div className="sign" ref={signRef}>
-            <span className="pole" aria-hidden="true" />
-            {(['yes', 'unsure'] as const).map((r, k) => (
-              <button key={r} type="button" className={`arm a${k + 1} ${road === r ? 'chosen' : ''}`} aria-pressed={road === r} aria-controls="road" onClick={() => pickRoad(r)}><b>{w[`fork.${r}`]}</b><small>{w[`fork.${r}.s`]}</small></button>
-            ))}
-          </div>
-        </div>
-        <div id="road" className={`road ${road ?? 'none'}`} aria-live="polite">
-          {road === 'yes' && (
-            <div className="wrap">
-              <h3>{w['yes.h']}</h3>
-              <ol className="miles">{[1, 2, 3].map((n) => <li key={n} style={{ ['--k' as string]: n }}><span className="stone num" aria-hidden="true">{n}</span><b>{w[`yes.${n}t`]}</b><p>{w[`yes.${n}p`]}</p></li>)}</ol>
-              <p className="need">{w['yes.need']}</p>
-              <div className="acts">{cta}</div>
-            </div>
-          )}
-          {road === 'unsure' && (
-            <div className="wrap">
-              <h3>{w['unsure.h']}</h3>
-              <div className="doubts">{[1, 2, 3, 4, 5, 6].map((n) => (
-                <button key={n} type="button" className={`doubt ${open.has(n) ? 'open' : ''}`} aria-expanded={open.has(n)} onClick={() => flipDoubt(n)} style={{ ['--k' as string]: n }}>
-                  <span className="q">{w[`d.${n}`]}</span><span className="a">{w[`d.${n}.b`]}</span>
-                </button>))}
-              </div>
-              <div className="acts"><b className="ask">{w['unsure.ask']}</b>{cta}<a className="link" href={`${wa.href}?text=${encodeURIComponent(w['unsure.waText'] ?? '')}`} rel="noreferrer">{w['unsure.no']}<Arrow /></a></div>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* ---------- 7. promises ---------- */}
-      <section id="safety" className="sec promises" data-sec="promises" style={{ height: `${HEIGHTS.promises * 100}vh` }} aria-labelledby="h-prom">
-        <div className="stick">
-          <div className="copy">
-            <p className="kick">{w['prom.k']}</p>
-            <h2 id="h-prom">{w['prom.h']}</h2>
-            <p>{w['prom.p']}</p>
-            <a className="link" href={links.safety}>{w['prom.all']}<Arrow /></a>
-          </div>
-          <div className="stickers" ref={stickRef}>
-            {[1, 2, 3, 4, 5, 6, 7].map((n, k) => (
-              <div key={n} className={`stk ${k < flips ? 'flip' : ''}`} style={{ ['--k' as string]: k }}>
-                <div className="in"><div className="f"><span className="mk">پہنچ</span><b>{w[`p${n}`] ?? ''}</b></div><div className="b"><b>{w[`p${n}`]}</b><p>{w[`p${n}.b`]}</p></div></div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- 8. what we never collect ---------- */}
-      <section className="sec never paper" data-sec="never" aria-labelledby="h-never">
-        <div className="wrap">
-          <p className="kick rv">{w['never.k']}</p>
-          <h2 id="h-never" className="rv">{w['never.h']}</h2>
-          <ul className="nolist">{[1, 2, 3, 4].map((n) => <li key={n} className="rv" style={{ ['--k' as string]: n }}><span>{w[`never.${n}`]}</span></li>)}</ul>
-          <p className="rv note">{w['never.p']}</p>
-          <a className="link rv" href={links.privacy}>{w['never.more']}<Arrow /></a>
-        </div>
-      </section>
-
-      {/* ---------- 9. calls calculator ---------- */}
-      <section className="sec calc paper" data-sec="calc" aria-labelledby="h-calc">
-        <div className="wrap">
-          <p className="kick rv">{w['calc.k']}</p>
-          <h2 id="h-calc" className="rv">{w['calc.h']}</h2>
-          <div className="calcbox rv">
-            <label className="slider"><span className="sr">{w['calc.label']}</span><input type="range" min={0} max={10} step={1} value={calc} onChange={(e) => setCalc(Number(e.target.value))} aria-valuetext={String(calc)} /><b className="num">{calc}</b></label>
-            {calc > 0 ? (
-              <p className="out"><b className="big num">{yearly.toLocaleString('en')}</b><span>{w['calc.out']}</span><small>{(w['calc.how'] ?? '').replace('{c}', String(calc))}</small></p>
-            ) : <p className="out"><span>{w['calc.zero']}</span></p>}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------- 10. drivers band ---------- */}
-      <section className="sec band" data-sec="band" aria-labelledby="h-band">
-        <div className="wrap">
-          <p className="kick rv">{w['band.k']}</p>
-          <h2 id="h-band" className="rv">{w['band.h']}</h2>
-          <p className="rv">{w['band.p']}</p>
-          <div className="acts rv"><a className="btn light" href="#join" onClick={(e) => { setRole('driver'); go('#join')(e); }}>{w['drv.go']}</a><a className="link" href={links.drivers}>{w['drv.more']}<Arrow /></a></div>
-        </div>
-      </section>
-
-      {/* ---------- 11. quotes (only real ones) ---------- */}
+      {/* ---------- 5. everything you'd ask (v19): one hub instead of a long trail of sections ---------- */}
+      <Hub kick={w['hub.k'] ?? ''} title={w['hub.h'] ?? ''} lead={w['hub.lead'] ?? ''} topics={topics} open={hubOpen} onOpen={setHubOpen} />
+      {/* ---------- 6. quotes (only real ones) ---------- */}
       {quotes.length > 0 && (
         <section className="sec quotes paper"><div className="wrap"><p className="kick">{w['quotes.k']}</p>{quotes.map((q) => <figure key={q.name}><blockquote>{q.text}</blockquote><figcaption>{q.name}</figcaption></figure>)}</div></section>
       )}
 
-      {/* ---------- 12. join ---------- */}
+      {/* ---------- 7. join ---------- */}
       <section id="join" className="sec join night" data-sec="join" aria-labelledby="h-join">
         <div className="wrap">
           <div className="joingrid">
@@ -451,7 +416,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
               <p>{w['join.lead']}</p>
               <a className="link" href={share} target="_blank" rel="noreferrer"><WaIcon />{w['share.btn']}<Arrow /></a>
             </div>
-            <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={wa.href} initialArea={area} />
+            <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={wa.href} initialArea={area} meter={summary.meter} />
           </div>
           <div className="waitwrap"><h3>{w['wait.title']}</h3><WaitingMap w={w} areas={areas} summary={summary} mine={mine ?? area} /></div>
           <div className="two">
@@ -461,19 +426,11 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
         </div>
       </section>
 
-      {/* ---------- 13. questions and footer ---------- */}
-      <section id="questions" className="sec faq night" data-sec="faq" aria-labelledby="h-faq">
-        <div className="wrap">
-          <h2 id="h-faq">{w['faq.title']}</h2>
-          <div className="qa">{qa.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div>
-        </div>
-      </section>
       <SiteFooter w={w} wa={wa} onAgain={() => scrollTo(0)}
         line={{ ur: worldWords.lines[2]?.ur ?? '', en: worldWords.lines[2]?.en ?? '' }}
         links={{ home: links.home, how: '#how', safety: links.safety, drivers: links.drivers, download: links.download, story: links.story, progress: links.progress, schools: links.schools, privacy: links.privacy, terms: links.terms, delete: links.delete, other: links.other }}
         labels={{ privacy: foot.privacy, terms: foot.terms, delete: foot.delete, download: foot.download, contact: foot.contact, switchLang: foot.switchLang, otherLang: lang === 'ur' ? 'en' : 'ur' }} />
 
-      <div className={`playbar ${playing ? 'on' : ''}`} aria-hidden={!playing}><i /><span>{w.play}</span><button type="button" onClick={() => { playRef.current = false; setPlaying(false); }}>{w.pause}</button></div>
     </main>
   );
 }

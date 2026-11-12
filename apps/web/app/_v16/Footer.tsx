@@ -3,7 +3,7 @@
 // swaying on their strings, the sea shimmering beyond, a band of chamak patti, one of Pohnch's lines
 // in Gulzar, and the links in four small groups. Drawn as one inline SVG, no pictures to download.
 import type { ReactNode } from 'react';
-import { Chamak, Couplet } from './truckart';
+import { Chamak, Couplet, Jhalar } from './truckart';
 
 export type FootLinks = { home: string; how: string; safety: string; drivers: string; download: string; story: string; progress: string; schools: string; privacy: string; terms: string; delete: string; other: string };
 export type FootLabels = { privacy: string; terms: string; delete: string; download: string; contact: string; switchLang: string; otherLang: 'ur' | 'en' };
@@ -53,8 +53,9 @@ export function SiteFooter({ w, links, labels, wa, line, onAgain }: {
     <footer className="sitefoot">
       <Skyline />
       <Chamak seed={2} h={16} className="fband" />
+      <Jhalar h={24} className="fjhalar" />
       <div className="fwrap">
-        <Couplet ur={line.ur} en={line.en} className="fline" />
+        <Couplet ur={line.ur} en={line.en} className="fline" birds />
         <div className="fgrid">
           <div className="fl">
             <span className="mark"><b>پہنچ</b><span>Pohnch</span></span>

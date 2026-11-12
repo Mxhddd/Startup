@@ -599,3 +599,32 @@ Urdu versions live under `/ur/...`.
 - The stills and the home's no-3D pictures come from it.
 
 Tests: `app/_v16/v18.test.ts`, `e2e/v18.spec.ts`, plus school cases in both interest test files.
+
+## Website v19: "a real reason behind every part" (12 November 2026)
+
+**Truck art, done properly** (`_v16/truckartSvg.ts`): a small library of hand-drawn SVG motifs with black outlines: roses, vines, jhalar (fringe with bells), chamak foil tiles, a parrot, wave borders, and `panelSvg()`, which puts them together into a painted panel. The same SVG is drawn into the 3D city's textures (van bands, back panel, rooftop boards; `world/textures.ts` turns SVG into an image and repaints when it loads), so the van and the pages match. The hot colour is gulabi; shingarf red is never used for decoration (tested).
+
+**The intro** (`Intro.tsx`, `introRules.ts`) plays in full, about 4 s, on every visit: the logo draws itself, then the star rises like the sun (a moon at night) and the page opens with the event `pohnch:intro-open`. Any tap, key or scroll skips it; reduced motion has none. The 3D camera then **flies in from the sea** (`SEA` and `FLY_SECS` in `scenes.ts`).
+
+**"A school day"** (`DayStrip` in `FrontDoor.tsx`): a slider from 06:00 to 15:00 that opens at Karachi's time (06:30 at night, marked as night). The 3D city, a small route drawing and a caption follow it. The rule for "where is the van at this minute" is `dayState()` in `scenes.ts`.
+
+**The live area meter:**
+- The database summary now has a `meter` per area (migration `20261112000200_area_meter.sql`, test `189-area-meter.test.sql`): families in bands (`few`, `3-9`, `10+`), a driver (`none`/`yes`) and what the area still needs. Never an exact count.
+- The rule lives once in `packages/core` (`areaMeter()`), and the SQL mirrors it.
+- The website turns it into words with `_v16/areaMeter.ts`. It shows under the day dial, on the waiting map (pins sized and coloured by status), in the join thank-you, on the drivers page and on /progress.
+- After merging: `pnpm dlx supabase db push`, then `pnpm dlx supabase functions deploy interest --no-verify-jwt --use-api`.
+
+**The story, tighter and yours:**
+- The sections are about 30% shorter.
+- In "One van, both sides" you hold the driver phone's Got in button yourself (`GotIn` in `Phone.tsx`); scrolling on taps it for you.
+- With an area picked, the alerts name it (`web.area.*`).
+- "Play the morning" is gone.
+
+**پہنچ گئے, the arrival:** the city dims, a painted panel rises and the word is SVG text that strokes in, then fills with gold, all following the scroll. The SVG never clips, so tall letters always show.
+
+**"Everything you'd ask"** (`_v16/Hub.tsx`) replaces the run of sections after the story (try it, the fork, promises, never, calculator, drivers band, questions). It has seven topics: how it starts, try it, safety, privacy, cost and calls, for drivers, and questions.
+- **Desktop:** the topics sit in a column with one panel open.
+- **Phone:** the same buttons and panels are an accordion.
+- **Links:** `#safety`, `#privacy`, `#questions`, `#cost`, `#for-drivers`, `#try` and `#start` open their topic (`HUB_HASH`).
+
+Tests: `app/_v16/v19.test.ts`, `e2e/v19.spec.ts`, `packages/core` interest tests, `189-area-meter.test.sql`.

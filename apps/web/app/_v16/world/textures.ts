@@ -5,6 +5,7 @@
 // redrawn once the fonts have loaded.
 import * as THREE from 'three';
 import { mulberry } from './map';
+import { chamakTile, panelSvg, svgSrc } from '../truckartSvg';
 
 export type WorldWords = {
   /** Pohnch's own lines, Urdu and English, for the rooftop boards and the van's back. */
@@ -33,11 +34,27 @@ function canvasTex(w: number, h: number, draw: (g: CanvasRenderingContext2D, w: 
   redraw(); painted.push({ tex, redraw });
   return tex;
 }
+/* truck-art motifs arrive as SVG images; each painted texture repaints once its images have loaded */
+const imgs = new Map<string, HTMLImageElement>();
+let onPaint: (() => void) | null = null;
+/** Draws an SVG (from truckartSvg.ts) into a canvas; if it hasn't loaded yet, every texture repaints when it has. */
+function drawSvg(g: CanvasRenderingContext2D, svg: string, x: number, y: number, w: number, h: number) {
+  let im = imgs.get(svg);
+  if (!im) {
+    im = new Image(); imgs.set(svg, im);
+    im.onload = () => { painted.forEach((p) => p.redraw()); onPaint?.(); };
+    im.src = svgSrc(svg);
+  }
+  if (im.complete && im.naturalWidth) g.drawImage(im, x, y, w, h);
+}
+/** Tell the world when painted textures change (images or fonts arrived), so it draws again. */
+export function onRepaint(cb: () => void) { onPaint = cb; }
+
 /** Repaint every texture with words once the fonts are ready; calls back so the world redraws. */
 export function whenFontsReady(done: () => void) {
   try { void document.fonts.ready.then(() => { painted.forEach((p) => p.redraw()); done(); }); } catch { /* no font loading API */ }
 }
-export function forgetPainted() { painted.length = 0; }
+export function forgetPainted() { painted.length = 0; onPaint = null; }
 
 /* ---------- soft shapes ---------- */
 /** A soft round glow; `rgb` like '255,214,150', `a` the centre opacity. */
@@ -64,38 +81,12 @@ export function waterTex() {
 }
 
 /* ---------- truck art ---------- */
-/** One band of chamak patti: diamonds with mirror dots between painted triangles, framed in sona. */
-export function chamak(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, seed = 1) {
-  const r = mulberry(seed); const cols = [TRUCK.kesar, TRUCK.zam, TRUCK.rose, TRUCK.pista, TRUCK.ghee];
-  g.save(); g.beginPath(); g.rect(x, y, w, h); g.clip();
-  g.fillStyle = TRUCK.neel; g.fillRect(x, y, w, h);
-  const s = h, n = Math.ceil(w / s) + 1;
-  for (let i = 0; i < n; i++) {
-    const cx = x + i * s + s / 2, cy = y + h / 2, c1 = cols[(i + Math.floor(r() * 2)) % cols.length]!, c2 = cols[(i + 2) % cols.length]!;
-    g.fillStyle = c1; g.beginPath(); g.moveTo(cx, y + 1); g.lineTo(cx + s / 2 - 1, cy); g.lineTo(cx, y + h - 1); g.lineTo(cx - s / 2 + 1, cy); g.closePath(); g.fill();
-    g.fillStyle = c2; g.beginPath(); g.moveTo(cx, y + h * 0.24); g.lineTo(cx + s * 0.26, cy); g.lineTo(cx, y + h * 0.76); g.lineTo(cx - s * 0.26, cy); g.closePath(); g.fill();
-    // a little mirror in the middle
-    const mr = Math.max(1.5, h * 0.1); const mg = g.createRadialGradient(cx - mr * 0.3, cy - mr * 0.3, 0, cx, cy, mr); mg.addColorStop(0, '#FFFFFF'); mg.addColorStop(1, '#B9C4D6'); g.fillStyle = mg; g.beginPath(); g.arc(cx, cy, mr, 0, Math.PI * 2); g.fill();
-    // half-diamonds between, in sona
-    g.fillStyle = TRUCK.sona; g.beginPath(); g.moveTo(cx + s / 2, y); g.lineTo(cx + s / 2 + s * 0.16, y + h * 0.22); g.lineTo(cx + s / 2 - s * 0.16, y + h * 0.22); g.closePath(); g.fill();
-    g.beginPath(); g.moveTo(cx + s / 2, y + h); g.lineTo(cx + s / 2 + s * 0.16, y + h * 0.78); g.lineTo(cx + s / 2 - s * 0.16, y + h * 0.78); g.closePath(); g.fill();
-  }
-  g.restore();
-  g.strokeStyle = TRUCK.sona; g.lineWidth = Math.max(1, h * 0.07); g.strokeRect(x + g.lineWidth / 2, y + g.lineWidth / 2, w - g.lineWidth, h - g.lineWidth);
-}
-/** A painted flower roundel (a classic truck-art motif, here in brand colours). */
-export function roundel(g: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
-  const petals = 8;
-  for (let k = 0; k < petals; k++) { const a = (k / petals) * Math.PI * 2; g.fillStyle = k % 2 ? TRUCK.kesar : TRUCK.rose; g.beginPath(); g.ellipse(cx + Math.cos(a) * r * 0.55, cy + Math.sin(a) * r * 0.55, r * 0.42, r * 0.2, a, 0, Math.PI * 2); g.fill(); }
-  g.fillStyle = TRUCK.zam; g.beginPath(); g.arc(cx, cy, r * 0.32, 0, Math.PI * 2); g.fill();
-  g.fillStyle = TRUCK.ghee; g.beginPath(); g.arc(cx, cy, r * 0.14, 0, Math.PI * 2); g.fill();
-}
 function fitText(g: CanvasRenderingContext2D, text: string, font: (px: number) => string, maxW: number, start: number, min = 12) {
   let px = start; do { g.font = font(px); px -= 2; } while (g.measureText(text).width > maxW && px > min);
 }
 
-/** A strip of chamak patti that repeats along a surface (van skirts, billboard edges). */
-export function bandTex(seed = 3) { return canvasTex(512, 32, (g, w, h) => chamak(g, 0, 0, w, h, seed), { repeat: true }); }
+/** A strip of chamak foil tiles that repeats along a surface (the van's sides). */
+export function bandTex(seed = 3) { const svg = chamakTile(32, seed); return canvasTex(512, 32, (g) => { for (let x = 0; x < 512; x += 128) drawSvg(g, svg, x, 0, 128, 32); }, { repeat: true }); }
 
 /** The van's number plate: kesar, with SCHOOL VAN and اسکول وین in siyahi. */
 export function plateTex(words: WorldWords) {
@@ -107,30 +98,28 @@ export function plateTex(words: WorldWords) {
     if (words.plateUr) { g.textAlign = 'right'; g.direction = 'rtl'; fitText(g, words.plateUr, (px) => `700 ${px}px ${urduFont()}`, 100, 26); g.fillText(words.plateUr, w - 16, h / 2 + 3); }
   });
 }
-/** The van's painted back panel: a chamak frame, a roundel, and Pohnch's line for drivers behind. */
+/** The van's painted back panel: a full truck-art panel (vine, foil, roses, jhalar) and Pohnch's line for the drivers behind. */
 export function backPanelTex(words: WorldWords) {
+  const art = panelSvg(256, 192, { ground: TRUCK.neel, seed: 1 });
   return canvasTex(256, 192, (g, w, h) => {
-    g.fillStyle = TRUCK.neel; g.fillRect(0, 0, w, h);
-    chamak(g, 0, 0, w, 22, 7); chamak(g, 0, h - 22, w, 22, 8);
-    roundel(g, 30, h / 2, 20); roundel(g, w - 30, h / 2, 20);
+    drawSvg(g, art, 0, 0, w, h);
     const line = words.lines[0]?.ur ?? '';
     if (line) {
       const parts = line.split('،').map((s) => s.trim()).filter(Boolean);
       g.fillStyle = TRUCK.ghee; g.textAlign = 'center'; g.textBaseline = 'middle'; g.direction = 'rtl';
-      parts.slice(0, 2).forEach((p, i) => { fitText(g, p, (px) => `400 ${px}px ${displayFont()}`, w - 90, 34, 14); g.fillText(p, w / 2, h / 2 + (parts.length > 1 ? (i ? 26 : -18) : 4)); });
+      parts.slice(0, 2).forEach((p, i) => { fitText(g, p, (px) => `400 ${px}px ${displayFont()}`, w - 110, 28, 12); g.fillText(p, w / 2, h * 0.5 + (parts.length > 1 ? (i ? 14 : -16) : 0)); });
     }
   });
 }
-/** A rooftop board: chamak frame, one Pohnch line in Gulzar, its English underneath. */
+/** A rooftop board: a full truck-art panel with parrots, one Pohnch line in Gulzar and its English underneath. */
 export function boardTex(line: { ur: string; en: string } | undefined, seed: number) {
+  const art = panelSvg(512, 220, { seed, birds: true });
   return canvasTex(512, 220, (g, w, h) => {
-    g.fillStyle = TRUCK.ghee; g.fillRect(0, 0, w, h);
-    chamak(g, 0, 0, w, 26, seed); chamak(g, 0, h - 26, w, 26, seed + 1);
-    roundel(g, 46, h / 2, 26); roundel(g, w - 46, h / 2, 26);
+    drawSvg(g, art, 0, 0, w, h);
     if (!line) return;
     g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = TRUCK.neel; g.direction = 'rtl'; fitText(g, line.ur, (px) => `400 ${px}px ${displayFont()}`, w - 150, 64, 20); g.fillText(line.ur, w / 2, h / 2 - 12);
-    g.direction = 'ltr'; g.fillStyle = TRUCK.ink; fitText(g, line.en, (px) => `700 ${px}px ${latinFont()}`, w - 160, 22, 12); g.fillText(line.en, w / 2, h / 2 + 50);
+    g.fillStyle = TRUCK.neel; g.direction = 'rtl'; fitText(g, line.ur, (px) => `400 ${px}px ${displayFont()}`, w * 0.42, 46, 18); g.fillText(line.ur, w / 2, h * 0.5);
+    g.direction = 'ltr'; g.fillStyle = TRUCK.ink; fitText(g, line.en, (px) => `700 ${px}px ${latinFont()}`, w * 0.42, 15, 11); g.fillText(line.en, w / 2, h * 0.5 + 34);
   });
 }
 /** The shop-sign sheet: 4 × 4 cells of 256 × 96. Cells 0–11 are painted signs, 12–15 are shutters. */

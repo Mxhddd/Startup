@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { AREA_IDS, AREA_SPOTS, checkInterest, visibleCounts } from './interest';
+import { AREA_IDS, AREA_SPOTS, VAN_FAMILIES, areaMeter, checkInterest, visibleCounts } from './interest';
 
 describe('join the pilot: checks', () => {
   it('accepts a parent with everything filled and tidies it', () => {
@@ -37,5 +37,20 @@ describe('the waiting map', () => {
   });
   it('has a place on the map for every area but "somewhere else"', () => {
     for (const id of AREA_IDS) if (id !== 'other') expect(AREA_SPOTS[id]).toBeDefined();
+  });
+});
+
+describe('the live area meter (v19)', () => {
+  it('shows families only in bands, never an exact number', () => {
+    expect([0, 1, 2, 3, 9, 10, 40].map((n) => areaMeter(n, 0).f)).toEqual([null, 'few', 'few', '3-9', '3-9', '10+', '10+']);
+  });
+  it('says what an area still needs before a van can start', () => {
+    expect(areaMeter(2, 0)).toEqual({ f: 'few', d: 'none', s: 'forming', m: 'several' });
+    expect(areaMeter(6, 0)).toEqual({ f: '3-9', d: 'none', s: 'forming', m: 'few' });
+    expect(areaMeter(5, 1)).toEqual({ f: '3-9', d: 'yes', s: 'needs-families', m: 'few' });
+    expect(areaMeter(0, 2)).toEqual({ f: null, d: 'yes', s: 'needs-families', m: 'several' });
+    expect(areaMeter(8, 0)).toEqual({ f: '3-9', d: 'none', s: 'needs-driver', m: null });
+    expect(areaMeter(12, 1)).toEqual({ f: '10+', d: 'yes', s: 'ready', m: null });
+    expect(VAN_FAMILIES).toBe(8);
   });
 });

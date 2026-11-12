@@ -187,3 +187,8 @@
 
 /* for schools: the form in the night band */
 .v16p .pnight form.school { max-width: 560px; display: grid; gap: 22px; }
+/* pilot progress: each area's live line (v19) */
+.v16p .pareas { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.v16p .pareas li { display: grid; gap: 2px; padding: 14px 16px; border-radius: 14px; background: #FFFDF8; box-shadow: inset 0 0 0 1px rgba(184,134,47,.25); border-inline-start: 5px solid var(--kesar); }
+.v16p .pareas li.st-ready { border-inline-start-color: var(--zam); }
+.v16p .pareas b { font-size: 17px; } .v16p .pareas span { font-size: 15px; color: var(--ink2); } .v16p .pareas em { font-style: normal; font-size: 15px; font-weight: 700; color: var(--ink); }

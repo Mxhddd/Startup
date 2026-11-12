@@ -8,6 +8,7 @@ import { t, type Lang, type MessageKey } from '@pohnch/messages';
 import { HoldDemo, SignalDemo } from './Demos';
 import { JoinForm, WaitingMap, useSummary } from './Panel';
 import { useCountUp } from './delight';
+import { meterParts } from './areaMeter';
 import { sendInterest } from '../_lib/interest';
 import type { Words } from './Phone';
 
@@ -15,8 +16,12 @@ export function DriverIslands({ lang, w, part }: { lang: Lang; w: Words; part: '
   const [role, setRole] = useState<'parent' | 'driver'>('driver');
   const [, setMine] = useState<AreaId | null>(null);
   if (part === 'demos') return <div className="demos2"><HoldDemo w={w} /><SignalDemo w={w} /></div>;
+  return <DriverJoin lang={lang} w={w} role={role} setRole={setRole} setMine={setMine} />;
+}
+function DriverJoin({ lang, w, role, setRole, setMine }: { lang: Lang; w: Words; role: 'parent' | 'driver'; setRole: (r: 'parent' | 'driver') => void; setMine: (a: AreaId | null) => void }) {
+  const summary = useSummary(true);
   const areas = AREA_IDS.map((id) => ({ id, label: t(lang, `area.${id}` as MessageKey), spot: id === 'other' ? null : AREA_SPOTS[id] }));
-  return <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} />;
+  return <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} meter={summary.meter} />;
 }
 
 /* ---------------- v18: Pilot progress (live counts, only when safe to show) ---------------- */
@@ -30,7 +35,7 @@ export function ProgressIsland({ lang, w }: { lang: Lang; w: Words }) {
   const summary = useSummary(true);
   const areas = AREA_IDS.map((id) => ({ id, label: t(lang, `area.${id}` as MessageKey), spot: id === 'other' ? null : AREA_SPOTS[id] }));
   const families = Object.values(summary.areas).reduce((a, b) => a + b, 0), shownAreas = Object.keys(summary.areas).length;
-  const any = families > 0 || summary.proof;
+  const any = families > 0 || summary.proof || Object.keys(summary.meter).length > 0;
   return (
     <div className="progress" data-testid="progress">
       {any ? (
@@ -42,6 +47,13 @@ export function ProgressIsland({ lang, w }: { lang: Lang; w: Words }) {
         <div className="pstart" data-testid="progress-start"><h2>{w['prog.start']}</h2><p>{w['prog.startP']}</p></div>
       )}
       <div className="pmap"><h3>{w['prog.map']}</h3><WaitingMap w={w} areas={areas} summary={summary} mine={null} /></div>
+      {Object.keys(summary.meter).length > 0 && (
+        <ul className="pareas" data-testid="progress-areas">
+          {areas.filter((a) => summary.meter[a.id]).map((a) => { const p = meterParts(w, summary.meter[a.id])!; return (
+            <li key={a.id} className={`st-${summary.meter[a.id]!.s}`}><b>{a.label}</b><span>{p.families} · {p.driver}</span><em>{p.status}</em></li>
+          ); })}
+        </ul>
+      )}
       <p className="pnote">{w['prog.note']}</p>
     </div>
   );
