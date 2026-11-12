@@ -13,7 +13,7 @@ test('the privacy policy reads in Urdu and English and says what is never kept',
 
 test('the home page links to the privacy policy', async ({ page }) => {
   await page.goto('/?lite');
-  await page.locator('#questions footer').getByRole('link', { name: 'Privacy policy' }).click();
+  await page.locator('footer.sitefoot').getByRole('link', { name: 'Privacy policy' }).click();
   await expect(page).toHaveURL(/\/privacy$/);
 });
 

@@ -7,8 +7,13 @@ import { dirOf, otherLang, t, type Lang, type MessageKey } from '@pohnch/message
 import type { ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
 import { href, otherHref } from '../_lib/links';
-import { DriverIslands } from './PageIslands';
-import { webWords } from './Home';
+import { DriverIslands, ProgressIsland, SchoolForm } from './PageIslands';
+import { PageScene } from './PageScene';
+import type { PageId } from './pageScenes';
+import { webWords } from './words';
+import { SiteFooter } from './Footer';
+import { Chamak, Couplet, Roundel, truckVars } from './truckart';
+import { worldWords } from './worldWords';
 import './home.css';
 import './pages.css';
 
@@ -29,11 +34,12 @@ export function Shell16({ lang, path, children }: { lang: Lang; path: string; ch
       <a href={`${href(lang, '/')}#how`}>{w(lang, 'nav.how')}</a>
       <a href={href(lang, '/safety')}>{w(lang, 'nav.safety')}</a>
       <a href={href(lang, '/drivers')}>{w(lang, 'nav.drivers')}</a>
+      <a href={href(lang, '/story')}>{w(lang, 'nav.story')}</a>
       <a href={href(lang, '/download')}>{k(lang, 'site.nav.download')}</a>
     </>
   );
   return (
-    <main className="v16 v16p" lang={lang} dir={dirOf(lang)} data-lang={lang}>
+    <main className="v16 v16p" lang={lang} dir={dirOf(lang)} data-lang={lang} style={truckVars()}>
       <header className="pbar">
         <a className="mark" href={href(lang, '/')} aria-label={w(lang, 'nav.home')}><b>پہنچ</b><span>Pohnch</span></a>
         <nav className="pnav" aria-label={w(lang, 'nav.menu')}>{links}</nav>
@@ -45,34 +51,21 @@ export function Shell16({ lang, path, children }: { lang: Lang; path: string; ch
         </details>
       </header>
       {children}
-      <footer className="pfoot">
-        <div className="pwrap">
-          <div className="fl"><span className="mark"><b>پہنچ</b><span>Pohnch</span></span><small>{w(lang, 'foot.made')}</small></div>
-          <nav aria-label={w(lang, 'nav.menu')}>
-            <a href={href(lang, '/')}>{w(lang, 'pg.home')}</a>
-            <a href={href(lang, '/safety')}>{w(lang, 'nav.safety')}</a>
-            <a href={href(lang, '/drivers')}>{w(lang, 'nav.drivers')}</a>
-            <a href={href(lang, '/download')}>{k(lang, 'site.nav.download')}</a>
-            <a href={href(lang, '/privacy')}>{k(lang, 'web.footer.privacy')}</a>
-            <a href={href(lang, '/terms')}>{k(lang, 'site.foot.terms')}</a>
-            <a href={href(lang, '/delete-account')}>{k(lang, 'site.foot.delete')}</a>
-            <a href={wa} rel="noreferrer">{k(lang, 'site.foot.contact')} <bdi dir="ltr" className="num">{PILOT_WHATSAPP.display}</bdi></a>
-            <a href={otherHref(lang, path)} hrefLang={other} lang={other}>{k(lang, 'lang.switch')}</a>
-          </nav>
-        </div>
-      </footer>
+      <SiteFooter w={webWords(lang)} wa={{ href: wa, display: PILOT_WHATSAPP.display }}
+        line={{ ur: worldWords().lines[2]?.ur ?? '', en: worldWords().lines[2]?.en ?? '' }}
+        links={{ home: href(lang, '/'), how: `${href(lang, '/')}#how`, safety: href(lang, '/safety'), drivers: href(lang, '/drivers'), download: href(lang, '/download'), story: href(lang, '/story'), progress: href(lang, '/progress'), schools: href(lang, '/schools'), privacy: href(lang, '/privacy'), terms: href(lang, '/terms'), delete: href(lang, '/delete-account'), other: otherHref(lang, path) }}
+        labels={{ privacy: k(lang, 'web.footer.privacy'), terms: k(lang, 'site.foot.terms'), delete: k(lang, 'site.foot.delete'), download: k(lang, 'site.nav.download'), contact: k(lang, 'site.foot.contact'), switchLang: k(lang, 'lang.switch'), otherLang: other }} />
     </main>
   );
 }
 
-/** The top of an inner page: a still of the 3D city, then the kicker, title and lead over its lower edge. */
-function Hero({ img, kick, title, lead, night }: { img: string; kick: string; title: string; lead?: string; night?: boolean }) {
+/** The top of an inner page (v18): its own scene of the 3D city (live on capable desktops, a still
+ *  elsewhere), an optional painted detail over it, then the kicker, title and lead over its lower edge. */
+function Hero({ scene, kick, title, lead, night, overlay }: { scene: PageId; kick: string; title: string; lead?: string; night?: boolean; overlay?: ReactNode }) {
   return (
     <section className={`phero ${night ? 'night' : ''}`}>
-      <picture>
-        <source media="(max-width: 760px)" srcSet={`/v16/${img}-960.webp`} />
-        <img src={`/v16/${img}.webp`} alt="" width={1600} height={1000} fetchPriority="high" />
-      </picture>
+      <PageScene id={scene} words={worldWords()} />
+      {overlay ? <div className="poverlay" aria-hidden="true">{overlay}</div> : null}
       <div className="pwrap phead">
         <p className="kick">{kick}</p>
         <h1>{title}</h1>
@@ -81,14 +74,29 @@ function Hero({ img, kick, title, lead, night }: { img: string; kick: string; ti
     </section>
   );
 }
+/** A quiet top for the small-print pages: the painted star and a band of chamak patti, no 3D. */
+function QuietHero({ kick, title, lead }: { kick: string; title: string; lead?: string }) {
+  return (
+    <section className="phero quiet">
+      <div className="pwrap phead">
+        <Roundel size={56} className="qstar" />
+        <p className="kick">{kick}</p>
+        <h1>{title}</h1>
+        {lead ? <p className="lede">{lead}</p> : null}
+      </div>
+      <Chamak seed={9} h={14} className="qband" />
+    </section>
+  );
+}
 
 export function DriversPage16({ lang }: { lang: Lang }) {
   const words = webWords(lang);
   return (
     <Shell16 lang={lang} path="/drivers">
-      <Hero img="drivers" kick={w(lang, 'dr.k')} title={k(lang, 'site.drv.title')} lead={k(lang, 'site.drv.lead')} />
+      <Hero scene="drivers" kick={w(lang, 'dr.k')} title={k(lang, 'site.drv.title')} lead={k(lang, 'site.drv.lead')}
+        overlay={<span className="floattap"><i /><b>{w(lang, 'sides.tap')}</b></span>} />
       <section className="pwrap pgrid4">
-        {[1, 2, 3, 4].map((n) => <div key={n} className="fact"><span className="num idx">{String(n).padStart(2, '0')}</span><h3>{k(lang, `site.drv.f${n}.t`)}</h3><p>{k(lang, `site.drv.f${n}.b`)}</p></div>)}
+        {[1, 2, 3, 4].map((n) => <div key={n} className="fact painted" data-tilt=""><span className="fhead"><Roundel size={30} /><span className="num idx">{String(n).padStart(2, '0')}</span></span><h3>{k(lang, `site.drv.f${n}.t`)}</h3><p>{k(lang, `site.drv.f${n}.b`)}</p></div>)}
       </section>
       <section className="pwrap">
         <h2>{w(lang, 'dr.try')}</h2>
@@ -96,7 +104,7 @@ export function DriversPage16({ lang }: { lang: Lang }) {
       </section>
       <section className="pwrap">
         <h2>{k(lang, 'site.drv.how.title')}</h2>
-        <ol className="miles">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{k(lang, `site.drv.how.${n}`)}</p></li>)}</ol>
+        <ol className="miles route">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{k(lang, `site.drv.how.${n}`)}</p></li>)}</ol>
       </section>
       <section className="pwrap">
         <h2>{w(lang, 'dr.faq')}</h2>
@@ -116,13 +124,14 @@ export function DriversPage16({ lang }: { lang: Lang }) {
 export function SafetyPage16({ lang }: { lang: Lang }) {
   return (
     <Shell16 lang={lang} path="/safety">
-      <Hero img="safety" kick={w(lang, 'sf.k')} title={w(lang, 'prom.h')} lead={k(lang, 'site.safety.lead')} />
+      <Hero scene="safety" kick={w(lang, 'sf.k')} title={w(lang, 'prom.h')} lead={k(lang, 'site.safety.lead')}
+        overlay={<span className="vbadge"><Roundel size={64} /><svg viewBox="0 0 24 24" width="28" height="28"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#FAF6EE" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg><b>{w(lang, 'phone.verified')}</b></span>} />
       <section className="pwrap">
         <ol className="promises">{[1, 2, 3, 4, 5, 6, 7].map((n) => <li key={n}><span className="seal" aria-hidden="true"><b>پہنچ</b></span><div><h3>{w(lang, `p${n}`)}</h3><p>{w(lang, `p${n}.b`)}</p></div></li>)}</ol>
       </section>
       <section className="pwrap">
         <h2>{w(lang, 'sf.ver.t')}</h2>
-        <ol className="miles">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{w(lang, `sf.ver.${n}`)}</p></li>)}</ol>
+        <ol className="miles route">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{w(lang, `sf.ver.${n}`)}</p></li>)}</ol>
       </section>
       <section className="pwrap">
         <h2>{w(lang, 'sf.tl.t')}</h2>
@@ -130,7 +139,7 @@ export function SafetyPage16({ lang }: { lang: Lang }) {
       </section>
       <section className="pwrap">
         <h2>{w(lang, 'never.h')}</h2>
-        <ul className="nolist">{[1, 2, 3, 4].map((n) => <li key={n}><span>{w(lang, `never.${n}`)}</span></li>)}</ul>
+        <ul className="nolist struck">{[1, 2, 3, 4].map((n) => <li key={n}><span>{w(lang, `never.${n}`)}</span></li>)}</ul>
       </section>
       <section className="pwrap help">
         <h2>{w(lang, 'sf.help.t')}</h2>
@@ -150,7 +159,7 @@ function storeQr(url: string): string {
 export function DownloadPage16({ lang }: { lang: Lang }) {
   return (
     <Shell16 lang={lang} path="/download">
-      <Hero img="download" kick={k(lang, 'site.dl.kicker')} title={k(lang, 'site.dl.title')} lead={k(lang, 'site.dl.lead')} />
+      <Hero scene="download" kick={k(lang, 'site.dl.kicker')} title={k(lang, 'site.dl.title')} lead={k(lang, 'site.dl.lead')} />
       <section className="pwrap">
         <h2>{w(lang, 'dl.apps')}</h2>
         <div className="apps">
@@ -196,7 +205,7 @@ export function PrivacyPage16({ lang }: { lang: Lang }) {
   );
   return (
     <Shell16 lang={lang} path="/privacy">
-      <Hero img="privacy" kick={k(lang, 'web.footer.privacy')} title={k(lang, 'privacy.title')} lead={k(lang, 'privacy.intro')} night />
+      <Hero scene="privacy" kick={k(lang, 'web.footer.privacy')} title={k(lang, 'privacy.title')} lead={k(lang, 'privacy.intro')} night />
       <Doc lang={lang} summary={summary} sections={PRIVACY.map((s) => ({ id: s, title: k(lang, `privacy.${s}.title`), body: k(lang, `privacy.${s}.body`) }))} />
     </Shell16>
   );
@@ -205,7 +214,7 @@ export function PrivacyPage16({ lang }: { lang: Lang }) {
 export function TermsPage16({ lang }: { lang: Lang }) {
   return (
     <Shell16 lang={lang} path="/terms">
-      <Hero img="paper" kick={k(lang, 'site.foot.terms')} title={k(lang, 'site.terms.title')} lead={k(lang, 'site.terms.updated')} />
+      <QuietHero kick={k(lang, 'site.foot.terms')} title={k(lang, 'site.terms.title')} lead={k(lang, 'site.terms.updated')} />
       <Doc lang={lang} sections={[1, 2, 3, 4, 5, 6].map((n) => ({ id: `t${n}`, title: k(lang, `site.terms.${n}.t`), body: k(lang, `site.terms.${n}.b`) }))} />
     </Shell16>
   );
@@ -214,7 +223,7 @@ export function TermsPage16({ lang }: { lang: Lang }) {
 export function DeletePage16({ lang }: { lang: Lang }) {
   return (
     <Shell16 lang={lang} path="/delete-account">
-      <Hero img="paper" kick={k(lang, 'site.foot.delete')} title={k(lang, 'site.del.title')} lead={k(lang, 'site.del.lead')} />
+      <QuietHero kick={k(lang, 'site.foot.delete')} title={k(lang, 'site.del.title')} lead={k(lang, 'site.del.lead')} />
       <section className="pwrap">
         <ol className="miles">
           <li><span className="stone num" aria-hidden="true">1</span><p>{k(lang, 'site.del.parent')}</p></li>
@@ -233,11 +242,64 @@ export function DeletePage16({ lang }: { lang: Lang }) {
 export function NotFound16() {
   return (
     <Shell16 lang="en" path="/">
-      <Hero img="lost" kick="404" title={w('en', 'nf.h')} lead={w('en', 'nf.p')} />
+      <Hero scene="lost" kick="404" title={w('en', 'nf.h')} lead={w('en', 'nf.p')}
+        overlay={<span className="wrongturn"><Chamak seed={11} h={10} /><b lang="ur" dir="rtl">{w('ur', 'nf.board')}</b><small>{w('en', 'nf.board')}</small><Chamak seed={12} h={10} /></span>} />
       <section className="pwrap nf">
         <p lang="ur" dir="rtl" className="urline">{w('ur', 'nf.h')} {w('ur', 'nf.p')}</p>
         <div className="getrow"><a className="btn" href="/">{w('en', 'nf.home')}</a><a className="link" href="/ur" lang="ur">{w('ur', 'nf.home')}<Arrow /></a></div>
       </section>
+    </Shell16>
+  );
+}
+
+/* ---------------- v18: new pages ---------------- */
+export function StoryPage16({ lang }: { lang: Lang }) {
+  const line = worldWords().lines[1]!;
+  return (
+    <Shell16 lang={lang} path="/story">
+      <Hero scene="story" kick={w(lang, 'st.k')} title={w(lang, 'st.h')} lead={w(lang, 'st.lead')} />
+      <section className="pwrap letter">
+        {[1, 2, 3].map((n) => (
+          <div key={n} className="chapter"><span className="cnum" aria-hidden="true"><Roundel size={44} /><b className="num">{n}</b></span><div><h2>{w(lang, `st.${n}t`)}</h2><p>{w(lang, `st.${n}`)}</p></div></div>
+        ))}
+      </section>
+      <section className="pwrap">
+        <h2>{w(lang, 'st.4t')}</h2>
+        <ul className="nolist struck">{[1, 2, 3, 4].map((n) => <li key={n}><span>{w(lang, `st.4.${n}`)}</span></li>)}</ul>
+      </section>
+      <section className="pwrap coupletwrap"><Couplet ur={line.ur} en={line.en} /></section>
+      <section className="pwrap talk">
+        <h2>{w(lang, 'st.5t')}</h2>
+        <p>{w(lang, 'st.5')}</p>
+        <div className="getrow"><a className="btn" href={wa} rel="noreferrer">WhatsApp <bdi dir="ltr" className="num">{PILOT_WHATSAPP.display}</bdi></a><Cta lang={lang} className="link" /></div>
+        <p className="signoff">{w(lang, 'why.sign')}</p>
+      </section>
+    </Shell16>
+  );
+}
+
+export function ProgressPage16({ lang }: { lang: Lang }) {
+  return (
+    <Shell16 lang={lang} path="/progress">
+      <Hero scene="progress" kick={w(lang, 'prog.k')} title={w(lang, 'prog.h')} lead={w(lang, 'prog.lead')} />
+      <section className="pwrap"><ProgressIsland lang={lang} w={webWords(lang)} /></section>
+      <section className="pwrap">
+        <h2>{w(lang, 'prog.next')}</h2>
+        <ol className="miles route">{[1, 2, 3].map((n) => <li key={n} className={n === 1 ? 'now' : ''}><span className="stone num" aria-hidden="true">{n}</span><b>{w(lang, `prog.m${n}t`)}</b><p>{w(lang, `prog.m${n}`)}</p></li>)}</ol>
+      </section>
+      <section className="pnight"><div className="pwrap"><h2>{w(lang, 'prog.join')}</h2><div className="getrow"><Cta lang={lang} className="btn light" /></div></div></section>
+    </Shell16>
+  );
+}
+
+export function SchoolsPage16({ lang }: { lang: Lang }) {
+  return (
+    <Shell16 lang={lang} path="/schools">
+      <Hero scene="schools" kick={w(lang, 'sch.k')} title={w(lang, 'sch.h')} lead={w(lang, 'sch.lead')} />
+      <section className="pwrap pgrid3">
+        {[1, 2, 3].map((n) => <div key={n} className="fact painted" data-tilt=""><span className="fhead"><Roundel size={30} /><span className="later">{w(lang, 'sch.later')}</span></span><h3>{w(lang, `sch.${n}t`)}</h3><p>{w(lang, `sch.${n}`)}</p></div>)}
+      </section>
+      <section className="pnight" id="school-form"><div className="pwrap"><h2>{w(lang, 'sch.form')}</h2><SchoolForm lang={lang} w={webWords(lang)} /></div></section>
     </Shell16>
   );
 }

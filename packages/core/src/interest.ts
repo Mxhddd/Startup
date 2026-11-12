@@ -22,7 +22,7 @@ export const AREA_SPOTS: Record<Exclude<AreaId, 'other'>, [number, number]> = {
 export const SHOW_FROM = 3;
 
 export type Interest = {
-  role: 'parent' | 'driver';
+  role: 'parent' | 'driver' | 'school';
   area: AreaId;
   school: string | null;
   kids: number | null;
@@ -35,10 +35,11 @@ export type InterestCheck = { ok: true; value: Interest } | { ok: false; field: 
 
 const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 
-/** Checks and tidies what the form sends. Parents give children and the driver's phone; drivers don't. */
+/** Checks and tidies what the form sends. Parents give children and the driver's phone; drivers don't.
+ *  A school (Pohnch for Schools, interest only) must give its name and a WhatsApp number for its office. */
 export function checkInterest(input: InterestInput): InterestCheck {
   const role = input.role;
-  if (role !== 'parent' && role !== 'driver') return { ok: false, field: 'role' };
+  if (role !== 'parent' && role !== 'driver' && role !== 'school') return { ok: false, field: 'role' };
   const area = input.area;
   if (typeof area !== 'string' || !(AREA_IDS as readonly string[]).includes(area)) return { ok: false, field: 'area' };
   const school = str(input.school).replace(/\s+/g, ' ');
@@ -56,6 +57,8 @@ export function checkInterest(input: InterestInput): InterestCheck {
   const raw = str(input.whatsapp);
   const whatsapp = raw ? normalisePkMobile(raw) : null;
   if (raw && !whatsapp) return { ok: false, field: 'whatsapp' };
+  if (role === 'school' && school.length < 2) return { ok: false, field: 'school' };
+  if (role === 'school' && !whatsapp) return { ok: false, field: 'whatsapp' };
   return { ok: true, value: { role, area: area as AreaId, school: school || null, kids, driverPhone, whatsapp } };
 }
 

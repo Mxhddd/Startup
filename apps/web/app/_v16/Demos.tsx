@@ -14,7 +14,7 @@ export function OffDemo({ w, phone }: { w: Words; phone: React.RefObject<PhoneHa
   useEffect(() => { phone.current?.setVan(0.3); }, [phone]);
   useEffect(() => { if (left <= 0) return; const t = setTimeout(() => setLeft(left - 1), 1000); return () => clearTimeout(t); }, [left]);
   return (
-    <article className="demo">
+    <article className="demo" data-tilt="">
       <ParentPhone ref={phone} className="mini" w={w} mode="map" eta={off ? null : 4} step={0} off={off} title={off ? w['try.off.btn'] ?? '' : w['morning.1h'] ?? ''} />
       <h3>{w['try.off.t']}</h3><p>{w['try.off.p']}</p>
       <div className="ctl">
@@ -36,7 +36,7 @@ export function HoldDemo({ w }: { w: Words }) {
   };
   const end = () => { cancelAnimationFrame(raf.current); if (!done) setH(0); };
   return (
-    <article className="demo">
+    <article className="demo" data-tilt="">
       <div className="hold-stage">
         <button type="button" className={`holdbtn ${done ? 'done' : ''}`} style={{ ['--h' as string]: h }} onPointerDown={begin} onPointerUp={end} onPointerCancel={end} onPointerLeave={end} onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) { e.preventDefault(); begin(e); } }} onKeyUp={end} onContextMenu={(e) => e.preventDefault()}>
           <span className="fill" /><b>{done ? w['try.hold.done'] : w['try.hold.btn']}</b>{!done && <small>{w['try.hold.s']}</small>}
@@ -51,7 +51,7 @@ export function SignalDemo({ w }: { w: Words }) {
   const [x, setX] = useState(20);
   const inTunnel = x >= 45 && x <= 70, after = x > 70;
   return (
-    <article className="demo">
+    <article className="demo" data-tilt="">
       <div className={`road-demo ${inTunnel ? 'lost' : after ? 'back' : ''}`}>
         <div className="tunnel" aria-hidden="true" />
         <div className="vanchip" style={{ insetInlineStart: `calc(${x}% - 22px)` }} aria-hidden="true"><i /></div>

@@ -9,7 +9,7 @@ export const AREA_IDS = ['dha', 'clifton', 'saddar', 'pechs', 'bahadurabad', 'gu
   'fbArea', 'northKarachi', 'scheme33', 'malir', 'korangi', 'lyari', 'orangi', 'keamari', 'other'] as const;
 export const ALLOWED_ORIGINS = ['https://pohnch.pk', 'https://www.pohnch.pk', 'https://pohnch.vercel.app', 'http://localhost:3100'];
 
-export type Interest = { role: 'parent' | 'driver'; area: string; school: string | null; kids: number | null; driverPhone: 'yes' | 'no' | 'unknown' | null; whatsapp: string | null };
+export type Interest = { role: 'parent' | 'driver' | 'school'; area: string; school: string | null; kids: number | null; driverPhone: 'yes' | 'no' | 'unknown' | null; whatsapp: string | null };
 type Body = Record<string, unknown>;
 const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
 export function normalisePkMobile(input: string): string | null {
@@ -18,7 +18,7 @@ export function normalisePkMobile(input: string): string | null {
 }
 export function checkInterest(b: Body): { ok: true; value: Interest } | { ok: false; field: string } {
   const role = b.role;
-  if (role !== 'parent' && role !== 'driver') return { ok: false, field: 'role' };
+  if (role !== 'parent' && role !== 'driver' && role !== 'school') return { ok: false, field: 'role' };
   const area = b.area;
   if (typeof area !== 'string' || !(AREA_IDS as readonly string[]).includes(area)) return { ok: false, field: 'area' };
   const school = str(b.school).replace(/\s+/g, ' ');
@@ -34,6 +34,8 @@ export function checkInterest(b: Body): { ok: true; value: Interest } | { ok: fa
   }
   const raw = str(b.whatsapp), whatsapp = raw ? normalisePkMobile(raw) : null;
   if (raw && !whatsapp) return { ok: false, field: 'whatsapp' };
+  if (role === 'school' && school.length < 2) return { ok: false, field: 'school' };
+  if (role === 'school' && !whatsapp) return { ok: false, field: 'whatsapp' };
   return { ok: true, value: { role, area, school: school || null, kids, driverPhone, whatsapp } };
 }
 

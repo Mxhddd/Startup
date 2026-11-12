@@ -45,6 +45,8 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
     return (
       <div className="joined" role="status" data-testid="join-sent">
         <svg width="56" height="56" viewBox="0 0 56 56" aria-hidden="true"><circle cx="28" cy="28" r="26" fill="none" stroke="#E8A33D" strokeWidth="2" /><path d="M17 29l7 7 15-16" fill="none" stroke="#E8A33D" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        {/* a few kites lift off for the family who just joined (hidden with reduced motion) */}
+        <span className="kiteburst" aria-hidden="true">{['#E8A33D', '#C46A8A', '#A7D47E', '#FAF6EE', '#17705A'].map((c, k) => <i key={c} style={{ ['--k' as string]: k, ['--c' as string]: c }} />)}</span>
         <h3>{w['join.sent']}</h3>
         <p>{w['join.sentB']} <a href={wa} rel="noreferrer">WhatsApp</a></p>
       </div>
@@ -123,7 +125,9 @@ export function WaitingMap({ w, areas, summary, mine }: { w: Words; areas: Area[
           return (
             <g key={a.id} className={me ? 'me' : undefined}>
               {n > 0 && <circle cx={x} cy={y} r={r * 2.2} fill="url(#glow)" />}
-              <circle cx={x} cy={y} r={n ? 5 : 3} fill={n || me ? '#F6C46E' : 'rgba(245,238,225,.35)'} />
+              {n || me
+                ? <g className="ppin"><path d={`M${x} ${y - 9}l6 9-6 9-6-9z`} fill="#E8A33D" /><path d={`M${x} ${y - 5}l3 5-3 5-3-5z`} fill="#17705A" /><circle cx={x} cy={y} r="1.6" fill="#FAF6EE" /></g>
+                : <circle cx={x} cy={y} r={3} fill="rgba(245,238,225,.35)" />}
               {me && <circle className="ring" cx={x} cy={y} r="10" fill="none" stroke="#F6C46E" strokeWidth="2" />}
             </g>
           );

@@ -1,0 +1,44 @@
+/* Truck art (v18): shared by the home page and every inner page. Brand moments only. */
+.chamak { display: block; width: 100%; background-repeat: repeat-x; background-size: auto 100%; flex: none; }
+.roundel { display: inline-block; flex: none; background-size: contain; background-repeat: no-repeat; background-position: center; }
+
+/* mirror-work glints: four-pointed sparkles that twinkle */
+.glints { position: absolute; inset: 0; pointer-events: none; }
+.glints i { position: absolute; width: 18px; height: 18px; left: calc(10% + var(--k) * 19%); top: 18%; background: #FFF8E6; clip-path: polygon(50% 0, 58% 42%, 100% 50%, 58% 58%, 50% 100%, 42% 58%, 0 50%, 42% 42%); filter: drop-shadow(0 0 6px rgba(255,214,140,.9)); opacity: 0; scale: .3; animation: twinkle 3.2s ease-in-out infinite; animation-delay: calc(var(--k) * .63s); }
+.glints i:nth-child(2n) { top: 70%; width: 13px; height: 13px; }
+.glints i:nth-child(3n) { top: 42%; }
+@keyframes twinkle { 0%, 70%, 100% { opacity: 0; scale: .3; rotate: 0deg; } 80% { opacity: 1; scale: 1; rotate: 45deg; } 90% { opacity: .2; scale: .6; } }
+
+/* a couplet panel: one Pohnch line in a painted frame */
+.couplet { position: relative; margin: 0; border-radius: 16px; overflow: hidden; background: #FAF6EE; color: #141A33; box-shadow: 0 24px 50px -30px rgba(0,0,0,.6); }
+.couplet .cp-in { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 16px 22px; }
+.couplet blockquote { margin: 0; display: grid; justify-items: center; gap: 2px; text-align: center; }
+.couplet blockquote b { font: 400 clamp(30px, 3.6vw, 46px)/1.55 var(--font-display), serif; color: #1F2A5C; }
+.couplet blockquote span { font: 700 14px/1.4 var(--font-latin), sans-serif; letter-spacing: .02em; color: #4A4F66; }
+
+/* the night footer */
+.sitefoot { position: relative; display: block; margin: 0; padding: 0 0 calc(40px + env(safe-area-inset-bottom, 0px)); border: 0; background: #10173A; color: #F5EEE1; overflow: hidden; }
+.sitefoot .sky-svg { display: block; width: 100%; height: clamp(150px, 20vw, 250px); background: linear-gradient(#141E48, #10173A); }
+.sitefoot .shimmer { animation: shimmer 9s linear infinite; }
+@keyframes shimmer { from { transform: translateX(0); } to { transform: translateX(-71px); } }
+.sitefoot .fkite { transform-box: fill-box; transform-origin: 50% 100%; animation: fsway 7s ease-in-out infinite alternate; animation-delay: calc(var(--k) * -2.3s); }
+@keyframes fsway { from { transform: rotate(-4deg) translateY(0); } to { transform: rotate(5deg) translateY(-6px); } }
+.sitefoot .fwrap { width: min(1180px, 100% - 40px); margin: 0 auto; }
+.sitefoot .fline { width: min(640px, 100%); margin: 44px auto 54px; }
+.sitefoot .fgrid { display: grid; grid-template-columns: 1.5fr repeat(4, 1fr); gap: 34px 30px; padding-top: 34px; border-top: 1px solid rgba(245,238,225,.16); }
+.sitefoot .fl { display: grid; gap: 10px; align-content: start; }
+.sitefoot .mark { display: inline-flex; align-items: baseline; gap: 10px; }
+.sitefoot .mark b { font: 400 40px/1 var(--font-display), serif; color: #F5EEE1; }
+.sitefoot .mark span { font: 800 18px var(--font-latin), sans-serif; }
+.sitefoot small { color: rgba(245,238,225,.72); font-size: 14px; line-height: 1.5; }
+.sitefoot nav { display: grid; gap: 10px; align-content: start; }
+.sitefoot nav h3 { margin: 0 0 4px; font: 800 14px var(--font-latin), sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #E8A33D; }
+[dir="rtl"] .sitefoot nav h3 { font: 700 15px var(--font-urdu), sans-serif; letter-spacing: 0; }
+.sitefoot nav a, .sitefoot .link { color: #F5EEE1; text-decoration: none; font-size: 15px; opacity: .88; transition: opacity .3s; background: none; border: 0; padding: 0; text-align: start; cursor: pointer; font-family: inherit; }
+.sitefoot nav a:hover, .sitefoot .link:hover { opacity: 1; text-decoration: underline; text-underline-offset: 4px; }
+@media (max-width: 860px) {
+  .sitefoot .fgrid { grid-template-columns: 1fr 1fr; }
+  .sitefoot .fl { grid-column: 1 / -1; }
+  .sitefoot .fline { margin: 30px auto 40px; }
+}
+@media (prefers-reduced-motion: reduce) { .glints i, .sitefoot .shimmer, .sitefoot .fkite { animation: none; } .glints { display: none; } }

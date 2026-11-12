@@ -341,10 +341,6 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16 .qa summary::after { content: "+"; margin-inline-start: auto; font: 500 28px var(--latin); color: var(--kesar); transition: transform .5s var(--calm); }
 .v16 .qa details[open] summary::after { transform: rotate(45deg); }
 .v16 .qa p { margin: 0 0 24px; }
-.v16 footer { margin-top: 90px; padding-top: 34px; border-top: 1px solid rgba(245,238,225,.18); display: flex; flex-wrap: wrap; gap: 26px 50px; justify-content: space-between; font-size: 15px; }
-.v16 footer .fl { display: grid; gap: 10px; } .v16 footer .mark b { font-size: 40px; } .v16 footer small { color: rgba(245,238,225,.6); font-size: 14px; }
-.v16 footer nav { display: flex; flex-wrap: wrap; gap: 12px 26px; align-content: start; max-width: 640px; }
-.v16 footer nav a { text-decoration: none; opacity: .82; } .v16 footer nav a:hover { opacity: 1; }
 
 /* play the morning */
 .v16 .playbar { position: fixed; z-index: 48; inset-inline-start: 24px; bottom: calc(24px + env(safe-area-inset-bottom, 0px)); display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 999px; background: var(--ink); color: #F5EEE1; font-weight: 600; font-size: 15px; opacity: 0; transform: translateY(20px); pointer-events: none; transition: all .6s var(--calm); }
@@ -588,3 +584,98 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
   .v16.menu-open .barcta { visibility: hidden; }
 }
 @media (max-width: 359px) { .v16 .bar .mark span { display: none; } .v16 .barcta .btn { padding: 0 12px; } }
+
+/* =====================================================================================
+   v18: "Karachi, hand-painted": truck-art moments, the clock line, delights, the footer
+   ===================================================================================== */
+/* the rich-but-calm kit: buttons lean toward the cursor, cards tilt a little */
+.v16 .btn { translate: var(--mx, 0) var(--my, 0); transition: background .3s, transform .5s var(--calm), box-shadow .5s var(--calm), translate .35s var(--calm); }
+.v16 [data-tilt] { transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform .45s var(--calm); }
+.v16 .demo[data-tilt]:hover { box-shadow: 0 30px 60px -40px rgba(16,22,47,.5); }
+
+/* the top bar's star fills as you read the story */
+.v16 .mark .pstar { position: relative; display: inline-grid; align-self: center; margin-inline-start: 4px; width: 18px; height: 18px; }
+.v16 .mark .pstar svg { grid-area: 1 / 1; }
+.v16 .pstar .po { fill: none; stroke: var(--kesar); stroke-width: 1.3; }
+.v16 .pstar .pf { fill: var(--kesar); }
+.v16 .pstar .pfw { clip-path: inset(calc((1 - var(--story, 0)) * 100%) 0 0 0); transition: clip-path .3s; }
+.v16 .bar .mark span::after { display: none; }
+@media (max-width: 359px) { .v16 .mark .pstar { display: none; } }
+
+/* intro: a painted ring blooms around the star before the layer opens */
+.v16 .intro .tring circle { fill: none; transform-box: fill-box; transform-origin: center; opacity: 0; scale: .55; animation: tring .8s cubic-bezier(.2, 1.2, .4, 1) 1.45s forwards; }
+.v16 .intro .tr1 { stroke: #E8A33D; stroke-width: 3.2; stroke-dasharray: 6 5; }
+.v16 .intro .tr2 { stroke: #17705A; stroke-width: 3.2; stroke-dasharray: 6 5; stroke-dashoffset: 5.5; }
+.v16 .intro .tr3 { stroke: #C9A24A; stroke-width: 1.4; stroke-dasharray: 1 7; stroke-linecap: round; animation-delay: 1.55s; }
+@keyframes tring { to { opacity: 1; scale: 1; rotate: 30deg; } }
+.v16 .intro.short .tring { display: none; }
+
+/* front door: the clock line, painted bullets, a truck-art edge on hover */
+.v16 .nowline { display: flex; flex-wrap: wrap; justify-content: center; align-items: baseline; gap: 4px 10px; width: fit-content; max-width: 100%; margin: 16px auto 0; padding: 9px 18px; border-radius: 22px; background: color-mix(in srgb, var(--paper) 88%, transparent); color: var(--ink); font-size: 15px; line-height: 1.45; box-shadow: inset 0 0 0 1px rgba(184,134,47,.28); min-height: 40px; }
+.v16 .nowline .nk { font-weight: 700; color: var(--ink2); }
+.v16 .nowline b { font: 800 16px var(--latin); color: var(--neel); }
+.v16 .nowline .nv { font-weight: 600; }
+.v16 .nowline small { flex-basis: 100%; font-size: 14px; color: var(--ink2); }
+.v16[data-night="1"] .nowline { background: rgba(16,22,47,.78); color: #F5EEE1; box-shadow: inset 0 0 0 1px rgba(232,163,61,.35); }
+.v16[data-night="1"] .nowline .nk, .v16[data-night="1"] .nowline small { color: rgba(245,238,225,.82); }
+.v16[data-night="1"] .nowline b { color: var(--kesar); }
+.v16 .door { position: relative; overflow: hidden; }
+.v16 .door::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 10px; background: var(--chamak) repeat-x; background-size: auto 100%; transform: scaleX(0); transform-origin: left; transition: transform .7s var(--calm); }
+.v16[dir="rtl"] .door::before { transform-origin: right; }
+.v16 .door:hover::before, .v16 .door:focus-within::before { transform: scaleX(1); }
+.v16 .door li { padding-inline-start: 28px; }
+.v16 .door li::before, .v16 .door.driver li::before { inset-inline-start: 0; top: .2em; width: 18px; height: 18px; border-radius: 0; background: var(--roundel) center/contain no-repeat; }
+
+/* the 7 am call: a cracked screen, a sign-painted tally */
+.v16 .log { position: relative; }
+.v16 .log::before { content: ""; position: absolute; inset: -14px -10px; z-index: 3; pointer-events: none; opacity: clamp(0, calc((var(--p, 0) - .3) * 4), .9);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 400' preserveAspectRatio='none'%3E%3Cg fill='none' stroke-linecap='round'%3E%3Cg stroke='%2310162F' stroke-opacity='.32' stroke-width='1.6'%3E%3Cpath d='M232 58L192 118 206 170 160 238 172 300 132 392M232 58L282 14M232 58L300 92M192 118L120 140 58 128M206 170L262 222 300 232M160 238L88 260 20 302M172 300L230 336'/%3E%3C/g%3E%3Cg stroke='%23fff' stroke-opacity='.7' stroke-width='.8' transform='translate(1.2 1.2)'%3E%3Cpath d='M232 58L192 118 206 170 160 238 172 300 132 392M232 58L282 14M232 58L300 92M192 118L120 140 58 128M206 170L262 222 300 232M160 238L88 260 20 302M172 300L230 336'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+.v16 .log li.tally { position: relative; }
+.v16 .log li.tally b { display: inline-block; font: 800 56px/1 var(--latin); color: var(--shing); -webkit-text-stroke: 1.5px #FBF7EF; paint-order: stroke fill; text-shadow: 3px 3px 0 var(--ink); rotate: -5deg; }
+.v16 .log li.tally::before { content: ""; position: absolute; inset-inline-end: 6px; bottom: -4px; width: 96px; height: 8px; background: var(--chamak-s) repeat-x; background-size: auto 100%; opacity: 0; transition: opacity .5s var(--calm); }
+.v16 .log li.tally.on::before { opacity: 1; }
+
+/* phones: a real glass sheen on the frame */
+.v16 .v-phone .bezel::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 6; background: linear-gradient(118deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 30%, rgba(255,255,255,0) 72%, rgba(255,255,255,.07) 100%); }
+
+/* the morning timeline: each dot rings out as the van passes */
+.v16 .tl li.on .b::after { content: ""; position: absolute; inset: -7px; border-radius: 50%; border: 2px solid currentColor; opacity: 0; animation: ringout 1s var(--calm) both; }
+.v16 .tl .b1, .v16 .tl .b2 { color: var(--neel); } .v16 .tl .b3 { color: var(--zam); } .v16 .tl .b4 { color: var(--kesar); }
+@keyframes ringout { 0% { opacity: .9; scale: .6; } 100% { opacity: 0; scale: 1.5; } }
+
+/* پہنچ گئے: painted bands draw out with the words, and the mirrors catch the light */
+.v16 .reached .rb { width: min(520px, 92%); margin: 0 auto; transform: scaleX(var(--c)); transform-origin: right; border-radius: 3px; }
+.v16 .reached .rb1 { margin-bottom: 6px; } .v16 .reached .rb2 { margin-top: 2px; }
+.v16 .reached .glints { opacity: clamp(0, calc((var(--c) - .9) * 10), 1); }
+
+/* signposts: hand-painted boards */
+.v16 .arm { padding-inline-start: 34px; }
+.v16 .arm::before { content: ""; position: absolute; inset: 0 24px auto 0; height: 7px; background: var(--chamak-s) repeat-x; background-size: auto 100%; }
+.v16 .arm::after { content: ""; position: absolute; inset-inline-start: 10px; top: 50%; width: 15px; height: 15px; margin-top: -5px; background: var(--roundel) center/contain no-repeat; }
+
+/* promises: a painted roundel on each sticker; "never" struck through with a brush */
+.v16 .stk .f::before { content: ""; display: block; width: 22px; height: 22px; margin: 0 auto -6px; background: var(--roundel) center/contain no-repeat; }
+.v16 .nolist span { display: inline; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 24' preserveAspectRatio='none'%3E%3Cpath d='M4 13C60 5 128 17 204 9S334 5 396 11L394 17C300 21 206 23 122 18S32 21 6 20Z' fill='%23A8321F'/%3E%3Cpath d='M30 15C120 12 220 14 370 13' stroke='%23C9583F' stroke-width='1.2' fill='none' opacity='.6'/%3E%3C/svg%3E") no-repeat 0 58% / 0% .24em; -webkit-box-decoration-break: clone; box-decoration-break: clone; transition: background-size .9s var(--calm) calc(var(--k, 0) * 140ms + .3s); }
+.v16[dir="rtl"] .nolist span { background-position: 100% 58%; }
+.v16 .nolist span::after { display: none; }
+.v16 .nolist .in span, .v16 .nolist li.in span { background-size: 100% .24em; }
+
+/* join: the form in a painted frame; kites lift off when a family joins; painted pins on the map */
+.v16 .join form.join { position: relative; padding-top: 22px; }
+.v16 .join form.join::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 10px; border-radius: 4px; background: var(--chamak) repeat-x; background-size: auto 100%; }
+.v16 .joined { position: relative; }
+.v16 .kiteburst { position: absolute; inset: -40px 0 auto 0; height: 200px; pointer-events: none; }
+.v16 .kiteburst i { position: absolute; left: calc(10% + var(--k) * 16%); bottom: 0; width: 18px; height: 24px; background: var(--c); clip-path: polygon(50% 0, 100% 42%, 50% 100%, 0 42%); opacity: 0; animation: kfly 2.8s cubic-bezier(.2, .7, .3, 1) both; animation-delay: calc(var(--k) * .14s + .2s); }
+@keyframes kfly { 0% { opacity: 0; transform: translate(0, 30px) rotate(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(calc((var(--k) - 2) * 36px), -230px) rotate(calc((var(--k) - 2) * 14deg)); } }
+.v16 .waitmap .ppin { filter: drop-shadow(0 0 6px rgba(246,196,110,.6)); }
+
+/* the home page's questions now end where the night footer begins */
+.v16 .faq .wrap { padding-bottom: 70px; }
+
+@media (prefers-reduced-motion: reduce) {
+  .v16 .kiteburst, .v16 .intro .tring { display: none; }
+  .v16 .tl li.on .b::after { animation: none; }
+  .v16 .btn, .v16 [data-tilt] { translate: none; transform: none; }
+}
+/* the signposts stay hidden until the page has stood them on the roundabout (no flash over "try it") */
+.v16.has3d .sign { opacity: 0; transition: opacity .4s; } .v16.has3d .sign.placed { opacity: 1; }

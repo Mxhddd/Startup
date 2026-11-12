@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: t('en', 'web.hero.p'),
   icons: { icon: '/icon.svg' },
   alternates: { canonical: '/', languages: { en: '/', ur: '/ur' } },
-  openGraph: { type: 'website', siteName: 'Pohnch', locale: 'en_PK', alternateLocale: ['ur_PK'], images: [{ url: '/v16/og.jpg', width: 1200, height: 630 }] },
+  openGraph: { type: 'website', siteName: 'Pohnch', locale: 'en_PK', alternateLocale: ['ur_PK'], images: [{ url: '/v18/og.jpg', width: 1200, height: 630 }] },
 };
 
 export const viewport: Viewport = { themeColor: '#FAF6EE' };

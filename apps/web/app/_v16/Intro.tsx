@@ -40,6 +40,10 @@ export function Intro({ skipLabel }: { skipLabel: string }) {
             <rect x="-22" y="-22" width="44" height="44" /><rect x="-22" y="-22" width="44" height="44" transform="rotate(45)" />
             <circle className="core" r="9" />
           </g>
+          {/* v18: a thin painted ring of chamak patti blooms around the star before the layer opens */}
+          <g className="tring" transform="translate(100 46)">
+            <circle r="38" className="tr1" /><circle r="38" className="tr2" /><circle r="44" className="tr3" />
+          </g>
         </svg>
         <div className="intro-words">
           <b className="ur" lang="ur">پہنچ</b>

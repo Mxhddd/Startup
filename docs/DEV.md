@@ -554,3 +554,48 @@ Also new:
 - **Phone top bar:** it keeps a small "Join the pilot"; the language switch moves into the menu.
 
 Tests: `app/_v16/v17.test.ts` and the intro and front-door tests in `e2e/home.spec.ts`. Videos for review use `?timescale=0.125`, which also slows the intro's timers.
+
+## Website v18: "Karachi, hand-painted" (12 November 2026)
+
+**The 3D city** is now split into modules under `apps/web/app/_v16/world/`; `world3d.ts` only puts them together and keeps the same `createWorld()`:
+
+| File | What it builds |
+| --- | --- |
+| `map.ts` | The plan: roads, home, roundabout, school, the route, the shore line; seeded random numbers. |
+| `city.ts` | Apartments with balconies, laundry, sunshades, AC units, shop shutters with painted signs (one texture sheet, read per instance by `atlasMat`), tanks, dishes, bougainvillea, rooftop boards with Pohnch's lines, painted kerbs, zebra crossings, neem trees, palms, the mosque, your home (with a jharoka), the school (with a pennant), lamps, the route. |
+| `van.ts` | The truck-art school van: chamak-patti bands, the SCHOOL VAN / اسکول وین plate, the painted back panel, roof rack with bags, children behind the glass, chrome hubcaps, mirror-work glints. |
+| `life.ts` | Kites, the chai stall, rickshaws, cars, a donkey cart, people, children at the gate, crows. Nothing that moves casts a shadow (the city's shadows are drawn once). |
+| `landmarks.ts` | The sea (shimmering), the shore, Mazar-e-Quaid and a minaret. |
+| `textures.ts` | Everything painted on canvases. Words come from the page (`worldWords()` in `_v16/worldWords.ts`, from `web.line.*`, `web.shop.*`, `web.van.plate`), never from code. |
+| `kit.ts` | Helpers: `paint`/`merge` (one draw per model kind), `atlasMat`, and `bake()`, which merges a still model's pieces per material. |
+
+Speed: it measured the same as v17 in the same run (desktop and phone), after merging still models and lighter trees.
+
+**Truck art** (`_v16/truckart.tsx`, `truckart.css`): chamak patti, roundels, couplet panels and glints, as seeded SVG, used only at brand moments. Shingarf red is never used for decoration (a test checks this).
+
+**Home page:**
+- the clock line ("Right now in Karachi", `nowKey()` in `hour.ts`, by the clock and saying so);
+- the painted ring at the end of the intro, roundel bullets, the cracked screen and painted ×6;
+- phone glass, the timeline dots ringing out, پہنچ گئے in painted bands, hand-painted signposts;
+- brush-stroke strikes (they follow wrapped lines), the count-up calculator, painted map pins, kites when a family joins;
+- the star in the top bar that fills as you read;
+- the interaction kit (`delight.ts`): buttons lean, cards tilt at most 4°, desktop only, never with reduced motion.
+
+**One night footer** (`_v16/Footer.tsx`) on every page.
+
+**Inner pages** have their own scenes (`pageScenes.ts`, `PageScene.tsx`): a still (`public/v18/<page>.webp`, 1600 and 960 wide) for everyone, plus the live city fading in on capable desktops. Terms and Delete account get a quiet painted top. Each page has its own share picture (`public/v18/og-*.jpg`, chosen in `_lib/meta.ts`).
+
+**New pages:**
+- `/story` (Team Pohnch's letter);
+- `/progress` (the public summary, with the same privacy limits as before);
+- `/schools` (interest only).
+
+Urdu versions live under `/ur/...`.
+
+**Schools in the database:** `pilot_interest.role` can be `'school'` (migration `20261112000100_school_interest.sql`, test `188-school-interest.test.sql`). A school must give its name (table rule) and an office WhatsApp number (checked by the website and the `interest` function). The public summary never counts schools. After merging: `pnpm dlx supabase db push`, then redeploy the function with `pnpm dlx supabase functions deploy interest --no-verify-jwt --use-api`.
+
+**Making the pictures again:**
+- The scratchpad lab (`apps/web/.proto/lab18.tsx`, not shipped) renders any page scene (`__page(id)`) or story moment (`__story(section, t)`).
+- The stills and the home's no-3D pictures come from it.
+
+Tests: `app/_v16/v18.test.ts`, `e2e/v18.spec.ts`, plus school cases in both interest test files.

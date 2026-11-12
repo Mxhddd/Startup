@@ -6,6 +6,7 @@ import type { Metadata } from 'next';
 import { t } from '@pohnch/messages';
 import { colors, shadow } from '@pohnch/ui/theme';
 import { InviteButtons } from './InviteButtons';
+import { Chamak } from '../_v16/truckart';
 
 export const metadata: Metadata = {
   title: `${t('ur', 'web.invite.title')} · Pohnch`,
@@ -18,10 +19,11 @@ export default function Invite() {
     <main style={{ minHeight: '100vh', background: colors.ghee, color: colors.siyahi, fontFamily: 'var(--font-urdu), var(--font-latin), sans-serif' }}>
       <div style={{ maxWidth: 520, margin: '0 auto', padding: '28px 16px 48px', display: 'grid', gap: 20 }}>
         <img src="/pohnch-lockup.svg" alt="Pohnch" width={180} height={51} style={{ height: 'auto', justifySelf: 'center' }} />
-        {/* v16: a still of the miniature Karachi street with the van, above the invitation */}
-        <img src="/v16/download-960.webp" alt="" width={960} height={600} style={{ width: '100%', height: 'auto', borderRadius: 28, boxShadow: shadow.raised }} />
+        {/* v18: the truck-art van at its stop, above the invitation (kept light: one small picture) */}
+        <img src="/v18/drivers-960.webp" alt="" width={960} height={1200} style={{ width: '100%', height: 'auto', aspectRatio: '4 / 3', objectFit: 'cover', borderRadius: 28, boxShadow: shadow.raised }} />
         {/* The invitation itself, as one card: a neel top with the headline, then the buttons. */}
         <article className="pohnch-rise" style={{ background: colors.white, borderRadius: 32, overflow: 'hidden', boxShadow: shadow.raised }}>
+          <Chamak seed={2} h={12} />
           <header style={{ background: colors.neel, backgroundImage: `linear-gradient(160deg, ${colors.neelRaised}, ${colors.neel})`, color: colors.ghee, padding: '28px 24px 26px', display: 'grid', gap: 14 }}>
             <svg aria-hidden="true" width="44" height="44" viewBox="0 0 24 24" style={{ justifySelf: 'center' }}>
               <rect x="5" y="5" width="14" height="14" fill={colors.kesar} />

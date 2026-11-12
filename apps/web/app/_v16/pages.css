@@ -101,7 +101,89 @@
 .v16p .nf .urline { font: 400 26px/1.8 var(--font-display), serif; color: var(--ink); }
 
 /* footer */
-.v16p .pfoot { background: var(--ink); color: #F5EEE1; padding-block: 60px calc(50px + env(safe-area-inset-bottom, 0px)); }
-.v16p .pfoot .pwrap { display: flex; flex-wrap: wrap; gap: 26px 50px; justify-content: space-between; font-size: 15px; }
-.v16p .pfoot .fl { display: grid; gap: 10px; } .v16p .pfoot .mark b { font-size: 40px; } .v16p .pfoot small { color: rgba(245,238,225,.6); font-size: 14px; }
-.v16p .pfoot nav { display: flex; flex-wrap: wrap; gap: 12px 26px; max-width: 640px; } .v16p .pfoot nav a { color: #F5EEE1; text-decoration: none; opacity: .82; } .v16p .pfoot nav a:hover { opacity: 1; }
+
+/* =====================================================================================
+   v18: each page its own scene, painted details, new pages (story, progress, schools)
+   ===================================================================================== */
+/* the scene: the still first, the live city fades in over it on capable desktops */
+.v16p .phero .pscene { position: absolute; inset: 0; }
+.v16p .pscene canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; opacity: 0; transition: opacity 1.4s var(--calm); }
+.v16p .pscene.live canvas { opacity: 1; }
+.v16p .poverlay { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+
+/* drivers: the one big button floats above the van */
+.v16p .floattap { position: absolute; left: 50%; top: 22%; translate: -50% 0; display: grid; place-items: center; gap: 8px; animation: floaty 5s ease-in-out infinite; }
+.v16p .floattap i { width: 104px; height: 104px; border-radius: 50%; background: var(--zam); box-shadow: 0 0 0 10px rgba(23,112,90,.18), 0 0 60px 10px rgba(167,212,126,.45), inset 0 -6px 0 rgba(0,0,0,.18); }
+.v16p .floattap b { padding: 6px 14px; border-radius: 999px; background: #FAF6EE; color: var(--ink); font: 800 16px var(--latin); box-shadow: 0 10px 20px -12px rgba(16,22,47,.6); }
+.v16p[data-lang="ur"] .floattap b { font: 700 17px var(--font-urdu); }
+@keyframes floaty { 0%, 100% { translate: -50% 0; } 50% { translate: -50% -10px; } }
+
+/* safety: a verified roundel badge by the school gate */
+.v16p .vbadge { position: absolute; right: 12%; top: 18%; display: grid; justify-items: center; gap: 8px; }
+.v16p .vbadge .roundel { width: 96px !important; height: 96px !important; filter: drop-shadow(0 12px 18px rgba(16,22,47,.35)); }
+.v16p .vbadge svg { position: absolute; top: 34px; }
+.v16p .vbadge b { padding: 6px 14px; border-radius: 999px; background: var(--zam); color: #fff; font: 700 15px var(--text); }
+
+/* 404: a painted "wrong turn" board */
+.v16p .wrongturn { position: absolute; left: 50%; top: 20%; translate: -50% 0; rotate: -4deg; width: 260px; display: grid; justify-items: center; gap: 2px; padding-bottom: 0; border-radius: 10px; overflow: hidden; background: var(--kesar); color: var(--ink); box-shadow: 0 20px 40px -20px rgba(16,22,47,.6); }
+.v16p .wrongturn b { font: 400 40px/1.5 var(--font-display), serif; padding-top: 6px; }
+.v16p .wrongturn small { font: 800 15px var(--latin); padding-bottom: 8px; }
+
+/* small print pages: a quiet painted top, no 3D */
+.v16p .phero.quiet { min-height: 0; padding-top: clamp(70px, 9vw, 120px); background: radial-gradient(70% 90% at 50% 0%, #F6EBD5, var(--paper)); }
+.v16p .phero.quiet::after { display: none; }
+.v16p .phero.quiet .qstar { display: block; margin-bottom: 20px; }
+.v16p .phero.quiet .qband { margin-top: 10px; }
+
+/* painted cards (drivers' benefits, schools' "later" list) */
+.v16p .fact.painted { position: relative; padding: 26px 22px 22px; border-radius: 18px; background: #FFFDF8; box-shadow: 0 24px 40px -32px rgba(16,22,47,.5), inset 0 0 0 1px rgba(184,134,47,.22); overflow: hidden; }
+.v16p .fact.painted::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 8px; background: var(--chamak-s) repeat-x; background-size: auto 100%; }
+.v16p .fact .fhead { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
+.v16p .fact .fhead .idx { margin: 0; }
+.v16p .fact .later { font: 800 14px var(--latin); letter-spacing: .1em; text-transform: uppercase; color: var(--gilt); }
+.v16p[data-lang="ur"] .fact .later { font: 700 15px var(--font-urdu); letter-spacing: 0; }
+.v16p .pgrid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+@media (max-width: 860px) { .v16p .pgrid3 { grid-template-columns: 1fr; } }
+
+/* steps on a painted route: the milestones joined by a dashed kesar road */
+.v16p .miles.route { position: relative; }
+.v16p .miles.route::before { content: ""; position: absolute; z-index: 0; inset-inline: 26px; top: 33px; height: 3px; background: repeating-linear-gradient(to right, var(--kesar) 0 9px, transparent 9px 17px); border-radius: 2px; }
+.v16p .miles.route li { position: relative; z-index: 1; }
+.v16p .miles.route li.now .stone { box-shadow: inset 0 0 0 2px var(--neel), 0 0 0 6px rgba(232,163,61,.35), 0 14px 18px -12px rgba(16,22,47,.6); }
+.v16p .miles.route b { display: block; font-size: 19px; margin-bottom: 2px; }
+@media (max-width: 760px) {
+  .v16p .miles.route { gap: 22px; }
+  .v16p .miles.route li { display: grid; grid-template-columns: 52px 1fr; column-gap: 18px; align-items: start; }
+  .v16p .miles.route li .stone { grid-row: span 3; margin-bottom: 0; }
+  .v16p .miles.route::before { inset-inline: auto; inset-inline-start: 25px; top: 30px; bottom: 30px; width: 3px; height: auto; background: repeating-linear-gradient(to bottom, var(--kesar) 0 9px, transparent 9px 17px); }
+}
+
+/* "never" lists on inner pages use the brush strike, already drawn */
+.v16p .nolist.struck span { background-size: 100% .24em; }
+
+/* our story: chapters with painted numbers, a couplet, a signed close */
+.v16p .letter { display: grid; gap: 46px; max-width: 860px; }
+.v16p .chapter { display: grid; grid-template-columns: 64px 1fr; gap: 22px; align-items: start; }
+.v16p .chapter .cnum { position: relative; display: grid; place-items: center; width: 64px; height: 64px; }
+.v16p .chapter .cnum .roundel { position: absolute; inset: 0; width: 64px !important; height: 64px !important; opacity: .9; }
+.v16p .chapter .cnum b { position: relative; width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--ink); color: #FAF6EE; font: 800 14px var(--latin); }
+.v16p .chapter h2 { font-size: clamp(28px, 3vw, 42px); margin-bottom: 10px; }
+.v16p .chapter p { font-size: clamp(18px, 1.5vw, 21px); line-height: 1.6; color: var(--ink2); max-width: 36em; }
+.v16p .coupletwrap .couplet { max-width: 680px; margin: 0 auto; }
+.v16p .talk .signoff { margin-top: 26px; font: 400 30px/1.5 var(--font-display), serif; color: var(--neel); }
+.v16p[data-lang="en"] .talk .signoff { font: 800 17px var(--latin); }
+
+/* pilot progress */
+.v16p .progress { display: grid; gap: 40px; }
+.v16p .pcounts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 24px; }
+.v16p .pcount { display: grid; gap: 4px; padding: 22px; border-radius: 18px; background: #FFFDF8; box-shadow: inset 0 0 0 1px rgba(184,134,47,.25); }
+.v16p .pcount b { font: 800 clamp(44px, 5vw, 68px)/1 var(--latin); letter-spacing: -.03em; color: var(--neel); }
+.v16p .pcount span { font-size: 16px; color: var(--ink2); }
+.v16p .pstart { padding: 30px; border-radius: 22px; background: #FFFDF8; box-shadow: inset 0 0 0 1px rgba(184,134,47,.25); }
+.v16p .pstart h2 { margin-bottom: 8px; } .v16p .pstart p { font-size: 18px; max-width: 34em; }
+.v16p .pmap { border-radius: 24px; overflow: hidden; background: var(--ink); color: #F5EEE1; padding: 26px; }
+.v16p .pmap h3 { margin: 0 0 14px; color: #F5EEE1; }
+.v16p .pnote { font-size: 15px; color: var(--ink2); }
+
+/* for schools: the form in the night band */
+.v16p .pnight form.school { max-width: 560px; display: grid; gap: 22px; }

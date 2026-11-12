@@ -13,10 +13,13 @@ import { DriverKit, JoinForm, Proof, WaitingMap, useSummary, type Area } from '.
 import { countDoubt } from '../_lib/interest';
 import { callsAYear, clamp, hourOfClock, karachiHours, skyHex, span } from './hour';
 import { SECTIONS, pinned, scrollS, worldAt, type Ctx, type SectionId } from './scenes';
-import type { Quality, World } from './world3d';
+import type { Quality, World, WorldWords } from './world3d';
 import { CallsCounter, HoldDemo, OffDemo, SignalDemo, TS } from './Demos';
 import { FrontDoor } from './FrontDoor';
 import { Intro } from './Intro';
+import { initDelight, useCountUp } from './delight';
+import { SiteFooter } from './Footer';
+import { Chamak, Glints, truckVars } from './truckart';
 import './home.css';
 
 export type HomeProps = {
@@ -26,10 +29,12 @@ export type HomeProps = {
   qa: [string, string][];
   quotes: { name: string; text: string }[];
   doorQuotes: { parent: { name: string; text: string } | null; driver: { name: string; text: string } | null };
-  links: { home: string; other: string; drivers: string; safety: string; privacy: string; terms: string; delete: string; download: string };
+  links: { home: string; other: string; drivers: string; safety: string; privacy: string; terms: string; delete: string; download: string; story: string; progress: string; schools: string };
   wa: { href: string; display: string };
   playUrl: string | null;
   foot: { privacy: string; terms: string; delete: string; download: string; contact: string; switchLang: string };
+  /** Words the 3D city paints on its boards, the van and the shop signs. */
+  worldWords: WorldWords;
 };
 
 const COVER: SectionId[] = ['try', 'never', 'calc', 'band', 'faq'];
@@ -47,7 +52,7 @@ function isLite(): boolean {
   return false;
 }
 
-export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, playUrl, foot }: HomeProps) {
+export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, playUrl, foot, worldWords }: HomeProps) {
   const root = useRef<HTMLElement>(null), canvas = useRef<HTMLCanvasElement>(null);
   const worldRef = useRef<World | null>(null);
   const sidesPhone = useRef<PhoneHandle>(null), mornPhone = useRef<PhoneHandle>(null), offPhone = useRef<PhoneHandle>(null);
@@ -108,14 +113,14 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
     if (!liteMode) void import('./world3d').then((m) => {
       if (stopped || !canvas.current) return;
       try {
-        world = m.createWorld(canvas.current, { quality });
+        world = m.createWorld(canvas.current, { quality, words: worldWords });
         const curve = m.routeCurve();
         ctx.routeAt = world.routeAt; ctx.uHome = m.routeU(m.HOME.x, m.HOME.z - 12, curve); ctx.uFork = m.routeU(m.FORK.x - 21, m.FORK.z, curve);
         worldRef.current = world;
         el.classList.add('has3d');
       } catch { setLite(true); }
     });
-    let last = { eta: -1, calls: -1, off: false, sides: -1, morn: -1, lock: -1, flips: -1, scrolled: false, grey: -1, night: '' };
+    let last = { eta: -1, calls: -1, off: false, sides: -1, morn: -1, lock: -1, flips: -1, scrolled: false, grey: -1, night: '', story: -1 };
     const lastP = SECTIONS.map(() => -1), lastVan = [-1, -1, -1];
     let tPrev = performance.now();
     const frame = (now: number) => {
@@ -159,8 +164,11 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       // promises: stickers turn over one by one
       const f = Math.floor(span(pp.promises!, 0.18, 0.92) * 7.99); if (f !== last.flips) { last.flips = f; setFlips(f); }
       // signposts stand on the roundabout
-      if (world && signRef.current && vis('fork')) { const [px, yy] = world.project(-10, 0, 10); const x = innerWidth < 760 ? innerWidth / 2 : px; signRef.current.style.transform = `translate3d(${x.toFixed(1)}px, ${yy.toFixed(1)}px, 0)`; }
+      if (world && signRef.current && vis('fork')) { const [px, yy] = world.project(-10, 0, 10); const x = innerWidth < 760 ? innerWidth / 2 : px; signRef.current.style.transform = `translate3d(${x.toFixed(1)}px, ${yy.toFixed(1)}px, 0)`; signRef.current.classList.add('placed'); }
       const sc = y > 40; if (sc !== last.scrolled) { last.scrolled = sc; setScrolled(sc); }
+      // the star in the top bar fills as you read the story (up to the tools)
+      const iTry = SECTIONS.indexOf('try'), story = Math.round(clamp(y / Math.max(1, tops[iTry]! - vh * 0.5)) * 200) / 200;
+      if (story !== last.story) { last.story = story; el.style.setProperty('--story', String(story)); }
       raf = requestAnimationFrame(frame);
     };
     measure(); raf = requestAnimationFrame(frame);
@@ -170,7 +178,8 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
     // join section loads the waiting map
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); if (e.target.id === 'join') setJoinSeen(true); } }), { rootMargin: '0px 0px -12% 0px' });
     el.querySelectorAll('.rv, #join').forEach((n) => io.observe(n));
-    return () => { stopped = true; cancelAnimationFrame(raf); removeEventListener('resize', onR); ro.disconnect(); io.disconnect(); world?.dispose(); lenisRef.current?.destroy(); lenisRef.current = null; };
+    const undoDelight = initDelight(el);
+    return () => { stopped = true; cancelAnimationFrame(raf); removeEventListener('resize', onR); ro.disconnect(); io.disconnect(); undoDelight(); world?.dispose(); lenisRef.current?.destroy(); lenisRef.current = null; };
   }, []);
 
   /* ---------- play the morning: the page scrolls itself through the story ---------- */
@@ -217,21 +226,22 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
   const dir = lang === 'ur' ? 'rtl' : 'ltr';
   const morningAlert = [null, w['morning.1h'], w['morning.2h'], w['sides.alert'], w['morning.4h']][morn] ?? null;
   const callTimes = ['6:49', '6:51', '6:52', '6:54', '6:55', '6:57'];
-  const yearly = callsAYear(calc);
+  const yearly = useCountUp(callsAYear(calc));
 
   return (
-    <main ref={root} className={`v16 ${lite ? 'lite' : ''} ${menu ? 'menu-open' : ''}`} lang={lang} dir={dir} data-lang={lang}>
+    <main ref={root} className={`v16 ${lite ? 'lite' : ''} ${menu ? 'menu-open' : ''}`} lang={lang} dir={dir} data-lang={lang} style={truckVars()}>
       <Intro skipLabel={w['intro.skip'] ?? ''} />
       <canvas ref={canvas} className="world" aria-hidden="true" />
       <div className="sky" aria-hidden="true" />
 
       {/* ---------- top bar ---------- */}
       <header className={`bar ${scrolled ? 'scrolled' : ''}`}>
-        <a className="mark" href={links.home} aria-label={w['nav.home']}><b>پہنچ</b><span>Pohnch</span></a>
+        <a className="mark" href={links.home} aria-label={w['nav.home']}><b>پہنچ</b><span>Pohnch</span><span className="pstar" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18"><path className="po" d="M10 0.8l1.9 4.6 4.6-1.9-1.9 4.6L19.2 10l-4.6 1.9 1.9 4.6-4.6-1.9L10 19.2l-1.9-4.6-4.6 1.9 1.9-4.6L0.8 10l4.6-1.9-1.9-4.6 4.6 1.9z" /></svg><svg viewBox="0 0 20 20" width="18" height="18" className="pfw"><path className="pf" d="M10 0.8l1.9 4.6 4.6-1.9-1.9 4.6L19.2 10l-4.6 1.9 1.9 4.6-4.6-1.9L10 19.2l-1.9-4.6-4.6 1.9 1.9-4.6L0.8 10l4.6-1.9-1.9-4.6 4.6 1.9z" /></svg></span></a>
         <nav className="nav" aria-label={w['nav.menu']}>
           <a href="#how" onClick={go('#how')}>{w['nav.how']}</a>
           <a href="#safety" onClick={go('#safety')}>{w['nav.safety']}</a>
           <a href={links.drivers}>{w['nav.drivers']}</a>
+          <a href={links.story}>{w['nav.story']}</a>
           <a href="#questions" onClick={go('#questions')}>{w['nav.questions']}</a>
         </nav>
         <a className="lang" href={links.other} hrefLang={lang === 'ur' ? 'en' : 'ur'} lang={lang === 'ur' ? 'en' : 'ur'}>{foot.switchLang}</a>
@@ -242,6 +252,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
         <a href="#how" onClick={go('#how')}>{w['nav.how']}</a>
         <a href="#safety" onClick={go('#safety')}>{w['nav.safety']}</a>
         <a href={links.drivers}>{w['nav.drivers']}</a>
+        <a href={links.story}>{w['nav.story']}</a>
         <a href="#questions" onClick={go('#questions')}>{w['nav.questions']}</a>
         <a href="#join" onClick={go('#join')}>{w.cta}</a>
         <a href={links.other}>{foot.switchLang}</a>
@@ -301,7 +312,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
             <p className={`fin ${morn >= 4 ? 'on' : ''}`}>{w['morning.end']}</p>
           </div>
           <ParentPhone ref={mornPhone} className="mp" w={w} mode="map" eta={morn <= 1 ? 6 - morn * 3 : null} step={Math.max(0, morn - 1)} title={morningAlert ?? w['morning.1h'] ?? ''} alert={morningAlert} />
-          <div className="reached" aria-hidden="true"><b lang="ur">{w.reached}</b></div>
+          <div className="reached" aria-hidden="true"><Chamak seed={5} h={14} className="rb rb1" /><b lang="ur">{w.reached}</b><Chamak seed={8} h={14} className="rb rb2" /><Glints n={5} /></div>
         </div>
       </section>
 
@@ -409,7 +420,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
           <div className="calcbox rv">
             <label className="slider"><span className="sr">{w['calc.label']}</span><input type="range" min={0} max={10} step={1} value={calc} onChange={(e) => setCalc(Number(e.target.value))} aria-valuetext={String(calc)} /><b className="num">{calc}</b></label>
             {calc > 0 ? (
-              <p className="out"><b className="big num" key={yearly}>{yearly.toLocaleString('en')}</b><span>{w['calc.out']}</span><small>{(w['calc.how'] ?? '').replace('{c}', String(calc))}</small></p>
+              <p className="out"><b className="big num">{yearly.toLocaleString('en')}</b><span>{w['calc.out']}</span><small>{(w['calc.how'] ?? '').replace('{c}', String(calc))}</small></p>
             ) : <p className="out"><span>{w['calc.zero']}</span></p>}
           </div>
         </div>
@@ -455,15 +466,12 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
         <div className="wrap">
           <h2 id="h-faq">{w['faq.title']}</h2>
           <div className="qa">{qa.map(([q, a]) => <details key={q}><summary>{q}</summary><p>{a}</p></details>)}</div>
-          <footer>
-            <div className="fl"><span className="mark"><b>پہنچ</b><span>Pohnch</span></span><small>{w['foot.made']}</small><button className="link" type="button" onClick={() => scrollTo(0)}>{w['foot.again']}<Arrow /></button></div>
-            <nav aria-label={w['nav.menu']}>
-              <a href={links.safety}>{w['nav.safety']}</a><a href={links.drivers}>{w['nav.drivers']}</a><a href={links.download}>{foot.download}</a><a href={links.privacy}>{foot.privacy}</a><a href={links.terms}>{foot.terms}</a><a href={links.delete}>{foot.delete}</a>
-              <a href={wa.href} rel="noreferrer">{foot.contact} <bdi dir="ltr" className="num">{wa.display}</bdi></a><a href={links.other}>{foot.switchLang}</a>
-            </nav>
-          </footer>
         </div>
       </section>
+      <SiteFooter w={w} wa={wa} onAgain={() => scrollTo(0)}
+        line={{ ur: worldWords.lines[2]?.ur ?? '', en: worldWords.lines[2]?.en ?? '' }}
+        links={{ home: links.home, how: '#how', safety: links.safety, drivers: links.drivers, download: links.download, story: links.story, progress: links.progress, schools: links.schools, privacy: links.privacy, terms: links.terms, delete: links.delete, other: links.other }}
+        labels={{ privacy: foot.privacy, terms: foot.terms, delete: foot.delete, download: foot.download, contact: foot.contact, switchLang: foot.switchLang, otherLang: lang === 'ur' ? 'en' : 'ur' }} />
 
       <div className={`playbar ${playing ? 'on' : ''}`} aria-hidden={!playing}><i /><span>{w.play}</span><button type="button" onClick={() => { playRef.current = false; setPlaying(false); }}>{w.pause}</button></div>
     </main>

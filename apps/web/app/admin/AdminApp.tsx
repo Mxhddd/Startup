@@ -365,7 +365,7 @@ function Stage2({ supabase, vans, t }: { supabase: SupabaseClient; vans: VanRow[
   );
 }
 
-type InterestRow = { id: string; created_at: string; role: 'parent' | 'driver'; area: string; school: string | null; kids: number | null; driver_phone: string | null; whatsapp: string | null; lang: string; contacted_at: string | null };
+type InterestRow = { id: string; created_at: string; role: 'parent' | 'driver' | 'school'; area: string; school: string | null; kids: number | null; driver_phone: string | null; whatsapp: string | null; lang: string; contacted_at: string | null };
 
 /**
  * v16: "Join the pilot" sign-ups from pohnch.pk, newest first, with a WhatsApp link to reply and a
@@ -389,7 +389,7 @@ function Interested({ supabase, t }: { supabase: SupabaseClient; t: (k: MessageK
       {error ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{t('admin.error')}</p> : rows.length === 0 ? <p style={{ margin: 0 }}>{t('admin.interest.empty')}</p> : null}
       {rows.map((r) => (
         <div key={r.id} style={{ display: 'flex', flexWrap: 'wrap', gap: '6px 16px', alignItems: 'center', paddingBlock: 8, borderTop: `1px solid ${colors.line}`, opacity: r.contacted_at ? 0.6 : 1 }}>
-          <b>{t(r.role === 'driver' ? 'admin.interest.driver' : 'admin.interest.parent')} · {t(`area.${r.area}` as MessageKey)}</b>
+          <b>{t(r.role === 'driver' ? 'admin.interest.driver' : r.role === 'school' ? 'admin.interest.school' : 'admin.interest.parent')} · {t(`area.${r.area}` as MessageKey)}</b>
           {r.school ? <span>{r.school}</span> : null}
           {r.kids ? <span>{t('admin.interest.kids', { n: r.kids })}</span> : null}
           {r.driver_phone ? <span>{t(`admin.interest.phone.${r.driver_phone}` as MessageKey)}</span> : null}

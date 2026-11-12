@@ -24,6 +24,12 @@ describe('interest function', () => {
     const r = await post({ kind: 'join', role: 'parent', area: 'dha', website: 'http://spam' }, d);
     expect(r.status).toBe(200); expect(d.rpc).not.toHaveBeenCalled();
   });
+  it("saves a school's interest (v18) and needs its number", async () => {
+    const d = deps();
+    expect((await post({ kind: 'join', role: 'school', area: 'gulshan', school: 'City School', whatsapp: '0300 1112233' }, d)).status).toBe(200);
+    expect(d.rpc.mock.calls[0]![1]).toMatchObject({ p_role: 'school', p_school: 'City School', p_kids: null, p_driver_phone: null, p_whatsapp: '+923001112233' });
+    expect((await post({ kind: 'join', role: 'school', area: 'gulshan', school: 'City School' })).body).toEqual({ error: 'whatsapp' });
+  });
   it('names the wrong field, refuses the sixth sign-up, counts honest answers', async () => {
     expect((await post({ kind: 'join', role: 'parent', area: 'mars' })).body).toEqual({ error: 'area' });
     expect((await post({ kind: 'join', role: 'parent', area: 'dha' }, deps('limited'))).status).toBe(429);
@@ -44,7 +50,7 @@ describe('interest function', () => {
   });
   it('checks exactly like the website does (same areas, same answers)', () => {
     expect([...AREA_IDS]).toEqual([...CORE_AREAS]);
-    const cases = [{ role: 'parent', area: 'dha', kids: 9 }, { role: 'driver', area: 'malir', whatsapp: '0311-2223334' }, { role: 'parent', area: 'gulshan', whatsapp: '123' }, { role: 'x', area: 'dha' }, { role: 'parent', area: 'dha', school: '<b>' }];
+    const cases = [{ role: 'school', area: 'dha', school: 'Bay View' }, { role: 'school', area: 'dha', whatsapp: '03001112233' }, { role: 'school', area: 'dha', school: 'Bay View', whatsapp: '03001112233' }, { role: 'parent', area: 'dha', kids: 9 }, { role: 'driver', area: 'malir', whatsapp: '0311-2223334' }, { role: 'parent', area: 'gulshan', whatsapp: '123' }, { role: 'x', area: 'dha' }, { role: 'parent', area: 'dha', school: '<b>' }];
     for (const c of cases) expect(checkInterest(c)).toEqual(coreCheck(c));
   });
 });

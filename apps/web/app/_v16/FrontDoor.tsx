@@ -4,12 +4,25 @@
 // goes to the drivers page. "Show me how it works" asks one optional question, "Where do you live?",
 // then hands the chosen area (or none) to the home page, which starts the parent story with it.
 import { useEffect, useRef, useState } from 'react';
+import { hhmm, karachiClock, nowKey } from './hour';
 import type { AreaId } from '@pohnch/core';
 import type { Area } from './Panel';
 import type { Words } from './Phone';
 
 const Arrow = () => <svg className="arr" width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6h19M15 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 type Quote = { name: string; text: string } | null;
+
+/** "Right now in Karachi · 07:12 · Morning run: vans are picking children up." By the clock, and it says so.
+ *  Drawn only in the browser (the server can't know the visitor's minute), refreshed every 30 s. */
+function NowLine({ w }: { w: Words }) {
+  const [now, setNow] = useState<{ h: number; m: number; day: number } | null>(null);
+  useEffect(() => { const tick = () => setNow(karachiClock(new Date())); tick(); const t = setInterval(tick, 30000); return () => clearInterval(t); }, []);
+  return (
+    <p className="nowline" aria-live="off">
+      {now ? <><span className="nk">{w['now.k']}</span><b className="num" dir="ltr">{hhmm(now.h, now.m)}</b><span className="nv">{w[`now.${nowKey(now.h, now.m, now.day)}`]}</span><small>{w['now.note']}</small></> : <span className="nk">&nbsp;</span>}
+    </p>
+  );
+}
 
 export function FrontDoor({ w, areas, driversHref, quotes, onParents, onPlay }: {
   w: Words; areas: Area[]; driversHref: string; quotes: { parent: Quote; driver: Quote };
@@ -38,6 +51,7 @@ export function FrontDoor({ w, areas, driversHref, quotes, onParents, onPlay }: 
         <p className="kick">{w['hero.k']}</p>
         <h1 id="h-hero">{w['door.h']}</h1>
         <p className="lede">{w['door.ask']}</p>
+        <NowLine w={w} />
       </div>
       <div className="doors">
         {panel('parent', quotes.parent, <><button type="button" className="btn" onClick={() => setAsking(true)} aria-haspopup="dialog">{w['door.parent.go']}<Arrow /></button><button type="button" className="play" onClick={onPlay}><svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 2l9 5-9 5z" fill="currentColor" /></svg>{w.play}</button></>)}

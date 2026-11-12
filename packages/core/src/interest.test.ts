@@ -14,6 +14,12 @@ describe('join the pilot: checks', () => {
     const r = checkInterest({ role: 'driver', area: 'malir', kids: 4, driverPhone: 'no' });
     expect(r.ok && r.value).toMatchObject({ role: 'driver', kids: null, driverPhone: null });
   });
+  it("takes a school's interest only with its name and an office WhatsApp number (v18)", () => {
+    expect(checkInterest({ role: 'school', area: 'gulshan', school: ' City  School ', whatsapp: '0300 1112233', kids: 3, driverPhone: 'yes' }))
+      .toEqual({ ok: true, value: { role: 'school', area: 'gulshan', school: 'City School', kids: null, driverPhone: null, whatsapp: '+923001112233' } });
+    expect(checkInterest({ role: 'school', area: 'gulshan', whatsapp: '03001112233' })).toEqual({ ok: false, field: 'school' });
+    expect(checkInterest({ role: 'school', area: 'gulshan', school: 'City School' })).toEqual({ ok: false, field: 'whatsapp' });
+  });
   it('names the field that is wrong', () => {
     expect(checkInterest({ role: 'admin', area: 'dha' })).toEqual({ ok: false, field: 'role' });
     expect(checkInterest({ role: 'parent', area: 'mars' })).toEqual({ ok: false, field: 'area' });
