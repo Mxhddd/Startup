@@ -317,7 +317,7 @@ importers:
         specifier: workspace:*
         version: link:../../packages/ui
       '@supabase/supabase-js':
-        specifier: ^2.118.0
+        specifier: 2.118.0
         version: 2.118.0
       '@vercel/analytics':
         specifier: 2.0.1
