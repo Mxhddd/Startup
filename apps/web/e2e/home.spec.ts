@@ -19,7 +19,7 @@ test('the intro plays in full on every visit and can be skipped', async ({ page 
   await page.reload();
   await expect(page.getByTestId('intro')).toBeVisible();
   await expect(page.locator('.intro.short')).toHaveCount(0);
-  await expect(page.getByTestId('intro')).toHaveCount(0, { timeout: 8000 });
+  await expect(page.getByTestId('intro')).toHaveCount(0, { timeout: 15000 });
 });
 
 test('with reduced motion there is no intro', async ({ page }) => {
@@ -121,7 +121,7 @@ test('if the server is down the form says so and offers WhatsApp', async ({ page
 
 test('Urdu lives under /ur, right to left, with a way back to English', async ({ page }) => {
   await page.goto('/ur?lite');
-  await expect(page.locator('main.v16')).toHaveAttribute('dir', 'rtl');
+  await expect(page.locator('.v16').first()).toHaveAttribute('dir', 'rtl');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('اسکول وین');
   await expect(page.getByTestId('door-parent')).toContainText('والدین کے لیے');
   // on phones the language switch sits in the menu (the top bar keeps the small join button)
@@ -142,7 +142,7 @@ test('the 3D city loads on a capable browser, with no page errors', async ({ pag
   page.on('pageerror', (e) => errors.push(e.message));
   await stubInterest(page);
   await page.goto('/');
-  await expect(page.locator('main.v16.has3d, main.v16.lite')).toHaveCount(1, { timeout: 60_000 });
+  await expect(page.locator('.v16.has3d, .v16.lite')).toHaveCount(1, { timeout: 60_000 });
   await toSection(page, '[data-sec=morning]', 0.5);
   await page.waitForTimeout(1500);
   expect(errors).toEqual([]);

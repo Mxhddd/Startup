@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { t } from '@pohnch/messages';
 import { colors } from '@pohnch/ui/theme';
-import { displayFont, handFont, latinFont, urduFont } from './fonts';
+import { displayFont, latinFont, urduFont } from './fonts';
 import './globals.css';
 import { SITE } from './_lib/site';
 import { Analytics } from '@vercel/analytics/next';
@@ -20,7 +20,7 @@ export const viewport: Viewport = { themeColor: '#FAF6EE' };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={`${urduFont.variable} ${latinFont.variable} ${displayFont.variable} ${handFont.variable}`}>
+    <html lang="en" className={`${urduFont.variable} ${latinFont.variable} ${displayFont.variable}`}>
       <body style={{ margin: 0, background: colors.ghee, ['--focus' as string]: colors.kesar }}>{children}<Analytics /></body>
     </html>
   );

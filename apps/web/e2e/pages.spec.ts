@@ -9,7 +9,7 @@ test('the delete-account page (needed for Google Play) explains both apps and th
   await expect(page.getByText(/within 7 days/)).toBeVisible();
   await page.locator('.pbar .lang').click();
   await expect(page).toHaveURL(/\/ur\/delete-account$/);
-  await expect(page.locator('main')).toHaveAttribute('dir', 'rtl');
+  await expect(page.locator('.v16').first()).toHaveAttribute('dir', 'rtl');
 });
 
 test('the footer links every page the stores ask for', async ({ page }) => {

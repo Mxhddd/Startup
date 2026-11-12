@@ -12,10 +12,10 @@ import { ParentPhone, DriverPhone, type PhoneHandle, type Words } from './Phone'
 import { DriverKit, JoinForm, Proof, WaitingMap, useSummary, type Area } from './Panel';
 import { countDoubt } from '../_lib/interest';
 import { callsAYear, clamp, hourOfClock, karachiClock, karachiHours, skyHex, span } from './hour';
-import { SECTIONS, dialStart, pinned, scrollS, worldAt, type Ctx, type SectionId } from './scenes';
+import { FLY_SECS, SECTIONS, dialStart, pinned, scrollS, worldAt, type Ctx, type SectionId } from './scenes';
 import { Hub, HUB_HASH, type HubTopic } from './Hub';
 import type { Quality, World, WorldWords } from './world3d';
-import { CallsCounter, HoldDemo, OffDemo, SignalDemo, TS } from './Demos';
+import { HoldDemo, OffDemo, SignalDemo, TS } from './Demos';
 import { FrontDoor } from './FrontDoor';
 import { Intro } from './Intro';
 import { initDelight, useCountUp } from './delight';
@@ -46,8 +46,11 @@ const fill = (t: string | undefined, v: Record<string, string | number>) => Obje
 const Arrow = () => <svg className="arr" width="22" height="12" viewBox="0 0 22 12" aria-hidden="true"><path d="M1 6h19M15 1l5 5-5 5" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 const WaIcon = () => <svg width="20" height="20" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20l1.3-4A8 8 0 1 1 8 18.7z" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" /><path d="M9 9.5c.3 1.7 2 3.7 4.5 4.5l1.2-1.2 1.8.8-.3 1.6c-3.5.4-7.8-3.5-7.6-7.2l1.6-.3.8 1.8z" fill="currentColor" /></svg>;
 
+const LITE_KEY = 'pohnch-lite';
 function isLite(): boolean {
   if (/[?&]lite\b/.test(location.search)) return true;
+  // this phone already struggled with the 3D earlier in this visit (v20): go straight to the pictures
+  try { if (sessionStorage.getItem(LITE_KEY) === '1' && !/[?&]keep3d\b/.test(location.search)) return true; } catch { /* storage blocked: decide afresh */ }
   const n = navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string }; deviceMemory?: number };
   if (n.connection?.saveData || /(^|-)2g$/.test(n.connection?.effectiveType ?? '')) return true;
   if (typeof n.deviceMemory === 'number' && n.deviceMemory <= 2) return true;
@@ -57,10 +60,12 @@ function isLite(): boolean {
 }
 
 export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, playUrl, foot, worldWords }: HomeProps) {
-  const root = useRef<HTMLElement>(null), canvas = useRef<HTMLCanvasElement>(null);
+  const root = useRef<HTMLDivElement>(null), canvas = useRef<HTMLCanvasElement>(null);
   const worldRef = useRef<World | null>(null);
   const sidesPhone = useRef<PhoneHandle>(null), mornPhone = useRef<PhoneHandle>(null), offPhone = useRef<PhoneHandle>(null);
   const [lite, setLite] = useState(false);
+  // the 3D state is React state (not a class added by hand), so re-renders (the menu, the language) never drop it
+  const [has3d, setHas3d] = useState(false), [fallback, setFallback] = useState(false);
   const [area, setArea] = useState<AreaId | null>(null);
   const [calls, setCalls] = useState({ n: 0, off: false });
   const [sides, setSides] = useState(0);
@@ -76,6 +81,9 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
   const [role, setRole] = useState<'parent' | 'driver'>('parent');
   const [mine, setMine] = useState<AreaId | null>(null);
   const [menu, setMenu] = useState(false);
+  // v20: which story chapter is on screen (-1 before the story, 0-3 calls/sides/morning/lock, 4 after)
+  const [chap, setChap] = useState(-1);
+  useEffect(() => { if (!menu) return; const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setMenu(false); }; addEventListener('keydown', esc); return () => removeEventListener('keydown', esc); }, [menu]);
   const [scrolled, setScrolled] = useState(false);
   const [, setJoinSeen] = useState(false);
   // v19 "A school day": the minute the dial shows (null until the page knows Karachi's time)
@@ -99,7 +107,8 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
     const l = lenisRef.current;
     const el = typeof target === 'string' ? document.querySelector<HTMLElement>(target) : null;
     if (l) l.scrollTo(el ?? (target as number), { duration: 1.6, offset: 0 });
-    else if (el) el.scrollIntoView({ behavior: 'smooth' }); else window.scrollTo({ top: target as number, behavior: 'smooth' });
+    const behavior: ScrollBehavior = matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+    if (!l && el) el.scrollIntoView({ behavior }); else if (!l && typeof target === 'number') window.scrollTo({ top: target, behavior });
   }, []);
 
   /* ---------- the scroll loop: measure, drive the 3D, drive the pinned sections ---------- */
@@ -130,18 +139,29 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
     const n = navigator as Navigator & { deviceMemory?: number };
     const cores = navigator.hardwareConcurrency ?? 4, mem = n.deviceMemory ?? 8;
     const quality: Quality = touch || innerWidth < 760 || cores <= 4 || mem <= 4 ? 'low' : cores >= 8 && mem >= 8 ? 'high' : 'mid';
-    // the 3D world loads after the page is on screen
-    if (!liteMode) void import('./world3d').then((m) => {
+    // the 3D world builds while the intro plays (its cost hides behind the sunrise); if the code can't load
+    // (offline, a failed download) or the device can't draw it, the page uses the painted pictures instead
+    const toPictures = (remember: boolean) => {
+      if (stopped) return;
+      world?.dispose(); world = null; worldRef.current = null;
+      setHas3d(false); setFallback(true); setLite(true);
+      if (remember) { try { sessionStorage.setItem(LITE_KEY, '1'); } catch { /* fine: decide again next time */ } }
+    };
+    if (!liteMode) import('./world3d').then((m) => {
       if (stopped || !canvas.current) return;
       try {
         world = m.createWorld(canvas.current, { quality, words: worldWords });
         const curve = m.routeCurve();
         ctx.routeAt = world.routeAt; ctx.uHome = m.routeU(m.HOME.x, m.HOME.z - 12, curve); ctx.uFork = m.routeU(m.FORK.x - 21, m.FORK.z, curve);
         worldRef.current = world;
-        el.classList.add('has3d');
-      } catch { setLite(true); }
-    });
-    let last = { eta: -1, calls: -1, off: false, sides: -1, morn: -1, lock: -1, scrolled: false, grey: -1, night: '', story: -1 };
+        setHas3d(true);
+      } catch { toPictures(false); }
+    }).catch(() => toPictures(false));
+    // the stutter test (v20): once the fly-in is over, time about 90 drawn frames; if the median frame takes
+    // longer than the device can afford (45 ms on phones, 70 ms elsewhere), switch to the pictures for this visit
+    const probe = TS === 1 && !/[?&]keep3d\b/.test(location.search);
+    const samples: number[] = [];
+    let last = { eta: -1, calls: -1, off: false, sides: -1, morn: -1, lock: -1, scrolled: false, grey: -1, night: '', story: -1, chap: -2 };
     const lastP = SECTIONS.map(() => -1), lastVan = [-1, -1, -1];
     let tPrev = performance.now();
     const frame = (now: number) => {
@@ -159,7 +179,11 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       const covered = COVER.some((id) => { const i = SECTIONS.indexOf(id); return tops[i]! <= y && tops[i]! + hts[i]! >= y + vh; });
       if (world && !covered) {
         world.setState(st); world.tune(dt);
-        if (world.quality === 'low') { const g = Math.round(st.grey * 100) / 100; if (g !== last.grey) { last.grey = g; canvas.current!.style.filter = g > 0 ? `grayscale(${(g * 0.9).toFixed(2)}) brightness(${(1 + g * 0.04).toFixed(2)})` : ''; } }
+        if (probe && samples.length < 90 && ctx.flyT > FLY_SECS + 0.6 && !document.hidden && dt < 400) {
+          samples.push(dt);
+          if (samples.length === 90) { const med = [...samples].sort((a, b) => a - b)[45]!; if (med > (world.quality === 'low' ? 45 : 70)) toPictures(true); }
+        }
+        if (world && world.quality === 'low') { const g = Math.round(st.grey * 100) / 100; if (g !== last.grey) { last.grey = g; canvas.current!.style.filter = g > 0 ? `grayscale(${(g * 0.9).toFixed(2)}) brightness(${(1 + g * 0.04).toFixed(2)})` : ''; } }
       }
       el.style.setProperty('--skyc', skyHex(st.hour));
       const night = st.hour > 2.5 ? '1' : '0'; if (night !== last.night) { last.night = night; el.dataset.night = night; }
@@ -188,6 +212,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       // lock screen countdown
       const lp = Math.round(span(pp.lock!, 0.15, 0.8) * 50) / 50; if (lp !== last.lock) { last.lock = lp; setLockP(lp); }
       const sc = y > 40; if (sc !== last.scrolled) { last.scrolled = sc; setScrolled(sc); }
+      const ci = Math.floor(S) - 1, ch = ci < 0 ? -1 : ci > 3 ? 4 : ci; if (ch !== last.chap) { last.chap = ch; setChap(ch); }
       // the star in the top bar fills as you read the story (up to the hub)
       const iHub = SECTIONS.indexOf('hub'), story = Math.round(clamp(y / Math.max(1, tops[iHub]! - vh * 0.5)) * 200) / 200;
       if (story !== last.story) { last.story = story; el.style.setProperty('--story', String(story)); }
@@ -267,7 +292,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       <p className="hubfree">{w['hub.free']}</p>
       <h3>{w['calc.h']}</h3>
       <div className="calcbox">
-        <label className="slider"><span className="sr">{w['calc.label']}</span><input type="range" min={0} max={10} step={1} value={calc} onChange={(e) => setCalc(Number(e.target.value))} aria-valuetext={String(calc)} /><b className="num">{calc}</b></label>
+        <label className="slider"><span className="sr">{w['calc.label']}</span><input className="range" type="range" min={0} max={10} step={1} value={calc} onChange={(e) => setCalc(Number(e.target.value))} aria-valuetext={String(calc)} /><b className="num">{calc}</b></label>
         {calc > 0 ? (
           <p className="out"><b className="big num">{yearly.toLocaleString('en')}</b><span>{w['calc.out']}</span><small>{(w['calc.how'] ?? '').replace('{c}', String(calc))}</small></p>
         ) : <p className="out"><span>{w['calc.zero']}</span></p>}
@@ -287,7 +312,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
   ];
 
   return (
-    <main ref={root} className={`v16 ${lite ? 'lite' : ''} ${menu ? 'menu-open' : ''}`} lang={lang} dir={dir} data-lang={lang} style={truckVars()}>
+    <div ref={root} className={`v16 ${lite ? 'lite' : ''} ${has3d ? 'has3d' : ''} ${fallback ? 'fallback' : ''} ${menu ? 'menu-open' : ''}`} lang={lang} dir={dir} data-lang={lang} style={truckVars()}>
       <Intro skipLabel={w['intro.skip'] ?? ''} />
       <canvas ref={canvas} className="world" aria-hidden="true" />
       <div className="sky" aria-hidden="true" />
@@ -295,7 +320,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       {/* ---------- top bar ---------- */}
       <header className={`bar ${scrolled ? 'scrolled' : ''}`}>
         <a className="mark" href={links.home} aria-label={w['nav.home']}><b>پہنچ</b><span>Pohnch</span><span className="pstar" aria-hidden="true"><svg viewBox="0 0 20 20" width="18" height="18"><path className="po" d="M10 0.8l1.9 4.6 4.6-1.9-1.9 4.6L19.2 10l-4.6 1.9 1.9 4.6-4.6-1.9L10 19.2l-1.9-4.6-4.6 1.9 1.9-4.6L0.8 10l4.6-1.9-1.9-4.6 4.6 1.9z" /></svg><svg viewBox="0 0 20 20" width="18" height="18" className="pfw"><path className="pf" d="M10 0.8l1.9 4.6 4.6-1.9-1.9 4.6L19.2 10l-4.6 1.9 1.9 4.6-4.6-1.9L10 19.2l-1.9-4.6-4.6 1.9 1.9-4.6L0.8 10l4.6-1.9-1.9-4.6 4.6 1.9z" /></svg></span></a>
-        <nav className="nav" aria-label={w['nav.menu']}>
+        <nav className="nav" aria-label={w['nav.main']}>
           <a href="#how" onClick={go('#how')}>{w['nav.how']}</a>
           <a href="#safety" onClick={go('#safety')}>{w['nav.safety']}</a>
           <a href={links.drivers}>{w['nav.drivers']}</a>
@@ -315,18 +340,25 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
         <a href="#join" onClick={go('#join')}>{w.cta}</a>
         <a href={links.other}>{foot.switchLang}</a>
       </nav>
+      <nav className={`chapters ${chap >= 0 && chap <= 3 ? 'on' : ''}`} aria-label={w['chap.label']}>
+        <ol>{(['calls', 'how', 'morning', 'lock'] as const).map((id, k) => (
+          <li key={id} className={chap === k ? 'on' : chap > k ? 'past' : ''}><a href={`#${id}`} onClick={go(`#${id}`)} aria-label={w[`${id === 'how' ? 'sides' : id}.k`]} aria-current={chap === k ? 'step' : undefined}><i /></a></li>
+        ))}</ol>
+        <a className="skip" href="#hub" onClick={go('#hub')}>{w['chap.skip']}</a>
+      </nav>
+
+      <main id="main">
 
       {/* ---------- the front door: for parents / for drivers ---------- */}
       <section className="sec hero" data-sec="hero" style={{ height: '125vh' }} aria-labelledby="h-hero">
         <div className="stick">
           <FrontDoor w={w} areas={areas} driversHref={links.drivers} quotes={doorQuotes} onParents={startParents} onArea={setArea}
-            day={{ min: dayMin, night: dayNight, nowMin, onDay }} area={area} meter={area ? summary.meter[area] : undefined} />
-          <div className="cue" aria-hidden="true"><i /></div>
+            day={{ min: dayMin, night: dayNight, nowMin, onDay }} area={area} meter={area ? summary.meter[area] : undefined} meterStatus={summary.status} />
         </div>
       </section>
 
       {/* ---------- 1. the 7 am phone call ---------- */}
-      <section className={`sec calls ${calls.off ? 'off' : ''}`} data-sec="calls" style={{ height: `${HEIGHTS.calls * 100}vh` }} aria-labelledby="h-calls">
+      <section id="calls" className={`sec calls ${calls.off ? 'off' : ''}`} data-sec="calls" style={{ height: `${HEIGHTS.calls * 100}vh` }} aria-labelledby="h-calls">
         <div className="stick">
           <div className="copy">
             <p className="kick">{w['calls.k']}</p>
@@ -361,7 +393,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       </section>
 
       {/* ---------- 3. the morning, minute by minute ---------- */}
-      <section className="sec morning" data-sec="morning" data-step={morn} style={{ height: `${HEIGHTS.morning * 100}vh` }} aria-labelledby="h-morning">
+      <section id="morning" className="sec morning" data-sec="morning" data-step={morn} style={{ height: `${HEIGHTS.morning * 100}vh` }} aria-labelledby="h-morning">
         <div className="stick">
           <div className="copy">
             <p className="kick">{w['morning.k']}</p>
@@ -369,7 +401,6 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
             <ol className="tl">
               {[1, 2, 3, 4].map((n) => <li key={n} className={morn >= n ? 'on' : ''}><span className="t num">{w[`morning.${n}t`]}</span><i className={`b b${n}`} /><div><b>{n === 1 ? leftWord : w[`morning.${n}h`]}</b><p>{n === 1 ? etaWord(6) ?? w['morning.1p'] : w[`morning.${n}p`]}</p></div></li>)}
             </ol>
-            <p className={`fin ${morn >= 4 ? 'on' : ''}`}>{w['morning.end']}</p>
           </div>
           <ParentPhone ref={mornPhone} className="mp" w={w} mode="map" eta={morn <= 1 ? 6 - morn * 3 : null} step={Math.max(0, morn - 1)} title={morningAlert ?? w['morning.1h'] ?? ''} alert={morningAlert} />
           {/* v19 the arrival: the city dims, a painted panel rises and پہنچ گئے is written stroke by stroke */}
@@ -379,13 +410,13 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
               <svg className="arrword" viewBox="0 0 760 300" overflow="visible"><text x="380" y="210" textAnchor="middle" lang="ur">{w.reached}</text></svg>
               <Glints n={6} />
             </div>
-            <small className="arrsub">{w['reached.sub']}</small>
+            <p className="arrsub"><small>{w['reached.sub']}</small><b>{w['morning.end']}</b></p>
           </div>
         </div>
       </section>
 
       {/* ---------- 4. the lock screen ---------- */}
-      <section className="sec lock" data-sec="lock" style={{ height: `${HEIGHTS.lock * 100}vh` }} aria-labelledby="h-lock">
+      <section id="lock" className="sec lock" data-sec="lock" style={{ height: `${HEIGHTS.lock * 100}vh` }} aria-labelledby="h-lock">
         <div className="stick">
           <div className="copy">
             <p className="kick">{w['lock.k']}</p>
@@ -403,7 +434,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
       <Hub kick={w['hub.k'] ?? ''} title={w['hub.h'] ?? ''} lead={w['hub.lead'] ?? ''} topics={topics} open={hubOpen} onOpen={setHubOpen} />
       {/* ---------- 6. quotes (only real ones) ---------- */}
       {quotes.length > 0 && (
-        <section className="sec quotes paper"><div className="wrap"><p className="kick">{w['quotes.k']}</p>{quotes.map((q) => <figure key={q.name}><blockquote>{q.text}</blockquote><figcaption>{q.name}</figcaption></figure>)}</div></section>
+        <section className="sec quotes paper" aria-labelledby="h-quotes"><div className="wrap"><h2 id="h-quotes" className="kick">{w['quotes.k']}</h2>{quotes.map((q) => <figure key={q.name}><blockquote>{q.text}</blockquote><figcaption>{q.name}</figcaption></figure>)}</div></section>
       )}
 
       {/* ---------- 7. join ---------- */}
@@ -416,7 +447,7 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
               <p>{w['join.lead']}</p>
               <a className="link" href={share} target="_blank" rel="noreferrer"><WaIcon />{w['share.btn']}<Arrow /></a>
             </div>
-            <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={wa.href} initialArea={area} meter={summary.meter} />
+            <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={wa.href} initialArea={area} meter={summary.meter} meterStatus={summary.status} />
           </div>
           <div className="waitwrap"><h3>{w['wait.title']}</h3><WaitingMap w={w} areas={areas} summary={summary} mine={mine ?? area} /></div>
           <div className="two">
@@ -425,13 +456,13 @@ export function HomeClient({ lang, w, areas, qa, quotes, doorQuotes, links, wa, 
           </div>
         </div>
       </section>
+      </main>
 
       <SiteFooter w={w} wa={wa} onAgain={() => scrollTo(0)}
         line={{ ur: worldWords.lines[2]?.ur ?? '', en: worldWords.lines[2]?.en ?? '' }}
         links={{ home: links.home, how: '#how', safety: links.safety, drivers: links.drivers, download: links.download, story: links.story, progress: links.progress, schools: links.schools, privacy: links.privacy, terms: links.terms, delete: links.delete, other: links.other }}
         labels={{ privacy: foot.privacy, terms: foot.terms, delete: foot.delete, download: foot.download, contact: foot.contact, switchLang: foot.switchLang, otherLang: lang === 'ur' ? 'en' : 'ur' }} />
-
-    </main>
+    </div>
   );
 }
 

@@ -27,7 +27,7 @@ export function Intro({ skipLabel }: { skipLabel: string }) {
   }, [phase]);
   if (phase === 'gone') return null;
   return (
-    <div className={`intro ${phase}`} data-testid="intro" role="presentation">
+    <div className={`intro ${phase}`} data-testid="intro">
       <div className="intro-mark" aria-hidden="true">
         <svg className="logo" viewBox="0 0 200 120" width="200" height="120">
           <path className="trail" d="M12 108 C 40 108 48 78 68 70 S 92 56 100 46" fill="none" />

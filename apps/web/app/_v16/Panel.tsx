@@ -6,7 +6,7 @@
 import { useEffect, useId, useRef, useState } from 'react';
 import qrcode from 'qrcode-generator';
 import { checkInterest, type AreaId, type AreaMeter } from '@pohnch/core';
-import { fetchSummary, sendInterest, type Summary } from '../_lib/interest';
+import { fetchSummary, LOADING_SUMMARY, sendInterest, type Summary } from '../_lib/interest';
 import { meterLine } from './areaMeter';
 
 export type Words = Record<string, string>;
@@ -15,12 +15,13 @@ export type Area = { id: AreaId; label: string; spot: [number, number] | null };
 const fill = (s: string | undefined, vars: Record<string, string | number>) => (s ?? '').replace(/\{(\w+)\}/g, (m, k: string) => (k in vars ? String(vars[k]) : m));
 
 /* ---------------- Join the pilot ---------------- */
-export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialArea, meter }: {
+export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialArea, meter, meterStatus = 'ready' }: {
   w: Words; lang: 'ur' | 'en'; areas: Area[]; role: 'parent' | 'driver'; setRole: (r: 'parent' | 'driver') => void; onJoined: (area: AreaId) => void; wa: string;
   /** The area picked at the front door ("Where do you live?"), already chosen in the form. */
   initialArea?: AreaId | null;
   /** v19: the live area meter, to show where the family or driver now stands after joining. */
   meter?: Record<string, AreaMeter>;
+  meterStatus?: 'loading' | 'ready' | 'error';
 }) {
   const id = useId();
   const [area, setArea] = useState('');
@@ -51,7 +52,7 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
         {/* a few kites lift off for the family who just joined (hidden with reduced motion) */}
         <span className="kiteburst" aria-hidden="true">{['#E8A33D', '#C46A8A', '#A7D47E', '#FAF6EE', '#17705A'].map((c, k) => <i key={c} style={{ ['--k' as string]: k, ['--c' as string]: c }} />)}</span>
         <h3>{w['join.sent']}</h3>
-        {area && area !== 'other' && <p className="joinmeter" data-testid="join-meter"><b>{(w['meter.thanks'] ?? '').replace('{area}', areas.find((a) => a.id === area)?.label ?? '')}</b> {meterLine(w, areas.find((a) => a.id === area)?.label ?? '', meter?.[area])}</p>}
+        {area && area !== 'other' && meterStatus === 'ready' && <p className="joinmeter" data-testid="join-meter"><b>{(w['meter.thanks'] ?? '').replace('{area}', areas.find((a) => a.id === area)?.label ?? '')}</b> {meterLine(w, areas.find((a) => a.id === area)?.label ?? '', meter?.[area])}</p>}
         <p>{w['join.sentB']} <a href={wa} rel="noreferrer">WhatsApp</a></p>
       </div>
     );
@@ -67,7 +68,7 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
       </fieldset>
       <label className="fld">
         <span>{w['join.area']}</span>
-        <select value={area} onChange={(e) => setArea(e.target.value)} aria-invalid={field === 'area'} data-testid="join-area">
+        <select value={area} onChange={(e) => setArea(e.target.value)} aria-invalid={field === 'area'} aria-describedby={field === 'area' ? `${id}-msg` : undefined} data-testid="join-area">
           <option value="" disabled>{w['join.areaPick']}</option>
           {areas.map((a) => <option key={a.id} value={a.id}>{a.label}</option>)}
         </select>
@@ -96,13 +97,13 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
       )}
       <label className="fld">
         <span>{w['join.wa']}</span>
-        <input type="tel" inputMode="tel" dir="ltr" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="03XX XXXXXXX" autoComplete="tel" aria-invalid={field === 'whatsapp'} className="num" />
-        <small>{w['join.waNote']}</small>
+        <input type="tel" inputMode="tel" dir="ltr" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="03XX XXXXXXX" autoComplete="tel" aria-invalid={field === 'whatsapp'} aria-describedby={field === 'whatsapp' ? `${id}-msg ${id}-wa` : `${id}-wa`} className="num" />
+        <small id={`${id}-wa`}>{w['join.waNote']}</small>
       </label>
-      <label className="trap" aria-hidden="true">website<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label>
+      <div className="trap" inert><label>website<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label></div>
       <div className="send">
         <button className="pill" type="submit" disabled={state === 'sending'} data-testid="join-send">{state === 'sending' ? w['join.sending'] : w['join.send']}</button>
-        <p className="msg" role="alert" aria-live="assertive">{state === 'error' ? w['join.err'] : err}</p>
+        <p className="msg" id={`${id}-msg`} role="alert" aria-live="assertive">{state === 'error' ? <>{w['join.err']} <a href={wa} rel="noreferrer">WhatsApp</a></> : err}</p>
       </div>
     </form>
   );
@@ -113,7 +114,7 @@ export function WaitingMap({ w, areas, summary, mine }: { w: Words; areas: Area[
   const shown = areas.filter((a) => a.spot);
   const any = Object.keys(summary.meter).length > 0;
   return (
-    <div className="waitmap">
+    <div className={`waitmap ${summary.status === 'loading' ? 'checking' : ''}`} aria-busy={summary.status === 'loading'}>
       <div className="mb">
       <svg viewBox="0 0 600 420" role="img" aria-label={w['wait.title']}>
         <defs>
@@ -130,7 +131,7 @@ export function WaitingMap({ w, areas, summary, mine }: { w: Words; areas: Area[
             <g key={a.id} className={`${me ? 'me' : ''} ${m ? `st-${m.s}` : ''}`} data-area={a.id}>
               {m && <circle cx={x} cy={y} r={r * 2.4} fill="url(#glow)" />}
               {m || me
-                ? <g className="ppin"><path d={`M${x} ${y - r - 3}l${r * 0.7 + 3} ${r + 3}-${r * 0.7 + 3} ${r + 3}-${r * 0.7 + 3}-${r + 3}z`} fill={ready ? '#17705A' : '#E8A33D'} stroke="#0E1022" strokeWidth="1.2" /><circle cx={x} cy={y} r={Math.max(1.6, r * 0.28)} fill="#FAF6EE" /></g>
+                ? <g className="ppin"><path d={`M${x} ${y - r - 3}l${r * 0.7 + 3} ${r + 3}-${r * 0.7 + 3} ${r + 3}-${r * 0.7 + 3}-${r + 3}z`} fill={ready ? '#17705A' : '#A7D47E'} stroke="#0E1022" strokeWidth="1.2" /><circle cx={x} cy={y} r={Math.max(1.6, r * 0.28)} fill="#FAF6EE" /></g>
                 : <circle cx={x} cy={y} r={3} fill="rgba(245,238,225,.35)" />}
               {m?.d === 'yes' && <g transform={`translate(${x + r + 8} ${y - r - 4})`}><rect x="-7" y="-5" width="14" height="10" rx="3" fill="#1F2A5C" stroke="#F5EEE1" strokeWidth="1.2" /><circle cx="0" cy="0" r="1.8" fill="#E8A33D" /></g>}
               {me && <circle className="ring" cx={x} cy={y} r={r + 10} fill="none" stroke="#F6C46E" strokeWidth="2" />}
@@ -144,7 +145,7 @@ export function WaitingMap({ w, areas, summary, mine }: { w: Words; areas: Area[
         return <span key={a.id} className="lbl" style={{ left: `${a.spot![0] * 100}%`, top: `${(a.spot![1] * 380 / 420) * 100}%` }}>{a.label}{m?.f ? ` · ${w[`meter.f.${m.f}`]}` : ''}</span>;
       })}
       </div>
-      <p className="cap">{mine ? w['wait.you'] : any ? w['wait.lead'] : w['wait.empty']}</p>
+      <p className="cap">{summary.status === 'loading' ? w['wait.checking'] : summary.status === 'error' ? w['wait.error'] : mine ? w['wait.you'] : any ? w['wait.lead'] : w['wait.empty']}</p>
       <div className="legend"><span className="lg ready">{w['meter.legend.ready']}</span><span className="lg forming">{w['meter.legend.forming']}</span><span className="lg driver">{w['meter.legend.driver']}</span></div>
       <p className="how">{w['meter.how']}</p>
     </div>
@@ -195,9 +196,9 @@ export function Proof({ w, proof }: { w: Words; proof: Summary['proof'] }) {
   return <div className="proof">{items.map(([n, l]) => <div key={l}><b className="num">{n.toLocaleString('en')}</b><span>{l}</span></div>)}</div>;
 }
 
-/** Loads the waiting-map counts and pilot numbers once the panel is on screen. */
+/** Loads the waiting-map counts, the area meter and the pilot numbers once (status: loading, ready or error). */
 export function useSummary(open: boolean): Summary {
-  const [s, setS] = useState<Summary>({ areas: {}, meter: {}, proof: null });
+  const [s, setS] = useState<Summary>(LOADING_SUMMARY);
   const asked = useRef(false);
   useEffect(() => {
     if (!open || asked.current) return;

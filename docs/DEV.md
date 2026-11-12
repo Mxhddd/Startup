@@ -628,3 +628,37 @@ Tests: `app/_v16/v18.test.ts`, `e2e/v18.spec.ts`, plus school cases in both inte
 - **Links:** `#safety`, `#privacy`, `#questions`, `#cost`, `#for-drivers`, `#try` and `#start` open their topic (`HUB_HASH`).
 
 Tests: `app/_v16/v19.test.ts`, `e2e/v19.spec.ts`, `packages/core` interest tests, `189-area-meter.test.sql`.
+
+## Website v20: polish, not features (12 November 2026)
+
+**One design system** (`apps/web/app/_v16/tokens.css`). Every colour, corner, shadow, layer and focus ring on the website comes from it:
+- The colours are the app theme's (`packages/ui/src/theme.ts`). Gold (kesar) means the brand star and "reached school". Red (shingarf) means help, late and strikes only.
+- `home.css` was rebuilt as one ordered file on the tokens; `pages.css` and `truckart.css` use them too. `app/_v16/v20.test.ts` checks that every `var(--x)` is defined, the old red is gone and red is used only for its meaning.
+- In Urdu the font list starts with Manrope so every digit uses it; Urdu letters fall through to Noto Sans Arabic.
+
+**The hub's look everywhere:**
+- **Cards:** the painted card (`.module`: a foil strip inside the top, a gilt hairline) on the front door, the day strip, the story's steps, the dialog, the progress page and the legal pages.
+- **Hubs:** Safety and Drivers are hubs (`PageHub` in `Hub.tsx`; `/safety#help` opens a topic).
+- **Legal pages:** privacy and terms keep all their text but get a contents list that marks the section you are reading (`DocSpy.tsx`).
+- **Story text:** words over the 3D city sit on a soft paper glow.
+
+**Truck art at the seams:**
+- **Seams:** a vine band where the story meets the hub; a jhalar fringe hanging from the hub and over every night band.
+- **Details:** painted kilometre stones, roses on lists and questions, and a foil edge with a mirror glint on the main button.
+
+**Phones first:**
+- **Smart 3D:** after the fly-in, the page times 90 frames. If the median is over 45 ms on a phone (70 ms elsewhere), it switches to the painted pictures and remembers that for the visit (`sessionStorage`). A failed 3D download also falls back to the pictures. Add `?keep3d` to skip the test (for recording films).
+- **Chapter dots:** "Skip to answers" jumps to the hub.
+- **Sizes:** the drawn phones sit side by side and Got in stays 64 px or more on screen. Tap targets are 44 px.
+
+**Honest states:** the area summary reports `status: loading | ready | error` (`_lib/interest.ts`). While loading, the area line, map and /progress say they are checking; if loading fails they say so. They never say "be the first" just because the answer hasn't arrived.
+
+**Fixes:**
+- **Front door:** at night the parent button and the dialog's Skip were unreadable.
+- **Area dialog:** it was clipped under the top bar. It is now a portal with a focus trap, Escape and focus return.
+- **3D after the menu:** it disappeared after opening the menu, because classes were added by hand and React rewrote them. They are state now.
+- **Drivers join form:** it had a 26vh gap, because the Join section's rule matched the form.
+- **Arrival:** پہنچ گئے no longer covers the timeline.
+- **Landmarks:** header and footer sit outside `<main>`.
+
+Tests: `app/_v16/v20.test.ts` and `e2e/v20.spec.ts`, which checks text size, contrast, tap targets, focus rings, the dialog, Urdu line-height, loading and error states, the inner hubs, the menu, the stutter fallback, and the 3D surviving the menu.

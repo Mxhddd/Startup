@@ -5,6 +5,3 @@ import { Gulzar, Manrope, Noto_Sans_Arabic } from 'next/font/google';
 export const urduFont = Noto_Sans_Arabic({ subsets: ['arabic'], weight: ['500', '600', '700'], variable: '--font-urdu' });
 export const latinFont = Manrope({ subsets: ['latin'], weight: ['500', '600', '700', '800'], variable: '--font-latin' });
 export const displayFont = Gulzar({ subsets: ['arabic'], weight: ['400'], variable: '--font-display' });
-// v13: a hand-written accent for the English margin notes only (as on the brochure).
-import { Caveat } from 'next/font/google';
-export const handFont = Caveat({ subsets: ['latin'], weight: ['600'], variable: '--font-hand' });

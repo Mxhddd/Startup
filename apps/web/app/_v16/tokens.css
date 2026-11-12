@@ -1,0 +1,57 @@
+/* pohnch.pk design tokens (v20). Every colour, corner, shadow, layer and focus ring on the website
+   comes from here. The colours are the app theme's (packages/ui/src/theme.ts: siyahi, ink2, kesar,
+   kesarText, shingarf, zamurrad, neel, pista) plus the website's paper tones.
+   Meaning, one colour each (CLAUDE.md):
+   - neel: the van, "left", selected things.
+   - zamurrad: picked up, dropped, ready.
+   - kesar: the brand star and "reached school" (with siyahi text on it).
+   - shingarf: help, "late" and strikes only.
+   - pista: growing (areas still gathering).
+   - gilt: hairlines and rules only, never text. */
+.v16 {
+  /* ink and paper */
+  --ink: #141A33;        /* siyahi: body text */
+  --ink2: #4A4F66;       /* secondary text (7.4:1 on paper) */
+  --stone: #6E6450;      /* captions (5.3:1 on paper) */
+  --paper: #FBF7EF;      /* page */
+  --card: #FFFDF8;       /* a card on paper */
+  --ivory: #F5EEE1;      /* text on night; soft washes */
+  --sand: #EDE3D0;       /* the city's day sky behind everything */
+  --night: #10162F;      /* dark grounds: join, menu, footer, phones */
+  --night2: #1A2148;
+  --onNight: #F5EEE1;    /* text on night */
+  --onNight2: #D6CFC1;   /* secondary text on night (11:1) */
+  --onNight3: #A39E95;   /* hints and placeholders on night (6.5:1) */
+  /* colour with a meaning */
+  --neel: #1F2A5C; --neel2: #2A3876; --neelTint: #E4E7F2;
+  --kesar: #E8A33D; --kesarText: #7A5410; --kesarSoft: #F6C46E;
+  --zam: #17705A; --zamOnNight: #8FD3B5; --zamTint: #DCEFE6;
+  --pista: #A7D47E;
+  --shing: #A8321F; --shingTint: #F6DDD6; --dangerOnNight: #F2A79B;
+  --gilt: #B8862F;
+  --hair: rgba(184, 134, 47, .3);        /* gilt hairline on paper */
+  --hairNight: rgba(245, 238, 225, .18); /* hairline on night */
+  /* shape: three corners and a pill */
+  --r1: 14px; --r2: 22px; --r3: 28px; --pill: 999px;
+  /* elevation: lifted a little, a card, a sheet */
+  --e1: 0 10px 24px -18px rgba(16, 22, 47, .55);
+  --e2: inset 0 0 0 1px var(--hair), 0 26px 52px -34px rgba(16, 22, 47, .55);
+  --e3: 0 40px 80px -34px rgba(16, 22, 47, .7);
+  /* layers, bottom to top */
+  --z-city: 0; --z-sec: 1; --z-copy: 2; --z-over: 3; --z-art: 4; --z-chapters: 45; --z-menu: 49; --z-bar: 50; --z-dialog: 70; --z-intro: 100;
+  /* focus: ink on light grounds, kesar on night */
+  --focus: var(--ink);
+  /* motion */
+  --calm: cubic-bezier(.22, .8, .2, 1); --glide: cubic-bezier(.65, 0, .35, 1);
+  /* type: Manrope for Latin and every digit, Noto Sans Arabic for Urdu text, Gulzar for big Urdu display.
+     In Urdu, Manrope comes first so digits and Latin letters always use it; it has no Arabic letters, so
+     every Urdu letter falls through to Noto Sans Arabic. */
+  --latin: var(--font-latin), system-ui, sans-serif;
+  --display: var(--font-latin), system-ui, sans-serif;
+  --text: var(--font-latin), system-ui, sans-serif;
+}
+.v16[data-lang="ur"] {
+  --display: var(--font-display), var(--font-urdu), serif;
+  --text: var(--font-latin), var(--font-urdu), system-ui, sans-serif;
+}
+.v16 .night, .v16 .pnight, .v16 .menu, .v16 .sitefoot, .v16[data-night="1"] .bar, .v16[data-night="1"] .hero, .v16 .v-phone { --focus: var(--kesar); }

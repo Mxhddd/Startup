@@ -4,7 +4,7 @@ const TOKEN = 'AbCdEfGhIjKlMnOpQrStUvWxYz0123456789_-abcde';
 
 test('the privacy policy reads in Urdu and English and says what is never kept', async ({ page }) => {
   await page.goto('/ur/privacy');
-  await expect(page.locator('main')).toHaveAttribute('dir', 'rtl');
+  await expect(page.locator('.v16').first()).toHaveAttribute('dir', 'rtl');
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('پرائیویسی پالیسی');
   await page.locator('.pbar .lang').click();
   await expect(page).toHaveURL(/\/privacy$/);

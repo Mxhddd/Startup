@@ -21,7 +21,7 @@ export function DriverIslands({ lang, w, part }: { lang: Lang; w: Words; part: '
 function DriverJoin({ lang, w, role, setRole, setMine }: { lang: Lang; w: Words; role: 'parent' | 'driver'; setRole: (r: 'parent' | 'driver') => void; setMine: (a: AreaId | null) => void }) {
   const summary = useSummary(true);
   const areas = AREA_IDS.map((id) => ({ id, label: t(lang, `area.${id}` as MessageKey), spot: id === 'other' ? null : AREA_SPOTS[id] }));
-  return <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} meter={summary.meter} />;
+  return <JoinForm w={w} lang={lang} areas={areas} role={role} setRole={setRole} onJoined={setMine} wa={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} meter={summary.meter} meterStatus={summary.status} />;
 }
 
 /* ---------------- v18: Pilot progress (live counts, only when safe to show) ---------------- */
@@ -38,13 +38,17 @@ export function ProgressIsland({ lang, w }: { lang: Lang; w: Words }) {
   const any = families > 0 || summary.proof || Object.keys(summary.meter).length > 0;
   return (
     <div className="progress" data-testid="progress">
-      {any ? (
+      {summary.status === 'loading' ? (
+        <div className="pstart checking" aria-busy="true" data-testid="progress-checking"><p>{w['prog.checking']}</p></div>
+      ) : any ? (
         <div className="pcounts" data-testid="progress-counts">
           {families > 0 && <><Count n={families} label={w['prog.families'] ?? ''} /><Count n={shownAreas} label={w['prog.areas'] ?? ''} /></>}
           {summary.proof && <><Count n={summary.proof.vans} label={w['prog.vans'] ?? ''} /><Count n={summary.proof.trips} label={w['prog.trips'] ?? ''} /><Count n={summary.proof.alerts} label={w['prog.alerts'] ?? ''} /></>}
         </div>
       ) : (
-        <div className="pstart" data-testid="progress-start"><h2>{w['prog.start']}</h2><p>{w['prog.startP']}</p></div>
+        summary.status === 'error'
+          ? <div className="pstart" data-testid="progress-error"><h2>{w['prog.errorH']}</h2><p>{w['prog.error']}</p></div>
+          : <div className="pstart" data-testid="progress-start"><h2>{w['prog.start']}</h2><p>{w['prog.startP']}</p></div>
       )}
       <div className="pmap"><h3>{w['prog.map']}</h3><WaitingMap w={w} areas={areas} summary={summary} mine={null} /></div>
       {Object.keys(summary.meter).length > 0 && (
@@ -83,7 +87,7 @@ export function SchoolForm({ lang, w }: { lang: Lang; w: Words }) {
         </select>
       </label>
       <label className="fld"><span>{w['sch.wa']}</span><input value={wa} onChange={(e) => setWa(e.target.value)} inputMode="tel" autoComplete="tel" dir="ltr" placeholder="03XX XXXXXXX" aria-invalid={field === 'whatsapp'} data-testid="school-wa" /></label>
-      <label className="trap" aria-hidden="true">Website<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label>
+      <div className="trap" inert><label>Website<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label></div>
       <p className="msg" role="alert" aria-live="assertive">{state === 'error' ? <>{w['join.err']} <a href={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} rel="noreferrer">WhatsApp</a></> : err}</p>
       <div><button className="pill btn" type="submit" disabled={state === 'sending'} data-testid="school-send">{state === 'sending' ? w['join.sending'] : w['sch.send']}</button></div>
     </form>

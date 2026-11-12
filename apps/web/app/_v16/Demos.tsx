@@ -1,7 +1,7 @@
 'use client';
 // The small working demos on pohnch.pk (v16), shared by the home page and the drivers page:
-// "Off today" with Undo, the driver's hold-to-tap button, the no-signal underpass, and the
-// calls-a-morning counter. Every word comes in as props (w = web.* words in one language).
+// "Off today" with Undo, the driver's hold-to-tap button and the no-signal underpass.
+// Every word comes in as props (w = web.* words in one language).
 import { useEffect, useRef, useState } from 'react';
 import { ParentPhone, type PhoneHandle, type Words } from './Phone';
 
@@ -17,7 +17,7 @@ export function OffDemo({ w, phone }: { w: Words; phone: React.RefObject<PhoneHa
   return (
     <article className="demo" data-tilt="">
       <ParentPhone ref={phone} className="mini" w={w} mode="map" eta={off ? null : 4} step={0} off={off} title={off ? w['try.off.btn'] ?? '' : w['morning.1h'] ?? ''} />
-      <h3>{w['try.off.t']}</h3><p>{w['try.off.p']}</p>
+      <h4>{w['try.off.t']}</h4><p>{w['try.off.p']}</p>
       <div className="ctl">
         <button type="button" className="btn ghost" aria-pressed={off} disabled={off} onClick={() => { setOff(true); setLeft(5); setMsg(w['try.off.done'] ?? ''); }}>{w['try.off.btn']}</button>
         <span className="msg" aria-live="polite">{msg}{left > 0 && <> · <span className="num">{left}</span> <button type="button" className="undo" onClick={() => { setOff(false); setLeft(0); setMsg(w['try.undone'] ?? ''); }}>{w['try.undo']}</button></>}</span>
@@ -43,7 +43,7 @@ export function HoldDemo({ w }: { w: Words }) {
           <span className="fill" /><b>{done ? w['try.hold.done'] : w['try.hold.btn']}</b>{!done && <small>{w['try.hold.s']}</small>}
         </button>
       </div>
-      <h3>{w['try.hold.t']}</h3><p>{w['try.hold.p']}</p>
+      <h4>{w['try.hold.t']}</h4><p>{w['try.hold.p']}</p>
       <div className="ctl"><span className="msg" aria-live="polite">{left > 0 && <><span className="num">{left}</span> <button type="button" className="undo" onClick={() => { setDone(false); setH(0); setLeft(0); }}>{w['try.undo']}</button></>}</span></div>
     </article>
   );
@@ -57,14 +57,9 @@ export function SignalDemo({ w }: { w: Words }) {
         <div className="tunnel" aria-hidden="true" />
         <div className="vanchip" style={{ insetInlineStart: `calc(${x}% - 22px)` }} aria-hidden="true"><i /></div>
         <span className="status">{inTunnel ? w['try.sig.lost'] : after ? w['try.sig.back'] : w['try.sig.live']}</span>
-        <input type="range" min={0} max={100} value={x} onChange={(e) => setX(Number(e.target.value))} aria-label={w['try.sig.label']} />
+        <input className="range" type="range" min={0} max={100} value={x} onChange={(e) => setX(Number(e.target.value))} aria-label={w['try.sig.label']} />
       </div>
-      <h3>{w['try.sig.t']}</h3><p>{w['try.sig.p']}</p>
+      <h4>{w['try.sig.t']}</h4><p>{w['try.sig.p']}</p>
     </article>
   );
-}
-export function CallsCounter({ label }: { label: string }) {
-  const [n, setN] = useState(14);
-  useEffect(() => { if (n <= 0) return; const t = setTimeout(() => setN(n - 1), n === 14 ? 600 : 110); return () => clearTimeout(t); }, [n]);
-  return <div className={`counter ${n === 0 ? 'calm' : ''}`}><b className="num">{n}</b><span>{label}</span></div>;
 }

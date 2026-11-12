@@ -8,6 +8,8 @@ import type { ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
 import { href, otherHref } from '../_lib/links';
 import { DriverIslands, ProgressIsland, SchoolForm } from './PageIslands';
+import { PageHub } from './Hub';
+import { DocSpy } from './DocSpy';
 import { PageScene } from './PageScene';
 import type { PageId } from './pageScenes';
 import { webWords } from './words';
@@ -39,10 +41,10 @@ export function Shell16({ lang, path, children }: { lang: Lang; path: string; ch
     </>
   );
   return (
-    <main className="v16 v16p" lang={lang} dir={dirOf(lang)} data-lang={lang} style={truckVars()}>
+    <div className="v16 v16p" lang={lang} dir={dirOf(lang)} data-lang={lang} style={truckVars()}>
       <header className="pbar">
         <a className="mark" href={href(lang, '/')} aria-label={w(lang, 'nav.home')}><b>پہنچ</b><span>Pohnch</span></a>
-        <nav className="pnav" aria-label={w(lang, 'nav.menu')}>{links}</nav>
+        <nav className="pnav" aria-label={w(lang, 'nav.main')}>{links}</nav>
         <a className="lang" href={otherHref(lang, path)} hrefLang={other} lang={other}>{k(lang, 'lang.switch')}</a>
         <span className="pcta"><Cta lang={lang} /></span>
         <details className="pmenu">
@@ -50,12 +52,12 @@ export function Shell16({ lang, path, children }: { lang: Lang; path: string; ch
           <nav aria-label={w(lang, 'nav.menu')}>{links}<a href={`${href(lang, '/')}#join`}>{w(lang, 'cta')}</a></nav>
         </details>
       </header>
-      {children}
+      <main id="main">{children}</main>
       <SiteFooter w={webWords(lang)} wa={{ href: wa, display: PILOT_WHATSAPP.display }}
         line={{ ur: worldWords().lines[2]?.ur ?? '', en: worldWords().lines[2]?.en ?? '' }}
         links={{ home: href(lang, '/'), how: `${href(lang, '/')}#how`, safety: href(lang, '/safety'), drivers: href(lang, '/drivers'), download: href(lang, '/download'), story: href(lang, '/story'), progress: href(lang, '/progress'), schools: href(lang, '/schools'), privacy: href(lang, '/privacy'), terms: href(lang, '/terms'), delete: href(lang, '/delete-account'), other: otherHref(lang, path) }}
         labels={{ privacy: k(lang, 'web.footer.privacy'), terms: k(lang, 'site.foot.terms'), delete: k(lang, 'site.foot.delete'), download: k(lang, 'site.nav.download'), contact: k(lang, 'site.foot.contact'), switchLang: k(lang, 'lang.switch'), otherLang: other }} />
-    </main>
+    </div>
   );
 }
 
@@ -98,18 +100,11 @@ export function DriversPage16({ lang }: { lang: Lang }) {
       <section className="pwrap pgrid4">
         {[1, 2, 3, 4].map((n) => <div key={n} className="fact painted" data-tilt=""><span className="fhead"><Roundel size={30} /><span className="num idx">{String(n).padStart(2, '0')}</span></span><h3>{k(lang, `site.drv.f${n}.t`)}</h3><p>{k(lang, `site.drv.f${n}.b`)}</p></div>)}
       </section>
-      <section className="pwrap">
-        <h2>{w(lang, 'dr.try')}</h2>
-        <DriverIslands lang={lang} w={words} part="demos" />
-      </section>
-      <section className="pwrap">
-        <h2>{k(lang, 'site.drv.how.title')}</h2>
-        <ol className="miles route">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{k(lang, `site.drv.how.${n}`)}</p></li>)}</ol>
-      </section>
-      <section className="pwrap">
-        <h2>{w(lang, 'dr.faq')}</h2>
-        <div className="qa">{[1, 2, 3, 4].map((n) => <details key={n}><summary>{w(lang, `dq.${n}.q`)}</summary><p>{w(lang, `dq.${n}.a`)}</p></details>)}</div>
-      </section>
+      <PageHub sid="answers" className="inner" kick={w(lang, 'drh.k')} title={w(lang, 'drh.h')} first="try" hashes={{ '#try': 'try', '#how': 'how', '#questions': 'faq' }} topics={[
+        { id: 'try', label: w(lang, 'drh.try'), content: <><h3>{w(lang, 'dr.try')}</h3><DriverIslands lang={lang} w={words} part="demos" /></> },
+        { id: 'how', label: w(lang, 'drh.how'), content: <><h3>{k(lang, 'site.drv.how.title')}</h3><ol className="miles route">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{k(lang, `site.drv.how.${n}`)}</p></li>)}</ol></> },
+        { id: 'faq', label: w(lang, 'drh.faq'), content: <><h3>{w(lang, 'dr.faq')}</h3><div className="qa">{[1, 2, 3, 4].map((n) => <details key={n}><summary>{w(lang, `dq.${n}.q`)}</summary><p>{w(lang, `dq.${n}.a`)}</p></details>)}</div></> },
+      ]} />
       <section className="pnight" id="join">
         <div className="pwrap">
           <h2>{w(lang, 'dr.join')}</h2>
@@ -126,27 +121,13 @@ export function SafetyPage16({ lang }: { lang: Lang }) {
     <Shell16 lang={lang} path="/safety">
       <Hero scene="safety" kick={w(lang, 'sf.k')} title={w(lang, 'prom.h')} lead={k(lang, 'site.safety.lead')}
         overlay={<span className="vbadge"><Roundel size={64} /><svg viewBox="0 0 24 24" width="28" height="28"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#FAF6EE" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg><b>{w(lang, 'phone.verified')}</b></span>} />
-      <section className="pwrap">
-        <ol className="promises">{[1, 2, 3, 4, 5, 6, 7].map((n) => <li key={n}><span className="seal" aria-hidden="true"><b>پہنچ</b></span><div><h3>{w(lang, `p${n}`)}</h3><p>{w(lang, `p${n}.b`)}</p></div></li>)}</ol>
-      </section>
-      <section className="pwrap">
-        <h2>{w(lang, 'sf.ver.t')}</h2>
-        <ol className="miles route">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{w(lang, `sf.ver.${n}`)}</p></li>)}</ol>
-      </section>
-      <section className="pwrap">
-        <h2>{w(lang, 'sf.tl.t')}</h2>
-        <ol className="tline">{[1, 2, 3, 4].map((n) => <li key={n}><i className={`b b${n}`} aria-hidden="true" /><b>{w(lang, `sf.tl.${n}t`)}</b><p>{w(lang, `sf.tl.${n}`)}</p></li>)}</ol>
-      </section>
-      <section className="pwrap">
-        <h2>{w(lang, 'never.h')}</h2>
-        <ul className="nolist struck">{[1, 2, 3, 4].map((n) => <li key={n}><span>{w(lang, `never.${n}`)}</span></li>)}</ul>
-      </section>
-      <section className="pwrap help">
-        <h2>{w(lang, 'sf.help.t')}</h2>
-        <p>{w(lang, 'sf.help.p')}</p>
-        <p className="nums"><b className="num">15</b><b className="num">1122</b></p>
-        <a className="link" href={href(lang, '/privacy')}>{k(lang, 'site.safety.policy')}<Arrow /></a>
-      </section>
+      <PageHub sid="answers" className="inner" kick={w(lang, 'sf.k')} title={w(lang, 'sfh.h')} first="promises" hashes={{ '#promises': 'promises', '#checks': 'check', '#location': 'location', '#never': 'never', '#help': 'help' }} topics={[
+        { id: 'promises', label: w(lang, 'sfh.prom'), content: <><ol className="promlist">{[1, 2, 3, 4, 5, 6, 7].map((n) => <li key={n} style={{ ['--k' as string]: n }}><Roundel size={34} /><div><b>{w(lang, `p${n}`)}</b><p>{w(lang, `p${n}.b`)}</p></div></li>)}</ol></> },
+        { id: 'check', label: w(lang, 'sfh.check'), content: <><h3>{w(lang, 'sf.ver.t')}</h3><ol className="miles route">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{w(lang, `sf.ver.${n}`)}</p></li>)}</ol></> },
+        { id: 'location', label: w(lang, 'sfh.loc'), content: <><h3>{w(lang, 'sf.tl.t')}</h3><ol className="tline">{[1, 2, 3, 4].map((n) => <li key={n}><i className={`b b${n}`} aria-hidden="true" /><b>{w(lang, `sf.tl.${n}t`)}</b><p>{w(lang, `sf.tl.${n}`)}</p></li>)}</ol></> },
+        { id: 'never', label: w(lang, 'sfh.never'), content: <><h3>{w(lang, 'never.h')}</h3><ul className="nolist">{[1, 2, 3, 4].map((n) => <li key={n} style={{ ['--k' as string]: n }}><span>{w(lang, `never.${n}`)}</span></li>)}</ul><a className="link" href={href(lang, '/privacy')}>{k(lang, 'site.safety.policy')}<Arrow /></a></> },
+        { id: 'help', label: w(lang, 'sfh.help'), content: <div className="help"><h3>{w(lang, 'sf.help.t')}</h3><p>{w(lang, 'sf.help.p')}</p><p className="nums"><b className="num">15</b><b className="num">1122</b></p></div> },
+      ]} />
     </Shell16>
   );
 }
@@ -185,7 +166,8 @@ export function DownloadPage16({ lang }: { lang: Lang }) {
 function Doc({ lang, sections, summary }: { lang: Lang; sections: { id: string; title: string; body: string }[]; summary?: ReactNode }) {
   return (
     <div className="pwrap doc">
-      <nav className="toc" aria-label={w(lang, 'pg.toc')}><p className="kick">{w(lang, 'pg.toc')}</p>{sections.map((s) => <a key={s.id} href={`#${s.id}`}>{s.title}</a>)}</nav>
+      <DocSpy ids={sections.map((s) => s.id)} />
+      <nav className="toc" aria-label={w(lang, 'pg.toc')}><p className="kick">{w(lang, 'pg.toc')}</p>{sections.map((s) => <a key={s.id} href={`#${s.id}`}><Roundel size={18} />{s.title}</a>)}</nav>
       <article>
         {summary}
         {sections.map((s) => <section key={s.id} id={s.id}><h2>{s.title}</h2><p>{s.body}</p></section>)}

@@ -93,7 +93,8 @@ test('پہنچ گئے arrives on a painted panel, fully inside it', async ({ pag
   // nothing can cut the letters off (the old version masked the top of the words away)
   expect(await page.locator('.arrword').evaluate((e) => getComputedStyle(e).overflow)).toBe('visible');
   expect(word.top).toBeGreaterThanOrEqual(0);
-  await expect(page.locator('.arrsub')).toHaveText('Reached school · 7:41');
+  await expect(page.locator('.arrsub small')).toHaveText('Reached school · 7:41');
+  await expect(page.locator('.arrsub b')).toHaveText('You didn’t call once.');
 });
 
 test('#safety and the menu open their hub topic', async ({ page }) => {

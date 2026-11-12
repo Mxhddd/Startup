@@ -3,7 +3,7 @@
 // small React pieces and CSS variables the pages use. Brand moments only (CLAUDE.md: ornamental frames
 // are for brand moments), and never shingarf red.
 import type { CSSProperties } from 'react';
-import { chamakTile, jhalarTile, lehriyaTile, panelSvg, roseSvg, svgUri, vineTile } from './truckartSvg';
+import { chamakTile, jhalarTile, panelSvg, roseSvg, svgUri, vineTile } from './truckartSvg';
 import './truckart.css';
 
 export { chamakTile, roseSvg } from './truckartSvg';
@@ -12,7 +12,7 @@ export { chamakTile, roseSvg } from './truckartSvg';
 export function truckVars(): CSSProperties {
   return {
     ['--chamak' as string]: svgUri(chamakTile(18, 0)), ['--chamak-s' as string]: svgUri(chamakTile(12, 2)),
-    ['--vine' as string]: svgUri(vineTile(28)), ['--jhalar' as string]: svgUri(jhalarTile(26)), ['--lehriya' as string]: svgUri(lehriyaTile(12)),
+    ['--vine' as string]: svgUri(vineTile(28)), ['--jhalar' as string]: svgUri(jhalarTile(26)),
     ['--roundel' as string]: svgUri(roseSvg(40, false)), ['--rose' as string]: svgUri(roseSvg(64)),
   };
 }
@@ -40,10 +40,13 @@ export function Glints({ n = 3 }: { n?: number }) {
 /** One of Pohnch's own lines on a painted panel: vine and foil on top, roses at the sides, jhalar below. */
 export function Couplet({ ur, en, className = '', birds = false }: { ur: string; en: string; className?: string; birds?: boolean }) {
   return (
-    <figure className={`couplet ${className} ${birds ? 'birds' : ''}`}>
-      <span className="cp-art" aria-hidden="true" style={{ backgroundImage: svgUri(panelSvg(640, 230, { birds })) }} />
+    <div className={`cpbox ${className}`}>
+    <figure className={`couplet ${birds ? 'birds' : ''}`}>
+      <span className="cp-art wide" aria-hidden="true" style={{ backgroundImage: svgUri(panelSvg(640, 230, { birds })) }} />
+      <span className="cp-art narrow" aria-hidden="true" style={{ backgroundImage: svgUri(panelSvg(400, 230)) }} />
       <blockquote><b lang="ur" dir="rtl">{ur}</b><span lang="en" dir="ltr">{en}</span></blockquote>
       <Glints n={4} />
     </figure>
+    </div>
   );
 }

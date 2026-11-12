@@ -4,7 +4,9 @@
 // goes to the drivers page. "Show me how it works" asks one optional question, "Where do you live?",
 // then hands the chosen area (or none) to the home page, which starts the parent story with it.
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { AreaMeter } from '@pohnch/core';
+import type { SummaryStatus } from '../_lib/interest';
 import { meterLine } from './areaMeter';
 import { hhmm } from './hour';
 import { DAY, dayState } from './scenes';
@@ -38,9 +40,9 @@ const fill = (t: string | undefined, v: Record<string, string>) => (t ?? '').rep
 
 /** "A school day" (v19): drag through the day and the city behind the front door follows the van; below,
  *  your area's live meter (or the way to pick your area). Opens at the real Karachi time. */
-function DayStrip({ w, min, night, nowMin, onDay, areaLabel, meter, onPickArea }: {
+function DayStrip({ w, min, night, nowMin, onDay, areaLabel, meter, status, onPickArea }: {
   w: Words; min: number | null; night: boolean; nowMin: number | null; onDay: (m: number) => void;
-  areaLabel: string | null; meter: AreaMeter | undefined; onPickArea: () => void;
+  areaLabel: string | null; meter: AreaMeter | undefined; status: SummaryStatus; onPickArea: () => void;
 }) {
   if (min == null) return <div className="daystrip" aria-hidden="true" />;
   const d = dayState(min, 0.5), h = Math.floor(min / 60), m = Math.floor(min % 60);
@@ -51,7 +53,7 @@ function DayStrip({ w, min, night, nowMin, onDay, areaLabel, meter, onPickArea }
       <div className="dial">
         <div className="dtop"><label htmlFor="daydial" className="dk">{w['day.k']}</label><span className="dhint">{w['day.hint']}</span></div>
         <div className="dtrack">
-          <input id="daydial" type="range" min={DAY.start} max={DAY.end} step={1} value={min} onChange={(e) => onDay(Number(e.target.value))} aria-label={w['day.label']} aria-valuetext={`${hhmm(h, m)} · ${caption}`} data-testid="daydial" />
+          <input id="daydial" className="range" type="range" min={DAY.start} max={DAY.end} step={1} value={min} onChange={(e) => onDay(Number(e.target.value))} aria-label={w['day.label']} aria-valuetext={`${hhmm(h, m)} · ${caption}`} data-testid="daydial" />
           {[DAY.door, DAY.school, DAY.homeTime].map((x) => <i key={x} className="mark" style={{ insetInlineStart: pct(x) }} aria-hidden="true" />)}
           {nowMin != null && !night && <span className="now" style={{ insetInlineStart: pct(nowMin) }} aria-hidden="true">{w['day.now']}</span>}
         </div>
@@ -59,29 +61,39 @@ function DayStrip({ w, min, night, nowMin, onDay, areaLabel, meter, onPickArea }
         {night && <small className="dnight">{w['day.night']}</small>}
       </div>
       <div className="arealine" data-testid="arealine">
-        {areaLabel ? <><span>{meterLine(w, areaLabel, meter)}</span><button type="button" className="link" onClick={onPickArea}>{w['meter.change']}</button></>
+        {areaLabel ? <><span className={status === 'loading' ? 'checking' : undefined} aria-live="polite">{status === 'loading' ? fill(w['meter.checking'], { area: areaLabel }) : status === 'error' ? fill(w['meter.error'], { area: areaLabel }) : meterLine(w, areaLabel, meter)}</span><button type="button" className="link" onClick={onPickArea}>{w['meter.change']}</button></>
           : <button type="button" className="link" onClick={onPickArea}>{w['meter.pick']}</button>}
       </div>
     </div>
   );
 }
 
-export function FrontDoor({ w, areas, driversHref, quotes, onParents, onArea, day, area, meter }: {
+export function FrontDoor({ w, areas, driversHref, quotes, onParents, onArea, day, area, meter, meterStatus }: {
   w: Words; areas: Area[]; driversHref: string; quotes: { parent: Quote; driver: Quote };
   onParents: (area: AreaId | null) => void;
   /** v19: pick an area without starting the story (from the area line under the day dial). */
   onArea: (area: AreaId | null) => void;
   day: { min: number | null; night: boolean; nowMin: number | null; onDay: (m: number) => void };
-  area: AreaId | null; meter: AreaMeter | undefined;
+  area: AreaId | null; meter: AreaMeter | undefined; meterStatus: SummaryStatus;
 }) {
   // the area question opens either to start the story ('story') or only to set your area ('area')
   const [asking, setAsking] = useState<false | 'story' | 'area'>(false);
-  const sheet = useRef<HTMLDivElement>(null);
+  const sheet = useRef<HTMLDivElement>(null), opener = useRef<HTMLElement | null>(null);
+  // a real dialog: focus moves in, Tab stays inside, Escape closes, and focus returns to the button that opened it
   useEffect(() => {
     if (!asking) return;
-    sheet.current?.querySelector<HTMLElement>('button')?.focus();
-    const esc = (e: KeyboardEvent) => { if (e.key === 'Escape') setAsking(false); };
-    addEventListener('keydown', esc); return () => removeEventListener('keydown', esc);
+    opener.current = document.activeElement as HTMLElement | null;
+    const box = sheet.current;
+    (box?.querySelector<HTMLElement>('[aria-current="true"]') ?? box?.querySelector<HTMLElement>('button'))?.focus();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setAsking(false); return; }
+      if (e.key !== 'Tab' || !box) return;
+      const all = [...box.querySelectorAll<HTMLElement>('button, a[href]')]; const first = all[0], last = all[all.length - 1];
+      if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last?.focus(); }
+      else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first?.focus(); }
+    };
+    addEventListener('keydown', key);
+    return () => { removeEventListener('keydown', key); opener.current?.focus({ preventScroll: true }); };
   }, [asking]);
   const pick = (a: AreaId | null) => { const mode = asking; setAsking(false); if (mode === 'area') onArea(a); else onParents(a); };
   const areaLabel = area ? areas.find((x) => x.id === area)?.label ?? null : null;
@@ -104,16 +116,16 @@ export function FrontDoor({ w, areas, driversHref, quotes, onParents, onArea, da
         {panel('parent', quotes.parent, <button type="button" className="btn" onClick={() => setAsking('story')} aria-haspopup="dialog">{w['door.parent.go']}<Arrow /></button>)}
         {panel('driver', quotes.driver, <a className="btn ghost" href={driversHref}>{w['door.driver.go']}<Arrow /></a>)}
       </div>
-      <DayStrip w={w} min={day.min} night={day.night} nowMin={day.nowMin} onDay={day.onDay} areaLabel={areaLabel} meter={meter} onPickArea={() => setAsking('area')} />
-      {asking && (
+      <DayStrip w={w} min={day.min} night={day.night} nowMin={day.nowMin} onDay={day.onDay} areaLabel={areaLabel} meter={meter} status={meterStatus} onPickArea={() => setAsking('area')} />
+      {asking && createPortal(
         <div className="area-sheet" role="dialog" aria-modal="true" aria-labelledby="area-q" ref={sheet} onClick={(e) => { if (e.target === e.currentTarget) setAsking(false); }}>
           <div className="area-card">
             <h2 id="area-q">{w['area.q']}</h2>
             <p>{w['area.p']}</p>
-            <div className="area-list">{areas.filter((a) => a.id !== 'other').map((a) => <button key={a.id} type="button" onClick={() => pick(a.id)} data-area={a.id}>{a.label}</button>)}</div>
+            <div className="area-list">{areas.filter((a) => a.id !== 'other').map((a) => <button key={a.id} type="button" onClick={() => pick(a.id)} data-area={a.id} aria-current={a.id === area ? 'true' : undefined}>{a.label}</button>)}</div>
             <button type="button" className="link" onClick={() => pick(null)}>{w['area.skip']}<Arrow /></button>
           </div>
-        </div>
+        </div>, sheet.current?.closest('.v16') ?? document.querySelector('.v16') ?? document.body,
       )}
     </div>
   );
