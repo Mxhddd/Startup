@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { handle, type Deps } from './handler.ts';
+import { handle, jwtAal, type Deps } from './handler.ts';
 import { hashToken, isInviteToken, newInviteToken } from './tokens.ts';
 
 const DRIVER = '0b1c2d3e-4f50-4617-8899-aabbccddeeff';
@@ -9,7 +9,8 @@ const VAN = 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee';
 
 function setup(rpcResult: { data?: unknown; error?: { message: string } | null } = {}) {
   const logs: string[] = [];
-  const rpc = vi.fn(async (_fn: string, _args?: Record<string, unknown>): Promise<{ data: unknown; error: { message: string } | null }> => ({ data: rpcResult.data ?? null, error: rpcResult.error ?? null }));
+  const rpc = vi.fn(async (fn: string, _args?: Record<string, unknown>): Promise<{ data: unknown; error: { message: string } | null }> =>
+    fn === 'rate_hit' ? { data: true, error: null } : { data: rpcResult.data ?? null, error: rpcResult.error ?? null });
   const deps: Deps = {
     userFromToken: async (jwt) => (jwt === 'good-token' ? DRIVER : null),
     rpc,
@@ -249,5 +250,31 @@ describe('leaving a van', () => {
     expect(args.p_token_hash).not.toContain(token);
     expect(logs.join(' ')).not.toContain(token);
     expect((await setup().post('invite.peek', { token: 'short' })).status).toBe(400);
+  });
+});
+
+describe('v20 security in the app function', () => {
+  const tok = (aal: string) => `x.${btoa(JSON.stringify({ sub: 'u', aal })).replace(/=+$/, '')}.y`;
+  const make = (rate: unknown) => {
+    const rpc = vi.fn(async (fn: string) => (fn === 'rate_hit' ? { data: rate, error: null } : { data: null, error: null }));
+    const deps: Deps = { userFromToken: async () => 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', rpc, siteUrl: 'https://pohnch.pk', log: () => {} };
+    const post = (action: string, token: string, body: unknown = {}) => handle(new Request(`https://x/functions/v1/app/${action}`, { method: 'POST', headers: { authorization: `Bearer ${token}` }, body: JSON.stringify(body) }), deps);
+    return { rpc, post };
+  };
+  it('reads the login step from the token', () => {
+    expect(jwtAal(tok('aal2'))).toBe('aal2');
+    expect(jwtAal('not-a-token')).toBe(null);
+  });
+  it('refuses team actions from a session without the authenticator step', async () => {
+    const { post, rpc } = make(true);
+    const r = await post('admin.switchOff', tok('aal1'), { vanId: 'aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee', off: true });
+    expect(r.status).toBe(403);
+    expect(await r.json()).toEqual({ error: 'needs_second_step' });
+    expect(rpc).not.toHaveBeenCalled();
+  });
+  it('lets the sensitive actions wait when the rate limit cannot be checked, but not a tap', async () => {
+    const { post } = make(null);
+    expect((await post('family.add', tok('aal1'), { phone: '03001234567' })).status).toBe(503);
+    expect((await post('tap', tok('aal1'), {})).status).not.toBe(503);
   });
 });

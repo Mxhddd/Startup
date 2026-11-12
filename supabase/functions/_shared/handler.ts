@@ -259,6 +259,21 @@ export const LIMITS: Record<string, [max: number, windowS: number]> = {
   'run.change': [20, DAY], 'admin.notice': [30, DAY], 'run_absence.set': [60, HOUR], 'trip.seatCheck': [40, HOUR],
 };
 
+/** Actions that must not run when the rate limit can't be checked. */
+const STRICT = /^(invite\.|family\.add|admin\.|account\.delete)/;
+
+/** The login step a token reached ('aal1' phone code, 'aal2' plus authenticator). The token itself was
+ *  already checked by userFromToken, so its payload can be read here. */
+export function jwtAal(jwt: string): string | null {
+  try {
+    const part = jwt.split('.')[1] ?? '';
+    const json = JSON.parse(atob(part.replace(/-/g, '+').replace(/_/g, '/').padEnd(Math.ceil(part.length / 4) * 4, '='))) as { aal?: string };
+    return typeof json.aal === 'string' ? json.aal : null;
+  } catch {
+    return null;
+  }
+}
+
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
 
@@ -278,6 +293,8 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
   const jwt = auth.startsWith('Bearer ') ? auth.slice(7) : '';
   const actor = jwt ? await deps.userFromToken(jwt) : null;
   if (!actor) return done(401, { error: 'not_logged_in' });
+  // v20 security: team actions need a session that passed the second login step (authenticator app).
+  if (name.startsWith('admin.') && jwtAal(jwt) !== 'aal2') return done(403, { error: 'needs_second_step' });
 
   let body: Body;
   try {
@@ -288,11 +305,13 @@ export async function handle(req: Request, deps: Deps): Promise<Response> {
     return done(400, { error: 'bad_json' });
   }
 
-  // Rate limit (counted in the database, per person and action). If the check itself fails we let the
-  // call through: a driver's tap matters more than the limit.
+  // Rate limit (counted in the database, per person and action). If the check itself fails we let a
+  // driver's tap through (it matters more than the limit), but not the sensitive actions: inviting,
+  // adding family by phone number and team actions wait until the limit can be checked (v20).
   const [max, windowS] = LIMITS[name] ?? [300, HOUR];
-  const limit = await deps.rpc('rate_hit', { p_actor: actor, p_bucket: name, p_max: max, p_window_s: windowS }).catch(() => ({ data: true, error: null }));
+  const limit = await deps.rpc('rate_hit', { p_actor: actor, p_bucket: name, p_max: max, p_window_s: windowS }).catch(() => ({ data: null, error: { message: 'unreachable' } }));
   if (limit.data === false) return done(429, { error: 'too_many' });
+  if (limit.data !== true && STRICT.test(name)) return done(503, { error: 'try_again' });
 
   try {
     return done(200, await action({ actor, body, deps }));

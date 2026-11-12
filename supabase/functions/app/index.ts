@@ -1,7 +1,7 @@
 // Deno entry for the "app" Edge Function. Deploy: supabase functions deploy app
 // Secrets it needs (Supabase sets the first three itself): SUPABASE_URL, SUPABASE_ANON_KEY,
 // SUPABASE_SERVICE_ROLE_KEY, SITE_URL (https://pohnch.pk), and EXPO_ACCESS_TOKEN (for pushes).
-import { createClient } from 'npm:@supabase/supabase-js@2';
+import { createClient } from 'npm:@supabase/supabase-js@2.118.0';
 import { handle } from '../_shared/handler.ts';
 import { notifyDayOff, notifyDriver, notifyNotice, notifyTrip } from '../_shared/notify.ts';
 import { updateLiveActivities, type ApnsConfig } from '../_shared/liveActivity.ts';

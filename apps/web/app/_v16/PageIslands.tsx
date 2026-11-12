@@ -10,6 +10,7 @@ import { JoinForm, WaitingMap, useSummary } from './Panel';
 import { useCountUp } from './delight';
 import { meterParts } from './areaMeter';
 import { sendInterest } from '../_lib/interest';
+import { Turnstile } from '../_lib/Turnstile';
 import type { Words } from './Phone';
 
 export function DriverIslands({ lang, w, part }: { lang: Lang; w: Words; part: 'demos' | 'join' }) {
@@ -66,14 +67,16 @@ export function ProgressIsland({ lang, w }: { lang: Lang; w: Words }) {
 /* ---------------- v18: For schools (interest only) ---------------- */
 export function SchoolForm({ lang, w }: { lang: Lang; w: Words }) {
   const [name, setName] = useState(''), [area, setArea] = useState(''), [wa, setWa] = useState(''), [trap, setTrap] = useState('');
-  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error' | 'human'>('idle');
   const [field, setField] = useState<string | null>(null);
+  const [human, setHuman] = useState(''), [round, setRound] = useState(0);
   async function submit(e: React.FormEvent) {
     e.preventDefault(); if (state === 'sending') return;
     const c = checkInterest({ role: 'school', area, school: name, whatsapp: wa });
     if (!c.ok) { setField(c.field); return; }
     setField(null); setState('sending');
-    setState((await sendInterest(c.value, lang, trap)) ? 'sent' : 'error');
+    const r = await sendInterest(c.value, lang, trap, human);
+    setState(r === 'ok' ? 'sent' : r); if (r !== 'ok') setRound((n) => n + 1);
   }
   if (state === 'sent') return <div className="joined" role="status" data-testid="school-sent"><h3>{w['sch.sent']}</h3></div>;
   const err = field === 'school' ? w['sch.needName'] : field === 'whatsapp' ? (wa ? w['join.badPhone'] : w['sch.needWa']) : field === 'area' ? w['join.needArea'] : field ? w['join.err'] : null;
@@ -88,7 +91,8 @@ export function SchoolForm({ lang, w }: { lang: Lang; w: Words }) {
       </label>
       <label className="fld"><span>{w['sch.wa']}</span><input value={wa} onChange={(e) => setWa(e.target.value)} inputMode="tel" autoComplete="tel" dir="ltr" placeholder="03XX XXXXXXX" aria-invalid={field === 'whatsapp'} data-testid="school-wa" /></label>
       <div className="trap" inert><label>Website<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label></div>
-      <p className="msg" role="alert" aria-live="assertive">{state === 'error' ? <>{w['join.err']} <a href={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} rel="noreferrer">WhatsApp</a></> : err}</p>
+      <Turnstile lang={lang} onToken={setHuman} round={round} />
+      <p className="msg" role="alert" aria-live="assertive">{state === 'error' ? <>{w['join.err']} <a href={`https://wa.me/${PILOT_WHATSAPP.waNumber}`} rel="noreferrer">WhatsApp</a></> : state === 'human' ? w['join.human'] : err}</p>
       <div><button className="pill btn" type="submit" disabled={state === 'sending'} data-testid="school-send">{state === 'sending' ? w['join.sending'] : w['sch.send']}</button></div>
     </form>
   );

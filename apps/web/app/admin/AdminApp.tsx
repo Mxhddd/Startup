@@ -1,11 +1,15 @@
 'use client';
 // The admin page in the browser: team login (phone + code), then the pilot's numbers, the driver
 // check queue, all vans (switch off / on) and today's trips. Refreshes every 30 seconds.
+// v20 security: the login is two steps. The phone code (behind Cloudflare's bot check, and only for existing
+// accounts), then a code from an authenticator app (Supabase MFA, TOTP). The database refuses team data to a
+// session without the second step, so this page only asks for it; it can't skip it.
 import { ageParts, createAppApi, displayPkMobile, normalisePkMobile } from '@pohnch/core';
 import { dirOf, t as tr, type Lang, type MessageKey, type Vars } from '@pohnch/messages';
 import { colors, shadow } from '@pohnch/ui/theme';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
+import { Turnstile } from '../_lib/Turnstile';
 
 type Stats = { days: number; trips: number; tripsTracked: number; familiesActive: number; familiesWithAlerts: number; alertsSent: number; alertsFailed: number };
 type VanRow = { van_id: string; van_name: string; school_name: string; plate: string | null; driver_name: string; driver_phone: string | null; verified_at: string | null; switched_off_at: string | null; riders: number; waiting: number };
@@ -16,7 +20,7 @@ const card: CSSProperties = { background: colors.white, borderRadius: 22, paddin
 const btn = (bg: string, fg: string): CSSProperties => ({ background: bg, color: fg, border: 'none', borderRadius: 14, padding: '12px 18px', fontWeight: 700, fontSize: 16, cursor: 'pointer', minHeight: 44, boxShadow: bg === colors.white ? shadow.card : 'none', fontFamily: 'inherit' });
 const pct = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 100) : 0);
 
-export function AdminApp({ url, anonKey }: { url: string; anonKey: string }) {
+export function AdminApp({ url, anonKey, turnstileKey = '' }: { url: string; anonKey: string; turnstileKey?: string }) {
   const [lang, setLang] = useState<Lang>('ur');
   const t = useCallback((k: MessageKey, v?: Vars) => tr(lang, k, v), [lang]);
   const supabase = useMemo<SupabaseClient | null>(() => (url && anonKey ? createClient(url, anonKey) : null), [url, anonKey]);
@@ -54,7 +58,7 @@ export function AdminApp({ url, anonKey }: { url: string; anonKey: string }) {
         ) : session === undefined ? (
           <p>{t('common.loading')}</p>
         ) : !session ? (
-          <Login supabase={supabase} t={t} />
+          <Login supabase={supabase} t={t} lang={lang} turnstileKey={turnstileKey} />
         ) : (
           <Gate supabase={supabase} session={session} url={url} t={t} />
         )}
@@ -63,7 +67,8 @@ export function AdminApp({ url, anonKey }: { url: string; anonKey: string }) {
   );
 }
 
-function Login({ supabase, t }: { supabase: SupabaseClient; t: (k: MessageKey, v?: Vars) => string }) {
+function Login({ supabase, t, lang, turnstileKey }: { supabase: SupabaseClient; t: (k: MessageKey, v?: Vars) => string; lang: Lang; turnstileKey: string }) {
+  const [human, setHuman] = useState(''), [round, setRound] = useState(0);
   const [phone, setPhone] = useState('');
   const [sent, setSent] = useState<string | null>(null);
   const [code, setCode] = useState('');
@@ -72,7 +77,9 @@ function Login({ supabase, t }: { supabase: SupabaseClient; t: (k: MessageKey, v
   const send = async () => {
     const e164 = normalisePkMobile(phone);
     if (!e164) return setError(t('error.phone'));
-    const { error: err } = await supabase.auth.signInWithOtp({ phone: e164 });
+    // only existing team accounts get a code (the page never creates accounts); the bot check's token goes along
+    const { error: err } = await supabase.auth.signInWithOtp({ phone: e164, options: { shouldCreateUser: false, ...(human ? { captchaToken: human } : {}) } });
+    setRound((n) => n + 1);
     if (err) return setError(t('error.generic'));
     setError(null);
     setSent(e164);
@@ -88,6 +95,7 @@ function Login({ supabase, t }: { supabase: SupabaseClient; t: (k: MessageKey, v
         <>
           <label htmlFor="phone">{t('login.phone.label')}</label>
           <input id="phone" inputMode="tel" autoComplete="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="03xx xxxxxxx" style={input} />
+          <Turnstile siteKey={turnstileKey} lang={lang} onToken={setHuman} round={round} />
           <button type="button" style={btn(colors.neel, colors.ghee)} onClick={send}>{t('login.send')}</button>
         </>
       ) : (
@@ -110,7 +118,56 @@ function Gate(props: { supabase: SupabaseClient; session: Session; url: string; 
   }, [props.supabase, props.session.user.id]);
   if (isAdmin === undefined) return <p>{props.t('common.loading')}</p>;
   if (!isAdmin) return <p data-testid="not-allowed" style={{ ...card }}>{props.t('admin.notAllowed')}</p>;
-  return <Dashboard {...props} />;
+  return <SecondStep {...props} />;
+}
+
+/** The second login step: a 6-digit code from an authenticator app. The first time, the page shows a QR code
+ *  to add Pohnch to the app (Google Authenticator, Microsoft Authenticator, 1Password...). */
+function SecondStep(props: { supabase: SupabaseClient; session: Session; url: string; t: (k: MessageKey, v?: Vars) => string }) {
+  const { supabase, t } = props;
+  const [level, setLevel] = useState<string | null>(null);
+  const [factor, setFactor] = useState<{ id: string; qr?: string; secret?: string } | null>(null);
+  const [code, setCode] = useState(''), [error, setError] = useState<string | null>(null);
+  useEffect(() => {
+    (async () => {
+      const aal = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      setLevel(aal.data?.currentLevel ?? 'aal1');
+      if (aal.data?.currentLevel === 'aal2') return;
+      const list = await supabase.auth.mfa.listFactors();
+      const ready = list.data?.totp?.find((f) => f.status === 'verified');
+      if (ready) return setFactor({ id: ready.id });
+      // start afresh: remove half-finished set-ups, then show a new QR code
+      for (const f of list.data?.all ?? []) if (f.status !== 'verified') await supabase.auth.mfa.unenroll({ factorId: f.id });
+      const en = await supabase.auth.mfa.enroll({ factorType: 'totp', friendlyName: 'Pohnch team' });
+      if (en.error || !en.data) return setError(t('error.generic'));
+      setFactor({ id: en.data.id, qr: en.data.totp.qr_code, secret: en.data.totp.secret });
+    })().catch(() => setError(t('error.generic')));
+  }, [supabase, t]);
+  const verify = async () => {
+    if (!factor) return;
+    const { error: err } = await supabase.auth.mfa.challengeAndVerify({ factorId: factor.id, code });
+    if (err) { setError(t('admin.mfa.bad')); return; }
+    setError(null); setLevel('aal2');
+  };
+  if (level === 'aal2') return <Dashboard {...props} />;
+  if (!level) return <p>{t('common.loading')}</p>;
+  const input: CSSProperties = { fontSize: 20, padding: '12px 14px', borderRadius: 12, border: `2px solid ${colors.siyahi}`, fontFamily: 'var(--font-latin), sans-serif', direction: 'ltr', letterSpacing: '.2em' };
+  return (
+    <section style={{ ...card, maxWidth: 460, display: 'grid', gap: 12 }} data-testid="admin-mfa">
+      <h2 style={{ margin: 0 }}>{t('admin.mfa.title')}</h2>
+      {factor?.qr ? (
+        <>
+          <p style={{ margin: 0 }}>{t('admin.mfa.enrol')}</p>
+          <img src={factor.qr} alt={t('admin.mfa.qrAlt')} width={200} height={200} style={{ background: '#fff', borderRadius: 12, padding: 8, justifySelf: 'start' }} />
+          <p style={{ margin: 0, fontSize: 14, color: colors.ink2 }}>{t('admin.mfa.manual')} <code style={{ fontFamily: 'var(--font-latin), monospace', direction: 'ltr', unicodeBidi: 'isolate', wordBreak: 'break-all' }}>{factor.secret}</code></p>
+        </>
+      ) : <p style={{ margin: 0 }}>{t('admin.mfa.ask')}</p>}
+      <label htmlFor="totp">{t('admin.mfa.code')}</label>
+      <input id="totp" inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))} style={input} />
+      <button type="button" style={btn(colors.neel, colors.ghee)} onClick={verify} disabled={!factor || code.length !== 6}>{t('admin.mfa.verify')}</button>
+      {error ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{error}</p> : null}
+    </section>
+  );
 }
 
 function Stat({ label, value, sub, testId }: { label: string; value: ReactNode; sub?: ReactNode; testId: string }) {

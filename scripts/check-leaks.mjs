@@ -71,6 +71,12 @@ for (const f of tracked) {
 }
 
 // ---------------------------------------------------------------- 3. bundles
+// v20: a NEXT_PUBLIC_ variable is shipped to every browser, so its name must never suggest a secret.
+for (const file of SOURCE_DIRS.flatMap((d) => walk(d, isCode)).concat([join(root, 'apps/web/next.config.ts'), join(root, '.env.example')].filter((f) => { try { return statSync(f).isFile(); } catch { return false; } }))) {
+  const src = readFileSync(file, 'utf8');
+  for (const m of src.matchAll(/NEXT_PUBLIC_[A-Z0-9_]*(SECRET|SERVICE|PRIVATE|PASSWORD)[A-Z0-9_]*/g)) problems.push(`${relative(root, file)}: ${m[0]} would be sent to every browser`);
+}
+
 const SECRET_PATTERNS = [
   [/service_role/, 'the words service_role'],
   [/c2VydmljZV9yb2xl/, 'a service-role JWT (base64 of "service_role")'],

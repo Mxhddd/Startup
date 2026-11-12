@@ -5,7 +5,7 @@ import { colors } from '@pohnch/ui/theme';
 import { displayFont, latinFont, urduFont } from './fonts';
 import './globals.css';
 import { SITE } from './_lib/site';
-import { Analytics } from '@vercel/analytics/next';
+import { SafeAnalytics } from './_lib/SafeAnalytics';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -21,7 +21,7 @@ export const viewport: Viewport = { themeColor: '#FAF6EE' };
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${urduFont.variable} ${latinFont.variable} ${displayFont.variable}`}>
-      <body style={{ margin: 0, background: colors.ghee, ['--focus' as string]: colors.kesar }}>{children}<Analytics /></body>
+      <body style={{ margin: 0, background: colors.ghee, ['--focus' as string]: colors.kesar }}>{children}<SafeAnalytics /></body>
     </html>
   );
 }

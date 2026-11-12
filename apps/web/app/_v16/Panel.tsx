@@ -8,6 +8,7 @@ import qrcode from 'qrcode-generator';
 import { checkInterest, type AreaId, type AreaMeter } from '@pohnch/core';
 import { fetchSummary, LOADING_SUMMARY, sendInterest, type Summary } from '../_lib/interest';
 import { meterLine } from './areaMeter';
+import { Turnstile } from '../_lib/Turnstile';
 
 export type Words = Record<string, string>;
 export type Area = { id: AreaId; label: string; spot: [number, number] | null };
@@ -31,8 +32,9 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
   const [driverPhone, setDriverPhone] = useState<'yes' | 'no' | 'unknown'>('unknown');
   const [whatsapp, setWhatsapp] = useState('');
   const [trap, setTrap] = useState('');
-  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error' | 'human'>('idle');
   const [field, setField] = useState<string | null>(null);
+  const [human, setHuman] = useState(''), [round, setRound] = useState(0);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -40,9 +42,9 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
     const checked = checkInterest({ role, area, school, kids, driverPhone, whatsapp });
     if (!checked.ok) { setField(checked.field); return; }
     setField(null); setState('sending');
-    const ok = await sendInterest(checked.value, lang, trap);
-    setState(ok ? 'sent' : 'error');
-    if (ok) onJoined(checked.value.area);
+    const r = await sendInterest(checked.value, lang, trap, human);
+    setState(r === 'ok' ? 'sent' : r);
+    if (r === 'ok') onJoined(checked.value.area); else setRound((n) => n + 1);
   }
 
   if (state === 'sent') {
@@ -101,9 +103,10 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
         <small id={`${id}-wa`}>{w['join.waNote']}</small>
       </label>
       <div className="trap" inert><label>website<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label></div>
+      <Turnstile lang={lang} onToken={setHuman} round={round} />
       <div className="send">
         <button className="pill" type="submit" disabled={state === 'sending'} data-testid="join-send">{state === 'sending' ? w['join.sending'] : w['join.send']}</button>
-        <p className="msg" id={`${id}-msg`} role="alert" aria-live="assertive">{state === 'error' ? <>{w['join.err']} <a href={wa} rel="noreferrer">WhatsApp</a></> : err}</p>
+        <p className="msg" id={`${id}-msg`} role="alert" aria-live="assertive">{state === 'error' ? <>{w['join.err']} <a href={wa} rel="noreferrer">WhatsApp</a></> : state === 'human' ? w['join.human'] : err}</p>
       </div>
     </form>
   );

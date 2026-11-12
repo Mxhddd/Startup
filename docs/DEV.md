@@ -64,7 +64,7 @@ Everything about the database, its security rules and the Edge Functions is expl
    The website's "Join the pilot" form uses a third, public function: `pnpm dlx supabase functions deploy interest --no-verify-jwt --use-api` (it holds the service key; sign-ups land in `pilot_interest`, readable only by the Pohnch team on /admin).
 5. `pnpm dlx supabase secrets set SITE_URL=https://pohnch.pk SMS_GATEWAY_URL=... SMS_GATEWAY_KEY=...`
 6. Dashboard > Authentication > Sign In / Providers > Phone: on. Authentication > Hooks > Send SMS: HTTPS, the `send-sms` function's URL; copy the secret it shows into `supabase secrets set SEND_SMS_HOOK_SECRET=...`.
-7. For trying it before the gateway exists: Authentication > Phone > "Test phone numbers": add your number with a fixed code.
+7. For trying it before the gateway exists: Authentication > Phone > "Test phone numbers": add your number with a random fixed code (never 123456, never written in the repo). An admin also needs the authenticator step (v20).
 8. Put the project URL and anon key in `.env` as `EXPO_PUBLIC_SUPABASE_URL` and `EXPO_PUBLIC_SUPABASE_ANON_KEY`. From then on, both apps start at the login screen.
 9. Make yourself the team: in the SQL editor, `insert into admins values ('<your user id>');` (your id is under Authentication > Users after you first log in).
 
@@ -186,7 +186,7 @@ The 30-day position cleanup is now tested (`070`), and a whole school day runs a
 ## The live project (set up 3 November 2026)
 
 - Supabase project **Pohonch** (`vsyunieszswpreogzolx`). The 9 migrations were applied through Supabase's Management API (this cloud session can't reach the database port directly) and recorded in `supabase_migrations.schema_migrations`, so `supabase db push` from a laptop stays in step. Both Edge Functions are deployed with `--use-api`.
-- Phone login: on, codes through the `send-sms` hook (secret set; no gateway yet), test numbers 0300 0000001 and 0300 0000002 with code 123456. Rate limits as in `config.toml`.
+- Phone login: on, codes through the `send-sms` hook (secret set; no gateway yet), test numbers 0300 0000001 and 0300 0000002 (their code is kept out of the repo: see docs/PILOT.md). Rate limits as in `config.toml`.
 - Expo: parent app = `@pohonch/pohonch`, driver app = `@pohonch/pohnch-driver`; the Supabase URL and anon key are EAS environment variables (development, preview, production).
 - Android builds: `cd apps/driver && pnpm dlx eas-cli build -p android --profile preview` (and the same in `apps/parent`); the build page gives an install link.
 - Pilot operations: `docs/PILOT.md`. Store texts: `docs/STORE.md`.

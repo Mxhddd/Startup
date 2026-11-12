@@ -16,14 +16,15 @@ export type SummaryStatus = 'loading' | 'ready' | 'error';
 export type Summary = { areas: Record<string, number>; meter: Record<string, AreaMeter>; proof: { vans: number; trips: number; alerts: number } | null; status: SummaryStatus };
 export const LOADING_SUMMARY: Summary = { areas: {}, meter: {}, proof: null, status: 'loading' };
 
-/** Sends the join form. Resolves true when the server saved it. The hidden field `website` is the bot trap. */
-export async function sendInterest(value: Interest, lang: 'ur' | 'en', website: string): Promise<boolean> {
+/** Sends the join form: 'ok' when the server saved it, 'human' when the bot check (Turnstile) didn't pass,
+ *  'error' otherwise. The hidden field `website` is the bot trap; `turnstile` is the bot check's token. */
+export async function sendInterest(value: Interest, lang: 'ur' | 'en', website: string, turnstile = ''): Promise<'ok' | 'human' | 'error'> {
   const url = base();
   try {
-    const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: 'join', lang, website, ...value }) });
-    return res.ok;
+    const res = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: 'join', lang, website, turnstile, ...value }) });
+    return res.ok ? 'ok' : res.status === 403 ? 'human' : 'error';
   } catch {
-    return false;
+    return 'error';
   }
 }
 

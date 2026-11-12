@@ -1546,5 +1546,14 @@
   "web.drh.h": "Everything drivers ask, in one place.",
   "web.drh.try": "Try the button",
   "web.drh.how": "How to start",
-  "web.drh.faq": "Questions"
+  "web.drh.faq": "Questions",
+  "admin.mfa.title": "Second step",
+  "admin.mfa.enrol": "Scan this with an authenticator app (Google Authenticator, Microsoft Authenticator or 1Password), then type the 6-digit code it shows. You do this once.",
+  "admin.mfa.qrAlt": "QR code to add Pohnch to your authenticator app",
+  "admin.mfa.manual": "Can’t scan? Type this key into the app:",
+  "admin.mfa.ask": "Open your authenticator app and type the 6-digit code for Pohnch.",
+  "admin.mfa.code": "Code from your authenticator app",
+  "admin.mfa.verify": "Continue",
+  "admin.mfa.bad": "That code didn’t work. Type the newest one from the app.",
+  "web.join.human": "The safety check didn’t finish. Wait a moment, then send again."
 }

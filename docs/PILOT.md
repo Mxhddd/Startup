@@ -13,7 +13,7 @@ Everything for running the pilot day to day: installing, the first practice run 
 | Maps | OpenFreeMap (free, no key) through MapLibre | Attribution shown on the map; consider a donation once the pilot runs |
 | Website and admin page | not deployed yet | needs a Vercel account (docs/DEV.md, B7) |
 
-### Test logins (code `123456`, valid until 30 June 2027)
+### Test logins (valid until 30 June 2027; the code lives only in Play Console > App content > App access, not in this repo)
 
 | Number | Use it as |
 | --- | --- |
@@ -22,9 +22,9 @@ Everything for running the pilot day to day: installing, the first practice run 
 
 Both start empty (3 November 2026: the earlier demo van and child were deleted), so everything you see is what you made through the real screens. To try a whole trip: set up the van as 0300 0000001, share its link, join as 0300 0000002, approve, then mark the van verified (below).
 
-Test numbers have a fixed code, so they must never be a team admin and must be removed before real families join (Supabase > Authentication > Sign In / Providers > Phone > test numbers).
+Test numbers have a fixed code, so they must never be a team admin and must be removed before real families join (Supabase > Authentication > Sign In / Providers > Phone > test numbers). Their code is never written in this repo: give it only to Google Play's reviewers (Play Console > App content > App access), and change it if it leaks.
 
-**Your own admin login (until an SMS gateway is connected):** in the same place, add your own number with a 6-digit code only you know (it then works like a password). Log in once in the parent app, then in Supabase > SQL editor run:
+**Your own admin login (until an SMS gateway is connected):** in the same place, add your own number with a **random** 6-digit code only you know. Since v20 the team page also asks for a code from an authenticator app (Google Authenticator or similar) every time, and the database refuses team data without it, so this fixed code alone opens nothing. The first time you open pohnch.pk/admin it shows a QR code: scan it with the app. Log in once in the parent app, then in Supabase > SQL editor run:
 
 ```sql
 insert into admins select id from auth.users where phone = '92300XXXXXXX';

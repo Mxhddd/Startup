@@ -1,4 +1,5 @@
--- The live area meter (v19): bands and a status per area, never exact numbers; schools never counted;
+-- The live area meter (v19): bands and a status per area, never exact numbers; schools never counted; since v20
+-- only areas with 3 or more families appear at all;
 -- the rule matches areaMeter() in packages/core (same cases as its unit test).
 begin;
 select plan(9);
@@ -14,11 +15,11 @@ select public.interest_add('driver', 'malir', null, null, null, null, 'en', md5(
 select public.interest_add('driver', 'korangi', null, null, null, null, 'en', repeat('k', 64));
 select public.interest_add('school', 'korangi', 'Korangi School', null, null, '+923001112299', 'en', repeat('s', 64));
 
-select is(public.interest_summary() -> 'meter' -> 'gulshan', '{"f":"few","d":"none","s":"forming","m":"several"}'::jsonb, 'two families show as "a few", still forming');
+select is(public.interest_summary() -> 'meter' -> 'gulshan', null, 'two families: the area is not shown (v20: 3 or more only)');
 select is(public.interest_summary() -> 'meter' -> 'dha', '{"f":"3-9","d":"yes","s":"needs-families","m":"few"}'::jsonb, 'six families and a driver: needs a few more families');
 select is(public.interest_summary() -> 'meter' -> 'clifton', '{"f":"3-9","d":"none","s":"needs-driver","m":null}'::jsonb, 'eight families, no driver: needs a driver');
 select is(public.interest_summary() -> 'meter' -> 'malir', '{"f":"10+","d":"yes","s":"ready","m":null}'::jsonb, 'twelve families and drivers: ready');
-select is(public.interest_summary() -> 'meter' -> 'korangi', '{"f":null,"d":"yes","s":"needs-families","m":"several"}'::jsonb, 'a driver alone: needs families; the school is not counted');
+select is(public.interest_summary() -> 'meter' -> 'korangi', null, 'a driver alone (and a school) is not shown');
 select ok((public.interest_summary() -> 'meter')::text !~ '"(f|d)":\s*[0-9]', 'the meter carries no numbers');
 select is(public.interest_summary() -> 'areas' -> 'gulshan', null, 'the old exact counts still hide areas under 3');
 

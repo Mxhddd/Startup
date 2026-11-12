@@ -34,7 +34,20 @@ export async function verifyWebhook(secret: string, headers: Headers, body: stri
   if (!id || !ts || !sigs || !/^\d+$/.test(ts)) return false;
   if (Math.abs(nowSec - Number(ts)) > 300) return false;
   const expected = await webhookSignature(secret, id, ts, body);
-  return sigs.split(' ').some((s) => s.replace(/^v1,/, '') === expected);
+  return sigs.split(' ').some((s) => safeEqual(s.replace(/^v1,/, ''), expected));
+}
+
+/** Compares two strings in constant time (no early exit that would leak how much matched). */
+export function safeEqual(a: string, b: string): boolean {
+  let diff = a.length ^ b.length;
+  for (let i = 0; i < Math.max(a.length, b.length); i++) diff |= (a.charCodeAt(i) || 0) ^ (b.charCodeAt(i) || 0);
+  return diff === 0;
+}
+
+/** v20 security: codes go only to Pakistani mobile numbers (+92 3xx xxxxxxx). Anything else (premium-rate
+ *  numbers abroad, typical of SMS fraud) is refused before it costs anything. */
+export function isPkMobile(phone: string): boolean {
+  return /^\+?923\d{9}$/.test(phone);
 }
 
 export type SmsDeps = {
@@ -64,6 +77,10 @@ export async function handleSendSms(req: Request, deps: SmsDeps): Promise<Respon
   if (!phone || !/^\d{4,8}$/.test(code)) {
     deps.log('send-sms 400');
     return new Response(JSON.stringify({ error: 'bad_payload' }), { status: 400 });
+  }
+  if (!isPkMobile(phone)) {
+    deps.log('send-sms 422 not a Pakistani mobile');
+    return new Response(JSON.stringify({ error: 'unsupported_number' }), { status: 422 });
   }
   if (!deps.gatewayUrl || !deps.gatewayKey) {
     deps.log('send-sms 503 no gateway set');

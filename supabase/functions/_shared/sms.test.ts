@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { handleSendSms, smsText, verifyWebhook, webhookSignature } from './sms.ts';
+import { handleSendSms, isPkMobile, safeEqual, smsText, verifyWebhook, webhookSignature } from './sms.ts';
 
 const SECRET = 'v1,whsec_' + btoa('a-test-secret-of-some-length-123');
 const PHONE = '923001234567';
@@ -68,5 +68,19 @@ describe('login code SMS', () => {
     const { d } = deps();
     const res = await handleSendSms(await signed(payload), { ...d, gatewayUrl: '' });
     expect(res.status).toBe(503);
+  });
+});
+
+describe('v20 security in the SMS hook', () => {
+  it('sends codes only to Pakistani mobile numbers', () => {
+    expect(isPkMobile('+923001234567')).toBe(true);
+    expect(isPkMobile('923001234567')).toBe(true);
+    expect(isPkMobile('+447700900123')).toBe(false);
+    expect(isPkMobile('+92211234567')).toBe(false);
+  });
+  it('compares signatures without an early exit', () => {
+    expect(safeEqual('abc', 'abc')).toBe(true);
+    expect(safeEqual('abc', 'abd')).toBe(false);
+    expect(safeEqual('abc', 'abcd')).toBe(false);
   });
 });

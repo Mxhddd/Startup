@@ -1,6 +1,6 @@
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AREA_IDS as CORE_AREAS, checkInterest as coreCheck } from '../../../packages/core/src/interest';
-import { AREA_IDS, checkInterest, handleInterest, type InterestDeps } from './interest.ts';
+import { AREA_IDS, checkInterest, handleInterest, resetInterestCaches, visitorIp, type InterestDeps } from './interest.ts';
 
 const deps = (data: unknown = 'ok') => {
   const rpc = vi.fn(async () => ({ data, error: null })) as unknown as InterestDeps['rpc'] & ReturnType<typeof vi.fn>;
@@ -10,6 +10,7 @@ const H = (o: Record<string, string> = {}) => new Headers({ origin: 'https://www
 const post = (body: unknown, d = deps()) => handleInterest('POST', new URL('https://x/functions/v1/interest'), H(), JSON.stringify(body), d);
 
 describe('interest function', () => {
+  beforeEach(() => resetInterestCaches());
   it('saves a parent sign-up with the IP hashed, never stored', async () => {
     const d = deps();
     const r = await post({ kind: 'join', role: 'parent', area: 'gulshan', school: 'City', kids: 2, driverPhone: 'yes', whatsapp: '0300 1234567', lang: 'ur' }, d);
@@ -52,5 +53,35 @@ describe('interest function', () => {
     expect([...AREA_IDS]).toEqual([...CORE_AREAS]);
     const cases = [{ role: 'school', area: 'dha', school: 'Bay View' }, { role: 'school', area: 'dha', whatsapp: '03001112233' }, { role: 'school', area: 'dha', school: 'Bay View', whatsapp: '03001112233' }, { role: 'parent', area: 'dha', kids: 9 }, { role: 'driver', area: 'malir', whatsapp: '0311-2223334' }, { role: 'parent', area: 'gulshan', whatsapp: '123' }, { role: 'x', area: 'dha' }, { role: 'parent', area: 'dha', school: '<b>' }];
     for (const c of cases) expect(checkInterest(c)).toEqual(coreCheck(c));
+  });
+});
+
+describe('v20 security in the interest function', () => {
+  beforeEach(() => resetInterestCaches());
+  const join = { kind: 'join', role: 'parent', area: 'gulshan', kids: 1 };
+  it("trusts Cloudflare's IP header over anything the visitor writes", () => {
+    expect(visitorIp(new Headers({ 'cf-connecting-ip': '5.6.7.8', 'x-forwarded-for': '1.1.1.1' }))).toBe('5.6.7.8');
+    expect(visitorIp(new Headers({}))).toBe('unknown');
+  });
+  it('needs a passed bot check once Turnstile is set up', async () => {
+    const d = { ...deps(), verifyHuman: vi.fn(async (t: string) => t === 'good') };
+    expect((await post(join, d)).status).toBe(403);
+    expect((await post({ ...join, turnstile: 'bad' }, d)).status).toBe(403);
+    expect((await post({ ...join, turnstile: 'good' }, d)).status).toBe(200);
+    expect(d.rpc).toHaveBeenCalledTimes(1);
+  });
+  it('tells a flood to wait when the hourly cap is reached', async () => {
+    expect((await post(join, deps('busy'))).status).toBe(503);
+  });
+  it('serves the summary from memory for 5 minutes', async () => {
+    let t = 0; const d = { ...deps({ areas: {}, meter: {}, proof: null }), now: () => t };
+    const get = () => handleInterest('GET', new URL('https://x/interest?summary=1'), H(), '', d);
+    await get(); await get(); t += 6 * 60 * 1000; await get();
+    expect(d.rpc).toHaveBeenCalledTimes(2);
+  });
+  it('counts at most 12 honest-answer openings an hour from one place', async () => {
+    const d = deps(null);
+    for (let i = 0; i < 20; i++) await post({ kind: 'doubt', n: 2 }, d);
+    expect(d.rpc).toHaveBeenCalledTimes(12);
   });
 });

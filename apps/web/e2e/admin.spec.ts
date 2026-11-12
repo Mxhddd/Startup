@@ -4,15 +4,18 @@ import { expect, test, type BrowserContext } from '@playwright/test';
 const SB = 'http://127.0.0.1:9';
 const USER = '00000000-0000-4000-8000-0000000000aa';
 const b64 = (o: unknown) => Buffer.from(JSON.stringify(o)).toString('base64url');
-const jwt = `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub: USER, role: 'authenticated', exp: Math.floor(Date.now() / 1000) + 3600 })}.sig`;
-const session = { access_token: jwt, refresh_token: 'r', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user: { id: USER, aud: 'authenticated', role: 'authenticated' } };
+// v20: a team session that passed the second login step (authenticator app) carries aal2; tokenFor('aal1')
+// is a session with only the phone code.
+const tokenFor = (aal: string) => `${b64({ alg: 'HS256', typ: 'JWT' })}.${b64({ sub: USER, role: 'authenticated', aal, amr: [{ method: aal === 'aal2' ? 'totp' : 'otp', timestamp: 1 }], exp: Math.floor(Date.now() / 1000) + 3600 })}.sig`;
+const sessionFor = (aal: string) => ({ access_token: tokenFor(aal), refresh_token: 'r', token_type: 'bearer', expires_in: 3600, expires_at: Math.floor(Date.now() / 1000) + 3600, user: { id: USER, aud: 'authenticated', role: 'authenticated', factors: [] } });
+const session = sessionFor('aal2');
 
 const notices: unknown[] = [];
 
-async function fakeSupabase(ctx: BrowserContext, opts: { loggedIn: boolean; admin: boolean }) {
+async function fakeSupabase(ctx: BrowserContext, opts: { loggedIn: boolean; admin: boolean; oneStep?: boolean }) {
   const calls: string[] = [];
   notices.length = 0;
-  if (opts.loggedIn) await ctx.addInitScript((s) => localStorage.setItem('sb-127-auth-token', JSON.stringify(s)), session);
+  if (opts.loggedIn) await ctx.addInitScript((s) => localStorage.setItem('sb-127-auth-token', JSON.stringify(s)), opts.oneStep ? sessionFor('aal1') : session);
   await ctx.route(`${SB}/**`, async (route) => {
     const u = new URL(route.request().url());
     calls.push(u.pathname);
@@ -93,4 +96,12 @@ test('v12: vans over 50 km/h today, and a team notice to one van', async ({ cont
   await page.getByTestId('notice-send').click();
   await expect(page.getByRole('status')).toBeVisible();
   expect(notices).toEqual([{ vanId: 'v-ok', body: 'Road closed at Nipa today' }]);
+});
+
+test('v20: a team member with only the phone code is asked for the authenticator code, and sees no team data', async ({ context, page }) => {
+  const calls = await fakeSupabase(context, { loggedIn: true, admin: true, oneStep: true });
+  await page.goto('/admin');
+  await expect(page.getByTestId('admin-mfa')).toBeVisible();
+  await expect(page.getByTestId('admin-mfa')).toContainText('آتھنٹیکیٹر'); // the team page opens in Urdu
+  expect(calls.filter((c) => c.includes('/rpc/'))).toEqual([]);
 });

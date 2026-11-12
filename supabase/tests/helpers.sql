@@ -9,9 +9,17 @@ create or replace function tests.create_user(p_phone text) returns uuid language
 $$;
 
 -- Act as a logged-in user (what an app request with that user's token does).
+-- (v20) A session that passed the second login step (aal2), as every Pohnch team member's must; for anyone
+-- else it changes nothing. tests.as_user_one_step() is a session with only the phone code (aal1).
 create or replace function tests.as_user(p_uid uuid) returns void language plpgsql as $$
 begin
-  perform set_config('request.jwt.claims', json_build_object('sub', p_uid, 'role', 'authenticated')::text, true);
+  perform set_config('request.jwt.claims', json_build_object('sub', p_uid, 'role', 'authenticated', 'aal', 'aal2')::text, true);
+  perform set_config('role', 'authenticated', true);
+end $$;
+
+create or replace function tests.as_user_one_step(p_uid uuid) returns void language plpgsql as $$
+begin
+  perform set_config('request.jwt.claims', json_build_object('sub', p_uid, 'role', 'authenticated', 'aal', 'aal1')::text, true);
   perform set_config('role', 'authenticated', true);
 end $$;
 

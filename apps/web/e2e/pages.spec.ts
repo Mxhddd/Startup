@@ -61,6 +61,6 @@ test('sitemap and robots: both languages listed, admin and invites kept out', as
   expect(map).not.toContain('/en/');
   expect(map).not.toContain('/admin');
   const robots = await (await request.get('/robots.txt')).text();
-  expect(robots).toContain('Disallow: /admin');
+  expect(robots).not.toContain('/admin'); // v20: not pointed at; noindex headers keep it out of search
   expect(robots).toContain('Disallow: /i/');
 });
