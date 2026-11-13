@@ -6,7 +6,7 @@
 // Run from apps/web:  npx tsx ../../design/print/brochure/build.mts <outDir>
 import { readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { chamakTile, jhalarTile, roseSvg, svgUri, vineTile } from '../../../packages/ui/src/truckart.ts';
+import { chamakTile, jhalarTile, parrot, roseSvg, svgUri, vineTile } from '../../../packages/ui/src/truckart.ts';
 const require = createRequire(new URL('../../../apps/web/package.json', import.meta.url));
 const qrcode = require('qrcode-generator');
 const { chromium } = require('playwright');
@@ -31,8 +31,12 @@ const ICON: Record<string, string> = {
 };
 const ic = (n: string, c = '#1F2A5C') => `<svg class="ic" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">${ICON[n]}</svg>`;
 
-const step = (n: number, icon: string, ur: string, en: string) => `<li><span class="num">${n}</span><span class="sic">${ic(icon)}</span><div><b class="ur">${ur}</b><small>${en}</small></div></li>`;
-const promise = (icon: string, ur: string, en: string) => `<li><span class="pic">${ic(icon, '#17705A')}</span><div><b class="ur">${ur}</b><small>${en}</small></div></li>`;
+// v2 (less templated): no icons in boxes. Steps are stops on a painted route, one colour per meaning;
+// promises are a typeset list with a kesar star and gilt rules, like a printed card, not an app screen.
+const stop = (n: number, fill: string, ink: string, ur: string, en: string) => `<li><div><b class="ur">${ur}</b><small>${en}</small></div><span class="dot" style="background:${fill};color:${ink}">${n}</span></li>`;
+const vow = (ur: string, en: string) => `<li><div><b class="ur">${ur}</b><small>${en}</small></div><span class="vstar">${STAR(11)}</span></li>`;
+const BIRD = (flip: boolean) => `<svg class="bird" viewBox="-70 -86 115 146" aria-hidden="true">${parrot(0, 0, 100, flip)}</svg>`;
+const ORN = `<span class="orn" aria-hidden="true"><i></i>${STAR(9)}<i></i></span>`;
 
 const phoneParent = `<div class="phone"><div class="scr lock">
   <div class="time">7:12</div>
@@ -40,7 +44,7 @@ const phoneParent = `<div class="phone"><div class="scr lock">
   <div class="note dim"><div class="nh">${STAR(9)} POHNCH · 7:05</div><b class="ur">وین نکل گئی، 4 منٹ میں آپ کے دروازے پر</b><span>The van left · at your door in 4 min</span></div>
   <div class="live"><div class="lr"><span class="m">8</span><span class="ur t">منٹ میں اسکول</span></div><div class="bar"><i></i></div></div>
 </div></div>`;
-const phoneDriver = `<div class="phone"><div class="scr drv">
+const phoneDriver = `<div class="phone short"><div class="scr drv">
   <div class="dh"><b class="ur">صبح کا سفر</b><span class="ur">12 بچے</span></div>
   <div class="dr done"><i></i><b class="ur">وین نکل گئی</b><em>7:05</em></div>
   <div class="dr done"><i></i><b class="ur">حمزہ، عائشہ</b><em>7:09</em></div>
@@ -51,42 +55,45 @@ const phoneDriver = `<div class="phone"><div class="scr drv">
 const panel = (cls: string, inner: string) => `<section class="panel ${cls}"><div class="band top"></div><div class="body">${inner}</div><div class="band bot"></div></section>`;
 
 const sideA = [
-  panel('paper', `<p class="kick">آپ کو کیا نظر آئے گا<span>What you see</span></p>
+  panel('paper', `<p class="kick">آپ کو کیا نظر آئے گا<span>What you see</span>${ORN}</p>
     ${phoneParent}
     <p class="cap ur">لاک اسکرین پر وین کا سفر، منٹ بہ منٹ۔</p><p class="capen">The trip on your lock screen, minute by minute.</p>`),
-  panel('paper', `<p class="kick">یہ کیسے کام کرتا ہے<span>How it works</span></p>
-    <ol class="steps">
-      ${step(1, 'van', 'ڈرائیور سفر شروع کرتا ہے', 'The driver starts the trip in the free Pohnch Driver app.')}
-      ${step(2, 'check', 'بچہ بیٹھا، آپ کو فوراً خبر', 'An alert the moment your child gets in.')}
-      ${step(3, 'school', 'اسکول پہنچے تو خبر', 'And when the van reaches school, and home.')}
+  panel('paper', `<p class="kick">یہ کیسے کام کرتا ہے<span>How it works</span>${ORN}</p>
+    <ol class="route">
+      ${stop(1, '#1F2A5C', '#FBF7EF', 'ڈرائیور سفر شروع کرتا ہے', 'The driver starts the trip in the free Pohnch Driver app.')}
+      ${stop(2, '#17705A', '#FFFFFF', 'بچہ بیٹھا، آپ کو فوراً خبر', 'An alert the moment your child gets in.')}
+      ${stop(3, '#E8A33D', '#141A33', 'اسکول پہنچے تو خبر', 'And when the van reaches school, and home.')}
     </ol>
     <p class="note2 ur">کوئی فون کال نہیں، کوئی انتظار نہیں۔</p><p class="capen">No calling, no waiting at the gate.</p>`),
-  panel('night cover', `<div class="logo">${markLight}</div>
+  panel('night cover', `<div class="frame"><span class="chamak"></span></div><div class="logo">${markLight}</div>
     <h1 class="ur">آپ کے بچے کی وین،<br><mark>آپ کے فون پر</mark></h1>
     <p class="en">Your child's school van, live on your phone.</p>
+    <div class="birds">${BIRD(false)}${ORN}${BIRD(true)}</div>
     <div class="pill">${STAR(12)} <span>Android · <b>pohnch.pk</b></span></div>`),
 ];
 const sideB = [
-  panel('paper', `<p class="kick">ڈرائیوروں کے لیے<span>For van drivers</span></p>
+  panel('paper', `<p class="kick">ڈرائیوروں کے لیے<span>For van drivers</span>${ORN}</p>
     ${phoneDriver}
-    <ul class="plist">
-      ${promise('free', 'ڈرائیوروں کے لیے مفت', 'Free for drivers, always.')}
-      ${promise('tap', 'ہر بچے کے لیے ایک ٹیپ', 'One tap per child, big buttons.')}
-      ${promise('list', 'آپ کے اسٹاپ، آپ کی ترتیب', 'Your stops, in your order.')}
-    </ul>`),
-  panel('paper', `<p class="kick">ہمارا وعدہ<span>Our promise</span></p>
-    <ul class="plist big">
-      ${promise('pin', 'جگہ صرف سفر کے دوران', 'Location only during a trip, never at home.')}
-      ${promise('name', 'بچے کا صرف پہلا نام', 'First names only. No photos, no gender.')}
-      ${promise('clock', '30 دن بعد ڈیٹا ختم', 'Trip locations deleted after 30 days.')}
-      ${promise('school', 'صرف آپ کی وین', 'You see only your child and your van.')}
+    <ul class="vows small">
+      ${vow('ڈرائیوروں کے لیے مفت', 'Free for drivers, always.')}
+      ${vow('ہر بچے کے لیے ایک ٹیپ', 'One tap per child, big buttons.')}
+      ${vow('آپ کے اسٹاپ، آپ کی ترتیب', 'Your stops, in your order.')}
+    </ul>
+    <p class="note2 ur" style="margin-top:auto">فون سے کال نہیں، ایک ٹیپ کافی</p><p class="capen">One tap tells every family. No calls while driving.</p>`),
+  panel('paper', `<p class="kick">ہمارا وعدہ<span>Our promise</span>${ORN}</p>
+    <ul class="vows">
+      ${vow('جگہ صرف سفر کے دوران', 'Location only during a trip, never at home.')}
+      ${vow('بچے کا صرف پہلا نام', 'First names only. No photos, no gender.')}
+      ${vow('30 دن بعد ڈیٹا ختم', 'Trip locations deleted after 30 days.')}
+      ${vow('صرف آپ کی وین', 'You see only your child and your van.')}
     </ul>
     <p class="note2 ur">کراچی میں، کراچی کے لیے بنی</p><p class="capen">Made in Karachi, for Karachi.</p>`),
-  panel('night qr', `<p class="kick light">پہنچ حاصل کریں<span>Get Pohnch</span></p>
+  panel('night qr', `<p class="kick light">پہنچ حاصل کریں<span>Get Pohnch</span>${ORN}</p>
     <div class="qrbox">${QR}<img class="r l" src="${ROSE}"><img class="r rr" src="${ROSE}"></div>
     <p class="scan ur">کیمرے سے اسکین کریں</p><p class="scanen">Scan with your Android camera</p>
     <p class="url">pohnch.pk/app</p>
-    <div class="wa"><span class="ur">مدد کے لیے واٹس ایپ</span><b>0300 1478729</b></div>`),
+    <div class="wa"><span class="ur">مدد کے لیے واٹس ایپ</span><b>0300 1478729</b></div>
+    <p class="for ur">والدین اور وین ڈرائیور · دونوں کے لیے</p><p class="foren">For parents and van drivers</p>`),
 ];
 
 const CSS = `
@@ -115,7 +122,7 @@ body { font-family: Manrope, sans-serif; color: #141A33; -webkit-print-color-adj
 .pill { display: inline-flex; align-items: center; gap: 2mm; padding: 2mm 4.5mm; border-radius: 99mm; box-shadow: inset 0 0 0 .3mm rgba(245,238,225,.3); font-size: 9pt; color: #F5EEE1 }
 .pill b { color: #F6C46E }
 .phone { width: 50mm; height: 98mm; border-radius: 8mm; background: #141A33; padding: 2.2mm; box-shadow: 0 6mm 10mm -6mm rgba(16,22,47,.6) }
-.scr { width: 100%; height: 100%; border-radius: 6mm; overflow: hidden; padding: 6mm 3.5mm 4mm; display: flex; flex-direction: column; gap: 2.5mm }
+.phone.short { height: 74mm } .scr { width: 100%; height: 100%; border-radius: 6mm; overflow: hidden; padding: 6mm 3.5mm 4mm; display: flex; flex-direction: column; gap: 2.5mm }
 .scr.lock { background: linear-gradient(180deg, #33428A, #18214C); color: #F5EEE1; text-align: center }
 .scr .time { font-size: 24pt; font-weight: 800; letter-spacing: -.02em; margin-bottom: 1mm }
 .scr .note { background: rgba(255,253,248,.95); color: #141A33; border-radius: 3mm; padding: 2.4mm; text-align: right; display: flex; flex-direction: column; gap: .6mm }
@@ -157,6 +164,30 @@ body { font-family: Manrope, sans-serif; color: #141A33; -webkit-print-color-adj
 .wa span { font-size: 8.5pt; color: #D6CFC1 } .wa b { font-size: 11.5pt; color: #F5EEE1; letter-spacing: .03em }
 .night .band.top { opacity: .95 }
 .ic { display: block }
+
+.kick::after { display: none }
+.orn { display: flex; align-items: center; gap: 2mm; margin-top: 2.2mm } .orn i { width: 9mm; height: .3mm; background: #B8862F; opacity: .7 } .orn svg { display: block }
+.kick.light .orn i { background: #F6C46E }
+.route { list-style: none; position: relative; width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; margin: 2mm 0 }
+.route::before { content: ""; position: absolute; right: 4.6mm; top: 12%; bottom: 12%; border-right: .7mm dashed #E8A33D }
+.route li { position: relative; display: grid; grid-template-columns: 1fr 10mm; gap: 4mm; align-items: center; direction: ltr }
+.route li div { text-align: right; display: flex; flex-direction: column; gap: .8mm }
+.route .dot { width: 10mm; height: 10mm; border-radius: 50%; display: grid; place-items: center; font-weight: 800; font-size: 12pt; box-shadow: 0 0 0 1.4mm #FBF7EF }
+.route b { font-size: 11.5pt; line-height: 1.55 } .route small { font-size: 8.2pt; color: #4A4F66; line-height: 1.35; text-align: right }
+.vows { list-style: none; width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; margin-top: 1mm }
+.vows.small { flex: none; gap: 0; margin-top: 2mm }
+.vows li { display: grid; grid-template-columns: 1fr 6mm; gap: 3mm; align-items: start; direction: ltr; padding: 3mm 0; border-top: .3mm solid rgba(184,134,47,.35) }
+.vows li:last-child { border-bottom: .3mm solid rgba(184,134,47,.35) }
+.vows li div { text-align: right; display: flex; flex-direction: column; gap: .5mm }
+.vows .vstar { padding-top: 1.6mm; display: flex; justify-content: center }
+.vows b { font-size: 11pt; line-height: 1.5 } .vows small { font-size: 8pt; color: #4A4F66; line-height: 1.35; text-align: right }
+.vows.small li { padding: 2mm 0 } .vows.small b { font-size: 9.5pt }
+.for { font-size: 9.5pt; color: #F6C46E; margin-top: auto; line-height: 1.6 } .foren { font-size: 8pt; color: #D6CFC1; margin-top: -3mm }
+.cover { position: relative }
+.cover .frame { position: absolute; inset: 15mm 6mm 13mm; border: .35mm solid rgba(246,196,110,.45); border-radius: 5mm; pointer-events: none }
+.cover .frame .chamak { position: absolute; top: 3mm; left: 10mm; right: 10mm; height: 2.4mm; border-radius: 9mm; background: ${svgUri(chamakTile(10))} repeat-x center 0 / auto 100% }
+.cover .birds { display: flex; align-items: flex-end; justify-content: center; gap: 3mm } .cover .birds .bird { width: 17mm; height: 21mm } .cover .birds .orn { margin: 0 0 3mm }
+.cover .birds .orn i { background: #F6C46E }
 `;
 
 const html = (bleed: number) => `<!doctype html><html><head><meta charset="utf-8">
