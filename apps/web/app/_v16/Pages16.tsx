@@ -8,6 +8,7 @@ import type { ReactNode } from 'react';
 import qrcode from 'qrcode-generator';
 import { href, otherHref } from '../_lib/links';
 import { DriverIslands, ProgressIsland, SchoolForm } from './PageIslands';
+import { AppJoin } from './AppJoin';
 import { PageHub } from './Hub';
 import { DocSpy } from './DocSpy';
 import { PageScene } from './PageScene';
@@ -151,12 +152,28 @@ export function DownloadPage16({ lang }: { lang: Lang }) {
         {STORE.playUrl ? (
           <div className="getrow"><a className="btn" href={STORE.playUrl} rel="noreferrer">{w(lang, 'ctaPlay')}</a><figure className="qr"><span dangerouslySetInnerHTML={{ __html: storeQr(STORE.playUrl) }} /><figcaption>{w(lang, 'dl.scan')}</figcaption></figure></div>
         ) : (
-          <div className="getrow"><Cta lang={lang} /><a className="link" href={wa} rel="noreferrer">{k(lang, 'site.dl.join')}<Arrow /></a></div>
+          <div className="getrow"><a className="btn" href={href(lang, '/app')} data-testid="dl-get">{w(lang, 'getapp.kick')}</a><a className="link" href={wa} rel="noreferrer">{k(lang, 'site.dl.join')}<Arrow /></a></div>
         )}
       </section>
       <section className="pwrap">
         <h2>{k(lang, 'site.dl.steps.title')}</h2>
         <ol className="miles">{[1, 2, 3].map((n) => <li key={n}><span className="stone num" aria-hidden="true">{n}</span><p>{k(lang, `site.dl.step${n}`)}</p></li>)}</ol>
+      </section>
+    </Shell16>
+  );
+}
+
+/** v21 pohnch.pk/app: the poster's QR code lands here. Light (no 3D scene) so it opens fast on any phone. */
+export function AppPage16({ lang }: { lang: Lang }) {
+  return (
+    <Shell16 lang={lang} path="/app">
+      <section className="pwrap joinpage">
+        <div className="module joincard">
+          <p className="kick">{w(lang, 'getapp.kick')}</p>
+          <h1>{w(lang, 'getapp.title')}</h1>
+          <p className="lead">{w(lang, 'getapp.lead')}</p>
+          <AppJoin lang={lang} waitlist={`${href(lang, '/')}#join`} />
+        </div>
       </section>
     </Shell16>
   );

@@ -3,7 +3,7 @@ import type { MetadataRoute } from 'next';
 import { SITE } from './_lib/site';
 import { href } from './_lib/links';
 
-const PAGES = ['/', '/drivers', '/safety', '/story', '/progress', '/schools', '/download', '/privacy', '/terms', '/delete-account'];
+const PAGES = ['/', '/app', '/drivers', '/safety', '/story', '/progress', '/schools', '/download', '/privacy', '/terms', '/delete-account'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return PAGES.flatMap((p) => {

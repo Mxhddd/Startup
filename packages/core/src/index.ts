@@ -1,5 +1,5 @@
 export { KARACHI_TZ, karachiDate, karachiClock, karachiHour, defaultRunKind, karachiDayParts, addDays, dayPartsOf, shortTime, nudgeTime } from './dates';
-export { INTEREST_URL, PILOT_WHATSAPP, STORE } from './contact';
+export { INTEREST_URL, JOIN, JOIN_URL, PILOT_WHATSAPP, STORE, playListing, playTesting } from './contact';
 export { HOLD_MS, UNDO_MS, holdProgress, undoSecondsLeft } from './taps';
 export { STALE_AFTER_S, signalState, ageParts, type Signal } from './signal';
 export { splitRuns, isolateLtr, LRI, PDI, type Run } from './bidi';

@@ -229,3 +229,36 @@
 /* a painted seam: jhalar hangs from the paper into every night band */
 .v16p main > .pnight { position: relative; padding-top: clamp(80px, 9vw, 120px); }
 .v16p main > .pnight::before { content: ""; position: absolute; inset: 0 0 auto; height: 24px; background: var(--jhalar) repeat-x 0 0 / auto 24px; pointer-events: none; }
+
+/* v21 pohnch.pk/app: the QR landing. One card, phone first: who are you, then three taps. */
+.v16p .joinpage { padding-top: 28px; padding-bottom: 56px; }
+.v16p .joincard { max-width: 620px; margin-inline: auto; padding: 44px 26px 28px; }
+.v16p .joincard h1 { font-size: clamp(30px, 7vw, 44px); margin: 4px 0 6px; }
+.v16p .joincard .lead { margin: 0 0 22px; color: var(--ink2); }
+.v16p .joinapp .who { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.v16p .joinapp .whobtn { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 12px; min-height: 150px; border-radius: var(--r2); border: 2px solid var(--sand); background: var(--card); color: var(--ink); font: inherit; cursor: pointer; transition: border-color .25s var(--calm), transform .25s var(--calm), box-shadow .25s var(--calm); text-align: center; }
+.v16p .joinapp .whobtn:hover { transform: translateY(-2px); }
+.v16p .joinapp .whobtn.on { border-color: var(--neel); box-shadow: 0 0 0 4px var(--neelTint), var(--e1); }
+.v16p .joinapp .whobtn .whotext b { display: block; font-size: 19px; }
+.v16p .joinapp .whobtn .whotext small { display: block; font-size: 14px; color: var(--ink2); line-height: 1.4; }
+.v16p .joinapp .whobtn:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.v16p .joinsteps { margin-top: 26px; animation: rise .45s var(--calm) both; }
+.v16p .joinroute { list-style: none; padding: 0; margin: 0; display: grid; gap: 18px; }
+.v16p .joinroute.route::before { display: none; }
+.v16p .joinroute li { display: grid; grid-template-columns: 52px 1fr; gap: 14px; align-items: start; }
+.v16p .joinroute li .btn { display: inline-flex; min-height: 52px; align-items: center; }
+.v16p .joinroute li .btn.ghost { background: var(--ivory); color: var(--ink); box-shadow: inset 0 0 0 1px var(--hair); }
+.v16p .joinroute li p { margin: 8px 0 0; font-size: 15px; color: var(--ink2); }
+.v16p .joinroute li.done .stone { background: var(--zam); color: #fff; }
+.v16p .joinsteps .why { margin: 22px 0 0; padding: 14px 16px; border-radius: var(--r1); background: var(--ivory); font-size: 15px; color: var(--ink2); }
+.v16p .joinsteps .btn.big { min-height: 60px; font-size: 19px; width: 100%; justify-content: center; display: flex; align-items: center; }
+.v16p .joinfoot { display: grid; gap: 12px; margin-top: 26px; padding-top: 18px; border-top: 1px solid var(--hair); }
+.v16p .joinfoot .quiet { color: var(--ink2); }
+.v16p .joinfoot .stuck summary { cursor: pointer; font-weight: 700; min-height: 44px; display: flex; align-items: center; }
+.v16p .joinfoot .stuck p { font-size: 14px; color: var(--ink2); margin: 6px 0 0; }
+@media (max-width: 380px) { .v16p .joinapp .who { grid-template-columns: 1fr; } .v16p .joinapp .whobtn { flex-direction: row; min-height: 84px; text-align: start; } .v16p .joincard { padding: 40px 18px 24px; } }
+@media (prefers-reduced-motion: reduce) { .v16p .joinsteps { animation: none; } .v16p .joinapp .whobtn { transition: none; } }
+.v16p .joinapp .whobtn .appicon { width: 64px; height: 64px; margin: 0; flex: none; }
+.v16p .joinapp .whobtn .appicon b { font-size: 24px; }
+.v16p .joinfoot .num { white-space: nowrap; }
+.v16p .joinfoot .link { line-height: 1.5; }

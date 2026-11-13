@@ -4,7 +4,7 @@
 // and pages load with no CSP errors.
 import { expect, test } from '@playwright/test';
 
-const PAGES = ['/', '/ur', '/drivers', '/safety', '/privacy', '/story', '/progress', '/schools', '/download', '/admin', '/i/' + 'a'.repeat(43)];
+const PAGES = ['/', '/ur', '/app', '/ur/app', '/drivers', '/safety', '/privacy', '/story', '/progress', '/schools', '/download', '/admin', '/i/' + 'a'.repeat(43)];
 
 test('every page sends the protective headers', async ({ request }) => {
   for (const path of PAGES) {

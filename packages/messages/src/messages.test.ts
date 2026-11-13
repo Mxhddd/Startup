@@ -1,9 +1,20 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { dirOf, en, otherLang, t, ur } from './index';
 
 describe('messages', () => {
   it('has the same keys in Urdu and English, so no screen is missing a word', () => {
     expect(Object.keys(ur).sort()).toEqual(Object.keys(en).sort());
+  });
+
+  // v21: a repeated key silently replaces the earlier text (JSON keeps the last one), so never allow one.
+  it('never repeats a key in either file', () => {
+    for (const f of ['en.json', 'ur.json']) {
+      const keys = [...readFileSync(new URL(`./${f}`, import.meta.url), 'utf8').matchAll(/^\s*"([^"]+)":/gm)].map((m) => m[1]);
+      const seen = new Set<string>();
+      const repeated = keys.filter((k) => (seen.has(k!) ? true : (seen.add(k!), false)));
+      expect(repeated, f).toEqual([]);
+    }
   });
 
   it('has no empty text', () => {
