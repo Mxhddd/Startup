@@ -3,7 +3,7 @@
 // 2. Check the input.
 // 3. Call the matching database function, which checks their role (supabase/migrations/..._actions.sql).
 // Logs say only which action ran and how it ended: never tokens, phone numbers or children's names.
-import { BadInput, bool, date, isoTime, num, oneOf, optionalUuid, phone, uuid, uuids } from './validate.ts';
+import { BadInput, bool, date, email, isoTime, num, oneOf, optionalUuid, phone, uuid, uuids } from './validate.ts';
 import { byteaHex, hashToken, isInviteToken, newInviteToken } from './tokens.ts';
 import type { DayOffJob, DriverJob, NoticePush, NotifyJob } from './notify.ts';
 import type { PushStep } from './push.ts';
@@ -172,7 +172,10 @@ export const actions: Record<string, Action> = {
     return { ok: true };
   },
   'family.add': async ({ actor, body, deps }) => {
-    const member = (await call(deps, 'user_id_by_phone', { p_phone: phone(body, 'phone') })) as string | null;
+    // v21: by mobile number, or by the Gmail of someone who signs in with Google (verified emails only).
+    const member = (typeof body.email === 'string'
+      ? await call(deps, 'user_id_by_email', { p_email: email(body, 'email') })
+      : await call(deps, 'user_id_by_phone', { p_phone: phone(body, 'phone') })) as string | null;
     // The person must have opened Pohnch once (so they have an account) before they can be added.
     if (!member) throw new DbError('user_not_found');
     await call(deps, 'add_family_member', { p_actor: actor, p_member: member });

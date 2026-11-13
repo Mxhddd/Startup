@@ -14,6 +14,8 @@ create schema auth;
 create table auth.users (
   id uuid primary key default gen_random_uuid(),
   phone text unique,
+  email text, -- v21: as on Supabase (people who sign in with Google have an email, no phone)
+  email_confirmed_at timestamptz,
   created_at timestamptz not null default now()
 );
 

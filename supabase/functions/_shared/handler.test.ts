@@ -111,6 +111,20 @@ describe('the app Edge Function', () => {
     expect(rpc).toHaveBeenCalledWith('user_id_by_phone', { p_phone: '+923001234567' });
   });
 
+  it('v21: adds a family member by a Gmail address (lower-cased), never by phone then', async () => {
+    const { post, rpc } = setup({ data: DRIVER });
+    await post('family.add', { email: ' Nani.Jaan@Gmail.com ' });
+    expect(rpc).toHaveBeenCalledWith('user_id_by_email', { p_email: 'nani.jaan@gmail.com' });
+    expect(rpc).not.toHaveBeenCalledWith('user_id_by_phone', expect.anything());
+  });
+
+  it('v21: refuses something that is not an email address', async () => {
+    const { post, rpc } = setup({ data: DRIVER });
+    const r = await post('family.add', { email: 'not-an-email' });
+    expect(r.status).toBe(400);
+    expect(rpc).not.toHaveBeenCalledWith('user_id_by_email', expect.anything());
+  });
+
   it('answers unknown actions and GETs without touching the database', async () => {
     const { deps, rpc } = setup();
     expect((await handle(new Request('https://x/functions/v1/app/nope', { method: 'POST', headers: { authorization: 'Bearer good-token' }, body: '{}' }), deps)).status).toBe(404);

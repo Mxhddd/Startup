@@ -101,7 +101,9 @@ export default function Menu() {
   const iOwn = !!members?.some((m) => m.is_me && m.is_owner && m.family_id === myFamily);
 
   const add = async () => {
-    if (!normalisePkMobile(phone)) return setMsg({ ok: false, text: t('error.phone') });
+    // v21: a mobile number, or the Gmail of someone who signs in with Google
+    const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(phone.trim());
+    if (!isEmail && !normalisePkMobile(phone)) return setMsg({ ok: false, text: t('parent.family.badWho') });
     try {
       await parent.parentApi.addFamilyMember(phone);
       setPhone('');
@@ -208,7 +210,7 @@ export default function Menu() {
       {/* Add someone to the family */}
       <EditSheet visible={sheet === 'add'} title={t('parent.menu.addPerson')} onClose={() => setSheet(null)} testID="add-person-sheet">
         <AppText variant="secondary">{t('parent.family.body')}</AppText>
-        <TextField label={t('parent.family.phone')} value={phone} onChange={setPhone} ltr maxLength={16} placeholder={t('parent.family.phoneHint')} testID="family-phone" />
+        <TextField label={t('parent.family.phone')} value={phone} onChange={setPhone} ltr maxLength={254} placeholder={t('parent.family.phoneHint')} testID="family-phone" />
         {msg ? <AppText color={msg.ok ? colors.zamurradOnTint : colors.dangerText}>{msg.text}</AppText> : null}
         <TapButton size="next" tone="left" icon="family" label={t('parent.family.add')} onConfirm={add} testID="family-add" />
       </EditSheet>

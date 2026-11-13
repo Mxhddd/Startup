@@ -23,6 +23,8 @@ export type PhoneLoginProps = {
   /** Returns whether this person still needs a name (first login). */
   verify: (phone: string, code: string) => Promise<{ needsName: boolean }>;
   saveName: (name: string) => Promise<void>;
+  /** v21: "Continue with Google" (null = the person backed out). Hidden when not set up for this build. */
+  google?: () => Promise<{ needsName: boolean; name?: string } | null>;
   onDone: () => void;
   /** Turns whatever the app threw into one of the error messages. */
   toError: (e: unknown) => LoginError;
@@ -166,7 +168,7 @@ function CodeField({ label, value, onChange, testID }: { label: string; value: s
   );
 }
 
-export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }: PhoneLoginProps) {
+export function PhoneLogin({ role, sendCode, verify, saveName, google, onDone, toError }: PhoneLoginProps) {
   const { t, dir } = useLang();
   const [step, setStep] = useState<'phone' | 'code' | 'name'>('phone');
   const [phoneInput, setPhoneInput] = useState('');
@@ -220,6 +222,17 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
       else onDone();
     });
 
+  const submitGoogle = () =>
+    run(async () => {
+      if (!google) return;
+      const r = await google();
+      if (!r) return; // backed out of the Google sheet: stay here quietly
+      if (r.needsName) {
+        setName(r.name ?? '');
+        setStep('name');
+      } else onDone();
+    });
+
   const submitName = () =>
     run(async () => {
       const clean = name.trim();
@@ -256,6 +269,16 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
           </AppText>
         </View>
 
+        {step === 'phone' && google ? (
+          <View style={{ gap: space.md, marginBottom: space.sm }}>
+            <GoogleButton label={t('login.google')} onPress={submitGoogle} disabled={busy} />
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+              <View style={{ flex: 1, height: 1, backgroundColor: colors.giltLine }} />
+              <AppText variant="small" color={colors.stone}>{t('login.or')}</AppText>
+              <View style={{ flex: 1, height: 1, backgroundColor: colors.giltLine }} />
+            </View>
+          </View>
+        ) : null}
         {step === 'phone' ? <Field kind="phone" label={t('login.phone.label')} value={phoneInput} onChange={setPhoneInput} testID="phone-input" /> : null}
         {step === 'code' ? <CodeField label={t('login.code.label')} value={code} onChange={(v) => setCode(v.replace(/\D/g, '').slice(0, 6))} testID="code-input" /> : null}
         {step === 'name' ? <Field kind="name" label={t('login.name.label')} value={name} onChange={setName} testID="name-input" /> : null}
@@ -300,4 +323,20 @@ export class LoginInputError extends Error {
   constructor(public kind: LoginError) {
     super(kind);
   }
+}
+
+/** v21: Google's own sign-in button look (white, the four-colour G), as Google's brand rules ask. */
+function GoogleButton({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {
+  return (
+    <Pressable accessibilityRole="button" accessibilityLabel={label} onPress={onPress} disabled={disabled} testID="login-google"
+      style={({ pressed }) => ({ minHeight: 60, borderRadius: 18, borderCurve: 'continuous', backgroundColor: '#FFFFFF', borderWidth: 1, borderColor: '#DADCE0', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, opacity: disabled ? 0.6 : 1, transform: [{ scale: pressed ? 0.98 : 1 }] })}>
+      <Svg width={22} height={22} viewBox="0 0 48 48">
+        <Path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" />
+        <Path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" />
+        <Path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" />
+        <Path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" />
+      </Svg>
+      <AppText bold color="#1F1F1F" style={{ fontSize: 17 }}>{label}</AppText>
+    </Pressable>
+  );
 }

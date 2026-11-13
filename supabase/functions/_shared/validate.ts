@@ -67,3 +67,12 @@ export function phone(b: Body, k: string): string {
   if (!m) throw new BadInput(k);
   return '+92' + m[1];
 }
+
+/** v21: an email address (a family member who signs in with Google). Lower-cased; at most 254 characters. */
+export function email(b: Body, k: string): string {
+  const v = b[k];
+  if (typeof v !== 'string') throw new BadInput(k);
+  const e = v.trim().toLowerCase();
+  if (e.length > 254 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e)) throw new BadInput(k);
+  return e;
+}

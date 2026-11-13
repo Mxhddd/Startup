@@ -194,7 +194,8 @@ export const parentApi = {
   /** v9: the van behind an invite link (name, school, driver, verified), for the join card. */
   peekInvite: (token: string) => db().api<{ vanName: string; schoolName: string; driverName: string; verified: boolean }>('invite.peek', { token }),
   inviteDriver: (childId: string) => db().api<{ url: string }>('invite.driver', { childId }),
-  addFamilyMember: (phone: string) => db().api('family.add', { phone }),
+  /** v21: a mobile number, or a Gmail address (someone who signs in with Google). */
+  addFamilyMember: (who: string) => db().api('family.add', who.includes('@') ? { email: who.trim() } : { phone: who }),
   leaveVan: (childId: string) => db().api('van.leave', { childId }),
   /** The owner removes someone; someone added removes themselves to leave. */
   removeFamilyMember: (familyId: string, memberId: string) => db().api('family.removeMember', { familyId, memberId }),
