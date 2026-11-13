@@ -107,15 +107,16 @@ export function MorphTarget({ morphKey, children, style }: { morphKey: string; c
     if (!hidden || !ctx) return;
     let alive = true;
     // Give the screen's own entrance a moment to lay out, then measure and land.
-    const id = setTimeout(async () => {
+    // v21: measure on the next frame (was a fixed 60 ms wait).
+    const id = requestAnimationFrame(async () => {
       const to = await measure(ref.current);
       if (!alive) return;
       if (!to) return setHidden(false);
       ctx.land(morphKey, to, () => alive && setHidden(false));
-    }, 60);
+    });
     return () => {
       alive = false;
-      clearTimeout(id);
+      cancelAnimationFrame(id);
     };
   }, [hidden, ctx, morphKey]);
   return (

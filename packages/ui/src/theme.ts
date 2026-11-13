@@ -1,21 +1,21 @@
 // The one theme file. Every colour, size and font name the apps use comes from here (design/BRAND.md).
 
 export const colors = {
-  ghee: '#FAF6EE', // ground, every screen background
-  white: '#FFFFFF', // cards and rows
+  ghee: '#FBF7EF', // ground, every screen background (v21: the website's --paper)
+  white: '#FFFDF8', // cards and rows (v21: the website's --card, a warm white)
   siyahi: '#141A33', // text, lock screen, dark panels
   ink2: '#4A4F66', // secondary text
   line: '#E2DCCD', // borders only
   neel: '#1F2A5C', // brand, primary buttons, step "left"
   neelHover: '#2B3A80',
-  neelTint: '#E6E9F5',
+  neelTint: '#E4E7F2',
   kesar: '#E8A33D', // the star, "reached school"; text on it is siyahi
   kesarTint: '#FBEBCF',
   kesarText: '#7A5410', // kesar-family text on white, ghee or kesarTint (v8: "No van tomorrow")
   shingarf: '#A8321F', // help, "van is late", strikes only
   shingarfTint: '#F6DDD6',
   zamurrad: '#17705A', // "picked", "dropped", success
-  zamurradTint: '#DCEFE7',
+  zamurradTint: '#DCEFE6',
   zamurradOnTint: '#0B4A3D',
   pista: '#A7D47E', // decoration only
   absentText: '#5E5A52',
@@ -23,7 +23,7 @@ export const colors = {
   dangerText: '#9E2A1F',
   dangerBg: '#F9E3DF',
   // From the v5 screens: quiet surfaces and the darker "lip" under the big buttons.
-  sand: '#F3EEE3', // secondary action tiles
+  sand: '#EFE6D5', // secondary action tiles (v21: toward the website's --sand)
   hairline: '#F0EBE0', // dividers inside a white card
   neelDeep: '#0E1430', // the lip under a neel button
   zamurradDeep: '#0B4A3D', // the lip under a zamurrad button
@@ -44,7 +44,7 @@ export const colors = {
   onBrand: '#FAF6EE', // text and icons on neel, zamurrad, shingarf and other dark fills
   onFill: '#FFFFFF', // white marks on zamurrad and shingarf
   onKesar: '#141A33', // text on kesar
-  night: '#141A33', // a dark chip or panel (offline banner, the undo bar's ground)
+  night: '#10162F', // a dark chip or panel (offline banner, the undo bar's ground; v21: the website's --night)
   link: '#1F2A5C', // neel used as text or an icon on a light surface
   // v10 "Jharoka": layered surfaces instead of boxes, buttons with depth.
   inset: '#F2ECE0', // filled fields, segmented tracks, quiet chips (no borders)
@@ -58,6 +58,18 @@ export const colors = {
   toggleOff: '#D9D1C1', // the track of a switch that is off
   headerTop: '#33428A', // the light corner of the arch header
   headerBottom: '#18214C', // its dark corner
+  // v21: the website's paper-and-gilt materials (apps/web/app/_v16/tokens.css), same names on both sides.
+  paper: '#FBF7EF', // = ghee
+  card: '#FFFDF8', // = white
+  ivory: '#F5EEE1', // a warm panel inside a card
+  stone: '#6E6450', // quiet captions on paper (5.6:1 on paper)
+  gilt: '#B8862F', // the hairline and small ornaments
+  giltLine: 'rgba(184,134,47,0.30)', // the gilt hairline round a card
+  kesarSoft: '#F6C46E', // kesar on night
+  onNight: '#F5EEE1', // text on night
+  onNight2: '#D6CFC1', // secondary text on night
+  zamOnNight: '#8FD3B5', // zamurrad text on night
+  handle: 'rgba(20,26,51,0.32)', // the sheet's grab handle (visible on white and on the map)
 };
 
 export type ColorName = keyof typeof colors;
@@ -80,6 +92,7 @@ export const nightColors: Partial<Record<ColorName, string>> = {
   neelGlow: 'rgba(0,0,0,0.35)', zamurradGlow: 'rgba(0,0,0,0.35)', kesarGlow: 'rgba(0,0,0,0.30)',
   inset: '#222B57', neelHi: '#4A5DB8', zamurradHi: '#1C836A', shingarfHi: '#C24A33', neelTint2: '#2C3766', zamurradTint2: '#1B4A3E',
   sandDeep: '#141B40', toggleOff: '#3A4470', headerTop: '#24306A', headerBottom: '#0A0F26',
+  paper: '#0E1430', card: '#182044', ivory: '#1F2750', stone: '#BFC4D6', giltLine: 'rgba(245,238,225,0.16)', handle: 'rgba(243,238,227,0.40)',
 };
 
 let scheme: 'light' | 'dark' = 'light';
@@ -132,12 +145,17 @@ export function onTextScale(cb: () => void): () => void {
 export type Step = 'left' | 'picked' | 'reachedSchool' | 'leftSchool' | 'dropped';
 
 /** One colour per meaning: the fill and text colour for each trip step. */
-export const stepColors: Record<Step, { fill: string; text: string }> = {
-  left: { fill: colors.neel, text: colors.ghee },
-  picked: { fill: colors.zamurrad, text: colors.white },
-  reachedSchool: { fill: colors.kesar, text: colors.siyahi },
-  leftSchool: { fill: colors.neel, text: colors.ghee },
-  dropped: { fill: colors.zamurrad, text: colors.white },
+// v21: read when drawn (getters), so the night palette and sunlight mode apply (they were copied once).
+const stepPair = (fill: 'neel' | 'zamurrad' | 'kesar', text: 'onBrand' | 'onFill' | 'onKesar') => ({
+  get fill() { return colors[fill]; },
+  get text() { return colors[text]; },
+});
+export const stepColors: Record<Step, { readonly fill: string; readonly text: string }> = {
+  left: stepPair('neel', 'onBrand'),
+  picked: stepPair('zamurrad', 'onFill'),
+  reachedSchool: stepPair('kesar', 'onKesar'),
+  leftSchool: stepPair('neel', 'onBrand'),
+  dropped: stepPair('zamurrad', 'onFill'),
 };
 
 export const space = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, gutter: 20 } as const;
@@ -168,6 +186,8 @@ export const elevation = {
   e1: '0px 1px 1px rgba(31,42,92,0.04), 0px 4px 10px rgba(31,42,92,0.05), 0px 14px 28px rgba(31,42,92,0.06)',
   e2: '0px 1px 2px rgba(31,42,92,0.06), 0px 8px 18px rgba(31,42,92,0.08), 0px 24px 48px rgba(31,42,92,0.10)',
   e3: '0px 2px 4px rgba(31,42,92,0.08), 0px 14px 30px rgba(31,42,92,0.14), 0px 40px 80px rgba(31,42,92,0.16)',
+  /** v21: the website's card (.module): a gilt hairline round it and a long soft drop under it. */
+  module: 'inset 0px 0px 0px 1px rgba(184,134,47,0.30), 0px 26px 52px -34px rgba(16,22,47,0.55)',
   /** The 1 px light along the top edge of a button face. */
   highlight: (alpha = 0.16) => `inset 0px 1px 0px rgba(255,255,255,${alpha})`,
 } as const;
@@ -237,14 +257,14 @@ export const fonts = {
 } as const;
 
 export const mapColors = {
-  land: '#EFE9DC',
+  land: '#ECE4D3',
   parks: '#DDEBCB',
   water: '#CFDCE8',
   road: '#FFFFFF',
-  roadCasing: '#DDD4C2',
-  labels: colors.ink2,
+  roadCasing: '#CFC3AA', // v21: darker so roads read on the warm land
+  get labels() { return colors.ink2; },
   residential: '#E9E2D2',
-  building: '#E3DBCA',
+  building: '#DDD2BD',
   rail: '#D6CDBB',
   boundary: '#C9C0AE',
 } as const;
@@ -256,9 +276,9 @@ export const mapColors = {
 export type MapMood = 'morning' | 'day' | 'dusk' | 'night';
 export type MapPalette = { [K in keyof typeof mapColors]: string } & { halo: string };
 export const mapMoods: Record<MapMood, MapPalette> = {
-  morning: { ...mapColors, land: '#F2E7D3', residential: '#ECE0CA', building: '#E6D8BF', parks: '#DCE8C2', water: '#CCD9E2', roadCasing: '#E0D2B8', halo: colors.ghee },
-  day: { ...mapColors, halo: colors.ghee },
-  dusk: { ...mapColors, land: '#E7E1D8', residential: '#E0D9CE', building: '#D8D0C3', parks: '#D3E0C6', water: '#BFCCDC', roadCasing: '#D2C9BA', road: '#FBF9F5', halo: '#F3EFE8' },
+  morning: { ...mapColors, land: '#F2E7D3', residential: '#ECE0CA', building: '#E6D8BF', parks: '#DCE8C2', water: '#CCD9E2', roadCasing: '#D2C2A3', get halo() { return colors.ghee; } },
+  day: { ...mapColors, labels: mapColors.labels, get halo() { return colors.ghee; } },
+  dusk: { ...mapColors, land: '#E7E1D8', residential: '#E0D9CE', building: '#D8D0C3', parks: '#D3E0C6', water: '#BFCCDC', roadCasing: '#C4B9A6', road: '#FFFFFF', halo: '#F3EFE8' },
   night: {
     land: '#161C35', residential: '#1A2140', building: '#222A4D', parks: '#1C2B33', water: '#0E1430', road: '#2B3560', roadCasing: '#1F2747',
     labels: '#BFC4D6', rail: '#2A3254', boundary: '#343C60', halo: '#141A33',

@@ -37,7 +37,7 @@ export function EtaPill({
       ) : null}
       <View style={{ flexDirection: row, alignItems: 'flex-end', justifyContent: 'space-between', gap: 12 }}>
         {minutes === 'door' ? (
-          <Animated.View entering={ZoomIn.springify().damping(springs.pop.damping)}>
+          <Animated.View entering={ZoomIn.springify().damping(springs.pop.damping).stiffness(springs.pop.stiffness)}>
             <AppText bold color={stale ? colors.ink2 : colors.zamurrad} style={{ fontSize: 30, lineHeight: 48 }}>
               {label}
             </AppText>
@@ -52,7 +52,7 @@ export function EtaPill({
           </View>
         )}
         {clock ? (
-          <Animated.View entering={FadeIn.delay(250)} style={{ height: 34, paddingHorizontal: 12, borderRadius: radius.pill, borderCurve: 'continuous', backgroundColor: stale ? colors.absentBg : colors.kesarTint, justifyContent: 'center', marginBottom: 12 }}>
+          <Animated.View entering={FadeIn.delay(90)} style={{ height: 34, paddingHorizontal: 12, borderRadius: radius.pill, borderCurve: 'continuous', backgroundColor: stale ? colors.absentBg : colors.kesarTint, justifyContent: 'center', marginBottom: 12 }}>
             <AppText variant="number" color={colors.siyahi} style={{ fontSize: 14, lineHeight: 20 }}>
               {t('eta.clock', { time: clock })}
             </AppText>

@@ -64,9 +64,11 @@ export default function Welcome() {
   const last = i === SLIDES.length - 1;
 
   const finish = async (ask: boolean) => {
+    // v21: on to login at once; the alerts question (a system dialog) opens over it.
+    // (the flag is written first, a few ms, so the login screen never sends you back here)
     await AsyncStorage.setItem(WELCOME_SEEN, '1').catch(() => undefined);
-    if (ask) await askForAlerts().catch(() => false);
     router.replace('/login');
+    if (ask) void askForAlerts().catch(() => false);
   };
   const go = (by: 1 | -1) => {
     const next = i + by;
@@ -117,7 +119,7 @@ export default function Welcome() {
           </View>
         </Animated.View>
 
-        <Animated.View entering={FadeIn.delay(200)} style={{ gap: space.lg }}>
+        <Animated.View entering={FadeIn.delay(80)} style={{ gap: space.lg }}>
           <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', gap: 6, justifyContent: 'center' }} accessibilityLabel={t('welcome.page', { n: i + 1, of: SLIDES.length })}>
             {SLIDES.map((s, k) => <Dot key={s} on={k === i} />)}
           </View>

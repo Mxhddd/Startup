@@ -50,6 +50,7 @@ function useParentState(enabled: boolean) {
   const [d, setD] = useState<Data>({ ...empty, loading: enabled });
   const [childId, setChildId] = useState<string | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const [syncFailed, setSyncFailed] = useState<null | (() => void)>(null);
   // Audit: the selected child lives in a ref too, so refresh() stays one stable function, and each
   // refresh is numbered so an older, slower one can never overwrite a newer one (or switch the child back).
   const childRef = useRef<string | null>(null);
@@ -204,8 +205,39 @@ function useParentState(enabled: boolean) {
                 ? 'live'
                 : 'idle';
 
+  // v21: optimistic saves. The screen changes on the tap (apply), the server call runs behind it (send),
+  // and a fresh load follows. If the call fails, the next load puts the real data back and `syncFailed`
+  // offers "Try again" (the SyncNote bar, on every screen).
+  const optimistic = useCallback(async (apply: (old: Data) => Data, send: () => Promise<unknown>): Promise<boolean> => {
+    setD(apply);
+    try {
+      await send();
+      setSyncFailed(null);
+      void refresh();
+      return true;
+    } catch {
+      setSyncFailed(() => () => void optimisticRef.current(apply, send));
+      void refresh();
+      return false;
+    }
+  }, [refresh]);
+  const optimisticRef = useRef(optimistic);
+  optimisticRef.current = optimistic;
+
   const actions = {
     refresh,
+    optimistic,
+    retrySync: () => { const again = syncFailed; setSyncFailed(null); again?.(); },
+    dismissSync: () => setSyncFailed(null),
+    /** v21: planned chutti, saved all at once and shown at once. */
+    saveChutti(add: string[], clear: string[]) {
+      if (!child) return Promise.resolve(false);
+      const id = child.id;
+      return optimistic(
+        (old) => ({ ...old, absences: [...old.absences.filter((x) => !clear.includes(x)), ...add.filter((x) => !old.absences.includes(x))] }),
+        () => Promise.all([...add.map((dt) => parent.parentApi.setAbsence(id, dt)), ...clear.map((dt) => parent.parentApi.clearAbsence(id, dt))]),
+      );
+    },
     /** Audit: switching child clears everything that belonged to the previous one, then loads. */
     selectChild: (id: string) => {
       if (id === childRef.current) return;
@@ -222,9 +254,12 @@ function useParentState(enabled: boolean) {
     /** v12: off for one run only (morning or afternoon), or back on. */
     async toggleRunOff(date: string, kind: 'morning' | 'afternoon') {
       if (!child) return;
+      const id = child.id;
       const on = !d.runOff.some((r) => r.date === date && r.kind === kind);
-      await parent.setRunAbsence(child.id, date, kind, on);
-      await refresh();
+      await optimistic(
+        (old) => ({ ...old, runOff: on ? [...old.runOff, { date, kind }] : old.runOff.filter((r) => !(r.date === date && r.kind === kind)) }),
+        () => parent.setRunAbsence(id, date, kind, on),
+      );
     },
     /** v12: a quick signal to the driver. "Sick today" also marks today's chutti. */
     async signal(kind: SignalKind) {
@@ -245,9 +280,12 @@ function useParentState(enabled: boolean) {
     },
     async toggleChutti(date: string) {
       if (!child) return;
-      if (d.absences.includes(date)) await parent.parentApi.clearAbsence(child.id, date);
-      else await parent.parentApi.setAbsence(child.id, date);
-      await refresh();
+      const id = child.id;
+      const off = d.absences.includes(date);
+      await optimistic(
+        (old) => ({ ...old, absences: off ? old.absences.filter((x) => x !== date) : [...old.absences, date] }),
+        () => (off ? parent.parentApi.clearAbsence(id, date) : parent.parentApi.setAbsence(id, date)),
+      );
     },
   };
 
@@ -259,6 +297,8 @@ function useParentState(enabled: boolean) {
     /** The driver gave the whole van today (or tomorrow) off. */
     vanOff: d.vanDaysOff.includes(today) ? ('today' as const) : d.vanDaysOff.includes(addDays(today, 1)) ? ('tomorrow' as const) : null,
     canUndoChuttiToday: canUndoChutti(today, today, vanLeftToday),
+    /** v21: a save that didn't reach the server (SyncNote offers "Try again"). */
+    syncFailed: syncFailed !== null,
     actions,
   };
 }

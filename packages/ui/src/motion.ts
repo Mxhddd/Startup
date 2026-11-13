@@ -7,30 +7,36 @@
 
 export const springs = {
   /** A finger goes down: quick and firm, no bounce. */
-  press: { damping: 30, stiffness: 600, mass: 0.6 },
+  press: { damping: 32, stiffness: 900, mass: 0.5 },
   /** The finger lifts: back up with a small, lively overshoot. */
-  release: { damping: 14, stiffness: 320, mass: 0.7 },
+  release: { damping: 16, stiffness: 480, mass: 0.6 },
   /** The bottom sheet and anything the size of the screen: heavy, calm, no wobble. */
-  sheet: { damping: 28, stiffness: 240, mass: 1 },
+  sheet: { damping: 30, stiffness: 380, mass: 0.9 },
   /** A tick or badge that pops in: one clear bounce. */
-  pop: { damping: 11, stiffness: 260, mass: 0.7 },
+  pop: { damping: 13, stiffness: 420, mass: 0.6 },
   /** Things moving to make room (a row turning done, a list reflowing). */
-  layout: { damping: 22, stiffness: 180, mass: 0.9 },
+  layout: { damping: 26, stiffness: 300, mass: 0.8 },
   /** Numbers rolling to their new value. */
-  number: { damping: 20, stiffness: 200, mass: 0.8 },
+  number: { damping: 22, stiffness: 320, mass: 0.7 },
 } as const;
 
 /** Timings for things that are not springs (fades, the hold fill, the undo countdown). In ms. */
 export const durations = {
-  fade: 180,
-  enter: 320,
+  fade: 140,
+  enter: 200,
+  /** A screen pushing in or out (v21: 360 → 240, so a tap lands at once). */
+  screen: 240,
   /** The gap between items of a list coming in one after another. */
-  stagger: 55,
+  stagger: 35,
   /** The van marker's breathing halo, one full cycle. */
   pulse: 2000,
   /** The van gliding between two positions (positions come every 5 s). */
   glide: 4800,
 } as const;
+
+/** v21: the website's two easing curves (tokens.css --calm and --glide), so the apps and pohnch.pk move alike.
+ *  Pass to Reanimated's Easing.bezier(...curve). */
+export const curves = { calm: [0.22, 0.8, 0.2, 1], glide: [0.65, 0, 0.35, 1] } as const;
 
 /** How far a pressed thing sinks: big buttons barely, small ones a little more (they need the feedback). */
 export const pressScale = { big: 0.975, small: 0.95, chip: 0.92 } as const;

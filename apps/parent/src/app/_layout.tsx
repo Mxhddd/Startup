@@ -16,6 +16,7 @@ import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { ParentProvider } from '../state/ParentStore';
+import { SyncNote } from '../components/SyncNote';
 import { TripNotifications } from '../notifications/TripNotifications';
 import { LocalAlerts } from '../notifications/LocalAlerts';
 import { rememberInvite, takeInvite } from '../state/pendingInvite';
@@ -91,6 +92,7 @@ function RootLayout() {
                 </Fragment>
               </ArchWipeProvider>
             </MorphProvider>
+            <SyncNote />
             <TripNotifications signedIn={configured && !!session} />
             <LocalAlerts signedIn={configured && !!session} />
           </ParentProvider>

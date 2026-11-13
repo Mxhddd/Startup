@@ -47,8 +47,8 @@ function Screens() {
   // finishing a trip feels like one continuous motion rather than a new page sliding over.
   return (
     <Stack screenOptions={options}>
-      <Stack.Screen name="trip" options={{ animation: 'fade', animationDuration: 420 }} />
-      <Stack.Screen name="done" options={{ animation: 'fade', animationDuration: 520, gestureEnabled: false }} />
+      <Stack.Screen name="trip" options={{ animation: 'fade', animationDuration: 220 }} />
+      <Stack.Screen name="done" options={{ animation: 'fade', animationDuration: 280, gestureEnabled: false }} />
     </Stack>
   );
 }

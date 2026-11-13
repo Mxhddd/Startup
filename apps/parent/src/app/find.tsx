@@ -113,7 +113,7 @@ export default function Find() {
         <>
           <AppText variant="display" style={{ fontSize: 28 }}>{t('s2.find.count', { n: vans.length })}</AppText>
           {vans.map((v, i) => (
-            <Animated.View key={v.van_id} entering={FadeInDown.delay(i * 70).springify().damping(22)}>
+            <Animated.View key={v.van_id} entering={FadeInDown.delay(i * 70).springify().damping(22).stiffness(300)}>
               <VanCard v={v} onOpen={() => { setSent(false); setPick(v); }} />
             </Animated.View>
           ))}

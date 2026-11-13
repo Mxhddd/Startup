@@ -57,7 +57,7 @@ export default function Request() {
           <TapButton size="next" tone="left" icon="plus" label={t('s2.req.start')} onConfirm={ask} testID="request-ask" />
         </View>
       ) : n !== null ? (
-        <Animated.View entering={FadeInDown.springify().damping(22)} style={{ backgroundColor: colors.white, borderRadius: 28, padding: 18, gap: 14, boxShadow: elevation.e1 }} testID="request-card">
+        <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ backgroundColor: colors.white, borderRadius: 28, padding: 18, gap: 14, boxShadow: elevation.e1 }} testID="request-card">
           <AppText bold style={{ fontSize: 18 }}>{child?.school_name ?? ''}</AppText>
           {/* One arch per child, filling in as neighbours join. */}
           <View style={{ flexDirection: row, justifyContent: 'space-between' }}>

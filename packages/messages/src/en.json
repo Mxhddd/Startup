@@ -137,6 +137,7 @@
   "common.back": "Back",
   "common.loading": "Loading…",
   "common.retry": "Try again",
+  "parent.sync.failed": "Couldn't save that. Check your internet.",
   "common.notConnected": "Pohnch isn't connected to its server yet. Practice works.",
   "location.notification.title": "Pohnch · trip running",
   "location.notification.body": "The van's place is shared with its families only until the trip ends",

@@ -32,7 +32,7 @@ function clock(iso: string | null): string | undefined {
 /** An onboarding state: the drawn "path arrives" mark, a title, a line, and the buttons. */
 function Onboard({ title, body, children }: { title: string; body?: string; children?: ReactNode }) {
   return (
-    <Animated.View testID="trip-sheet" entering={FadeInDown.springify().damping(22)} style={{ gap: space.lg }}>
+    <Animated.View testID="trip-sheet" entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ gap: space.lg }}>
       <LineArt width={150} />
       <View style={{ gap: 6 }}>
         <AppText variant="display" style={{ fontSize: 32 }}>{title}</AppText>
@@ -248,7 +248,7 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
 
       {/* v8: the van is at your door: how long it has waited, and "we're ready" for the driver. */}
       {live && !childDone && (p.eta === 'door' || (typeof p.eta === 'number' && p.eta <= 3)) ? (
-        <Animated.View entering={FadeInDown.springify().damping(20)} layout={layout} testID="door-panel" style={{ gap: space.md }}>
+        <Animated.View entering={FadeInDown.springify().damping(20).stiffness(300)} layout={layout} testID="door-panel" style={{ gap: space.md }}>
           {p.doorSince ? (
             <View style={{ flexDirection: row, alignItems: 'center', gap: 12 }}>
               {/* v10: a zamurrad arch seal with the home mark, beside the wait. */}
@@ -314,17 +314,17 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
 
       {/* v9: the one obvious next thing for this state of the day (homeState in @pohnch/core). */}
       {next.action === 'offToday' && canSetChutti ? (
-        <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout}>
+        <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} layout={layout}>
           <TapButton tone="quiet" icon="calendar" label={t('parent.chutti.offToday')} onConfirm={toggleChutti} testID="next-off-today" />
         </Animated.View>
       ) : next.action === 'week' ? (
-        <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout}>
+        <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} layout={layout}>
           <TapButton tone="quiet" icon="pulse" label={t('history.link')} onConfirm={() => router.push('/history')} testID="next-week" />
         </Animated.View>
       ) : null}
 
       {p.timeline.late ? (
-        <Animated.View entering={FadeInDown.springify()} layout={layout} style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
+        <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} layout={layout} style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
           <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: colors.shingarf }} />
           <AppText bold color={colors.dangerText} style={{ flex: 1 }}>{t('parent.late', { reason: t(`help.reason.${p.timeline.late as 'traffic'}`) })}</AppText>
         </Animated.View>
@@ -336,7 +336,7 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
           {p.canUndoChuttiToday ? <AbsentChip onUndo={toggleChutti} /> : <AppText variant="small" color={colors.ink2}>{t('parent.chutti.locked')}</AppText>}
         </Animated.View>
       ) : (
-        <Animated.View entering={FadeIn.duration(300)} layout={layout} style={{ gap: space.sm, paddingTop: space.xs }}>
+        <Animated.View entering={FadeIn.duration(180)} layout={layout} style={{ gap: space.sm, paddingTop: space.xs }}>
           {p.story ? (
             // v8: the run is over: today's story, in brand type, with how long the ride took.
             <View testID="story-card" style={{ flexDirection: row, alignItems: 'flex-end', gap: space.md, marginTop: space.sm }}>

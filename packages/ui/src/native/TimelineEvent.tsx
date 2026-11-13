@@ -55,7 +55,7 @@ export function TimelineEvent({
   // The line to the next step draws itself downward, just after this step arrives.
   const drawn = useSharedValue(0);
   useEffect(() => {
-    drawn.value = withDelay(staggerDelay(index) + 180, withTiming(1, { duration: 420, easing: Easing.out(Easing.cubic) }));
+    drawn.value = withDelay(staggerDelay(index) + 60, withTiming(1, { duration: 300, easing: Easing.out(Easing.cubic) }));
   }, [drawn, index]);
   const lineStyle = useAnimatedStyle(() => ({ transform: [{ scaleY: drawn.value }] }));
 
@@ -73,7 +73,7 @@ export function TimelineEvent({
     <Animated.View
       testID={`timeline-${step}`}
       entering={FadeInDown.delay(staggerDelay(index)).springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)}
-      layout={LinearTransition.springify().damping(springs.layout.damping)}
+      layout={LinearTransition.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)}
       style={{ flexDirection: row, gap: 16, minHeight: 70 }}
     >
       <View style={{ alignItems: 'center', width: 34 }}>

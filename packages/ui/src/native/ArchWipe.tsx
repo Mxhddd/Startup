@@ -1,6 +1,7 @@
 // v11 (canvas "Z11-Transition"): pages open through an arch. Tap something, and an arch of neel light
 // with our star pattern grows out of it until it fills the screen; the next page is opened behind it;
-// then the arch lifts away (fades and keeps growing) to reveal the page. About 0.7 s in all.
+// then the arch lifts away (fades and keeps growing) to reveal the page. About 0.45 s in all, and (v21) the
+// page itself opens on the tap, not after the arch.
 // Reduce Motion: no arch; the page simply opens.
 import { createContext, useCallback, useContext, useRef, useState, type ComponentRef, type ReactNode } from 'react';
 import { useWindowDimensions, View } from 'react-native';
@@ -8,6 +9,7 @@ import Animated, { Easing, runOnJS, useAnimatedStyle, useReducedMotion, useShare
 import { colors } from '../theme';
 import { ArchShape } from './Arch';
 import { feel } from './feedback';
+import { curves } from '../motion';
 
 type ViewRef = ComponentRef<typeof View>;
 type Ctx = { open: (from: ViewRef | null, go: () => void) => void };
@@ -37,11 +39,13 @@ export function ArchWipeProvider({ children }: { children: ReactNode }) {
       s.value = 0.06;
       o.value = 1;
       feel('sheetUp');
-      s.value = withTiming(1, { duration: 380, easing: Easing.out(Easing.cubic) }, (fin) => {
+      // v21: the page opens straight away (the tap acts at once); the arch only dresses the change, growing
+      // over the new page as it slides in, then lifting away.
+      go();
+      s.value = withTiming(1, { duration: 200, easing: Easing.bezier(...curves.calm) }, (fin) => {
         if (!fin) return;
-        runOnJS(go)();
-        s.value = withTiming(1.25, { duration: 420, easing: Easing.out(Easing.quad) });
-        o.value = withTiming(0, { duration: 420 }, () => runOnJS(done)());
+        s.value = withTiming(1.25, { duration: 260, easing: Easing.out(Easing.quad) });
+        o.value = withTiming(0, { duration: 260 }, () => runOnJS(done)());
       });
     });
   }, [reduce, s, o, done]);

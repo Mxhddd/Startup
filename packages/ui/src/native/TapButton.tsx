@@ -11,8 +11,8 @@
 // highlight along the top edge, and stands on its lip. The neutral tone is no longer a bordered white
 // box but a soft neel-tint face; quiet is sand on a sand lip. Big buttons hold their icon in a soft
 // circle instead of a square tile.
-import { HOLD_MS, createHold } from '@pohnch/core';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { HOLD_MS } from '@pohnch/core';
+import { useRef, useState } from 'react';
 import { View, type LayoutChangeEvent } from 'react-native';
 import Svg, { Defs, LinearGradient, Rect, Stop } from 'react-native-svg';
 import Animated, {
@@ -38,22 +38,11 @@ import { PressableScale } from './PressableScale';
 
 type Tone = Step | 'neutral' | 'help' | 'quiet';
 
-const lips: Record<Step | 'help', string> = {
-  left: colors.neelDeep,
-  leftSchool: colors.neelDeep,
-  picked: colors.zamurradDeep,
-  dropped: colors.zamurradDeep,
-  reachedSchool: colors.kesarDeep,
-  help: colors.shingarfDeep,
-};
-
-const glows: Record<Step, string> = {
-  left: colors.neelGlow,
-  leftSchool: colors.neelGlow,
-  picked: colors.zamurradGlow,
-  dropped: colors.zamurradGlow,
-  reachedSchool: colors.kesarGlow,
-};
+// v21: read when drawing (they were copied once at load, so dark mode kept the day colours).
+const lipOf = (k: Step | 'help'): string =>
+  ({ left: colors.neelDeep, leftSchool: colors.neelDeep, picked: colors.zamurradDeep, dropped: colors.zamurradDeep, reachedSchool: colors.kesarDeep, help: colors.shingarfDeep })[k];
+const glowOf = (k: Step): string =>
+  ({ left: colors.neelGlow, leftSchool: colors.neelGlow, picked: colors.zamurradGlow, dropped: colors.zamurradGlow, reachedSchool: colors.kesarGlow })[k];
 
 // Read when drawing (not at load), so the night palette's tops apply too.
 const tops = (k: Step | 'help'): string =>
@@ -64,8 +53,8 @@ type Look = { fill: string; top: string; text: string; lip: string | null; glow:
 function look(tone: Tone): Look {
   if (tone === 'neutral') return { fill: colors.neelTint, top: colors.neelTint, text: colors.link, lip: colors.neelTint2, glow: null, ring: colors.white, hi: 0.7 };
   if (tone === 'quiet') return { fill: colors.sand, top: colors.sand, text: colors.siyahi, lip: colors.sandDeep, glow: null, ring: colors.white, hi: 0.7 };
-  if (tone === 'help') return { fill: colors.shingarf, top: tops('help'), text: colors.white, lip: lips.help, glow: null, ring: 'rgba(255,255,255,0.16)', hi: 0.16 };
-  return { ...stepColors[tone], top: tops(tone), lip: lips[tone], glow: glows[tone], ring: tone === 'reachedSchool' ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.16)', hi: tone === 'reachedSchool' ? 0.35 : 0.16 };
+  if (tone === 'help') return { fill: colors.shingarf, top: tops('help'), text: colors.white, lip: lipOf('help'), glow: null, ring: 'rgba(255,255,255,0.16)', hi: 0.16 };
+  return { ...stepColors[tone], top: tops(tone), lip: lipOf(tone), glow: glowOf(tone), ring: tone === 'reachedSchool' ? 'rgba(255,255,255,0.32)' : 'rgba(255,255,255,0.16)', hi: tone === 'reachedSchool' ? 0.35 : 0.16 };
 }
 
 /** A soft band of light that sweeps across the button once, when a tap is confirmed. */
@@ -111,7 +100,8 @@ export function TapButton({
   icon?: IconName;
   hold?: boolean;
   disabled?: boolean;
-  onConfirm: () => void;
+  /** v21: may return a promise; the button then waits (and can't be tapped twice) until it settles. */
+  onConfirm: () => unknown;
   testID?: string;
   /** v9: the sound and haptic when it confirms (a trip step plays its own tone). */
   feel?: FeelKind;
@@ -124,35 +114,41 @@ export function TapButton({
   const shine = useSharedValue(0);
   const [width, setWidth] = useState(0);
   const [holding, setHolding] = useState(false);
-  // Keep the latest onConfirm without rebuilding the hold timer.
+  const [busy, setBusy] = useState(false);
+  // Keep the latest onConfirm without rebuilding anything.
   const confirmRef = useRef(onConfirm);
   confirmRef.current = onConfirm;
+  const holdingRef = useRef(false);
 
   const celebrate = () => {
     feelIt(confirmFeel);
-    pop.value = withSequence(withTiming(1.03, { duration: 110 }), withSpring(1, springs.pop));
+    pop.value = withSequence(withTiming(1.03, { duration: 90 }), withSpring(1, springs.pop));
     shine.value = 0;
-    shine.value = withTiming(1, { duration: 720, easing: Easing.out(Easing.cubic) });
+    shine.value = withTiming(1, { duration: 520, easing: Easing.out(Easing.cubic) });
+  };
+
+  // v21: the action runs in the same frame as the feedback. A promise keeps the button busy (no double taps).
+  const fire = () => {
+    celebrate();
+    const r = confirmRef.current();
+    if (r && typeof (r as Promise<unknown>).then === 'function') {
+      setBusy(true);
+      (r as Promise<unknown>).catch(() => undefined).finally(() => setBusy(false));
+    }
   };
 
   // A rising tick at each quarter of the hold (sound and touch), so the driver hears it filling.
   const holdTick = (q: number) => feelIt(HOLD_FEELS[q - 1] ?? 'hold1');
 
-  const holdCtl = useMemo(
-    () =>
-      createHold(() => {
-        setHolding(false);
-        progress.value = withTiming(0, { duration: 260 });
-        celebrate();
-        confirmRef.current();
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [progress],
-  );
-
-  useEffect(() => () => {
-    holdCtl.release();
-  }, [holdCtl]);
+  // v21: the hold confirms when the fill itself finishes (on the UI thread), not from a separate JS timer
+  // that could run late while the phone is busy. The fill and the confirm are now one and the same.
+  const holdDone = () => {
+    if (!holdingRef.current) return;
+    holdingRef.current = false;
+    setHolding(false);
+    progress.value = withTiming(0, { duration: 200 });
+    fire();
+  };
 
   // A soft tick at each quarter of the hold, so the driver feels it filling without looking.
   useAnimatedReaction(
@@ -163,14 +159,17 @@ export function TapButton({
   );
 
   const start = () => {
-    if (!hold || disabled) return;
+    if (!hold || disabled || busy) return;
+    holdingRef.current = true;
     setHolding(true);
-    progress.value = withTiming(1, { duration: HOLD_MS, easing: Easing.inOut(Easing.quad) });
-    holdCtl.press();
+    progress.value = withTiming(1, { duration: HOLD_MS, easing: Easing.inOut(Easing.quad) }, (fin) => {
+      if (fin) runOnJS(holdDone)();
+    });
   };
 
   const cancel = () => {
-    if (!holdCtl.release()) return;
+    if (!holdingRef.current) return;
+    holdingRef.current = false;
     setHolding(false);
     cancelAnimation(progress);
     progress.value = withSpring(0, springs.release);
@@ -179,6 +178,7 @@ export function TapButton({
   const fillStyle = useAnimatedStyle(() => ({ width: `${progress.value * 100}%`, opacity: progress.value > 0 ? 1 : 0 }));
   const popStyle = useAnimatedStyle(() => ({ transform: [{ scale: pop.value }] }));
 
+  const off = disabled || busy;
   const fill = disabled ? colors.absentBg : c.fill;
   const text = disabled ? colors.absentText : c.text;
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
@@ -192,21 +192,17 @@ export function TapButton({
         accessibilityRole="button"
         accessibilityLabel={label}
         accessibilityHint={hold ? t('tap.hold') : undefined}
-        accessibilityState={{ disabled }}
-        disabled={disabled}
+        accessibilityState={{ disabled: off, busy }}
+        disabled={off}
         scaleTo={big ? 'big' : 'small'}
         haptic={big || hold ? 'press' : 'tap'}
         lip={c.lip && !disabled ? { color: c.lip, depth: big ? 6 : 4 } : undefined}
         glow={big && c.glow ? c.glow : undefined}
-        onLayout={(e: LayoutChangeEvent) => setWidth(e.nativeEvent.layout.width)}
-        onPress={
-          hold
-            ? undefined
-            : () => {
-                celebrate();
-                onConfirm();
-              }
-        }
+        onLayout={(e: LayoutChangeEvent) => {
+          const w = Math.round(e.nativeEvent.layout.width);
+          if (w !== width) setWidth(w);
+        }}
+        onPress={hold ? undefined : fire}
         onPressIn={start}
         onPressOut={cancel}
         faceStyle={{
@@ -214,6 +210,7 @@ export function TapButton({
           borderRadius: big ? radius.big : radius10.field, borderCurve: 'continuous',
           backgroundColor: fill,
           boxShadow: disabled ? undefined : elevation.highlight(c.hi),
+          opacity: busy ? 0.75 : 1,
           overflow: 'hidden',
           justifyContent: 'center',
         }}

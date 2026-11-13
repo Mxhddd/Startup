@@ -16,7 +16,7 @@ import type { DriverStore } from '../state/DriverStore';
 function Card({ tint, ink, icon, title, sub, children, testID }: { tint: string; ink: string; icon: IconName; title: string; sub?: string; children?: React.ReactNode; testID: string }) {
   const { dir } = useLang();
   return (
-    <Animated.View entering={FadeInDown.springify().damping(22)} exiting={FadeOut} testID={testID} style={{ backgroundColor: tint, borderRadius: radius10.group, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
+    <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} exiting={FadeOut} testID={testID} style={{ backgroundColor: tint, borderRadius: radius10.group, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
       <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md }}>
         <Icon name={icon} size={26} color={ink} />
         <View style={{ flex: 1, gap: 2 }}>

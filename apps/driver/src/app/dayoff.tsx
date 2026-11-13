@@ -74,7 +74,7 @@ export default function DayOff() {
       {failed ? <AppText color={colors.dangerText}>{t('error.offline')}</AppText> : null}
 
       {pending ? (
-        <Animated.View entering={FadeInDown.springify()} exiting={FadeOut}>
+        <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} exiting={FadeOut}>
           <UndoBar
             text={t('driver.dayOff.given')}
             tappedAt={pending.at}
@@ -87,7 +87,7 @@ export default function DayOff() {
           />
         </Animated.View>
       ) : isOff ? (
-        <Animated.View key={`off-${date}`} entering={FadeInDown.springify()} style={{ gap: space.md }}>
+        <Animated.View key={`off-${date}`} entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ gap: space.md }}>
           <View style={{ backgroundColor: colors.kesarTint, borderRadius: radius.card, borderCurve: 'continuous', padding: space.lg }}>
             <AppText bold style={{ fontSize: 17 }} testID="dayoff-is-off">{t('driver.dayOff.isOff')}</AppText>
           </View>
@@ -95,7 +95,7 @@ export default function DayOff() {
           <AppText variant="small" color={colors.ink2}>{t('driver.dayOff.cancelHint')}</AppText>
         </Animated.View>
       ) : (
-        <Animated.View key={`on-${date}`} entering={FadeInDown.springify()} style={{ gap: space.md }}>
+        <Animated.View key={`on-${date}`} entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ gap: space.md }}>
           <TapButton size="next" hold tone="left" icon="calendar" label={t('driver.dayOff.give')} disabled={!d.van?.verified_at}
             onConfirm={() => setPending({ date, at: Date.now() })} testID="dayoff-give" />
           <AppText variant="small" color={colors.ink2} align="center">{t('driver.dayOff.hint')}</AppText>

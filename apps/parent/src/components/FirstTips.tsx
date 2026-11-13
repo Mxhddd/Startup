@@ -39,7 +39,7 @@ export function FirstTips() {
   const last = i === TIPS.length - 1;
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   return (
-    <Animated.View entering={FadeInDown.springify().damping(22)} exiting={FadeOut.duration(160)} testID="first-tips" accessibilityLabel={t('tips.label')}
+    <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} exiting={FadeOut.duration(160)} testID="first-tips" accessibilityLabel={t('tips.label')}
       style={{ flexDirection: row, alignItems: 'center', gap: space.md, padding: 14, borderRadius: 22, borderCurve: 'continuous', backgroundColor: colors.neelTint }}>
       <StarIcon size={20} color={colors.kesar} />
       <AppText bold color={colors.link} style={{ flex: 1, fontSize: 15 }}>{t(TIPS[i] as (typeof TIPS)[number])}</AppText>

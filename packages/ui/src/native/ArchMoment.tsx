@@ -51,7 +51,7 @@ export function ArchMoment({ visible, tone, letter, title, sub, onDone }: { visi
     t.value = 0;
     t.value = withSequence(
       withTiming(1, { duration: reduce ? 250 : 900, easing: Easing.out(Easing.cubic) }),
-      withDelay(1500, withTiming(2, { duration: 420 }, (fin) => fin && runOnJS(onDone)())),
+      withDelay(1000, withTiming(2, { duration: 280 }, (fin) => fin && runOnJS(onDone)())),
     );
   }, [visible]); // eslint-disable-line react-hooks/exhaustive-deps
 

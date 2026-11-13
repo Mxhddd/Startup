@@ -22,11 +22,11 @@ export function Screen({ title, children, back = true, scroll = true, footer }: 
   });
   const fold = useAnimatedStyle(() => ({ paddingBottom: interpolate(y.value, [0, 80], [space.xl, space.md], 'clamp') }));
   const titleFold = useAnimatedStyle(() => ({ transform: [{ scale: interpolate(y.value, [0, 80], [1, 0.86], 'clamp') }] }));
-  const body = <Animated.View entering={FadeInDown.delay(80).springify().damping(22)} style={{ gap: space.lg, paddingBottom: space.xxl }}>{children}</Animated.View>;
+  const body = <Animated.View entering={FadeInDown.delay(80).springify().damping(22).stiffness(300)} style={{ gap: space.lg, paddingBottom: space.xxl }}>{children}</Animated.View>;
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       <StatusBar style="light" />
-      <Animated.View entering={FadeInUp.springify().damping(22)}
+      <Animated.View entering={FadeInUp.springify().damping(22).stiffness(300)}
         style={[{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + space.md, paddingBottom: space.xl, paddingHorizontal: space.xl, flexDirection: row, alignItems: 'center', gap: space.md, boxShadow: shadow.card, borderBottomLeftRadius: 36, borderBottomRightRadius: 36, zIndex: 2 }, fold]}>
         {back ? (
           <PressableScale accessibilityRole="button" accessibilityLabel={t('common.back')} scaleTo="chip" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} hitSlop={8}

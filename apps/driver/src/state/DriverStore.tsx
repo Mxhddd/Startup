@@ -36,7 +36,8 @@ function queuedEvents(items: QueueItem[], tripId: string): EventRow[] {
   return out;
 }
 
-export type UndoState = { clientId: string; text: string; at: number } | null;
+/** v21: `added` is what the tap put on screen, so undo can take exactly that off again at once. */
+export type UndoState = { clientId: string; text: string; at: number; added?: EventRow[] } | null;
 
 type State = {
   loading: boolean;
@@ -103,14 +104,13 @@ function useDriverState() {
         return;
       }
       const today = karachiDate(new Date());
-      const [stops, rs, absent, trips, daysOff] = await Promise.all([
+      // v21: one round of reads (was two after each other), so every refresh is about twice as quick.
+      const [stops, rs, absent, trips, daysOff, offM, offA, signals, notices, changes, found] = await Promise.all([
         driver.stopsOf(van.id),
         driver.ridersOf(van.id),
         driver.absencesOn(today),
         driver.tripsToday(van.id),
         driver.daysOffFrom(van.id, today),
-      ]);
-      const [offM, offA, signals, notices, changes, found] = await Promise.all([
         driver.runAbsencesOn(today, 'morning').catch(() => []),
         driver.runAbsencesOn(today, 'afternoon').catch(() => []),
         driver.signalsToday().catch(() => []),
@@ -208,9 +208,15 @@ function useDriverState() {
     async startTrip(kind: 'morning' | 'afternoon') {
       if (!s.van) return;
       const { tripId } = await driver.driverApi.startTrip(s.van.id, kind, randomUUID());
-      // Starting a trip is the one moment the app asks for location permission.
-      if (tripId) setLocation(await startTripLocation(tripId, { title: t('location.notification.title'), body: t('location.notification.body') }));
-      await refresh();
+      // v21: the trip shows as running the moment the server says yes (the trip screen opens), and
+      // location and the full reload follow behind it instead of in front of it.
+      if (tripId) {
+        setS((old) => (old.trips.some((x) => x.id === tripId) ? old : { ...old, events: [], trips: [...old.trips, { id: tripId, kind, status: 'running', is_practice: false, started_at: new Date().toISOString() }] }));
+        // Starting a trip is the one moment the app asks for location permission.
+        void startTripLocation(tripId, { title: t('location.notification.title'), body: t('location.notification.body') })
+          .then(setLocation)
+          .finally(() => void refresh());
+      } else void refresh();
     },
 
     /**
@@ -223,8 +229,9 @@ function useDriverState() {
       const step = running.kind === 'morning' ? 'picked' : 'dropped';
       const childIds = group.children.filter((c) => c.state === 'waiting' && (!only || only.includes(c.childId))).map((c) => c.childId);
       if (childIds.length === 0) return;
-      setS((old) => ({ ...old, events: [...old.events, ...childIds.map((childId) => ({ childId, step, undone: false }))] }));
-      setUndo({ clientId, text, at: Date.now() });
+      const added = childIds.map((childId) => ({ childId, step, undone: false }));
+      setS((old) => ({ ...old, events: [...old.events, ...added] }));
+      setUndo({ clientId, text, at: Date.now(), added });
       await queue.add({ id: clientId, action: 'tap', body: { tripId: running.id, step, childIds, clientId, happenedAt: new Date().toISOString() }, queuedAt: Date.now() });
     },
 
@@ -233,19 +240,22 @@ function useDriverState() {
       if (!running) return;
       if (s.events.some((e) => e.childId === null && e.step === 'reached_school' && !e.undone)) return;
       const clientId = randomUUID();
-      setS((old) => ({ ...old, events: [...old.events, { childId: null, step: 'reached_school', undone: false }] }));
-      setUndo({ clientId, text, at: Date.now() });
+      const added = [{ childId: null, step: 'reached_school', undone: false }];
+      setS((old) => ({ ...old, events: [...old.events, ...added] }));
+      setUndo({ clientId, text, at: Date.now(), added });
       await queue.add({ id: clientId, action: 'tap', body: { tripId: running.id, step: 'reached_school', clientId, happenedAt: new Date().toISOString() }, queuedAt: Date.now() });
     },
 
     async undoLast() {
       if (!undo) return;
-      const { clientId } = undo;
+      const { clientId, added } = undo;
       setUndo(null);
+      // v21: the tap comes off the screen at once (exactly the rows it added), before any network.
+      if (added?.length) setS((old) => ({ ...old, events: old.events.filter((e) => !added.includes(e)) }));
       // Still on the phone? Just take it out of the queue. Already sent? Ask the server to undo it.
       const wasWaiting = await queue.remove(clientId);
       if (!wasWaiting) await queue.add({ id: `undo-${clientId}`, action: 'tap.undo', body: { clientId }, queuedAt: Date.now() });
-      await refresh();
+      void refresh();
     },
 
     clearUndo: () => setUndo(null),
@@ -259,20 +269,36 @@ function useDriverState() {
     /** The whole van off (or back on) for a day; the server tells every family. */
     async setDayOff(date: string, off: boolean) {
       if (!s.van) return;
-      await driver.driverApi.dayOff(s.van.id, date, off);
-      await refresh();
+      const today = karachiDate(new Date());
+      // v21: shown at once; put back by the reload if the server says no.
+      setS((old) => {
+        const daysOff = off ? [...new Set([...old.daysOff, date])] : old.daysOff.filter((x) => x !== date);
+        return { ...old, daysOff, dayOff: daysOff.includes(today) };
+      });
+      try {
+        await driver.driverApi.dayOff(s.van.id, date, off);
+      } finally {
+        void refresh();
+      }
     },
 
     /** v12: a one-day start time for a run (null = back to usual). Families are told by push. */
     async changeTime(kind: 'morning' | 'afternoon', date: string, time: string | null) {
       if (!s.van) return;
-      await driver.v12Api.runChange(s.van.id, kind, date, time);
-      await refresh();
+      setS((old) => ({ ...old, changes: [...old.changes.filter((c) => !(c.date === date && c.kind === kind)), ...(time ? [{ date, kind, time }] : [])] }));
+      try {
+        await driver.v12Api.runChange(s.van.id, kind, date, time);
+      } finally {
+        void refresh();
+      }
     },
     async markFound(childId: string, what: driver.FoundItem['what']) {
       if (!s.van) return;
-      await driver.markFound(s.van.id, childId, what);
-      await refresh();
+      try {
+        await driver.markFound(s.van.id, childId, what);
+      } finally {
+        void refresh();
+      }
     },
     async markCollected(id: string) {
       setS((old) => ({ ...old, found: old.found.filter((f) => f.id !== id) }));
@@ -296,7 +322,7 @@ function useDriverState() {
       setS((old) => ({ ...old, trips: old.trips.map((x) => (x.id === id ? { ...x, status: 'ended' as const } : x)) }));
       if (seatChecked && !running.is_practice) await queue.add({ id: `seat-${id}`, action: 'trip.seatCheck', body: { tripId: id }, queuedAt: Date.now() });
       await queue.add({ id: `end-${id}`, action: 'trip.end', body: { tripId: id }, queuedAt: Date.now() });
-      await refresh();
+      void refresh();
     },
   };
 

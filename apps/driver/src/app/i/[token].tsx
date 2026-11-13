@@ -23,7 +23,7 @@ export default function FamilyInvite() {
       await driver.driverApi.acceptFamilyInvite(token, d.van.id);
       await d.actions.refresh();
       setMsg({ ok: true, text: t('driver.invite.done') });
-      setTimeout(() => router.replace('/families'), 800);
+      setTimeout(() => router.replace('/families'), 300);
     } catch (e) {
       setMsg({ ok: false, text: e instanceof ApiError && e.code === 'invite_invalid' ? t('driver.invite.bad') : t('error.generic') });
     }

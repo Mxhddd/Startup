@@ -43,7 +43,7 @@ export function SetupChecklist({ d }: { d: ReturnType<typeof useDriver> }) {
   }, [all]);
   if (all || !d.van) return null;
   return (
-    <Animated.View entering={FadeInDown.springify().damping(22)} exiting={FadeOutUp.duration(260)} layout={LinearTransition.springify().damping(22)} testID="setup-checklist"
+    <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} exiting={FadeOutUp.duration(260)} layout={LinearTransition.springify().damping(22).stiffness(300)} testID="setup-checklist"
       style={{ backgroundColor: colors.white, borderRadius: 28, borderCurve: 'continuous', boxShadow: elevation.e1, paddingHorizontal: space.lg, paddingTop: space.md }}>
       <AppText variant="headline">{t('driver.checklist.title', { n, of: steps.length })}</AppText>
       {steps.map((s, i) => (

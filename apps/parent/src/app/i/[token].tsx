@@ -81,7 +81,7 @@ export default function JoinFromLink() {
         {p.children.length === 0 || !p.membership ? <FlowSteps step={3} total={4} label={t('parent.flow.label', { n: 3, of: 4 })} /> : null}
         {/* v10: the card is a jharoka arch: a pale arch with a kesar seal at its crown, the van's name in Gulzar. */}
         <TiltLayer tilt={tilt} depth={14}>
-        <Animated.View entering={FadeInDown.springify().damping(20)} style={{ boxShadow: shadow.raised, borderBottomLeftRadius: radius.sheet, borderBottomRightRadius: radius.sheet }}>
+        <Animated.View entering={FadeInDown.springify().damping(20).stiffness(300)} style={{ boxShadow: shadow.raised, borderBottomLeftRadius: radius.sheet, borderBottomRightRadius: radius.sheet }}>
           <ArchShape width={cardW} height={Math.round(cardW * 0.62)} rise={Math.round(cardW * 0.5)} color={colors.ghee}>
             <View style={{ position: 'absolute', left: space.xl, right: space.xl, top: 34, alignItems: 'center', gap: 4 }}>
               <ArchShape width={64} height={76} color={colors.kesar}>
@@ -118,7 +118,7 @@ export default function JoinFromLink() {
             )}
 
             {state === 'sent' ? (
-              <Animated.View entering={ZoomIn.springify().damping(16)} style={{ alignItems: 'stretch', gap: space.sm, paddingVertical: space.md }}>
+              <Animated.View entering={ZoomIn.springify().damping(18).stiffness(300)} style={{ alignItems: 'stretch', gap: space.sm, paddingVertical: space.md }}>
                 {/* A kesar seal with room above it, so the stars rise into empty space, not over the driver's name. */}
                 <View style={{ height: 112, alignItems: 'center', justifyContent: 'flex-end' }}>
                   <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.kesar, alignItems: 'center', justifyContent: 'center' }}>

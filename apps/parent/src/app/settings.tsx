@@ -85,7 +85,7 @@ export default function Settings() {
     <Page title={t('settings.title')} sub={t('settings.hint')}>
 
       {!allowed ? (
-        <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 28, borderCurve: 'continuous', backgroundColor: colors.kesarTint }}>
+        <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, padding: 16, borderRadius: 28, borderCurve: 'continuous', backgroundColor: colors.kesarTint }}>
           <AppText bold style={{ flex: 1 }}>{t('settings.off')}</AppText>
           <PressableScale accessibilityRole="button" testID="alerts-allow"
             onPress={() => (undecided ? askForAlerts().then((ok) => { setAllowed(ok); setUndecided(false); if (ok) registerForPush().catch(() => undefined); }) : Linking.openSettings())} faceStyle={{ height: 44, paddingHorizontal: 16, borderRadius: 14, borderCurve: 'continuous', backgroundColor: colors.night, justifyContent: 'center' }}>

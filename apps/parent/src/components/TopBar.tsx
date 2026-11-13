@@ -50,7 +50,7 @@ export function TopBar({
   const { t, dir } = useLang();
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   return (
-    <Animated.View entering={FadeInUp.delay(120).springify().damping(22)} style={{ position: 'absolute', top: top + space.md, left: space.gutter, right: space.gutter, flexDirection: row, alignItems: 'center', gap: space.sm }}>
+    <Animated.View entering={FadeInUp.delay(120).springify().damping(22).stiffness(300)} style={{ position: 'absolute', top: top + space.md, left: space.gutter, right: space.gutter, flexDirection: row, alignItems: 'center', gap: space.sm }}>
       {kids.map((k, i) => (
         <ChildChip key={k.id} name={k.first_name} on={k.id === selected} i={i} onPress={() => onSelect(k.id)} />
       ))}

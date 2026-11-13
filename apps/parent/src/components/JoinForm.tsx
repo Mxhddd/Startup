@@ -23,13 +23,16 @@ export function JoinForm({ initialToken }: { initialToken?: string }) {
   const send = async () => {
     const token = tokenFromInviteLink(link);
     if (!token) return setMsg({ ok: false, text: t('parent.join.bad') });
-    if (!childId) return router.push('/child');
+    // v21: replace, not push, so /join is never stacked twice (the child screen comes back here once)
+    if (!childId) return router.replace('/child');
     setBusy(true);
     try {
       await parent.parentApi.joinVan(token, childId);
-      await p.actions.refresh();
+      // v21: home straight away (same as opening an invite link); the store refreshes in the background
+      // and home shows the van (or "waiting for the driver") as soon as it arrives.
       setMsg({ ok: true, text: t('parent.join.done') });
-      setTimeout(() => router.replace('/'), 800);
+      void p.actions.refresh();
+      router.replace('/');
     } catch (e) {
       setMsg({ ok: false, text: e instanceof ApiError && e.code === 'invite_invalid' ? t('parent.join.bad') : t('error.generic') });
     } finally {

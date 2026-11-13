@@ -47,7 +47,7 @@ export function Logo({ width = 120, tone = 'neel', animated = false }: { width?:
 
   return (
     <View accessibilityRole="image" accessibilityLabel="پہنچ Pohnch" style={{ width, height }}>
-      {animated ? <Animated.View entering={FadeInDown.springify().damping(springs.layout.damping)}>{letters}</Animated.View> : letters}
+      {animated ? <Animated.View entering={FadeInDown.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)}>{letters}</Animated.View> : letters}
       <Animated.View pointerEvents="none" style={[{ position: 'absolute', left: cx - iconSize / 2, top: cy - iconSize / 2 }, star]}>
         <StarIcon size={iconSize} color={colors.kesar} />
       </Animated.View>

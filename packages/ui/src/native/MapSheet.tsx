@@ -113,7 +113,7 @@ export function MapSheet({
       <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, overflow: 'hidden' }}>
         <BlurView intensity={50} tint={colorScheme() === 'dark' ? 'dark' : 'light'} style={{ flex: 1, backgroundColor: colorScheme() === 'dark' ? 'rgba(24,32,68,0.84)' : 'rgba(255,255,255,0.80)' }} />
         {accent ? (
-          <Animated.View key={accent} entering={FadeIn.duration(600)} style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 140 }}>
+          <Animated.View key={accent} entering={FadeIn.duration(280)} style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 140 }}>
             <Gradient stops={[[0, accent, 0.16], [1, accent, 0]]} />
           </Animated.View>
         ) : null}

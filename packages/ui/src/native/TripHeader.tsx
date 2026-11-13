@@ -47,7 +47,7 @@ export function TripHeader({
   return (
     <Animated.View
       testID="trip-header"
-      entering={FadeInUp.springify().damping(22)}
+      entering={FadeInUp.springify().damping(22).stiffness(300)}
       style={{
         marginTop: topInset + 10,
         marginHorizontal: 14,

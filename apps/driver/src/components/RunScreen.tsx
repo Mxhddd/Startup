@@ -203,12 +203,12 @@ export function RunScreen(p: RunScreenProps) {
         />
         <View style={{ paddingHorizontal: space.lg, paddingTop: space.sm, gap: space.sm }}>
           {p.banner ? (
-            <Animated.View entering={FadeInDown.springify()} style={{ backgroundColor: colors.kesarTint, borderRadius: 20, borderCurve: 'continuous', padding: space.md, boxShadow: elevation.e2 }}>
+            <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ backgroundColor: colors.kesarTint, borderRadius: 20, borderCurve: 'continuous', padding: space.md, boxShadow: elevation.e2 }}>
               <AppText variant="small" bold>{p.banner}</AppText>
             </Animated.View>
           ) : null}
           {fast && p.fix?.speed ? (
-            <Animated.View entering={FadeInDown.springify()} testID="speed-banner" style={{ backgroundColor: colors.shingarf, borderRadius: 20, borderCurve: 'continuous', padding: space.md, boxShadow: elevation.e2 }}>
+            <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} testID="speed-banner" style={{ backgroundColor: colors.shingarf, borderRadius: 20, borderCurve: 'continuous', padding: space.md, boxShadow: elevation.e2 }}>
               <AppText bold color={colors.white} style={{ fontSize: 17 }}>{t('driver.speed.banner', { kmh: kmh(p.fix.speed) })}</AppText>
             </Animated.View>
           ) : null}
@@ -219,7 +219,7 @@ export function RunScreen(p: RunScreenProps) {
       <Animated.View entering={SlideInDown.springify().damping(26).stiffness(220)} style={{ position: 'absolute', left: 0, right: 0, bottom: 0, maxHeight: sheetMax, overflow: 'hidden', backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, boxShadow: shadow.sheet, paddingTop: 22, paddingHorizontal: space.gutter, paddingBottom: insets.bottom + 20, gap: 14 }}>
         <AllDoneSweep show={allDone && p.groups.length > 0} />
         {seat !== null ? (
-          <Animated.View key="seat" entering={FadeInDown.springify().damping(20)} layout={layout} style={{ gap: 12 }} testID="seat-check">
+          <Animated.View key="seat" entering={FadeInDown.springify().damping(20).stiffness(300)} layout={layout} style={{ gap: 12 }} testID="seat-check">
             {/* Reached school keeps its 5-second undo here too; undoing goes back to the trip. */}
             {p.undo ? <MarkedPanel key={`ms${p.undo.at}`} text={p.undo.text} /> : null}
             {p.undo ? <UndoBar key={`u${p.undo.at}`} text={t('undo.prompt')} tappedAt={p.undo.at} onUndo={() => { p.onUndo(); setSeat(null); }} onExpire={p.onUndoExpire} /> : null}
@@ -250,7 +250,7 @@ export function RunScreen(p: RunScreenProps) {
               ) : null}
             </View>
             {readyHere.length > 0 ? (
-              <Animated.View entering={FadeInDown.springify()} style={{ flexDirection: row, alignItems: 'center', gap: 8, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.zamurradTint }} testID="ready-note">
+              <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ flexDirection: row, alignItems: 'center', gap: 8, alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: radius.pill, backgroundColor: colors.zamurradTint }} testID="ready-note">
                 <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: colors.zamurrad }} />
                 <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 15 }}>{t('driver.trip.ready', { name: join(readyHere.map((c) => c.firstName)) })}</AppText>
               </Animated.View>
@@ -280,7 +280,7 @@ export function RunScreen(p: RunScreenProps) {
             {!p.undo ? <AppText variant="small" color={colors.ink2}>{t(p.kind === 'morning' ? 'driver.trip.autoNote' : 'driver.trip.autoNoteAfternoon')}</AppText> : null}
           </Animated.View>
         ) : allDone && p.groups.length > 0 ? (
-          <Animated.View entering={FadeInDown.springify()} layout={layout}>
+          <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} layout={layout}>
             <AppText bold align="center" color={colors.zamurradOnTint}>{t('driver.trip.allDone')}</AppText>
           </Animated.View>
         ) : null}

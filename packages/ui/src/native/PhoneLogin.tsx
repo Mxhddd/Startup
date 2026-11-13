@@ -245,7 +245,7 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
         </View>
         {/* The cream sheet rises in under the logo, on the heavy sheet spring. */}
         <Animated.View
-          entering={SlideInDown.delay(250).springify().damping(springs.sheet.damping).stiffness(springs.sheet.stiffness)}
+          entering={SlideInDown.delay(90).springify().damping(springs.sheet.damping).stiffness(springs.sheet.stiffness)}
           style={{ flexGrow: 1, backgroundColor: colors.ghee, borderTopLeftRadius: radius.sheet, borderTopRightRadius: radius.sheet, paddingHorizontal: space.xl, paddingTop: space.xxl, paddingBottom: space.xxl, boxShadow: '0px -24px 60px rgba(8,12,32,0.35)' }}
         >
         <Animated.View key={step} entering={FadeInDown.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)} exiting={FadeOut.duration(120)} style={{ gap: space.xl }}>
@@ -261,7 +261,7 @@ export function PhoneLogin({ role, sendCode, verify, saveName, onDone, toError }
         {step === 'name' ? <Field kind="name" label={t('login.name.label')} value={name} onChange={setName} testID="name-input" /> : null}
 
         {error ? (
-          <Animated.View accessibilityRole="alert" testID="login-error" entering={FadeInDown.springify().damping(springs.pop.damping)} style={[{ backgroundColor: colors.dangerBg, borderRadius: radius.card, borderCurve: 'continuous', padding: space.md }, shakeStyle]}>
+          <Animated.View accessibilityRole="alert" testID="login-error" entering={FadeInDown.springify().damping(springs.pop.damping).stiffness(springs.pop.stiffness)} style={[{ backgroundColor: colors.dangerBg, borderRadius: radius.card, borderCurve: 'continuous', padding: space.md }, shakeStyle]}>
             <AppText bold color={colors.dangerText}>{t(`error.${error}`)}</AppText>
           </Animated.View>
         ) : null}

@@ -54,7 +54,7 @@ function WeekScore({ tracked, done }: { tracked: number; done: number }) {
   const r = 26;
   const c = 2 * Math.PI * r;
   return (
-    <Animated.View entering={FadeInDown.springify().damping(22)} testID="week-line" accessibilityLabel={t('driver.week', { tracked, done })}
+    <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} testID="week-line" accessibilityLabel={t('driver.week', { tracked, done })}
       style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius10.group, backgroundColor: colors.white, boxShadow: elevation.e1 }}>
       <View style={{ width: 64, height: 64, alignItems: 'center', justifyContent: 'center' }}>
         <Svg width={64} height={64} style={{ position: 'absolute', transform: [{ rotate: '-90deg' }] }}>
@@ -81,6 +81,7 @@ export default function DriverToday() {
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   const [askFor, setAskFor] = useState<'morning' | 'afternoon' | null>(null);
   const [checkFor, setCheckFor] = useState<'morning' | 'afternoon' | null>(null);
+  const [startFailed, setStartFailed] = useState(false);
 
   // v12: once a day, the pre-trip checklist comes first.
   // The first real trip shows the location explanation first (Google Play rule); after that, it starts straight away.
@@ -88,7 +89,9 @@ export default function DriverToday() {
     if (!checked && (await preTripNeeded())) return setCheckFor(kind);
     const seen = await AsyncStorage.getItem(DISCLOSED).catch(() => null);
     if (!seen) return setAskFor(kind);
-    d.actions.startTrip(kind).catch(() => d.actions.refresh());
+    // v21: a start that fails says so (it used to fail silently).
+    setStartFailed(false);
+    return d.actions.startTrip(kind).catch(() => { setStartFailed(true); void d.actions.refresh(); });
   };
 
   // Audit: every hook runs before the redirect below (hooks after an early return crashed Today
@@ -116,7 +119,7 @@ export default function DriverToday() {
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       {/* Header */}
       <StatusBar style="light" />
-      <Animated.View entering={FadeInUp.springify().damping(22)} style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 58 : 30, gap: 10, borderBottomLeftRadius: 36, borderBottomRightRadius: 36 }}>
+      <Animated.View entering={FadeInUp.springify().damping(22).stiffness(300)} style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 58 : 30, gap: 10, borderBottomLeftRadius: 36, borderBottomRightRadius: 36 }}>
         <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
           <Animated.View style={[{ flex: 1, transformOrigin: dir === 'rtl' ? 'right' : 'left' }, greet]}>
           <Pressable style={{ flex: 1 }} onLongPress={__DEV__ ? () => router.push('/gallery') : undefined}>
@@ -151,7 +154,7 @@ export default function DriverToday() {
       >
         {hasMap ? (
           // The route as a raised card that overlaps the header, so the screen has depth.
-          <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ height: 196, marginTop: -38, marginHorizontal: space.gutter, borderRadius: 28, borderCurve: 'continuous', overflow: 'hidden', boxShadow: elevation.e3, backgroundColor: colors.white }}>
+          <Animated.View entering={FadeInDown.delay(120).springify().damping(22).stiffness(300)} style={{ height: 196, marginTop: -38, marginHorizontal: space.gutter, borderRadius: 28, borderCurve: 'continuous', overflow: 'hidden', boxShadow: elevation.e3, backgroundColor: colors.white }}>
             <PohnchMap
               testID="today-map"
               accessibilityLabel={t('driver.nav.stops')}
@@ -164,7 +167,7 @@ export default function DriverToday() {
 
         <View style={{ paddingHorizontal: space.gutter, paddingTop: space.xl, gap: space.lg }}>
           {!configured ? (
-            <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius10.group, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.xl, gap: space.md }}>
+            <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} testID="today-empty" style={{ backgroundColor: colors.white, borderRadius: radius10.group, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.xl, gap: space.md }}>
               <AppText bold>{t('app.driver.name')}</AppText>
               <AppText variant="secondary">{t('common.notConnected')}</AppText>
               <TapButton tone="left" label={t('driver.nav.practice')} onConfirm={() => router.push('/practice')} testID="nav-practice" />
@@ -172,12 +175,12 @@ export default function DriverToday() {
           ) : d.loading ? (
             <Shimmer lines={[{ w: '50%', h: 18 }, { w: '100%', h: 62 }, { w: '100%', h: 62 }, { w: '100%', h: 62 }]} />
           ) : d.error ? (
-            <Animated.View entering={FadeInDown.springify()} style={{ gap: space.md }}>
+            <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ gap: space.md }}>
               <AppText bold color={colors.dangerText}>{t(d.error === 'offline' ? 'error.offline' : 'error.generic')}</AppText>
               <TapButton tone="quiet" label={t('common.retry')} onConfirm={d.actions.refresh} />
             </Animated.View>
           ) : !d.van ? (
-            <Animated.View entering={FadeInDown.springify()} testID="today-empty" style={{ gap: space.md, paddingTop: space.lg }}>
+            <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} testID="today-empty" style={{ gap: space.md, paddingTop: space.lg }}>
               <AppText variant="title" style={{ fontSize: 26 }}>{t('driver.today.setup')}</AppText>
               <AppText variant="secondary">{t('driver.setup.hint')}</AppText>
               <TapButton size="next" tone="left" icon="van" label={t('driver.today.setup')} onConfirm={() => router.push('/setup')} testID="setup-van" />
@@ -237,7 +240,12 @@ export default function DriverToday() {
       </Animated.ScrollView>
 
       {canStart ? (
-        <Animated.View entering={FadeInDown.delay(260).springify().damping(20)} style={{ position: 'absolute', left: space.gutter, right: space.gutter, bottom: insets.bottom + space.xl }}>
+        <Animated.View entering={FadeInDown.delay(80).springify().damping(22).stiffness(300)} style={{ position: 'absolute', left: space.gutter, right: space.gutter, bottom: insets.bottom + space.xl, gap: space.sm }}>
+          {startFailed ? (
+            <View style={{ backgroundColor: colors.dangerBg, borderRadius: radius.card, borderCurve: 'continuous', padding: space.md }} testID="start-failed">
+              <AppText bold align="center" color={colors.dangerText}>{t('error.offline')}</AppText>
+            </View>
+          ) : null}
           {nextKind ? (
             <TapButton size="next" tone="left" icon="van" hold testID="start-trip"
               label={t(nextKind === 'morning' ? 'driver.today.startMorning' : 'driver.today.startAfternoon')}

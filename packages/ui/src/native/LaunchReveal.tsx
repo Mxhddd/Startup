@@ -14,7 +14,7 @@ export function LaunchReveal() {
   const lift = useSharedValue(0);
   useEffect(() => {
     star.value = withSequence(withTiming(1.12, { duration: 260, easing: Easing.out(Easing.quad) }), withSpring(0.001, springs.press));
-    lift.value = withDelay(380, withTiming(1, { duration: 520, easing: Easing.inOut(Easing.cubic) }, (f) => {
+    lift.value = withDelay(120, withTiming(1, { duration: 380, easing: Easing.inOut(Easing.cubic) }, (f) => {
       if (f) runOnJS(setDone)(true);
     }));
   }, [star, lift]);

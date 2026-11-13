@@ -64,7 +64,7 @@ export default function Kids() {
         const col = childColors(i);
         const text = !l ? '' : ['coming', 'inVan', 'atSchool', 'home'].includes(l.key) ? t(`parent.place.${l.key as 'home'}`, { name: c.first_name }) : t(`kids.${l.key as 'off'}`, { name: c.first_name });
         return (
-          <Animated.View key={c.id} entering={FadeInDown.delay(i * 90).springify().damping(22)}>
+          <Animated.View key={c.id} entering={FadeInDown.delay(i * 90).springify().damping(22).stiffness(300)}>
             <PressableScale accessibilityRole="button" accessibilityLabel={text || c.first_name} testID={`kid-${i}`} onPress={() => { p.actions.selectChild(c.id); router.navigate('/'); }}
               faceStyle={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: radius10.group, backgroundColor: colors.white }}>
               <Niche letter={c.first_name.slice(0, 1)} fill={col.fill} ink={col.ink} width={64} height={78} floating={false} />

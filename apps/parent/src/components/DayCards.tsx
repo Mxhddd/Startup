@@ -16,7 +16,7 @@ const layout = LinearTransition.springify().damping(24).stiffness(200);
 function Note({ tint, ink, icon, title, sub, testID }: { tint: string; ink: string; icon: IconName; title: string; sub?: string; testID: string }) {
   const { dir } = useLang();
   return (
-    <Animated.View entering={FadeInDown.springify().damping(20)} exiting={FadeOut.duration(200)} layout={layout} testID={testID} accessibilityRole="alert"
+    <Animated.View entering={FadeInDown.springify().damping(20).stiffness(300)} exiting={FadeOut.duration(200)} layout={layout} testID={testID} accessibilityRole="alert"
       style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius10.row, borderCurve: 'continuous', backgroundColor: tint }}>
       <View style={{ width: 36, height: 36, borderRadius: 18, backgroundColor: 'rgba(255,255,255,0.55)', alignItems: 'center', justifyContent: 'center' }}>
         <Icon name={icon} size={20} color={ink} />
@@ -90,7 +90,7 @@ export function FoundItems() {
   return (
     <Animated.View layout={layout} style={{ gap: space.sm }} testID="found-items">
       {p.found.map((f) => (
-        <Animated.View key={f.id} entering={FadeInDown.springify()} exiting={FadeOut} layout={layout}
+        <Animated.View key={f.id} entering={FadeInDown.springify().damping(22).stiffness(300)} exiting={FadeOut} layout={layout}
           style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, padding: 14, borderRadius: radius10.row, backgroundColor: colors.zamurradTint }}>
           <Icon name="bag" size={22} color={colors.zamurradOnTint} />
           <AppText bold color={colors.zamurradOnTint} style={{ flex: 1, fontSize: 16 }}>{t('found.parent', { name, what: t(`found.what.${f.what}`), who: p.driverName ?? t('parent.chutti.theDriver') })}</AppText>

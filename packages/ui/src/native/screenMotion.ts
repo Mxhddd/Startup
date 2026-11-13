@@ -3,6 +3,7 @@
 import { Platform } from 'react-native';
 import { useLang } from '../lang';
 import { colors } from '../theme';
+import { durations } from '../motion';
 
 export function useScreenOptions() {
   const { dir } = useLang();
@@ -11,7 +12,7 @@ export function useScreenOptions() {
     headerShown: false,
     contentStyle: { backgroundColor: colors.ghee },
     animation,
-    animationDuration: 360,
+    animationDuration: durations.screen,
     gestureEnabled: true,
     fullScreenGestureEnabled: true,
   } as const;

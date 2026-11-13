@@ -1,7 +1,7 @@
 // The map in both apps: MapLibre with free OpenFreeMap tiles (OpenStreetMap data), recoloured to the
 // brand. No Google account, map key or billing is needed. It never shows the phone's own location.
 import { Camera, GeoJSONSource, Layer, Map, Marker, type CameraRef, type StyleSpecification } from '@maplibre/maplibre-react-native';
-import { useEffect, useRef, useState } from 'react';
+import { memo, useEffect, useRef, useState } from 'react';
 import Animated, { useAnimatedStyle, useReducedMotion, useSharedValue, withSpring } from 'react-native-reanimated';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { brandMapStyle, type MapStyleJson } from '../mapStyle';
@@ -10,6 +10,7 @@ import { BASE_MAP_STYLE_URL, colorScheme, colors, karachiRegion, mapMoodAt, type
 import { AppText } from './AppText';
 import { StopPin } from './StopPin';
 import { VanMarker } from './VanMarker';
+import { useGlide } from './useGlide';
 
 export type MapPin =
   | { id: string; kind: 'stop' | 'home' | 'school'; lat: number; lng: number }
@@ -228,11 +229,18 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
           <PinView pin={p} />
         </Marker>
       ))}
-      {van ? (
-        <Marker id="van" lngLat={[van.lng, van.lat]} anchor="center">
-          <VanMarker heading={(van.heading ?? 0) - mapBearing} stale={van.stale} speed={van.speed} waiting={van.waiting} lights={mood === 'dusk' || mood === 'night'} />
-        </Marker>
-      ) : null}
+      {van ? <GlidingVan lat={van.lat} lng={van.lng} heading={(van.heading ?? 0) - mapBearing} stale={van.stale} speed={van.speed} waiting={van.waiting} lights={mood === 'dusk' || mood === 'night'} /> : null}
     </Map>
   );
 }
+
+/** v21: the van marker glides between real positions by itself; only this small piece redraws each frame. */
+const GlidingVan = memo(function GlidingVan({ lat, lng, heading, stale, speed, waiting, lights }: { lat: number; lng: number; heading: number; stale: boolean; speed?: number | null; waiting?: boolean; lights: boolean }) {
+  const at = useGlide({ latitude: lat, longitude: lng }, stale);
+  if (!at) return null;
+  return (
+    <Marker id="van" lngLat={[at.longitude, at.latitude]} anchor="center">
+      <VanMarker heading={heading} stale={stale} speed={speed} waiting={waiting} lights={lights} />
+    </Marker>
+  );
+});

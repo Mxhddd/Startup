@@ -34,7 +34,7 @@ export function RouteDots({ total, done, tone = 'light' }: { total: number; done
       parts.push(<View key="end" style={{ width: 18, height: 18, borderRadius: 9, borderCurve: 'continuous', backgroundColor: colors.zamurrad, boxShadow: `0px 0px 0px 4px ${dark ? 'rgba(167,212,126,0.45)' : colors.zamurradTint}` }} />);
     } else if (isVan) {
       parts.push(
-        <Animated.View key="van" layout={LinearTransition.springify().damping(springs.layout.damping)} style={{ width: 22, height: 22, borderRadius: 11, borderCurve: 'continuous', backgroundColor: dark ? colors.kesar : colors.neel, boxShadow: `0px 0px 0px 5px ${dark ? 'rgba(232,163,61,0.3)' : colors.neelTint}` }} />,
+        <Animated.View key="van" layout={LinearTransition.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)} style={{ width: 22, height: 22, borderRadius: 11, borderCurve: 'continuous', backgroundColor: dark ? colors.kesar : colors.neel, boxShadow: `0px 0px 0px 5px ${dark ? 'rgba(232,163,61,0.3)' : colors.neelTint}` }} />,
       );
     } else if (i < at) {
       parts.push(<View key={i} style={{ width: 14, height: 14, borderRadius: 7, borderCurve: 'continuous', backgroundColor: main }} />);

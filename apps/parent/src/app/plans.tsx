@@ -53,7 +53,7 @@ export default function Plans() {
   };
   return (
     <Page title={t('s2.live.title')} sub={t('s2.live.sub')}>
-      <Animated.View entering={FadeInDown.springify().damping(22)} style={{ gap: space.md }}>
+      <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ gap: space.md }}>
         <Plan on title={t('s2.live.title')} price={t('s2.live.price')} per={t('s2.live.per')} badge={t('s2.live.free')} feats={[t('s2.live.f1'), t('s2.live.f2'), t('s2.live.f3'), t('s2.live.f4')]} />
         <Plan title={t('s2.free.title')} price={t('s2.free.price')} per={t('s2.free.per')} feats={[t('s2.free.f1'), t('s2.free.f2')]} />
         {s?.status === 'trial' ? (

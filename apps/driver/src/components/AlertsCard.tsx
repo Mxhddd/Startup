@@ -15,7 +15,7 @@ export function AlertsCard() {
   }, []);
   if (!show) return null;
   return (
-    <Animated.View entering={FadeInDown.springify().damping(22)} exiting={FadeOutUp.duration(240)} testID="alerts-card"
+    <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} exiting={FadeOutUp.duration(240)} testID="alerts-card"
       style={{ backgroundColor: colors.neelTint, borderRadius: 28, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
       <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md }}>
         <Icon name="bell" size={24} color={colors.link} />

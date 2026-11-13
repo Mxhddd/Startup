@@ -72,7 +72,7 @@ export default function History() {
           const tl = timelineFor(tr.kind, child.id, day.events[tr.id] ?? []);
           const story = storyOf(tr.kind, tl.items);
           return (
-            <Animated.View key={tr.id} entering={FadeInDown.delay(n * 80).springify().damping(22)}
+            <Animated.View key={tr.id} entering={FadeInDown.delay(n * 80).springify().damping(22).stiffness(300)}
               style={{ backgroundColor: colors.white, borderRadius: radius10.group, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.lg, gap: space.sm }}>
               <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center' }}>
                 <AppText bold style={{ flex: 1, fontSize: 18 }}>{t(tr.kind === 'morning' ? 'trip.morning' : 'trip.afternoon')}</AppText>

@@ -20,11 +20,14 @@ export default function Families() {
   const [stopFor, setStopFor] = useState<Record<string, string>>({});
   const [error, setError] = useState(false);
   const [removing, setRemoving] = useState<{ membershipId: string; name: string } | null>(null);
+  const [decided, setDecided] = useState<string[]>([]);
+  const decidedRef = decided;
+  const requests = d.requests.filter((r) => !decided.includes(r.membershipId));
   if (!d.van) return null;
   const van = d.van;
   const row = dir === 'rtl' ? 'row-reverse' : 'row';
   const position = (stopId: string | null) => d.stops.find((s) => s.id === stopId)?.position ?? 999;
-  const riders = [...d.riders].sort((a, b) => position(a.stopId) - position(b.stopId) || a.firstName.localeCompare(b.firstName));
+  const riders = [...d.riders].filter((r) => !r.membershipId || !decidedRef.includes(r.membershipId)).sort((a, b) => position(a.stopId) - position(b.stopId) || a.firstName.localeCompare(b.firstName));
 
   const share = async () => {
     try {
@@ -34,36 +37,41 @@ export default function Families() {
       setError(true);
     }
   };
+  // v21: the card leaves the list on the tap; the reload follows. If the server says no, it comes back.
   const decide = async (membershipId: string, approve: boolean) => {
     setError(false);
+    setDecided((x) => [...x, membershipId]);
     try {
       await driver.driverApi.decide(membershipId, approve, approve ? stopFor[membershipId] ?? null : null);
-      await d.actions.refresh();
     } catch {
       setError(true);
+      setDecided((x) => x.filter((y) => y !== membershipId));
     }
+    void d.actions.refresh();
   };
   const remove = async () => {
     if (!removing) return;
     const { membershipId } = removing;
     setRemoving(null);
+    setDecided((x) => [...x, membershipId]);
     try {
       await driver.driverApi.removeRider(membershipId);
-      await d.actions.refresh();
     } catch {
       setError(true);
+      setDecided((x) => x.filter((y) => y !== membershipId));
     }
+    void d.actions.refresh();
   };
 
   return (
     <Screen title={t('driver.families.title')}>
       {error ? <AppText bold color={colors.dangerText}>{t('error.generic')}</AppText> : null}
 
-      {d.requests.length > 0 ? (
+      {requests.length > 0 ? (
         <Animated.View layout={layout} style={{ gap: space.md }}>
-          <AppText variant="headline">{t('driver.families.requests')} · {String(d.requests.length)}</AppText>
-          {d.requests.map((r) => (
-            <Animated.View key={r.membershipId} entering={FadeInDown.springify().damping(22)} layout={layout} style={{ gap: space.sm }}>
+          <AppText variant="headline">{t('driver.families.requests')} · {String(requests.length)}</AppText>
+          {requests.map((r) => (
+            <Animated.View key={r.membershipId} entering={FadeInDown.springify().damping(22).stiffness(300)} layout={layout} style={{ gap: space.sm }}>
               <AppText variant="small" bold color={colors.ink2}>{t('driver.families.pickStop')}</AppText>
               <View style={{ flexDirection: row, flexWrap: 'wrap', gap: 8 }}>
                 {d.stops.map((s) => (
@@ -78,7 +86,7 @@ export default function Families() {
       ) : null}
 
       {van.verified_at ? <InviteCard onShare={share} /> : <AppText variant="secondary">{t('driver.families.needsCheck')}</AppText>}
-      {d.requests.length === 0 ? <AppText variant="secondary">{t('driver.families.none')}</AppText> : null}
+      {requests.length === 0 ? <AppText variant="secondary">{t('driver.families.none')}</AppText> : null}
 
       <Animated.View layout={layout} style={{ gap: space.sm }}>
         <AppText variant="headline">{t('driver.families.riders', { n: riders.length })}</AppText>
@@ -87,7 +95,7 @@ export default function Families() {
             {riders.map((r, i) => {
               const stop = d.stops.find((s) => s.id === r.stopId);
               return (
-                <Animated.View key={r.childId} entering={FadeInDown.delay(i * 30).springify().damping(22)} layout={layout}
+                <Animated.View key={r.childId} entering={FadeInDown.delay(i * 30).springify().damping(22).stiffness(300)} layout={layout}
                   style={{ flexDirection: row, alignItems: 'center', gap: space.md, minHeight: 72 }}>
                   <View style={{ width: 32, height: 32, borderRadius: 16, backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>
                     <AppText variant="number" color={colors.white} style={{ fontSize: 15, lineHeight: 20 }}>{stop ? String(stop.position) : '—'}</AppText>

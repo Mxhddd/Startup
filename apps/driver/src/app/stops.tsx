@@ -86,6 +86,7 @@ export default function Stops() {
   const [edit, setEdit] = useState<{ stop: Stop; which: Which } | null>(null);
   const [reordering, setReordering] = useState(false);
   const [order, setOrder] = useState<string[] | null>(null);
+  const [ghosts, setGhosts] = useState<{ lat: number; lng: number }[]>([]);
   useEffect(() => setLabels(Object.fromEntries(d.stops.map((s) => [s.id, s.label]))), [d.stops]);
   if (!d.van) return null;
   const van = d.van;
@@ -93,12 +94,16 @@ export default function Stops() {
   const namesAt = (stopId: string) => d.riders.filter((r) => r.stopId === stopId).map((r) => r.firstName).join(dir === 'rtl' ? '، ' : ', ');
 
   // Any change that fails (usually no signal) says so instead of silently doing nothing.
+  // v21: the reload runs behind (the change already shows), not in front of the next tap.
   const attempt = (fn: () => Promise<unknown>) => {
     setFailed(false);
-    fn().then(d.actions.refresh).catch(() => setFailed(true));
+    fn().catch(() => setFailed(true)).finally(() => void d.actions.refresh().then(() => setGhosts([])));
   };
-  const add = ({ lat, lng }: { lat: number; lng: number }) =>
-    attempt(() => driver.addStop(van.id, { label: t('driver.stops.default', { n: d.stops.length + 1 }), lat, lng }));
+  // v21: a new pin shows on the map the moment it's tapped (a "ghost" until the server has it).
+  const add = ({ lat, lng }: { lat: number; lng: number }) => {
+    setGhosts((g) => [...g, { lat, lng }]);
+    attempt(() => driver.addStop(van.id, { label: t('driver.stops.default', { n: d.stops.length + 1 + ghosts.length }), lat, lng }));
+  };
   // Reordering: drag in a compact list, then "Done" saves the new order once (if it changed).
   const finishReorder = () => {
     setReordering(false);
@@ -119,7 +124,7 @@ export default function Stops() {
   return (
     <Screen title={t('driver.stops.title')}>
       <AppText variant="secondary">{t('driver.stops.hint')}</AppText>
-      <DriverMap pins={d.stops.map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, n: s.position }))} onPress={add} />
+      <DriverMap pins={[...d.stops.map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, n: s.position })), ...ghosts.map((g, i) => ({ id: `ghost-${i}`, lat: g.lat, lng: g.lng, n: d.stops.length + i + 1 }))]} onPress={add} />
       {failed ? <AppText color={colors.dangerText}>{t('error.offline')}</AppText> : null}
       {d.stops.length === 0 ? <AppText variant="secondary">{t('driver.stops.empty')}</AppText> : <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{t('driver.stops.timesHint')}</AppText>}
       {d.stops.length > 1 ? (
@@ -130,14 +135,14 @@ export default function Stops() {
         </PressableScale>
       ) : null}
       {better && !reordering ? (
-        <Animated.View entering={FadeInDown.springify().damping(22)} testID="best-order" style={{ backgroundColor: colors.zamurradTint, borderRadius: 24, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
+        <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} testID="best-order" style={{ backgroundColor: colors.zamurradTint, borderRadius: 24, borderCurve: 'continuous', padding: space.lg, gap: space.md }}>
           <AppText bold color={colors.zamurradOnTint} style={{ fontSize: 18 }}>{t('driver.best.title', { km: better.savedKm.toFixed(1) })}</AppText>
           <AppText color={colors.zamurradOnTint} style={{ fontSize: 16 }}>{better.order.map((id) => d.stops.find((s) => s.id === id)?.label ?? '').join(dir === 'rtl' ? ' ← ' : ' → ')}</AppText>
           <TapButton tone="picked" icon="route" label={t('driver.best.use')} testID="best-order-use" onConfirm={() => attempt(() => driver.reorderStops(van.id, better.order))} />
         </Animated.View>
       ) : null}
       {reordering ? (
-        <Animated.View entering={FadeInDown.springify().damping(22)} style={{ gap: space.sm }}>
+        <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} style={{ gap: space.sm }}>
           <AppText variant="secondary">{t('driver.stops.dragHint')}</AppText>
           <DragList items={d.stops.map((s) => ({ id: s.id, label: s.label, sub: namesAt(s.id) || undefined }))} onChange={setOrder} />
         </Animated.View>
@@ -146,7 +151,7 @@ export default function Stops() {
         {d.stops.map((s, i) => {
           const names = namesAt(s.id);
           return (
-            <Animated.View key={s.id} testID={`stop-row-${i}`} entering={FadeInDown.delay(i * 40).springify().damping(22)} layout={layout}
+            <Animated.View key={s.id} testID={`stop-row-${i}`} entering={FadeInDown.delay(i * 40).springify().damping(22).stiffness(300)} layout={layout}
               style={{ backgroundColor: colors.white, borderRadius: 24, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.md, gap: space.sm }}>
               <View style={{ flexDirection: row, alignItems: 'center', gap: space.sm }}>
                 <View style={{ width: 36, height: 36, borderRadius: 18, borderCurve: 'continuous', backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>

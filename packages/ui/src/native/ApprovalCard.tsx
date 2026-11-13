@@ -12,9 +12,9 @@ export function ApprovalCard({ child, stop, onApprove, onDecline }: { child: str
   return (
     <Animated.View
       testID="approval-card"
-      entering={FadeInDown.springify().damping(springs.layout.damping)}
+      entering={FadeInDown.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)}
       exiting={FadeOutUp.duration(200)}
-      layout={LinearTransition.springify().damping(springs.layout.damping)}
+      layout={LinearTransition.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)}
       style={{ backgroundColor: colors.white, borderRadius: radius.big, borderCurve: 'continuous', boxShadow: shadow.card, padding: space.lg, gap: space.md }}
     >
       <View style={{ gap: 2 }}>

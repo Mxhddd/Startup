@@ -24,7 +24,7 @@ const PRIVACY_URL = 'https://pohnch.pk/privacy';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Animated.View entering={FadeInDown.springify().damping(22)} layout={layout} style={{ gap: space.sm }}>
+    <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} layout={layout} style={{ gap: space.sm }}>
       <SectionCaption>{title}</SectionCaption>
       {children}
     </Animated.View>

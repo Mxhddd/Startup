@@ -19,9 +19,9 @@ export function LivePill({ top, clock, staleSeconds }: { top: number; clock: str
   const text = age ? t('parent.live.lastSeen', { age: t(`age.${age.unit}`, { n: age.n }) }) : t('parent.live.pill', { time: clock });
   return (
     <Animated.View
-      entering={FadeInUp.delay(260).springify().damping(20)}
+      entering={FadeInUp.delay(100).springify().damping(20).stiffness(300)}
       exiting={FadeOutUp.duration(180)}
-      layout={LinearTransition.springify().damping(22)}
+      layout={LinearTransition.springify().damping(22).stiffness(300)}
       accessibilityLiveRegion="polite"
       testID="live-pill"
       style={{ position: 'absolute', top: top + space.md + 58, [dir === 'rtl' ? 'right' : 'left']: space.gutter }}

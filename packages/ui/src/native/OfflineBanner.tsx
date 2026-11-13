@@ -20,7 +20,7 @@ export function OfflineBanner(props: { side: 'driver'; queued: number } | { side
     <Animated.View
       testID="offline-banner"
       accessibilityRole="alert"
-      entering={FadeInUp.springify().damping(springs.layout.damping)}
+      entering={FadeInUp.springify().damping(springs.layout.damping).stiffness(springs.layout.stiffness)}
       exiting={FadeOutUp.duration(180)}
       style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 12, backgroundColor: colors.night, borderRadius: radius.card, borderCurve: 'continuous', paddingHorizontal: 14, paddingVertical: 12, boxShadow: shadow.float }}
     >

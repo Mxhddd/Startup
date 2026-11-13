@@ -42,12 +42,15 @@ export default function ChildPage() {
     parent.membershipOf(existing.id).then((m) => setOnVan(m !== null)).catch(() => setOnVan(false));
   }, [existing]);
 
-  const run = async (fn: () => Promise<unknown>, then: () => void) => {
+  // v21: `wait` = the next screen needs the new data (a first child, before joining a van). Edits go back
+  // at once and the reload follows behind.
+  const run = async (fn: () => Promise<unknown>, then: () => void, wait = true) => {
     setBusy(true);
     setError(null);
     try {
       await fn();
-      await p.actions.refresh();
+      if (wait) await p.actions.refresh();
+      else void p.actions.refresh();
       then();
     } catch {
       setError(t('error.generic'));
@@ -73,7 +76,7 @@ export default function ChildPage() {
     return run(async () => {
       await parent.updateChild(existing.id, c);
       if (moved) await parent.setHomePin(existing.id, pin.lat, pin.lng);
-    }, () => (router.canGoBack() ? router.back() : router.replace('/')));
+    }, () => (router.canGoBack() ? router.back() : router.replace('/')), false);
   };
 
   return (
@@ -108,7 +111,7 @@ export default function ChildPage() {
       <TapButton size="next" tone="left" icon="check" label={existing ? t('common.save') : t('parent.addChild')} disabled={busy} onConfirm={save} testID="child-save" />
 
       {existing ? (
-        <Animated.View entering={FadeInDown.delay(120).springify().damping(22)} style={{ gap: space.md, marginTop: space.lg }}>
+        <Animated.View entering={FadeInDown.delay(120).springify().damping(22).stiffness(300)} style={{ gap: space.md, marginTop: space.lg }}>
           {onVan ? (
             <>
               <TapButton hold tone="quiet" label={t('parent.family.leave', { name: existing.first_name })} disabled={busy} testID="leave-van"

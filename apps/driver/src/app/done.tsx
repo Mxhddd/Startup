@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 function Spark({ i, n }: { i: number; n: number }) {
   const v = useSharedValue(0);
   useEffect(() => {
-    v.value = withDelay(500, withTiming(1, { duration: 1100, easing: Easing.out(Easing.cubic) }));
+    v.value = withDelay(150, withTiming(1, { duration: 700, easing: Easing.out(Easing.cubic) }));
   }, [v]);
   const angle = (i / n) * Math.PI * 2;
   const style = useAnimatedStyle(() => ({
@@ -53,16 +53,16 @@ export default function Done() {
           {Array.from({ length: 10 }, (_, i) => <Spark key={i} i={i} n={10} />)}
           <DrawnCheck fill={colors.zamurrad} color={colors.white} size={112} />
         </View>
-        <Animated.View entering={FadeInDown.delay(350).springify().damping(20)} style={{ gap: space.sm, alignItems: 'center' }}>
+        <Animated.View entering={FadeInDown.delay(120).springify().damping(20).stiffness(300)} style={{ gap: space.sm, alignItems: 'center' }}>
           <AppText variant="display" color={colors.ghee} align="center" style={{ fontSize: 36 }}>{t('driver.done.title')}</AppText>
           <AppText color={colors.mutedOnDark} align="center" style={{ fontSize: 17 }}>{t(kind === 'afternoon' ? 'driver.done.afternoon' : 'driver.done.morning')}</AppText>
         </Animated.View>
-        <Animated.View entering={FadeIn.delay(700).duration(400)} style={{ flexDirection: 'row', alignSelf: 'stretch', gap: space.md, paddingVertical: space.lg, borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(250,246,238,0.14)' }}>
+        <Animated.View entering={FadeIn.delay(300).duration(260)} style={{ flexDirection: 'row', alignSelf: 'stretch', gap: space.md, paddingVertical: space.lg, borderTopWidth: 1, borderBottomWidth: 1, borderColor: 'rgba(250,246,238,0.14)' }}>
           {minutes ? <Stat value={minutes} label={t('driver.done.minutes')} /> : null}
           {children ? <Stat value={children} label={t('driver.done.children')} /> : null}
         </Animated.View>
       </View>
-      <Animated.View entering={FadeInDown.delay(900).springify().damping(20)}>
+      <Animated.View entering={FadeInDown.delay(380).springify().damping(20).stiffness(300)}>
         <TapButton size="next" tone="reachedSchool" label={t('driver.done.back')} onConfirm={() => router.replace('/')} testID="done-back" />
       </Animated.View>
     </View>

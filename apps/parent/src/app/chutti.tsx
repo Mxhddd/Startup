@@ -3,8 +3,8 @@
 // that morning's list. Days in the past, and more than 60 days ahead, can't be chosen.
 // Also the landing place for "Off today" from the home-screen widget and the "van left" alert
 // (?quick=today): today comes already chosen, so one tap on Save confirms it.
-// Data: absences, through the "app" Edge Function (absence.set / absence.clear).
-import { parent } from '@pohnch/client';
+// Data: absences, through the "app" Edge Function (absence.set / absence.clear). v21: saved on the tap
+// (ParentStore.saveChutti), all days at once.
 import { addDays, canPlanDay, chuttiChanges, dayPartsOf, monthGrid, nextMonth } from '@pohnch/core';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, Icon, PressableScale, TapButton } from '@pohnch/ui/native';
@@ -33,7 +33,6 @@ export default function Chutti() {
   const { t, dir } = useLang();
   const p = useParent();
   const { quick, child } = useLocalSearchParams<{ quick?: string; child?: string }>();
-  const [busy, setBusy] = useState(false);
   const [error, setError] = useState(false);
 
   // Opened for a particular child (from an alert): show that child.
@@ -60,21 +59,12 @@ export default function Chutti() {
   const name = p.child?.first_name ?? '';
 
   const toggle = (d: string) => setChosen((c) => (c.includes(d) ? c.filter((x) => x !== d) : [...c, d]));
-  const save = async () => {
+  // v21: saved on the tap. The days show as off straight away (home too), the screen closes at once, and
+  // all the days go to the server together. If that fails, the "Try again" bar appears.
+  const save = () => {
     if (!p.child) return;
-    setBusy(true);
-    setError(false);
-    try {
-      for (const d of changes.add) await parent.parentApi.setAbsence(p.child.id, d);
-      for (const d of changes.clear) await parent.parentApi.clearAbsence(p.child.id, d);
-      await p.actions.refresh();
-      router.canGoBack() ? router.back() : router.replace('/');
-    } catch {
-      setError(true);
-      await p.actions.refresh();
-    } finally {
-      setBusy(false);
-    }
+    void p.actions.saveChutti(changes.add, changes.clear);
+    router.canGoBack() ? router.back() : router.replace('/');
   };
 
   const upcoming = [...chosen].filter((d) => d >= p.today).sort();
@@ -143,7 +133,7 @@ export default function Chutti() {
         {upcoming.length ? <AppText variant="secondary">{upcoming.slice(0, 4).map(label).join(dir === 'rtl' ? '، ' : ', ')}{upcoming.length > 4 ? '…' : ''}</AppText> : null}
       </View>
       {error ? <AppText bold color={colors.dangerText}>{t('parent.chutti.error')}</AppText> : null}
-      <TapButton size="next" tone="left" icon="calendar" label={t('common.save')} disabled={!changed || busy || !p.child} onConfirm={save} testID="chutti-save" />
+      <TapButton size="next" tone="left" icon="calendar" label={t('common.save')} disabled={!changed || !p.child} onConfirm={save} testID="chutti-save" />
     </Page>
   );
 }

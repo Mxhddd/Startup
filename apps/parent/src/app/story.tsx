@@ -92,7 +92,7 @@ export default function Story() {
       ) : !s ? (
         <View style={{ alignItems: 'center' }}><Shimmer arches={{ count: 1, w: 260, h: 300 }} /></View>
       ) : (
-        <Animated.View entering={FadeInDown.springify().damping(20)} style={{ gap: space.lg, alignItems: 'center' }}>
+        <Animated.View entering={FadeInDown.springify().damping(20).stiffness(300)} style={{ gap: space.lg, alignItems: 'center' }}>
           {/* The card that becomes the picture. collapsable={false} so Android keeps it as one view. */}
           <TiltLayer tilt={tilt} depth={10}>
           <View ref={card} collapsable={false} style={{ width: CARD_W, height: CARD_H + 30, backgroundColor: colors.ghee, alignItems: 'center' }} testID="story-card">
@@ -122,7 +122,7 @@ export default function Story() {
           {/* v12: on Friday, the week ends with a small burst of stars over the card. */}
           <StarBurst play={new Date(Date.now() + 5 * 3600_000).getUTCDay() === 5} />
           {streak >= 2 ? (
-            <Animated.View entering={FadeInDown.delay(300).springify().damping(20)} testID="streak-card"
+            <Animated.View entering={FadeInDown.delay(300).springify().damping(20).stiffness(300)} testID="streak-card"
               style={{ alignSelf: 'stretch', flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: space.md, padding: space.md, borderRadius: 24, backgroundColor: colors.zamurradTint }}>
               <View style={{ width: 56, height: 56, borderRadius: 28, backgroundColor: colors.zamurrad, alignItems: 'center', justifyContent: 'center' }}>
                 <AppText variant="number" color={colors.onFill} style={{ fontSize: 24, lineHeight: 30 }}>{String(streak)}</AppText>

@@ -137,6 +137,7 @@
   "common.back": "واپس",
   "common.loading": "لوڈ ہو رہا ہے…",
   "common.retry": "دوبارہ کوشش کریں",
+  "parent.sync.failed": "یہ محفوظ نہیں ہو سکا۔ انٹرنیٹ چیک کریں۔",
   "common.notConnected": "پہنچ ابھی سرور سے نہیں جڑا۔ مشق چل سکتی ہے۔",
   "location.notification.title": "پہنچ · سفر جاری ہے",
   "location.notification.body": "سفر ختم ہونے تک وین کی جگہ صرف اس کے خاندانوں کو دکھ رہی ہے",

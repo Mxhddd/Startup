@@ -1,6 +1,8 @@
 // Draws the van smoothly between real positions (v9 glide, packages/core/src/glide.ts): it keeps
 // rolling the way it was going for a few seconds (so it never stalls between positions), and when a
 // new position arrives it eases into it along a curve (so it never jumps). Stops when the trip does.
+// v21: moved into the map itself (GlidingVan in PohnchMap), so each frame redraws only the van marker,
+// not the whole map and the screen around it (that used to compete with taps during a live trip).
 import { glidePosition, type GlideState, type LatLng } from '@pohnch/core';
 import { useEffect, useRef, useState } from 'react';
 
