@@ -129,7 +129,8 @@ export default function Trip() {
         const minutes = trip ? Math.max(1, Math.round((Date.now() - Date.parse(trip.started_at)) / 60_000)) : null;
         const delivered = d.progress.done;
         // Go to the moment first, so Today never flashes in between; the trip ends behind it.
-        if (trip && !trip.is_practice) router.replace({ pathname: '/done', params: { kind, children: String(delivered), ...(minutes ? { minutes: String(minutes) } : {}) } });
+        // v21: practice trips end on the same "Trip complete" screen (they used to drop back to Today).
+        if (trip) router.replace({ pathname: '/done', params: { kind, children: String(delivered), ...(minutes ? { minutes: String(minutes) } : {}) } });
         setSeat(null);
         // The seat check was confirmed (that's how we got here); it is queued before the end.
         await d.actions.endTrip(true);

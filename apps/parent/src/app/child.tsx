@@ -91,7 +91,7 @@ export default function ChildPage() {
           </Animated.View>
         </MorphTarget>
       ) : null}>
-      {!existing && p.children.length === 0 ? <FlowSteps step={2} total={4} label={t('parent.flow.label', { n: 2, of: 4 })} /> : null}
+      {!existing && p.children.length === 0 ? <FlowSteps step={2} total={3} label={t('parent.flow.label', { n: 2, of: 3 })} /> : null}
       <TextField label={t('parent.child.firstName')} value={name} onChange={setName} maxLength={30} testID="child-name" />
       <TextField label={t('parent.child.school')} value={school} onChange={setSchool} maxLength={80} testID="child-school" />
       <View style={{ gap: 8 }}>

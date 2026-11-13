@@ -4,21 +4,12 @@ import { useLang } from '@pohnch/ui';
 import { PhoneLogin } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useEffect, useMemo } from 'react';
-import { WELCOME_SEEN } from '../state/welcome';
+import { useMemo } from 'react';
 
 export default function Login() {
   const { lang } = useLang();
   const actions = useMemo(() => loginActions('parent', lang), [lang]);
-  // First time on this phone: the three welcome screens come first.
-  useEffect(() => {
-    AsyncStorage.getItem(WELCOME_SEEN)
-      .then((seen) => {
-        if (!seen) router.replace('/welcome');
-      })
-      .catch(() => undefined);
-  }, []);
+  // (v21: whether Welcome comes first is decided in the root layout, before anything is drawn.)
   return (
     <>
       <StatusBar style="light" />

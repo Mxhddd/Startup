@@ -8,6 +8,7 @@ import { driver, type Stop } from '@pohnch/client';
 import { bestOrder, nudgeTime, shortTime } from '@pohnch/core';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, EditSheet, Icon, PressableScale, TapButton, type IconName } from '@pohnch/ui/native';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
@@ -179,6 +180,10 @@ export default function Stops() {
         })}
         </>
       )}
+      {/* v21: a clear way back to Today once the stops are in (it used to be the header arrow only). */}
+      {d.stops.length > 0 && !reordering ? (
+        <TapButton size="next" tone="left" icon="check" label={t('driver.stops.done')} onConfirm={() => (router.canGoBack() ? router.back() : router.replace('/'))} testID="stops-done" />
+      ) : null}
       <TimeSheet edit={edit} onClose={() => setEdit(null)} onSave={saveTime} />
     </Screen>
   );

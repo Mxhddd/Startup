@@ -9,7 +9,6 @@
 import { colors, radius, space, useLang } from '@pohnch/ui';
 import { AppText, Gradient, Icon, LangSwitch, LineArt, PressableScale, Sky, TapButton, TiltLayer, WALLS, WallShape, skyMoodNow, useTilt, type IconName } from '@pohnch/ui/native';
 import { useWindowDimensions } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useState } from 'react';
@@ -18,7 +17,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import Animated, { Easing, FadeIn, FadeOut, SlideInLeft, SlideInRight, runOnJS, useAnimatedStyle, useSharedValue, withRepeat, withSpring, withTiming } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { askForAlerts } from '../notifications/setup';
-import { WELCOME_SEEN } from '../state/welcome';
+import { markWelcomeSeen } from '../state/welcome';
 
 
 const SLIDES = ['map', 'privacy', 'alerts'] as const;
@@ -66,7 +65,7 @@ export default function Welcome() {
   const finish = async (ask: boolean) => {
     // v21: on to login at once; the alerts question (a system dialog) opens over it.
     // (the flag is written first, a few ms, so the login screen never sends you back here)
-    await AsyncStorage.setItem(WELCOME_SEEN, '1').catch(() => undefined);
+    await markWelcomeSeen();
     router.replace('/login');
     if (ask) void askForAlerts().catch(() => false);
   };

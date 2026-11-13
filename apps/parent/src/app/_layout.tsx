@@ -11,7 +11,7 @@ import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { Fragment, useEffect } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -20,6 +20,7 @@ import { SyncNote } from '../components/SyncNote';
 import { TripNotifications } from '../notifications/TripNotifications';
 import { LocalAlerts } from '../notifications/LocalAlerts';
 import { rememberInvite, takeInvite } from '../state/pendingInvite';
+import { loadWelcomeSeen, welcomeSeen } from '../state/welcome';
 import '../notifications/liveTask'; // defines the Android live-notification task at start-up
 
 import { withCrashReports } from '../crash';
@@ -40,7 +41,8 @@ function AuthGate({ ready, signedIn, configured }: { ready: boolean; signedIn: b
     const here = segments[0] as string | undefined;
     const linkToken = (segments as string[])[1];
     if (!signedIn && here === 'i' && typeof linkToken === 'string') rememberInvite(linkToken);
-    if (!signedIn && here !== 'login' && here !== 'welcome' && here !== 'gallery') router.replace('/login');
+    // v21: a new phone sees Welcome first, decided before the first frame (no Login flash).
+    if (!signedIn && here !== 'login' && here !== 'welcome' && here !== 'gallery') router.replace(welcomeSeen() ? '/login' : '/welcome');
     if (signedIn && here === 'login') {
       const token = takeInvite();
       router.replace(token ? { pathname: '/i/[token]', params: { token } } : '/');
@@ -71,13 +73,17 @@ function RootLayout() {
   const scheme = phoneScheme === 'dark' ? 'dark' : 'light';
   if (colorScheme() !== scheme) applyColorScheme(scheme);
   const fontsDone = loaded || !!error;
+  const [welcomeKnown, setWelcomeKnown] = useState(false);
+  useEffect(() => {
+    void loadWelcomeSeen().finally(() => setWelcomeKnown(true));
+  }, []);
 
   useEffect(() => {
     // Hide the splash once fonts are in (the system font is a safe fallback) and we know who is logged in.
-    if (fontsDone && ready) SplashScreen.hideAsync();
-  }, [fontsDone, ready]);
+    if (fontsDone && ready && welcomeKnown) SplashScreen.hideAsync();
+  }, [fontsDone, ready, welcomeKnown]);
 
-  if (!fontsDone || !ready) return null;
+  if (!fontsDone || !ready || !welcomeKnown) return null;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>

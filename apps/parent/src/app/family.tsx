@@ -177,21 +177,24 @@ export default function Menu() {
         )}
       </Section>
 
-      {s2 ? (
-        <Section title={t('s2.menu')}>
-          <Group>
-            <MenuRow icon="star" iconTint={{ tint: colors.kesarTint, ink: colors.onKesar }} title={t('s2.live.title')} line={t('s2.live.free')} onPress={() => router.push('/plans')} testID="menu-live" />
-            <MenuRow icon="search" title={t('s2.find.title')} onPress={() => router.push('/find')} testID="menu-find" />
-            <MenuRow icon="plus" title={t('s2.req.title')} onPress={() => router.push('/request')} testID="menu-request" />
-            {p.membership?.status === 'approved' ? <MenuRow icon="wallet" iconTint={{ tint: colors.zamurradTint, ink: colors.zamurradOnTint }} title={t('s2.fees.title')} onPress={() => router.push('/fees')} testID="menu-fees" /> : null}
-          </Group>
-        </Section>
-      ) : null}
+      {/* v21: everything about vans in one place (join another van; with stage 2, find, request, Live, fees). */}
+      <Section title={t('parent.menu.van')}>
+        <Group>
+          <MenuRow icon="route" title={t('parent.join')} onPress={() => router.push('/join')} testID="menu-join" />
+          {s2 ? (
+            <>
+              <MenuRow icon="star" iconTint={{ tint: colors.kesarTint, ink: colors.onKesar }} title={t('s2.live.title')} line={t('s2.live.free')} onPress={() => router.push('/plans')} testID="menu-live" />
+              <MenuRow icon="search" title={t('s2.find.title')} onPress={() => router.push('/find')} testID="menu-find" />
+              <MenuRow icon="plus" title={t('s2.req.title')} onPress={() => router.push('/request')} testID="menu-request" />
+              {p.membership?.status === 'approved' ? <MenuRow icon="wallet" iconTint={{ tint: colors.zamurradTint, ink: colors.zamurradOnTint }} title={t('s2.fees.title')} onPress={() => router.push('/fees')} testID="menu-fees" /> : null}
+            </>
+          ) : null}
+        </Group>
+      </Section>
 
       <Section title={t('parent.menu.more')}>
         <Group>
           <MenuRow icon="bell" title={t('parent.notifications')} line={t('parent.menu.notificationsLine')} onPress={() => router.push('/settings')} testID="open-settings" />
-          <MenuRow icon="route" title={t('parent.join')} onPress={() => router.push('/join')} />
           <MenuRow icon="phone" iconTint={{ tint: colors.kesarTint, ink: colors.onKesar }} title={t('parent.menu.help')} line={t('parent.menu.helpLine', { phone: PILOT_WHATSAPP.display })} onPress={() => setSheet('help')} testID="menu-help" />
         </Group>
       </Section>

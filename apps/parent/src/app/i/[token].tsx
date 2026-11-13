@@ -78,7 +78,7 @@ export default function JoinFromLink() {
         <StarPattern opacity={0.08} />
       </TiltLayer>
       <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'flex-end', padding: space.lg, paddingTop: insets.top + space.lg, paddingBottom: insets.bottom + space.xl, gap: space.lg }}>
-        {p.children.length === 0 || !p.membership ? <FlowSteps step={3} total={4} label={t('parent.flow.label', { n: 3, of: 4 })} /> : null}
+        {p.children.length === 0 || !p.membership ? <FlowSteps step={3} total={3} label={t('parent.flow.label', { n: 3, of: 3 })} /> : null}
         {/* v10: the card is a jharoka arch: a pale arch with a kesar seal at its crown, the van's name in Gulzar. */}
         <TiltLayer tilt={tilt} depth={14}>
         <Animated.View entering={FadeInDown.springify().damping(20).stiffness(300)} style={{ boxShadow: shadow.raised, borderBottomLeftRadius: radius.sheet, borderBottomRightRadius: radius.sheet }}>

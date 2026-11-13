@@ -25,7 +25,7 @@ export default function Join() {
   };
   return (
     <Page title={t('parent.join.title')}>
-      {!p.membership ? <FlowSteps step={3} total={4} label={t('parent.flow.label', { n: 3, of: 4 })} /> : null}
+      {!p.membership ? <FlowSteps step={3} total={3} label={t('parent.flow.label', { n: 3, of: 3 })} /> : null}
       <JoinForm />
       {p.child && !p.membership ? (
         <View style={{ gap: space.sm, marginTop: space.md }}>
