@@ -14,4 +14,5 @@
 
 ## Google sign-in (free logins)
 - Google Cloud project "Pohnch": OAuth consent screen (published), a Web client (its ID goes in Supabase, Authentication, Google, and as `EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID` in the EAS environment), and Android clients for `pk.pohnch.parent` and `pk.pohnch.driver` with both the upload key's SHA-1 and Play's app-signing SHA-1.
+- Web client ID (public): `476524598980-25jj4li7m0ae3osn3e0n5nrcmcsemutm.apps.googleusercontent.com`; set in Supabase (with its secret) and as an EAS variable in both projects (13 Nov 2026), shipped by over-the-air update.
 - Until the client ID is set, the apps show phone login only.
