@@ -9,7 +9,7 @@ import { colors, space, useLang } from '@pohnch/ui';
 import { AppText, ArchAvatar, FlowSteps, Icon, MorphTarget, SectionCaption, TapButton, TextField } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
 import { BrandMap } from '../components/BrandMap';
 import { Page } from '../components/Page';
@@ -17,6 +17,7 @@ import { useParent } from '../state/ParentStore';
 import { takeInvite } from '../state/pendingInvite';
 
 export default function ChildPage() {
+  const screenH = useWindowDimensions().height;
   const { t, dir } = useLang();
   const p = useParent();
   const { id } = useLocalSearchParams<{ id?: string }>();
@@ -97,7 +98,7 @@ export default function ChildPage() {
       <View style={{ gap: 8 }}>
         <SectionCaption>{t('parent.child.pin')}</SectionCaption>
         {/* v10: the map runs edge to edge and fades into the page, never framed in a card. */}
-        <View style={{ height: 280, marginHorizontal: -18 }}>
+        <View style={{ height: Math.round(Math.min(280, Math.max(200, screenH * 0.32))), marginHorizontal: -18 }}>
           <BrandMap accessibilityLabel={t('parent.child.pin')} home={pin} onPress={setPin} style={{ flex: 1 }} />
           <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 36, experimental_backgroundImage: `linear-gradient(180deg, ${colors.ghee}, transparent)` }} />
           <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 36, experimental_backgroundImage: `linear-gradient(0deg, ${colors.ghee}, transparent)` }} />

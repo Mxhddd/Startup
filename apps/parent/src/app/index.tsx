@@ -9,7 +9,7 @@ import { useRain } from '@pohnch/client';
 import { childPlace } from '@pohnch/core';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
+import { useWindowDimensions, View } from 'react-native';
 import Animated, { ZoomIn, ZoomOut, useAnimatedStyle, useSharedValue } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandMap } from '../components/BrandMap';
@@ -34,7 +34,11 @@ export default function ParentHome() {
   const barStyle = useAnimatedStyle(() => ({ opacity: 1 - 0.5 * Math.min(1, sheet.value) }));
   const live = p.phase === 'live';
   const onboarding = p.phase !== 'live' && p.phase !== 'idle';
-  const peek = onboarding ? 360 : 196;
+  // v21: sheet sizes come from the screen height (they were fixed 360/196/640, which overflowed short phones).
+  const { height: screenH } = useWindowDimensions();
+  const usable = screenH - insets.top - insets.bottom;
+  const peek = Math.round(onboarding ? Math.min(360, usable * 0.46) : Math.min(196, Math.max(160, usable * 0.26)));
+  const openH = Math.round(onboarding ? Math.min(360, usable * 0.6) : Math.min(640, usable * 0.88));
   // v12: rain over the sky, and the sheet tinted by the moment of the trip.
   const rain = useRain(p.membership?.status === 'approved');
   const place = live ? childPlace(p.kind, p.timeline.items) : null;
@@ -80,7 +84,7 @@ export default function ParentHome() {
       {live ? <LivePill top={insets.top} clock={karachiClock(new Date(p.now))} staleSeconds={p.signal?.stale ? p.signal.secondsAgo : null} /> : null}
       </Animated.View>
 
-      <MapSheet peek={peek} open={onboarding ? 360 : 640} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen} progress={sheet} accent={accent}>
+      <MapSheet peek={peek} open={Math.max(peek, openH)} bottomInset={insets.bottom} expanded={open} onExpandedChange={setOpen} progress={sheet} accent={accent}>
         <TripSheet expanded={open} onOpenTrip={() => setOpen((o) => !o)} progress={sheet} onMoment={setArch} />
       </MapSheet>
       {/* v11: the step as an arch of light over everything, then it settles away. */}

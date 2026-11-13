@@ -6,7 +6,7 @@ import { NotoSansArabic_500Medium, NotoSansArabic_700Bold } from '@expo-google-f
 import { useSession } from '@pohnch/client';
 import { LangProvider, applyColorScheme, colorScheme } from '@pohnch/ui';
 import { loadTextSize } from '../textSize';
-import { ArchWipeProvider, LaunchReveal, MorphProvider, useScreenOptions } from '@pohnch/ui/native';
+import { ArchWipeProvider, LaunchReveal, MorphProvider, setOrnament, useScreenOptions } from '@pohnch/ui/native';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
@@ -27,6 +27,8 @@ import { withCrashReports } from '../crash';
 import { startSounds } from '../sounds';
 
 SplashScreen.preventAutoHideAsync();
+// v21: the parent app wears the website's truck-art cards (the driver app stays plain).
+setOrnament(true);
 // v9: load the in-app sounds (and the phone's sound setting) once, at start.
 void startSounds();
 // v12: big-text mode, if chosen.

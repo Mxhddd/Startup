@@ -62,3 +62,5 @@ export { StarSpinner } from './native/StarSpinner';
 export { RouteRibbon } from './native/RouteRibbon';
 export { EmptyScene } from './native/EmptyScene';
 export { StarBurst } from './native/StarBurst';
+export { TruckBand, ChamakStrip, Rose, setOrnament, ornamentOn } from './native/TruckArt';
+export { useGlide } from './native/useGlide';

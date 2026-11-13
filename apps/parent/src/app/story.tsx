@@ -12,16 +12,17 @@ import { makeImageFromView } from '@shopify/react-native-skia';
 import { File, Paths } from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import { useEffect, useRef, useState, type ComponentRef, type RefObject } from 'react';
-import { Platform, Share, View } from 'react-native';
+import { Platform, Share, useWindowDimensions, View } from 'react-native';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import { Page } from '../components/Page';
 import { useParent } from '../state/ParentStore';
 
-const CARD_W = 300;
-const CARD_H = 440;
+// v21: the card shrinks on narrow phones (300 wide did not fit a 320 screen's page).
+const cardSize = (screenW: number) => { const w = Math.min(300, screenW - 36); return { CARD_W: w, CARD_H: Math.round((w * 440) / 300) }; };
 
 export default function Story() {
   const { t, dir } = useLang();
+  const { CARD_W, CARD_H } = cardSize(useWindowDimensions().width);
   const p = useParent();
   const [days, setDays] = useState<(StoryDay & { label: string })[] | null>(null);
   // Audit: this week's chutti days (the store only holds today and later), so they don't break the streak.
@@ -96,7 +97,7 @@ export default function Story() {
           {/* The card that becomes the picture. collapsable={false} so Android keeps it as one view. */}
           <TiltLayer tilt={tilt} depth={10}>
           <View ref={card} collapsable={false} style={{ width: CARD_W, height: CARD_H + 30, backgroundColor: colors.ghee, alignItems: 'center' }} testID="story-card">
-            <ArchShape width={CARD_W} height={CARD_H} rise={170} color={colors.neel} gradient={[colors.headerTop, colors.neel]} pattern>
+            <ArchShape width={CARD_W} height={CARD_H} rise={Math.round(CARD_W * 0.57)} color={colors.neel} gradient={[colors.headerTop, colors.neel]} pattern>
               <View style={{ position: 'absolute', left: 20, right: 20, top: 64, alignItems: 'center', gap: 2 }}>
                 <StarIcon size={28} color={colors.kesar} />
                 <AppText variant="display" color={colors.onBrand} align="center" style={{ fontSize: 34 }}>{t('story.title', { name })}</AppText>

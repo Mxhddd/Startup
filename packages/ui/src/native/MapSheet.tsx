@@ -128,7 +128,7 @@ export function MapSheet({
       </View>
       <GestureDetector gesture={Gesture.Exclusive(pan, tapHandle)}>
         <View accessibilityRole="adjustable" accessibilityLabel={t('sheet.handle')} style={{ height: 30, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ width: 40, height: 5, borderRadius: 3, borderCurve: 'continuous', backgroundColor: colors.line }} />
+          <View style={{ width: 40, height: 5, borderRadius: 3, borderCurve: 'continuous', backgroundColor: colors.handle }} />
         </View>
       </GestureDetector>
       <View style={{ flex: 1, gap: space.lg }}>{children}</View>

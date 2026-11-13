@@ -31,6 +31,7 @@
   "exports": {
     ".": "./src/index.ts",
     "./native": "./src/native.ts",
-    "./theme": "./src/theme.ts"
+    "./theme": "./src/theme.ts",
+    "./truckart": "./src/truckart.ts"
   }
 }

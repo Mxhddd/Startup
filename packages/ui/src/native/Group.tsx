@@ -8,6 +8,7 @@ import { colors, elevation, radius10 } from '../theme';
 import { AppText } from './AppText';
 import { Icon, StarIcon, type IconName } from './icons';
 import { PressableScale } from './PressableScale';
+import { ChamakStrip, ornamentOn } from './TruckArt';
 
 export function SectionCaption({ children, color }: { children: ReactNode; color?: string }) {
   const { dir } = useLang();
@@ -21,9 +22,16 @@ export function SectionCaption({ children, color }: { children: ReactNode; color
   );
 }
 
-export function Group({ children, style, testID }: { children: ReactNode; style?: StyleProp<ViewStyle>; testID?: string }) {
+/**
+ * v21: in the parent app (ornament on) a Group is the website's card: a gilt hairline round it and a long
+ * soft shadow. `foil` adds the chamak strip inside its top edge, for the one featured card on a screen.
+ * In the driver app it stays plain.
+ */
+export function Group({ children, style, testID, foil = false }: { children: ReactNode; style?: StyleProp<ViewStyle>; testID?: string; foil?: boolean }) {
+  const dressed = ornamentOn();
   return (
-    <View testID={testID} style={[{ backgroundColor: colors.white, borderRadius: radius10.group, borderCurve: 'continuous', padding: 6, gap: 2, boxShadow: elevation.e1 }, style]}>
+    <View testID={testID} style={[{ backgroundColor: colors.white, borderRadius: radius10.group, borderCurve: 'continuous', padding: 6, gap: 2, boxShadow: dressed ? `${elevation.module}, ${elevation.e1}` : elevation.e1 }, foil && dressed ? { paddingTop: 26 } : null, style]}>
+      {foil && dressed ? <ChamakStrip /> : null}
       {children}
     </View>
   );

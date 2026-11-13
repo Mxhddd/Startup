@@ -179,7 +179,7 @@ export default function Menu() {
 
       {/* v21: everything about vans in one place (join another van; with stage 2, find, request, Live, fees). */}
       <Section title={t('parent.menu.van')}>
-        <Group>
+        <Group foil>
           <MenuRow icon="route" title={t('parent.join')} onPress={() => router.push('/join')} testID="menu-join" />
           {s2 ? (
             <>

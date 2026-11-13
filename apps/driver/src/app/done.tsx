@@ -3,7 +3,7 @@
 // long the trip took and how many children were taken safely. One button back to Today.
 // The numbers come from the trip screen as route params (nothing is read or stored here).
 import { colors, space, useLang } from '@pohnch/ui';
-import { AppText, DrawnCheck, StarIcon, TapButton, feel } from '@pohnch/ui/native';
+import { AppText, DrawnCheck, StarIcon, TapButton, feel, TruckBand } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -48,7 +48,9 @@ export default function Done() {
   return (
     <View testID="trip-done" style={{ flex: 1, backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + space.xxl, paddingBottom: insets.bottom + space.xl, paddingHorizontal: space.xl }}>
       <StatusBar style="light" />
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.xl }}>
+      {/* v21: the trip's brand moment wears a jhalar fringe across the top, as on pohnch.pk. */}
+      <TruckBand kind="jhalar" height={24} style={{ position: 'absolute', top: insets.top, left: 0, right: 0 }} />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', gap: space.xl, width: '100%', maxWidth: 520, alignSelf: 'center' }}>
         <View style={{ width: 120, height: 120, alignItems: 'center', justifyContent: 'center' }}>
           {Array.from({ length: 10 }, (_, i) => <Spark key={i} i={i} n={10} />)}
           <DrawnCheck fill={colors.zamurrad} color={colors.white} size={112} />

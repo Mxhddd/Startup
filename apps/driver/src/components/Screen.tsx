@@ -22,7 +22,8 @@ export function Screen({ title, children, back = true, scroll = true, footer }: 
   });
   const fold = useAnimatedStyle(() => ({ paddingBottom: interpolate(y.value, [0, 80], [space.xl, space.md], 'clamp') }));
   const titleFold = useAnimatedStyle(() => ({ transform: [{ scale: interpolate(y.value, [0, 80], [1, 0.86], 'clamp') }] }));
-  const body = <Animated.View entering={FadeInDown.delay(80).springify().damping(22).stiffness(300)} style={{ gap: space.lg, paddingBottom: space.xxl }}>{children}</Animated.View>;
+  // v21: a readable width on big screens and tablets (centred, at most 560).
+  const body = <Animated.View entering={FadeInDown.delay(40).springify().damping(22).stiffness(300)} style={{ gap: space.lg, paddingBottom: space.xxl, width: '100%', maxWidth: 560, alignSelf: 'center' }}>{children}</Animated.View>;
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       <StatusBar style="light" />

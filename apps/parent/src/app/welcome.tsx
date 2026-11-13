@@ -7,7 +7,7 @@
 // v10 (canvas "Z10P-Welcome"): a starry neel ground; each picture sits in a pale jharoka arch, and the
 // words are set in Gulzar below it.
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AppText, Gradient, Icon, LangSwitch, LineArt, PressableScale, Sky, TapButton, TiltLayer, WALLS, WallShape, skyMoodNow, useTilt, type IconName } from '@pohnch/ui/native';
+import { AppText, Gradient, Icon, LangSwitch, LineArt, PressableScale, Sky, TapButton, TiltLayer, WALLS, WallShape, skyMoodNow, useTilt, type IconName, TruckBand } from '@pohnch/ui/native';
 import { useWindowDimensions } from 'react-native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -108,7 +108,7 @@ export default function Welcome() {
           ) : null}
         </View>
 
-        <Animated.View key={slide} entering={enter.springify().damping(24).stiffness(180)} exiting={FadeOut.duration(140)} style={{ flex: 1, justifyContent: 'center', gap: space.xl }}>
+        <Animated.View key={slide} entering={enter.springify().damping(24).stiffness(300)} exiting={FadeOut.duration(140)} style={{ flex: 1, justifyContent: 'center', gap: space.xl }}>
           <View style={{ alignItems: 'center', minHeight: 200, justifyContent: 'center' }}>
             {slide === 'map' ? <LineArt width={200} color={colors.onBrand} /> : <Mark icon={slide === 'privacy' ? 'pin' : 'bell'} />}
           </View>
@@ -119,6 +119,8 @@ export default function Welcome() {
         </Animated.View>
 
         <Animated.View entering={FadeIn.delay(80)} style={{ gap: space.lg }}>
+          {/* v21: the painted vine from pohnch.pk's seams, a first hello in the website's hand. */}
+          <TruckBand kind="vine" height={22} style={{ marginHorizontal: -space.xl, opacity: 0.95 }} />
           <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', gap: 6, justifyContent: 'center' }} accessibilityLabel={t('welcome.page', { n: i + 1, of: SLIDES.length })}>
             {SLIDES.map((s, k) => <Dot key={s} on={k === i} />)}
           </View>
