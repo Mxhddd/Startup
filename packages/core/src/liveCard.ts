@@ -82,3 +82,17 @@ export function buildLiveCard(o: {
     marks: o.text.marks(o.kind),
   };
 }
+
+/** v21: a text progress bar any phone can draw (Android's live trip notification): 10 cells, filled first. */
+export function textBar(progress: number, cells = 10): string {
+  const n = Math.max(0, Math.min(cells, Math.round(progress * cells)));
+  return '\u25B0'.repeat(n) + '\u25B1'.repeat(cells - n);
+}
+
+/** v21: the Android live trip notification's title and text, from the same card as the Live Activity. */
+export function liveText(card: LiveCard, unit: string): { title: string; body: string } {
+  const title = card.minutes ? `${card.lead} · ${card.minutes} ${unit}` : card.headline;
+  const lines = [card.minutes ? card.headline : card.lead, `${textBar(card.progress)}${card.ahead ? ` · ${card.ahead}` : ''}`];
+  if (card.footer) lines.push(card.footer);
+  return { title, body: lines.filter(Boolean).join('\n') };
+}

@@ -1,28 +1,34 @@
-// Android's live trip notification: our own layout (LiveTripNotification.tsx), posted once and then
-// updated in place with the same id, on the quiet "Van on the way" channel. Filled from the same card as
-// the iPhone Live Activity (buildLiveCard). When the app is closed, liveTask.ts does the updating.
-import type { LiveCard } from '@pohnch/core';
-import LiveTrip, { type LiveTripProps } from './LiveTripNotification';
+// Android's live trip notification (v21): a standard, ongoing notification on the quiet "Van on the way"
+// channel, posted once and then replaced in place (same identifier). It used to draw a custom layout
+// (expo-widgets custom notifications); on some phones that showed only an empty panel, so this uses the
+// system's own notification, which every Android phone draws the same way:
+//   title  "Ali's van · 8 min"
+//   text   "min to your door" + "▰▰▰▰▰▱▱▱▱▱ · 2 stops before you"
+// Filled from the same card as the iPhone Live Activity (buildLiveCard). When the app is closed,
+// liveTask.ts does the updating.
+import { liveText, type LiveCard } from '@pohnch/core';
+import * as Notifications from 'expo-notifications';
 import { LIVE_CHANNEL } from './setup';
 
 export const LIVE_ID = 'pohnch-live-trip';
 
-export function toLiveProps(card: LiveCard, unit: string): LiveTripProps {
-  return { state: card.state, lead: card.lead, headline: card.headline, minutes: card.minutes, unit, progress: card.progress, ahead: card.ahead, footer: card.footer, steps: card.steps, marks: card.marks };
-}
-
 export async function showOngoing(card: LiveCard, unit = 'min') {
-  const props = toLiveProps(card, unit);
-  const title = card.minutes ? `${card.lead} · ${card.minutes} ${unit}` : card.headline;
-  const existing = await LiveTrip.get(LIVE_ID).catch(() => null);
-  if (existing) {
-    await existing.update(props, { title, text: card.footer }).catch(() => LiveTrip.post(props, { id: LIVE_ID, channelId: LIVE_CHANNEL, ongoing: true, title, text: card.footer, color: '#1F2A5C', url: 'pohnch://' }));
-  } else {
-    await LiveTrip.post(props, { id: LIVE_ID, channelId: LIVE_CHANNEL, ongoing: true, title, text: card.footer, color: '#1F2A5C', url: 'pohnch://' });
-  }
+  const { title, body } = liveText(card, unit);
+  await Notifications.scheduleNotificationAsync({
+    identifier: LIVE_ID,
+    content: {
+      title,
+      body,
+      sticky: true,
+      autoDismiss: false,
+      color: '#1F2A5C',
+      priority: Notifications.AndroidNotificationPriority.LOW,
+      data: { url: 'pohnch://' },
+    },
+    trigger: { channelId: LIVE_CHANNEL },
+  });
 }
 
 export async function clearOngoing() {
-  const existing = await LiveTrip.get(LIVE_ID).catch(() => null);
-  await existing?.cancel().catch(() => undefined);
+  await Notifications.dismissNotificationAsync(LIVE_ID).catch(() => undefined);
 }

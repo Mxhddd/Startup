@@ -14,7 +14,7 @@ export { buildRun, runProgress, type StopGroup, type StopRow, type RiderRow, typ
 export { distanceM, etaMinutes, timelineFor, canUndoChutti, routeDotsLine, childPlace, formatDistance, arrivalClock, AT_DOOR_M, type ChildPlace, type ParentEvent, type TimelineItem, type TripStep } from './parent';
 export { tokenFromInviteLink } from './invite';
 export { MOMENTS, ALERT_STEPS, newMoment, type Moment, type MomentStep } from './moments';
-export { buildLiveCard, type LiveCard, type LiveState, type LiveText } from './liveCard';
+export { buildLiveCard, liveText, textBar, type LiveCard, type LiveState, type LiveText } from './liveCard';
 export { findLivePayload, LIVE_KEY, type LivePayload } from './livePayload';
 export { moveId } from './reorder';
 export { scrubEvent, scrubText } from './scrub';
