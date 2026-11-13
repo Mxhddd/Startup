@@ -54,32 +54,47 @@ const phoneDriver = `<div class="phone short"><div class="scr drv">
 
 const panel = (cls: string, inner: string) => `<section class="panel ${cls}"><div class="band top"></div><div class="body">${inner}</div><div class="band bot"></div></section>`;
 
+// v3 (tells the idea): the cover asks the question every parent asks ("Where's the van?"), the outside
+// spread answers it with one real morning (times, one colour per step) and the phone that shows it; inside,
+// before and after, our promise, and the QR code.
+const moment = (time: string, fill: string, ur: string, en: string, last = false) => `<li class="${last ? 'last' : ''}"><div><b class="ur">${ur}</b><small>${en}</small></div><span class="tdot" style="background:${fill}"></span><span class="time">${time}</span></li>`;
+const before = (ur: string, en: string) => `<li><b class="ur">${ur}</b><small>${en}</small></li>`;
+
 const sideA = [
-  panel('paper', `<p class="kick">آپ کو کیا نظر آئے گا<span>What you see</span>${ORN}</p>
+  panel('paper', `<p class="kick">فون پر سب کچھ<span>All on your phone</span>${ORN}</p>
     ${phoneParent}
-    <p class="cap ur">لاک اسکرین پر وین کا سفر، منٹ بہ منٹ۔</p><p class="capen">The trip on your lock screen, minute by minute.</p>`),
-  panel('paper', `<p class="kick">یہ کیسے کام کرتا ہے<span>How it works</span>${ORN}</p>
-    <ol class="route">
-      ${stop(1, '#1F2A5C', '#FBF7EF', 'ڈرائیور سفر شروع کرتا ہے', 'The driver starts the trip in the free Pohnch Driver app.')}
-      ${stop(2, '#17705A', '#FFFFFF', 'بچہ بیٹھا، آپ کو فوراً خبر', 'An alert the moment your child gets in.')}
-      ${stop(3, '#E8A33D', '#141A33', 'اسکول پہنچے تو خبر', 'And when the van reaches school, and home.')}
-    </ol>
-    <p class="note2 ur">کوئی فون کال نہیں، کوئی انتظار نہیں۔</p><p class="capen">No calling, no waiting at the gate.</p>`),
-  panel('night cover', `<div class="frame"><span class="chamak"></span></div><div class="logo">${markLight}</div>
-    <h1 class="ur">آپ کے بچے کی وین،<br><mark>آپ کے فون پر</mark></h1>
-    <p class="en">Your child's school van, live on your phone.</p>
+    <p class="cap ur">ایپ کھولنے کی بھی ضرورت نہیں: لاک اسکرین پر منٹ بہ منٹ۔</p><p class="capen">You don't even open the app. It's on your lock screen.</p>`),
+  panel('paper', `<p class="kick">پہنچ کے ساتھ ایک صبح<span>One morning with Pohnch</span>${ORN}</p>
+    <ol class="day">
+      ${moment('7:05', '#1F2A5C', 'وین نکل گئی', 'The van left. Ali is 4 stops away.')}
+      ${moment('7:09', '#17705A', 'علی وین میں بیٹھ گیا', 'Ali got in. You saw it, you didn’t call.')}
+      ${moment('7:22', '#1F2A5C', 'نقشے پر وین چلتی دکھائی دی', 'Watch it move on the map, minute by minute.')}
+      ${moment('7:31', '#E8A33D', 'اسکول پہنچ گئے', 'At school. And the same again at home time.', true)}
+    </ol>`),
+  panel('night cover', `<div class="frame"><span class="chamak"></span></div>
+    <div class="logo">${markLight}</div>
+    <h1 class="ur hook">وین کہاں ہے؟</h1>
+    <p class="ur sub2">اب فون کرنے کی ضرورت نہیں۔<br><mark>وین آپ کے فون پر۔</mark></p>
+    <p class="en">Where's the van? Stop calling.<br>See it, live, on your phone.</p>
     <div class="birds">${BIRD(false)}${ORN}${BIRD(true)}</div>
-    <div class="pill">${STAR(12)} <span>Android · <b>pohnch.pk</b></span></div>`),
+    <p class="for2">School-van parents in Karachi · <b>Free pilot</b></p>`),
 ];
 const sideB = [
-  panel('paper', `<p class="kick">ڈرائیوروں کے لیے<span>For van drivers</span>${ORN}</p>
-    ${phoneDriver}
-    <ul class="vows small">
-      ${vow('ڈرائیوروں کے لیے مفت', 'Free for drivers, always.')}
-      ${vow('ہر بچے کے لیے ایک ٹیپ', 'One tap per child, big buttons.')}
-      ${vow('آپ کے اسٹاپ، آپ کی ترتیب', 'Your stops, in your order.')}
-    </ul>
-    <p class="note2 ur" style="margin-top:auto">فون سے کال نہیں، ایک ٹیپ کافی</p><p class="capen">One tap tells every family. No calls while driving.</p>`),
+  panel('paper', `<p class="kick">پہلے اور اب<span>Before and after</span>${ORN}</p>
+    <div class="ba">
+      <p class="tag then">پہلے<span>Before</span></p>
+      <ul class="then">
+        ${before('ڈرائیور کو بار بار فون', 'Calling the driver again and again')}
+        ${before('گیٹ پر کھڑے انتظار', 'Waiting at the gate, guessing')}
+        ${before('“بیٹھ گیا؟ پہنچ گیا؟”', '“Is he in? Did she reach?”')}
+      </ul>
+      <p class="tag now">اب<span>Now</span></p>
+      <ul class="now">
+        ${vow('ایک نظر، پورا سفر', 'One look, the whole trip.')}
+        ${vow('بیٹھا تو خبر، پہنچا تو خبر', 'An alert when in, an alert at school.')}
+      </ul>
+    </div>
+    <p class="drv ur">وین ڈرائیور ہیں؟ آپ کی ایپ مفت ہے۔</p><p class="capen">Van driver? Your app is free: one tap per child.</p>`),
   panel('paper', `<p class="kick">ہمارا وعدہ<span>Our promise</span>${ORN}</p>
     <ul class="vows">
       ${vow('جگہ صرف سفر کے دوران', 'Location only during a trip, never at home.')}
@@ -165,6 +180,30 @@ body { font-family: Manrope, sans-serif; color: #141A33; -webkit-print-color-adj
 .night .band.top { opacity: .95 }
 .ic { display: block }
 
+.cover h1.hook { font-size: 40pt; line-height: 1.55; color: #F6C46E; margin-top: -2mm }
+.cover .sub2 { font-size: 13pt; line-height: 1.75; color: #F5EEE1; font-weight: 700; margin-top: -4mm } .cover .sub2 mark { background: none; color: #F6C46E }
+.cover .logo svg { width: 30mm !important }
+.for2 { font-size: 8.5pt; color: #D6CFC1 } .for2 b { color: #F6C46E }
+.day { list-style: none; width: 100%; flex: 1; display: flex; flex-direction: column; justify-content: space-evenly; position: relative; margin-top: 1mm }
+.day::before { content: ""; position: absolute; right: 15.2mm; top: 9%; bottom: 9%; border-right: .7mm dashed #E8A33D }
+.day li { display: grid; grid-template-columns: 1fr 5mm 12mm; gap: 2.8mm; align-items: center; direction: ltr; position: relative }
+.day li div { text-align: right; display: flex; flex-direction: column; gap: .6mm }
+.day .tdot { width: 5mm; height: 5mm; border-radius: 50%; box-shadow: 0 0 0 1.2mm #FBF7EF }
+.day .time { font-weight: 800; font-size: 11pt; color: #141A33; font-variant-numeric: tabular-nums; text-align: left }
+.day li.last .time { color: #7A5410 }
+.day b { font-size: 11pt; line-height: 1.5 } .day small { font-size: 8pt; color: #4A4F66; line-height: 1.35; text-align: right }
+.ba { width: 100%; display: flex; flex-direction: column; gap: 2mm; margin-top: 1mm }
+.ba .tag { font-family: Gulzar, serif; font-size: 18pt; line-height: 1.6; text-align: right; display: flex; align-items: baseline; justify-content: space-between; direction: ltr; border-bottom: .3mm solid rgba(184,134,47,.35) }
+.ba .tag span { font-family: Manrope; font-size: 7.5pt; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #4A4F66; order: -1 }
+.ba .tag.then { color: #4A4F66 } .ba .tag.now { color: #17705A; margin-top: 3mm }
+.ba ul.then { list-style: none; display: flex; flex-direction: column; gap: 2mm }
+.ba ul.then li { text-align: right; display: flex; flex-direction: column }
+.ba ul.then b { font-size: 10pt; line-height: 1.5; color: #4A4F66; text-decoration: line-through; text-decoration-color: rgba(168,50,31,.55); text-decoration-thickness: .35mm }
+.ba ul.then small { font-size: 7.5pt; color: #6E6450 }
+.ba ul.now { list-style: none } .ba ul.now li { display: grid; grid-template-columns: 1fr 6mm; gap: 3mm; direction: ltr; padding: 1.6mm 0 } .ba ul.now li div { text-align: right; display: flex; flex-direction: column }
+.ba ul.now b { font-size: 10.5pt; line-height: 1.5 } .ba ul.now small { font-size: 7.8pt; color: #4A4F66; text-align: right } .ba ul.now .vstar { padding-top: 1.4mm; display: flex; justify-content: center }
+.drv { font-size: 10.5pt; font-weight: 700; color: #1F2A5C; margin-top: auto; line-height: 1.6 }
+
 .kick::after { display: none }
 .orn { display: flex; align-items: center; gap: 2mm; margin-top: 2.2mm } .orn i { width: 9mm; height: .3mm; background: #B8862F; opacity: .7 } .orn svg { display: block }
 .kick.light .orn i { background: #F6C46E }
@@ -198,13 +237,13 @@ const html = (bleed: number) => `<!doctype html><html><head><meta charset="utf-8
 </body></html>`;
 
 const b = await chromium.launch();
-for (const [name, bleed] of [['pohnch-brochure-zfold', 0], ['pohnch-brochure-zfold-print-bleed', 3]] as const) {
+for (const [name, bleed] of [['pohnch-brochure', 0]] as const) {
   const p = await b.newPage({ viewport: { width: 1200, height: 900 }, deviceScaleFactor: 2 });
   await p.setContent(html(bleed), { waitUntil: 'networkidle' });
   await p.evaluate(() => document.fonts.ready);
   await p.pdf({ path: `${out}/${name}.pdf`, width: `${297 + 2 * bleed}mm`, height: `${210 + 2 * bleed}mm`, printBackground: true });
   if (bleed === 0) {
-    writeFileSync(`${out}/pohnch-brochure-zfold.html`, html(0));
+    
     const sheets = await p.$$('.sheet');
     await sheets[0]!.screenshot({ path: `${out}/pohnch-brochure-outside.png` });
     await sheets[1]!.screenshot({ path: `${out}/pohnch-brochure-inside.png` });

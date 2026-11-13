@@ -1,7 +1,6 @@
 # Pohnch Z-fold brochure
 
-- `pohnch-brochure-zfold.pdf`: A4 landscape, 2 pages (outside, inside). For office or home printers.
-- `pohnch-brochure-zfold-print-bleed.pdf`: the same with 3 mm bleed on every side (303 × 216 mm), for a print shop.
+- `pohnch-brochure.pdf`: the one file. A4 landscape, 2 pages (outside, inside).
 - `pohnch-brochure-outside.png`, `pohnch-brochure-inside.png`: previews.
 
 Print: A4, double-sided, flip on the SHORT edge. Fold into a Z (accordion) with the dark cover panel on top.
