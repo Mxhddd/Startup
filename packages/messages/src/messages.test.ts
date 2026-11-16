@@ -1,4 +1,5 @@
-import { readFileSync } from 'node:fs';
+import enRaw from './en.json?raw';
+import urRaw from './ur.json?raw';
 import { describe, expect, it } from 'vitest';
 import { dirOf, en, otherLang, t, ur } from './index';
 
@@ -9,8 +10,8 @@ describe('messages', () => {
 
   // v21: a repeated key silently replaces the earlier text (JSON keeps the last one), so never allow one.
   it('never repeats a key in either file', () => {
-    for (const f of ['en.json', 'ur.json']) {
-      const keys = [...readFileSync(new URL(`./${f}`, import.meta.url), 'utf8').matchAll(/^\s*"([^"]+)":/gm)].map((m) => m[1]);
+    for (const [f, raw] of [['en.json', enRaw], ['ur.json', urRaw]] as const) {
+      const keys = [...raw.matchAll(/^\s*"([^"]+)":/gm)].map((m) => m[1]);
       const seen = new Set<string>();
       const repeated = keys.filter((k) => (seen.has(k!) ? true : (seen.add(k!), false)));
       expect(repeated, f).toEqual([]);
