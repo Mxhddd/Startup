@@ -59,7 +59,7 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
       </div>
     );
   }
-  const err = field === 'area' ? w['join.needArea'] : field === 'whatsapp' ? w['join.badPhone'] : field ? w['join.err'] : null;
+  const err = field === 'area' ? w['join.needArea'] : field === 'whatsapp' ? (whatsapp.trim() ? w['join.badPhone'] : w['join.needWa']) : field ? w['join.err'] : null;
   return (
     <form className="join" onSubmit={submit} noValidate data-testid="join-form">
       <fieldset className="seg">
@@ -99,7 +99,7 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
       )}
       <label className="fld">
         <span>{w['join.wa']}</span>
-        <input type="tel" inputMode="tel" dir="ltr" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="03XX XXXXXXX" autoComplete="tel" aria-invalid={field === 'whatsapp'} aria-describedby={field === 'whatsapp' ? `${id}-msg ${id}-wa` : `${id}-wa`} className="num" />
+        <input type="tel" inputMode="tel" dir="ltr" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="03XX XXXXXXX" autoComplete="tel" required aria-required="true" aria-invalid={field === 'whatsapp'} aria-describedby={field === 'whatsapp' ? `${id}-msg ${id}-wa` : `${id}-wa`} className="num" />
         <small id={`${id}-wa`}>{w['join.waNote']}</small>
       </label>
       <div className="trap" inert><label>website<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label></div>

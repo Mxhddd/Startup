@@ -103,6 +103,9 @@ test('joining the pilot sends the form and says thank you', async ({ page }) => 
   await page.getByTestId('join-send').click();
   await expect(page.getByText('Choose your area first.')).toBeVisible();
   await page.getByTestId('join-area').selectOption('gulshan');
+  // v21: without a WhatsApp number the form says so (we must be able to reach the family)
+  await page.getByTestId('join-send').click();
+  await expect(page.getByText('Please add your WhatsApp number so we can reach you.')).toBeVisible();
   await page.getByPlaceholder('03XX XXXXXXX').fill('0300 1234567');
   await page.getByTestId('join-send').click();
   await expect(page.getByTestId('join-sent')).toBeVisible();
@@ -115,6 +118,7 @@ test('if the server is down the form says so and offers WhatsApp', async ({ page
   await page.goto('/?lite');
   await toSection(page, '#join');
   await page.getByTestId('join-area').selectOption('dha');
+  await page.getByPlaceholder('03XX XXXXXXX').fill('0300 1234567');
   await page.getByTestId('join-send').click();
   await expect(page.locator('.send .msg')).toContainText('Couldn’t send');
 });

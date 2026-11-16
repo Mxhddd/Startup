@@ -43,6 +43,7 @@ test('the drivers page lets drivers try the big button and join as a driver', as
   await expect(hold).toContainText('Sent');
   await expect(page.getByRole('radio', { name: 'A van driver' })).toBeChecked();
   await page.getByTestId('join-area').selectOption('malir');
+  await page.getByPlaceholder('03XX XXXXXXX').fill('0300 1234567');
   await page.getByTestId('join-send').click();
   await expect(page.getByTestId('join-sent')).toBeVisible();
 });

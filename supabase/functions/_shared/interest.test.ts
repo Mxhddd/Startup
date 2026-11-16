@@ -33,7 +33,8 @@ describe('interest function', () => {
   });
   it('names the wrong field, refuses the sixth sign-up, counts honest answers', async () => {
     expect((await post({ kind: 'join', role: 'parent', area: 'mars' })).body).toEqual({ error: 'area' });
-    expect((await post({ kind: 'join', role: 'parent', area: 'dha' }, deps('limited'))).status).toBe(429);
+    expect((await post({ kind: 'join', role: 'parent', area: 'dha', whatsapp: '0300 1234567' }, deps('limited'))).status).toBe(429);
+    expect((await post({ kind: 'join', role: 'parent', area: 'dha' })).body).toEqual({ error: 'whatsapp' }); // v21: a family must be reachable
     const d = deps(null); expect((await post({ kind: 'doubt', n: 3 }, d)).status).toBe(200); expect(d.rpc).toHaveBeenCalledWith('interest_doubt', { p_n: 3 });
     expect((await post({ kind: 'doubt', n: 9 })).status).toBe(400);
   });
@@ -58,7 +59,7 @@ describe('interest function', () => {
 
 describe('v20 security in the interest function', () => {
   beforeEach(() => resetInterestCaches());
-  const join = { kind: 'join', role: 'parent', area: 'gulshan', kids: 1 };
+  const join = { kind: 'join', role: 'parent', area: 'gulshan', kids: 1, whatsapp: '0300 1234567' };
   it("trusts Cloudflare's IP header over anything the visitor writes", () => {
     expect(visitorIp(new Headers({ 'cf-connecting-ip': '5.6.7.8', 'x-forwarded-for': '1.1.1.1' }))).toBe('5.6.7.8');
     expect(visitorIp(new Headers({}))).toBe('unknown');

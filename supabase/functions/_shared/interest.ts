@@ -39,7 +39,8 @@ export function checkInterest(b: Body): { ok: true; value: Interest } | { ok: fa
   const raw = str(b.whatsapp), whatsapp = raw ? normalisePkMobile(raw) : null;
   if (raw && !whatsapp) return { ok: false, field: 'whatsapp' };
   if (role === 'school' && school.length < 2) return { ok: false, field: 'school' };
-  if (role === 'school' && !whatsapp) return { ok: false, field: 'whatsapp' };
+  // v21: everyone leaves a WhatsApp number (a family who signed up without one could never be reached).
+  if (!whatsapp) return { ok: false, field: 'whatsapp' };
   return { ok: true, value: { role, area, school: school || null, kids, driverPhone, whatsapp } };
 }
 
