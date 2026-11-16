@@ -53,3 +53,5 @@
   .sitefoot .fline { margin: 30px auto 40px; }
 }
 @media (prefers-reduced-motion: reduce) { .glints i, .sitefoot .shimmer, .sitefoot .fkite { animation: none; } .glints { display: none; } }
+/* v21: the WhatsApp number never breaks across two lines */
+.sitefoot .num { white-space: nowrap; }

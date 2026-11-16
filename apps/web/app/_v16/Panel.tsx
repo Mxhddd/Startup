@@ -68,6 +68,12 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
           <label key={r}><input type="radio" name={`${id}-role`} value={r} checked={role === r} onChange={() => setRole(r)} /><span>{w[`join.${r}`]}</span></label>
         ))}
       </fieldset>
+      {/* v21: the person's own number, first, labelled for who they are (it read like the driver's number before) */}
+      <label className="fld">
+        <span>{w[role === 'driver' ? 'join.waDriver' : 'join.waParent']}</span>
+        <input type="tel" inputMode="tel" dir="ltr" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="03XX XXXXXXX" autoComplete="tel" required aria-required="true" aria-invalid={field === 'whatsapp'} aria-describedby={field === 'whatsapp' ? `${id}-msg ${id}-wa` : `${id}-wa`} className="num" />
+        <small id={`${id}-wa`}>{w[role === 'driver' ? 'join.waNoteDriver' : 'join.waNoteParent']}</small>
+      </label>
       <label className="fld">
         <span>{w['join.area']}</span>
         <select value={area} onChange={(e) => setArea(e.target.value)} aria-invalid={field === 'area'} aria-describedby={field === 'area' ? `${id}-msg` : undefined} data-testid="join-area">
@@ -97,11 +103,6 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
           </fieldset>
         </>
       )}
-      <label className="fld">
-        <span>{w['join.wa']}</span>
-        <input type="tel" inputMode="tel" dir="ltr" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="03XX XXXXXXX" autoComplete="tel" required aria-required="true" aria-invalid={field === 'whatsapp'} aria-describedby={field === 'whatsapp' ? `${id}-msg ${id}-wa` : `${id}-wa`} className="num" />
-        <small id={`${id}-wa`}>{w['join.waNote']}</small>
-      </label>
       <div className="trap" inert><label>website<input tabIndex={-1} autoComplete="off" value={trap} onChange={(e) => setTrap(e.target.value)} /></label></div>
       <Turnstile lang={lang} onToken={setHuman} round={round} />
       <div className="send">

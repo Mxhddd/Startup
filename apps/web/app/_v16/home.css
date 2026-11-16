@@ -678,3 +678,19 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16 .hub::before { content: ""; position: absolute; inset: 0 0 auto; height: 26px; background: var(--vine) repeat-x 0 0 / auto 26px; pointer-events: none; }
 .v16 .hub:not(.inner)::after { content: ""; position: absolute; z-index: var(--z-over); inset: auto 0 -23px; height: 24px; background: var(--jhalar) repeat-x 0 0 / auto 24px; pointer-events: none; }
 .v16 .hub.inner::before { display: none; }
+
+/* v21 phone pass: nothing floats over the words, pictures sit below the text they illustrate */
+@media (max-width: 920px) {
+  /* the chapter-dot rail covered headings and the arrival banner on phones; the menu already has every section */
+  .v16 .chapters { display: none !important; }
+  .v16 .calls .stick, .v16 .sides .stick, .v16 .morning .stick, .v16 .lock .stick { padding-top: 92px; }
+  /* minute by minute: the phone follows the timeline instead of covering it */
+  .v16 .mp { position: relative; bottom: auto; inset-inline-end: auto; --s: .5; justify-self: center; margin-top: -10px; }
+  /* on your lock screen: a smaller phone under the heading, never over it */
+  .v16 .lp { --s: .6; justify-self: center; }
+  .v16 .lock .stick { gap: 14px; }
+  /* Urdu bar: the button and menu always fit */
+  .v16 .bar { min-width: 0; }
+  .v16[data-lang="ur"] .barcta .btn { padding: 0 12px; font-size: 14px; }
+}
+@media (max-width: 400px) { .v16[data-lang="ur"] .bar .mark span { display: none; } }
