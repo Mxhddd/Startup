@@ -662,3 +662,13 @@ Tests: `app/_v16/v19.test.ts`, `e2e/v19.spec.ts`, `packages/core` interest tests
 - **Landmarks:** header and footer sit outside `<main>`.
 
 Tests: `app/_v16/v20.test.ts` and `e2e/v20.spec.ts`, which checks text size, contrast, tap targets, focus rings, the dialog, Urdu line-height, loading and error states, the inner hubs, the menu, the stutter fallback, and the 3D surviving the menu.
+
+## v22 Growth panel (/admin)
+
+One place for "how many people saw, tapped, signed up and use the apps".
+
+- **Website counts** (`site_daily`, migration `20261117000100_growth.sql`): one number per day, per page, per event. Nothing about the visitor is stored: no IP, no cookie, no id. `apps/web/app/_lib/SiteCounter.tsx` sends `view` on every page and `visitor` once a day per browser (the browser remembers only today's date, under `pohnch.seen`). `/admin` and `/invite` are never counted; `/i/<token>` is counted as `/i`. The `/app` page sends `click_testers`, `click_play` and `click_apk` when a download link is tapped.
+- **The path**: website → `interest` Edge Function (`{kind:'hit', page, ev}`, at most 200 counted per place per hour) → `site_hit()` → `site_daily`.
+- **The panel**: `admin_growth()` returns today / 7 days / all time for site events, form sign-ups, app accounts, parents and drivers, plus 14 days of visitors and the most-viewed pages. Only the team (two-step login) can call it.
+- **Play installs**: typed in on the panel from Play Console (`admin_set_installs`), until a Play service key lets us fetch them.
+- Tests: `supabase/tests/database/192-growth.test.sql`, `supabase/functions/_shared/interest.test.ts`, `apps/web/app/_lib/SiteCounter.test.ts`, `apps/web/app/admin/growth.test.ts`.

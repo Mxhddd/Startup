@@ -5,6 +5,7 @@
 // (JOIN.public), it is one button straight to the Play listing. The QR on the posters never changes.
 // The choice is remembered in the address (#parent / #driver) so a shared link opens on the right one.
 import { JOIN, PILOT_WHATSAPP, playListing, playTesting } from '@pohnch/core';
+import { countHit, type SiteEvent } from '../_lib/interest';
 import { t, type Lang, type MessageKey } from '@pohnch/messages';
 import { useEffect, useState } from 'react';
 
@@ -33,6 +34,8 @@ export function AppJoin({ lang, waitlist }: { lang: Lang; waitlist: string }) {
     : [];
   const next = steps.find((s) => !done.includes(s.n))?.n ?? 0;
   const apk = role ? JOIN.apk[role] : null;
+  // v22: counts a tap on a download link for the Growth panel (only the page and which link).
+  const tap = (ev: SiteEvent) => countHit(ev, typeof location === 'undefined' ? '/app' : location.pathname);
   return (
     <div className="joinapp">
       <div className="who" role="radiogroup" aria-label={w(lang, 'title')}>
@@ -47,7 +50,7 @@ export function AppJoin({ lang, waitlist }: { lang: Lang; waitlist: string }) {
       {role ? (
         JOIN.public ? (
           <div className="joinsteps">
-            <a className="btn big" href={playListing(pkg)} rel="noreferrer" data-testid="join-play">{w(lang, 'public')}</a>
+            <a className="btn big" href={playListing(pkg)} rel="noreferrer" onClick={() => tap('click_play')} data-testid="join-play">{w(lang, 'public')}</a>
           </div>
         ) : (
           <div className="joinsteps" aria-live="polite">
@@ -57,7 +60,7 @@ export function AppJoin({ lang, waitlist }: { lang: Lang; waitlist: string }) {
                   <span className="stone num" aria-hidden="true">{done.includes(s.n) ? '✓' : s.n}</span>
                   <div>
                     <a className={s.n === next ? 'btn' : 'btn ghost'} href={s.href} target="_blank" rel="noreferrer"
-                      onClick={() => setDone((d) => (d.includes(s.n) ? d : [...d, s.n]))} data-testid={`join-step-${s.n}`}>{s.title}</a>
+                      onClick={() => { setDone((d) => (d.includes(s.n) ? d : [...d, s.n])); if (s.n === 2) tap('click_testers'); if (s.n === 3) tap('click_play'); }} data-testid={`join-step-${s.n}`}>{s.title}</a>
                     <p>{s.body}</p>
                   </div>
                 </li>
@@ -72,7 +75,7 @@ export function AppJoin({ lang, waitlist }: { lang: Lang; waitlist: string }) {
         {role && apk ? (
           <details className="stuck">
             <summary>{w(lang, 'stuck')}</summary>
-            <a className="link" href={apk} rel="noreferrer" data-testid="join-apk">{w(lang, 'apk')}</a>
+            <a className="link" href={apk} rel="noreferrer" onClick={() => tap('click_apk')} data-testid="join-apk">{w(lang, 'apk')}</a>
             <p>{w(lang, 'apkNote')}</p>
           </details>
         ) : null}

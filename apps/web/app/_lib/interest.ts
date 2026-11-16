@@ -52,3 +52,15 @@ export function countDoubt(n: number): void {
     /* counting is best effort */
   }
 }
+
+/** v22 Growth panel: counts one page view, a new visitor today, or a tap on a download link. Only the page's
+ *  path (no query, no #fragment) and the event are sent; nothing identifies the visitor. Best effort. */
+export type SiteEvent = 'view' | 'visitor' | 'click_testers' | 'click_play' | 'click_apk';
+export function countHit(ev: SiteEvent, page: string): void {
+  const url = base();
+  try {
+    void fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: 'hit', ev, page: page.split(/[?#]/)[0] }), keepalive: true }).catch(() => undefined);
+  } catch {
+    /* counting is best effort */
+  }
+}

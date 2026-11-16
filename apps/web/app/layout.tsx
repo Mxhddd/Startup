@@ -6,6 +6,7 @@ import { displayFont, latinFont, urduFont } from './fonts';
 import './globals.css';
 import { SITE } from './_lib/site';
 import { SafeAnalytics } from './_lib/SafeAnalytics';
+import { SiteCounter } from './_lib/SiteCounter';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE),
@@ -23,7 +24,7 @@ export const viewport: Viewport = { themeColor: '#FAF6EE' };
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" className={`${urduFont.variable} ${latinFont.variable} ${displayFont.variable}`}>
-      <body style={{ margin: 0, background: colors.ghee, ['--focus' as string]: colors.kesar }}>{children}<SafeAnalytics /></body>
+      <body style={{ margin: 0, background: colors.ghee, ['--focus' as string]: colors.kesar }}>{children}<SafeAnalytics /><SiteCounter /></body>
     </html>
   );
 }

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { AREA_IDS as CORE_AREAS, checkInterest as coreCheck } from '../../../packages/core/src/interest';
-import { AREA_IDS, checkInterest, handleInterest, resetInterestCaches, visitorIp, type InterestDeps } from './interest.ts';
+import { AREA_IDS, checkInterest, handleInterest, resetInterestCaches, sitePage, visitorIp, type InterestDeps } from './interest.ts';
 
 const deps = (data: unknown = 'ok') => {
   const rpc = vi.fn(async () => ({ data, error: null })) as unknown as InterestDeps['rpc'] & ReturnType<typeof vi.fn>;
@@ -84,5 +84,34 @@ describe('v20 security in the interest function', () => {
     const d = deps(null);
     for (let i = 0; i < 20; i++) await post({ kind: 'doubt', n: 2 }, d);
     expect(d.rpc).toHaveBeenCalledTimes(12);
+  });
+});
+
+describe('v22 Growth panel counter', () => {
+  beforeEach(() => resetInterestCaches());
+  it('names pages without leaking anything', () => {
+    expect(sitePage('/')).toBe('/');
+    expect(sitePage('/app/')).toBe('/app');
+    expect(sitePage('/ur')).toBe('/ur');
+    expect(sitePage('/ur/drivers?x=1')).toBe('/ur/drivers');
+    expect(sitePage('/i/SECRET-token-here')).toBe('/i');
+    expect(sitePage('/wp-admin.php')).toBe('other');
+    expect(sitePage('/ur/nope')).toBe('/ur/other');
+    expect(sitePage('https://evil.example/')).toBeNull();
+    expect(sitePage(42)).toBeNull();
+  });
+  it('counts a view and a tap, and refuses unknown events', async () => {
+    const d = deps(null);
+    expect((await post({ kind: 'hit', page: '/app', ev: 'view' }, d)).status).toBe(200);
+    expect(d.rpc).toHaveBeenCalledWith('site_hit', { p_page: '/app', p_event: 'view' });
+    expect((await post({ kind: 'hit', page: '/i/abc', ev: 'click_testers' }, d)).status).toBe(200);
+    expect(d.rpc).toHaveBeenLastCalledWith('site_hit', { p_page: '/i', p_event: 'click_testers' });
+    expect((await post({ kind: 'hit', page: '/', ev: 'scroll' }, d)).status).toBe(400);
+    expect((await post({ kind: 'hit', page: 'nope', ev: 'view' }, d)).status).toBe(400);
+  });
+  it('counts at most 200 hits an hour from one place', async () => {
+    const d = deps(null);
+    for (let i = 0; i < 230; i++) await post({ kind: 'hit', page: '/', ev: 'view' }, d);
+    expect(d.rpc).toHaveBeenCalledTimes(200);
   });
 });

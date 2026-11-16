@@ -10,6 +10,7 @@ import { colors, shadow } from '@pohnch/ui/theme';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Turnstile } from '../_lib/Turnstile';
+import { growthRows, type Growth } from './growth';
 
 type Stats = { days: number; trips: number; tripsTracked: number; familiesActive: number; familiesWithAlerts: number; alertsSent: number; alertsFailed: number };
 type VanRow = { van_id: string; van_name: string; school_name: string; plate: string | null; driver_name: string; driver_phone: string | null; verified_at: string | null; switched_off_at: string | null; riders: number; waiting: number };
@@ -181,6 +182,105 @@ function Stat({ label, value, sub, testId }: { label: string; value: ReactNode; 
   );
 }
 
+/** v22 Growth panel: everyone who saw, tapped, signed up and uses the apps, in one place.
+ *  Website counts come from the site's own counter (site_daily: a number per page per day, nothing about the visitor);
+ *  sign-ups from the join form; app numbers from the accounts and vans; Play installs are typed in from Play Console. */
+const PLAY_CONSOLE = 'https://play.google.com/console';
+
+function GrowthPanel({ supabase, t }: { supabase: SupabaseClient; t: (k: MessageKey, v?: Vars) => string }) {
+  const [g, setG] = useState<Growth | null>(null);
+  const [error, setError] = useState(false);
+  const [typed, setTyped] = useState<{ parent: string; driver: string }>({ parent: '', driver: '' });
+  const [saved, setSaved] = useState(false);
+  const load = useCallback(async () => {
+    const r = await supabase.rpc('admin_growth');
+    setError(!!r.error);
+    if (!r.error) setG(r.data as Growth);
+  }, [supabase]);
+  useEffect(() => { void load(); const id = setInterval(load, 60_000); return () => clearInterval(id); }, [load]);
+  const save = async () => {
+    setSaved(false);
+    for (const app of ['parent', 'driver'] as const) {
+      const n = Number(typed[app]);
+      if (typed[app].trim() === '' || !Number.isInteger(n) || n < 0) continue;
+      const r = await supabase.rpc('admin_set_installs', { p_app: app, p_installs: n });
+      if (r.error) return setError(true);
+    }
+    setTyped({ parent: '', driver: '' }); setSaved(true); void load();
+  };
+  const num: CSSProperties = { textAlign: 'end', fontVariantNumeric: 'tabular-nums', fontFamily: 'var(--font-latin), sans-serif', padding: '8px 10px', direction: 'ltr' };
+  const head: CSSProperties = { ...num, color: colors.ink2, fontWeight: 600, fontSize: 15 };
+  const series = g?.series ?? [];
+  const peak = Math.max(1, ...series.map((d) => d.visitors));
+  const day = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+  return (
+    <section style={{ ...card, display: 'grid', gap: 14 }} data-testid="admin-growth">
+      <div>
+        <h2 style={{ margin: 0, fontSize: 22 }}>{t('admin.growth.title')}</h2>
+        <p style={{ margin: '4px 0 0', color: colors.ink2, fontSize: 15 }}>{t('admin.growth.hint')}</p>
+      </div>
+      {error ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{t('admin.error')}</p> : null}
+      {g ? (
+        <>
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 16 }}>
+              <thead><tr><td style={head} /><th style={head} scope="col">{t('admin.growth.today')}</th><th style={head} scope="col">{t('admin.growth.week')}</th><th style={head} scope="col">{t('admin.growth.total')}</th></tr></thead>
+              <tbody>
+                {growthRows(g).map((r) => (
+                  <tr key={r.key} style={{ borderTop: `1px solid ${colors.line}` }}>
+                    <th scope="row" style={{ textAlign: 'start', fontWeight: 600, padding: '8px 10px' }}>{t(r.key)}</th>
+                    <td style={num}>{r.v.today}</td><td style={{ ...num, fontWeight: 700, color: colors.neel }}>{r.v.week}</td><td style={num}>{r.v.total}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p style={{ margin: 0 }}>{t('admin.growth.vans', { n: g.vans.set_up, t: g.vans.tracked_week })}</p>
+
+          <div style={{ display: 'grid', gap: 6 }}>
+            <span style={{ color: colors.ink2, fontSize: 15 }}>{t('admin.growth.chart')}</span>
+            <div style={{ display: 'flex', alignItems: 'flex-end', gap: 4, height: 96, direction: 'ltr' }} aria-hidden="true">
+              {series.map((d) => (
+                <div key={d.day} title={`${day(d.day)}: ${d.visitors}`} style={{ flex: 1, minWidth: 6, height: `${Math.max(3, (d.visitors / peak) * 100)}%`, background: d.visitors ? colors.neel : colors.line, borderRadius: 4 }} />
+              ))}
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', direction: 'ltr', color: colors.ink2, fontSize: 14 }}>
+              <span>{series[0] ? day(series[0].day) : ''}</span><span>{series.at(-1) ? day(series.at(-1)!.day) : ''}</span>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gap: 4 }}>
+            <span style={{ color: colors.ink2, fontSize: 15 }}>{t('admin.growth.pages')}</span>
+            {g.pages.length === 0 ? <span>{t('admin.growth.noPages')}</span> : g.pages.map((p) => (
+              <div key={p.page} style={{ display: 'flex', justifyContent: 'space-between', gap: 12, direction: 'ltr' }}><code>{p.page}</code><span style={{ fontVariantNumeric: 'tabular-nums' }}>{p.views}</span></div>
+            ))}
+          </div>
+
+          <div style={{ display: 'grid', gap: 8, borderTop: `1px solid ${colors.line}`, paddingTop: 12 }}>
+            <strong>{t('admin.growth.installs')}</strong>
+            <span style={{ color: colors.ink2, fontSize: 15 }}>{t('admin.growth.installsHint')} <a href={PLAY_CONSOLE} target="_blank" rel="noreferrer" style={{ color: colors.neel, fontWeight: 700 }}>{t('admin.growth.openPlay')}</a></span>
+            {(['parent', 'driver'] as const).map((app) => {
+              const last = g.installs[app];
+              return (
+                <label key={app} style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 10 }}>
+                  <span style={{ minWidth: 110, fontWeight: 600 }}>{t(app === 'parent' ? 'admin.growth.parentApp' : 'admin.growth.driverApp')}</span>
+                  <input inputMode="numeric" pattern="[0-9]*" value={typed[app]} onChange={(e) => setTyped((x) => ({ ...x, [app]: e.target.value.replace(/[^0-9]/g, '') }))}
+                    style={{ width: 110, minHeight: 44, borderRadius: 12, border: `1px solid ${colors.line}`, padding: '0 12px', fontSize: 16, direction: 'ltr' }} data-testid={`installs-${app}`} />
+                  <span style={{ color: colors.ink2 }}>{last ? t('admin.growth.lastEntered', { n: last.installs, d: day(last.day) }) : t('admin.growth.notEntered')}</span>
+                </label>
+              );
+            })}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <button type="button" style={btn(colors.neel, colors.white)} onClick={save} data-testid="installs-save">{t('admin.growth.save')}</button>
+              {saved ? <span role="status">{t('admin.growth.saved')}</span> : null}
+            </div>
+          </div>
+        </>
+      ) : null}
+    </section>
+  );
+}
+
 function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; session: Session; url: string; t: (k: MessageKey, v?: Vars) => string }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [vans, setVans] = useState<VanRow[]>([]);
@@ -225,6 +325,7 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
         <button type="button" style={btn(colors.white, colors.neel)} onClick={load}>{t('admin.refresh')}</button>
       </div>
       {error ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{t('admin.error')}</p> : null}
+      <GrowthPanel supabase={supabase} t={t} />
       {stats ? (
         <section style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
           <Stat testId="stat-tracked" label={t('admin.stat.tracked')} value={`${pct(stats.tripsTracked, stats.trips)}%`} sub={<><bdi dir="ltr">{`${stats.tripsTracked} / ${stats.trips}`}</bdi> · {t('admin.stat.trackedHint')}</>} />

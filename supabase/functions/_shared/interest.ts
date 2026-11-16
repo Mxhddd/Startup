@@ -2,6 +2,7 @@
 //  GET  ?summary=1           -> { areas: {gulshan: 12}, meter: {gulshan: {f,d,s,m}}, proof: null | {vans, trips, alerts} } (cached 5 min)
 //  POST {kind:'join', ...}    -> 200 {ok:true} | 400 {error:field} | 403 {error:'human'} | 429 {error:'limited'} | 503 {error:'busy'}
 //  POST {kind:'doubt', n}     -> 200 {ok:true} (counts one opening of honest answer n)
+//  POST {kind:'hit', page, ev} -> 200 {ok:true} (v22: counts one page view, new visitor or download tap for the Growth panel)
 // The checks mirror packages/core/src/interest.ts (a test keeps the two in step). The hidden `website`
 // field is a bot trap: if it is filled in, we answer "ok" and save nothing. Nothing is logged.
 // v20 security: once TURNSTILE_SECRET is set, a join must carry a passed Cloudflare Turnstile check; the
@@ -68,8 +69,24 @@ export function visitorIp(headers: Headers): string {
 const SUMMARY_MS = 5 * 60 * 1000;
 let summaryCache: { at: number; data: unknown } | null = null;
 const doubtHits = new Map<string, { at: number; n: number }>();
+const siteHits = new Map<string, { at: number; n: number }>();
 /** Forget the in-memory caches (tests). */
-export function resetInterestCaches() { summaryCache = null; doubtHits.clear(); }
+export function resetInterestCaches() { summaryCache = null; doubtHits.clear(); siteHits.clear(); }
+
+/** v22: what the Growth panel counts. 'visitor' is sent once a day per browser; 'click_*' when a download link is tapped. */
+export const SITE_EVENTS = ['view', 'visitor', 'click_testers', 'click_play', 'click_apk'] as const;
+/** The website's pages, by name. Any other address is counted as 'other', and an invite link never shows its token. */
+const SITE_PAGES = ['/', '/app', '/download', '/drivers', '/safety', '/schools', '/story', '/progress', '/privacy', '/terms', '/delete-account', '/invite'];
+/** Turns an address into the page name the panel shows ('/ur/app' stays '/ur/app'; '/i/<token>' becomes '/i'). */
+export function sitePage(raw: unknown): string | null {
+  if (typeof raw !== 'string' || raw.length > 300 || !raw.startsWith('/')) return null;
+  let p = raw.split(/[?#]/)[0]!.replace(/\/+$/, '') || '/';
+  if (/^\/i(\/|$)/.test(p)) return '/i';
+  const ur = p === '/ur' || p.startsWith('/ur/');
+  if (ur) p = p.slice(3) || '/';
+  const name = SITE_PAGES.includes(p) ? p : 'other';
+  return ur ? (name === '/' ? '/ur' : `/ur${name === 'other' ? '/other' : name}`) : name;
+}
 export type Reply = { status: number; body: unknown; headers: Record<string, string> };
 
 export async function handleInterest(method: string, url: URL, headers: Headers, bodyText: string, deps: InterestDeps): Promise<Reply> {
@@ -101,6 +118,19 @@ export async function handleInterest(method: string, url: URL, headers: Headers,
     fresh.n += 1; doubtHits.set(key, fresh);
     if (doubtHits.size > 5000) doubtHits.clear();
     if (fresh.n <= 12) await deps.rpc('interest_doubt', { p_n: n });
+    return reply(200, { ok: true });
+  }
+  if (b.kind === 'hit') {
+    // v22 Growth panel: one page view, one new visitor today, or one download-link tap. Only the page's
+    // name and the event are counted; nothing about the visitor is kept.
+    const event = b.ev, page = sitePage(b.page);
+    if (typeof event !== 'string' || !(SITE_EVENTS as readonly string[]).includes(event)) return reply(400, { error: 'ev' });
+    if (!page) return reply(400, { error: 'page' });
+    const key = await deps.hashIp(ip), hit = siteHits.get(key);
+    const fresh = !hit || now - hit.at > 3600_000 ? { at: now, n: 0 } : hit;
+    fresh.n += 1; siteHits.set(key, fresh);
+    if (siteHits.size > 20000) siteHits.clear();
+    if (fresh.n <= 200) await deps.rpc('site_hit', { p_page: page, p_event: event });
     return reply(200, { ok: true });
   }
   if (b.kind !== 'join') return reply(400, { error: 'kind' });
