@@ -39,7 +39,7 @@
 .sitefoot .fgrid { display: grid; grid-template-columns: 1.5fr repeat(4, 1fr); gap: 34px 30px; padding-top: 34px; border-top: 1px solid rgba(245,238,225,.16); }
 .sitefoot .fl { display: grid; gap: 10px; align-content: start; }
 .sitefoot .mark { display: inline-flex; align-items: baseline; gap: 10px; }
-.sitefoot .mark b { font: 400 40px/1 var(--font-display), serif; color: #F5EEE1; }
+.sitefoot .mark b { font: 400 40px/1 var(--font-display), serif; color: #F5EEE1; padding-top: .35em; }
 .sitefoot .mark span { font: 800 18px var(--font-latin), sans-serif; }
 .sitefoot small { color: #D6CFC1; font-size: 14px; line-height: 1.6; }
 .sitefoot nav { display: grid; gap: 0; align-content: start; }

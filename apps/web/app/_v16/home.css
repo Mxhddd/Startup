@@ -73,7 +73,7 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16[data-night="1"] .bar::before { background: linear-gradient(rgba(16,22,47,.82), transparent); }
 .v16[data-night="1"] .bar.scrolled { background: color-mix(in srgb, var(--night) 94%, transparent); box-shadow: 0 1px 0 var(--hairNight); }
 .v16 .mark { display: inline-flex; align-items: baseline; gap: 10px; min-height: 44px; text-decoration: none; }
-.v16 .mark b { font: 400 32px/1 var(--font-display), serif; }
+.v16 .mark b { font: 400 32px/1 var(--font-display), serif; padding-top: .35em; } /* v22: room for Gulzar's tall strokes */
 .v16 .mark span { font: 800 18px var(--latin); letter-spacing: -.01em; }
 .v16 .nav { display: flex; gap: 6px; margin-inline-start: auto; font-weight: 600; font-size: 15px; }
 .v16 .nav a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 11px; border-radius: var(--pill); text-decoration: none; transition: background .3s; }
@@ -556,7 +556,7 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16 .intro-words { display: grid; justify-items: center; gap: 2px; animation: wordsOut .6s ease 2.3s forwards; }
 @keyframes wordsOut { to { opacity: 0; transform: translateY(16px); } }
 .v16 .intro .ur, .v16 .intro .en i { background: linear-gradient(100deg, var(--ivory) 42%, #FFD38A 50%, var(--ivory) 58%) no-repeat; background-size: 300% 100%; background-position: 100% 0; -webkit-background-clip: text; background-clip: text; color: transparent; }
-.v16 .intro .ur { font: 400 clamp(64px, 12vw, 104px)/1.25 var(--font-display), serif; padding-inline: 12px; -webkit-mask-image: linear-gradient(to left, #000 40%, transparent 60%); mask-image: linear-gradient(to left, #000 40%, transparent 60%); -webkit-mask-size: 260% 100%; mask-size: 260% 100%; -webkit-mask-position: 0 0; mask-position: 0 0; animation: write 1s cubic-bezier(.4, 0, .2, 1) .7s forwards, glint 1.1s ease-in-out 1.6s forwards; }
+.v16 .intro .ur { font: 400 clamp(64px, 12vw, 104px)/1.25 var(--font-display), serif; padding: .5em 16px .2em; margin-block: -.4em -.1em; /* v22: Gulzar's tall strokes and dots rise above the line box; the text-clipped fill and the mask paint only inside the box, so give them room */ -webkit-mask-image: linear-gradient(to left, #000 40%, transparent 60%); mask-image: linear-gradient(to left, #000 40%, transparent 60%); -webkit-mask-size: 260% 100%; mask-size: 260% 100%; -webkit-mask-position: 0 0; mask-position: 0 0; animation: write 1s cubic-bezier(.4, 0, .2, 1) .7s forwards, glint 1.1s ease-in-out 1.6s forwards; }
 .v16 .intro .en { display: flex; font: 800 clamp(22px, 3.4vw, 30px)/1 var(--font-latin), sans-serif; letter-spacing: .02em; }
 .v16 .intro .en i { font-style: normal; opacity: 0; translate: 0 14px; animation: rise .7s var(--calm) forwards, glint 1.1s ease-in-out 1.6s forwards; animation-delay: calc(1.25s + var(--k) * 60ms), calc(1.62s + var(--k) * 30ms); }
 @keyframes write { to { -webkit-mask-position: 100% 0; mask-position: 100% 0; } }
@@ -694,3 +694,13 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
   .v16[data-lang="ur"] .barcta .btn { padding: 0 12px; font-size: 14px; }
 }
 @media (max-width: 400px) { .v16[data-lang="ur"] .bar .mark span { display: none; } }
+
+/* v22: on laptop screens (wide but short) the front door was taller than the screen, so its top
+   ("Karachi · school vans") slid under the menu bar and its bottom was cut. Start it below the bar
+   and shrink it to fit. */
+@media (min-width: 921px) and (max-height: 960px) {
+  .v16 .hero .stick { align-content: start; padding-top: 74px; }
+  .v16 .frontdoor { padding-top: 0; gap: 22px; zoom: .9; }
+}
+@media (min-width: 921px) and (max-height: 840px) { .v16 .frontdoor { zoom: .88; gap: 16px; } .v16 .hero .stick { padding-top: 70px; } }
+@media (min-width: 921px) and (max-height: 730px) { .v16 .frontdoor { zoom: .78; } }
