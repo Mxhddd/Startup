@@ -13,6 +13,12 @@ export type Growth = {
 };
 const ZERO: Tri = { today: 0, week: 0, total: 0 };
 /** The rows of the Growth table, in the order a visitor moves: see the site, tap download, sign up, use the app. */
+/** Fills in anything missing, so an empty or partial answer shows zeros instead of breaking the page. */
+export function asGrowth(raw: unknown): Growth {
+  const o = raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Partial<Growth>) : {};
+  return { site: o.site ?? {}, signups: o.signups ?? {}, people: o.people ?? {}, vans: o.vans ?? { set_up: 0, tracked_week: 0 },
+    series: Array.isArray(o.series) ? o.series : [], pages: Array.isArray(o.pages) ? o.pages : [], installs: o.installs ?? {} };
+}
 export function growthRows(g: Growth): { key: MessageKey; v: Tri }[] {
   return [
     { key: 'admin.growth.visitors', v: g.site.visitor ?? ZERO },

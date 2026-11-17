@@ -10,7 +10,7 @@ import { colors, shadow } from '@pohnch/ui/theme';
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Turnstile } from '../_lib/Turnstile';
-import { growthRows, type Growth } from './growth';
+import { asGrowth, growthRows, type Growth } from './growth';
 import { welcomeLink } from './whatsapp';
 
 type Stats = { days: number; trips: number; tripsTracked: number; familiesActive: number; familiesWithAlerts: number; alertsSent: number; alertsFailed: number };
@@ -196,7 +196,7 @@ function GrowthPanel({ supabase, t }: { supabase: SupabaseClient; t: (k: Message
   const load = useCallback(async () => {
     const r = await supabase.rpc('admin_growth');
     setError(!!r.error);
-    if (!r.error) setG(r.data as Growth);
+    if (!r.error) setG(asGrowth(r.data));
   }, [supabase]);
   useEffect(() => { void load(); const id = setInterval(load, 60_000); return () => clearInterval(id); }, [load]);
   const save = async () => {

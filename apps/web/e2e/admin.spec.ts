@@ -32,6 +32,8 @@ async function fakeSupabase(ctx: BrowserContext, opts: { loggedIn: boolean; admi
     if (u.pathname === '/functions/v1/app/admin.verify') return json({ ok: true });
     // v10 stage 2
     if (u.pathname === '/rest/v1/rpc/admin_flags') return json([]);
+    if (u.pathname === '/rest/v1/rpc/admin_growth') return json({ site: { visitor: { today: 5, week: 47, total: 60 } }, signups: { parent: { today: 1, week: 3, total: 3 } }, people: {}, vans: { set_up: 1, tracked_week: 0 },
+      series: [{ day: '2026-11-17', views: 64, visitors: 47, signups: 1 }], pages: [{ page: '/', views: 33 }], installs: {} });
     // v12
     if (u.pathname === '/rest/v1/rpc/admin_speeding_today') return json([{ van_name: 'Rafiq bhai van', driver_name: 'Rafiq bhai', max_kmh: 63, fast_fixes: 4 }]);
     if (u.pathname === '/functions/v1/app/admin.notice') {
@@ -67,6 +69,7 @@ test('the team sees the four numbers, the check queue, and verifies a driver', a
   await expect(page.getByTestId('stat-tracked')).toContainText('80%');
   await expect(page.getByTestId('stat-live')).toContainText('45%');
   await expect(page.getByTestId('stat-alerts')).toContainText('312');
+  await expect(page.getByTestId('admin-growth')).toContainText('47');
   await expect(page.getByTestId('queue-row')).toHaveCount(1);
   await expect(page.getByTestId('trip-row')).toContainText('4 / 9');
   await page.getByTestId('queue-row').getByRole('button').click();

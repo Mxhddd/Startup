@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { en } from '@pohnch/messages';
-import { growthRows, type Growth } from './growth';
+import { asGrowth, growthRows, type Growth } from './growth';
 
 const empty: Growth = { site: {}, signups: {}, people: {}, vans: { set_up: 0, tracked_week: 0 }, series: null, pages: [], installs: {} };
 
@@ -20,5 +20,12 @@ describe('v22 Growth panel rows', () => {
   });
   it('has words for every row', () => {
     for (const r of growthRows(empty)) expect((en as Record<string, string>)[r.key]).toBeTruthy();
+  });
+  it('turns an empty or odd answer into zeros', () => {
+    for (const raw of [null, [], 'x', {}]) {
+      const g = asGrowth(raw);
+      expect(growthRows(g).every((r) => r.v.total === 0)).toBe(true);
+      expect(g.series).toEqual([]);
+    }
   });
 });

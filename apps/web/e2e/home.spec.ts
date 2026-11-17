@@ -14,6 +14,7 @@ test('the intro plays in full on every visit and can be skipped', async ({ page 
   await page.goto('/?lite');
   const intro = page.getByTestId('intro');
   await expect(intro).toBeVisible();
+  await expect(intro).toHaveAttribute('data-ready', '1'); // the page is ready to listen for a key
   await page.keyboard.press('Space');
   await expect(intro).toHaveCount(0, { timeout: 3000 });
   await page.reload();

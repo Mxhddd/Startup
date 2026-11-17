@@ -12,11 +12,13 @@ import { INTRO_OPEN_AT, INTRO_OPEN_MS, introMode } from './introRules';
 
 export function Intro({ skipLabel }: { skipLabel: string }) {
   const [phase, setPhase] = useState<'full' | 'leaving' | 'gone'>('full');
+  const [ready, setReady] = useState(false); // true once tap/scroll/key can skip it (tests wait for this)
   useEffect(() => {
     if (introMode(matchMedia('(prefers-reduced-motion: reduce)').matches) === 'none') { setPhase('gone'); dispatchEvent(new Event('pohnch:intro-open')); return; }
     const leave = () => setPhase((p) => (p === 'full' ? 'leaving' : p));
     const t = setTimeout(leave, INTRO_OPEN_AT / TS);
     const opts = { passive: true, once: true } as const;
+    setReady(true);
     addEventListener('pointerdown', leave, opts); addEventListener('wheel', leave, opts); addEventListener('touchstart', leave, opts); addEventListener('keydown', leave, opts);
     return () => { clearTimeout(t); removeEventListener('pointerdown', leave); removeEventListener('wheel', leave); removeEventListener('touchstart', leave); removeEventListener('keydown', leave); };
   }, []);
@@ -27,7 +29,7 @@ export function Intro({ skipLabel }: { skipLabel: string }) {
   }, [phase]);
   if (phase === 'gone') return null;
   return (
-    <div className={`intro ${phase}`} data-testid="intro">
+    <div className={`intro ${phase}`} data-testid="intro" data-ready={ready ? '1' : undefined}>
       <div className="intro-mark" aria-hidden="true">
         <svg className="logo" viewBox="0 0 200 120" width="200" height="120">
           <path className="trail" d="M12 108 C 40 108 48 78 68 70 S 92 56 100 46" fill="none" />
