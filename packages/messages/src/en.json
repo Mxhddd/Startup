@@ -1665,5 +1665,9 @@
   "admin.money.plan": "Plan",
   "admin.money.save": "Record payment",
   "admin.money.saved": "Saved. Paid until {date}.",
-  "admin.money.introUsed": "This phone or seat has already had the Rs 99 first month."
+  "admin.money.introUsed": "This phone or seat has already had the Rs 99 first month.",
+  "web.links.hand": "school van, live · Karachi",
+  "web.links.start": "start here!",
+  "web.links.alert": "Ayesha is in the van",
+  "web.links.alertSub": "Picked up · 7:12"
 }

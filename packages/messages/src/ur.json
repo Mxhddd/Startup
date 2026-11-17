@@ -1665,5 +1665,9 @@
   "admin.money.plan": "پلان",
   "admin.money.save": "ادائیگی درج کریں",
   "admin.money.saved": "محفوظ۔ {date} تک ادا شدہ۔",
-  "admin.money.introUsed": "اس فون یا سیٹ پر Rs 99 والا پہلا مہینہ لیا جا چکا ہے۔"
+  "admin.money.introUsed": "اس فون یا سیٹ پر Rs 99 والا پہلا مہینہ لیا جا چکا ہے۔",
+  "web.links.hand": "school van, live · Karachi",
+  "web.links.start": "یہاں سے شروع کریں",
+  "web.links.alert": "عائشہ وین میں ہے",
+  "web.links.alertSub": "وین میں · 7:12"
 }
