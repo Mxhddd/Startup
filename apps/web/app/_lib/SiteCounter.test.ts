@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { SEEN_KEY, firstVisitToday, karachiDay, uncounted } from './SiteCounter';
+import { SEEN_KEY, firstVisitToday, karachiDay, shouldCount, uncounted } from './SiteCounter';
 
 const memory = () => { const m = new Map<string, string>(); return { getItem: (k: string) => m.get(k) ?? null, setItem: (k: string, v: string) => void m.set(k, v), m }; };
 
@@ -19,6 +19,13 @@ describe('v22 site counter', () => {
   it('uses the Karachi date (UTC+5)', () => {
     expect(karachiDay(new Date('2026-11-16T19:30:00Z'))).toBe('2026-11-17');
     expect(karachiDay(new Date('2026-11-16T18:59:00Z'))).toBe('2026-11-16');
+  });
+  it('counts only real visitors on pohnch.pk, never local builds, previews or test robots', () => {
+    expect(shouldCount('pohnch.pk', false)).toBe(true);
+    expect(shouldCount('www.pohnch.pk', undefined)).toBe(true);
+    expect(shouldCount('pohnch.pk', true)).toBe(false);
+    expect(shouldCount('localhost', false)).toBe(false);
+    expect(shouldCount('pohnch-git-claude.vercel.app', false)).toBe(false);
   });
   it('never counts the team page or invite links', () => {
     expect(uncounted('/admin')).toBe(true);

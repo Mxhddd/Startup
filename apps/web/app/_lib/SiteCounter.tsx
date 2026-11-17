@@ -9,6 +9,12 @@ import { countHit } from './interest';
 export const SEEN_KEY = 'pohnch.seen';
 /** Karachi's date today, as YYYY-MM-DD. */
 export const karachiDay = (now = new Date()) => new Date(now.getTime() + 5 * 3600_000).toISOString().slice(0, 10);
+/** Only real visitors on the live site count: the pohnch.pk hostnames, and never a browser driven by a
+ *  test robot (Playwright and other automation set navigator.webdriver). Local builds, previews and our
+ *  own test runs were once counted as visitors, which made the Growth panel far higher than Vercel's. */
+export const LIVE_HOSTS = ['pohnch.pk', 'www.pohnch.pk'];
+export const shouldCount = (host: string, webdriver: boolean | undefined) => LIVE_HOSTS.includes(host) && !webdriver;
+
 /** Pages we never count. */
 export const uncounted = (path: string) => /^\/(admin|invite)(\/|$)/.test(path);
 
@@ -26,7 +32,7 @@ export function firstVisitToday(store: Pick<Storage, 'getItem' | 'setItem'> | nu
 export function SiteCounter() {
   const path = usePathname() ?? '/';
   useEffect(() => {
-    if (uncounted(path)) return;
+    if (uncounted(path) || !shouldCount(window.location.hostname, navigator.webdriver)) return;
     countHit('view', path);
     let store: Storage | null = null;
     try { store = window.localStorage; } catch { store = null; }
