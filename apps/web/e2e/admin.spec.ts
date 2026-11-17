@@ -70,6 +70,11 @@ test('the team sees the four numbers, the check queue, and verifies a driver', a
   const calls = await fakeSupabase(context, { loggedIn: true, admin: true });
   await page.goto('/admin');
   await expect(page.getByTestId('stat-tracked')).toContainText('80%');
+  // v23 overview: numbers against their goals, what needs a person, and the funnel
+  await expect(page.getByTestId('kpi-tracked')).toContainText('80%');
+  await expect(page.getByTestId('admin-todo')).toContainText('1');
+  await expect(page.getByTestId('admin-funnel')).toContainText('47');
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT, fullPage: true });
   await expect(page.getByTestId('stat-live')).toContainText('45%');
   await expect(page.getByTestId('stat-alerts')).toContainText('312');
   await expect(page.getByTestId('admin-growth')).toContainText('47');

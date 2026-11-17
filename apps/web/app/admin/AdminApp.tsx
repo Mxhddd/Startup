@@ -282,6 +282,144 @@ function GrowthPanel({ supabase, t }: { supabase: SupabaseClient; t: (k: Message
   );
 }
 
+type HelpLite = { resolved_at: string | null };
+type InterestLite = { contacted_at: string | null };
+type Kpi = { id: string; label: string; value: string; sub: string; tone: 'good' | 'mid' | 'low' };
+
+/**
+ * v23 Overview: the page opens with answers, not tables. Four numbers against their targets (gate 1:
+ * 80% of trips tracked end to end; 30% of riders paying), what needs a person today (each a jump link to
+ * its section), and the funnel from a website visit to a working van, with the drop between each step.
+ */
+function Overview({ supabase, stats, vans, t }: { supabase: SupabaseClient; stats: Stats | null; vans: VanRow[]; t: (k: MessageKey, v?: Vars) => string }) {
+  const [g, setG] = useState<Growth | null>(null);
+  const [rev, setRev] = useState<Revenue | null>(null);
+  const [help, setHelp] = useState<HelpLite[]>([]);
+  const [leads, setLeads] = useState<InterestLite[]>([]);
+  const [speed, setSpeed] = useState(0);
+  useEffect(() => {
+    const load = async () => {
+      const [a, b, c, d, e] = await Promise.all([supabase.rpc('admin_growth'), supabase.rpc('admin_revenue'), supabase.rpc('admin_help_alerts'), supabase.rpc('admin_interest'), supabase.rpc('admin_speeding_today')]);
+      if (!a.error) setG(asGrowth(a.data));
+      if (!b.error && b.data && typeof b.data === 'object' && !Array.isArray(b.data)) setRev(b.data as Revenue);
+      if (!c.error) setHelp((c.data ?? []) as HelpLite[]);
+      if (!d.error) setLeads((d.data ?? []) as InterestLite[]);
+      if (!e.error) setSpeed(((e.data ?? []) as unknown[]).length);
+    };
+    void load();
+    const id = setInterval(load, 60_000);
+    return () => clearInterval(id);
+  }, [supabase]);
+
+  const riders = vans.reduce((n, v) => n + (v.riders ?? 0), 0);
+  const tracked = stats ? pct(stats.tripsTracked, stats.trips) : 0;
+  const paying = rev ? pct(rev.paying, riders) : 0;
+  const vansUp = g?.vans.set_up ?? 0;
+  const vansWorking = g?.vans.tracked_week ?? 0;
+  const visitors = g?.site.visitor?.week ?? 0;
+  const signups = (g?.signups.parent?.week ?? 0) + (g?.signups.driver?.week ?? 0) + (g?.signups.school?.week ?? 0);
+  const tone = (v: number, goal: number): Kpi['tone'] => (v >= goal ? 'good' : v >= goal / 2 ? 'mid' : 'low');
+  const kpis: Kpi[] = [
+    { id: 'kpi-tracked', label: t('admin.ov.tracked'), value: `${tracked}%`, sub: t('admin.ov.trackedSub', { a: stats?.tripsTracked ?? 0, b: stats?.trips ?? 0 }), tone: stats && stats.trips ? tone(tracked, 80) : 'low' },
+    { id: 'kpi-paying', label: t('admin.ov.paying'), value: `${paying}%`, sub: t('admin.ov.payingSub', { a: rev?.paying ?? 0, b: riders }), tone: riders ? tone(paying, 30) : 'low' },
+    { id: 'kpi-vans', label: t('admin.ov.vans'), value: `${vansWorking}`, sub: t('admin.ov.vansSub', { n: vansUp }), tone: tone(vansWorking, 3) },
+    { id: 'kpi-visitors', label: t('admin.ov.visitors'), value: `${visitors}`, sub: t('admin.ov.visitorsSub', { n: signups, p: pct(signups, visitors) }), tone: signups > 0 ? 'good' : visitors > 0 ? 'mid' : 'low' },
+  ];
+  const toneColor = { good: colors.zamurrad, mid: colors.kesar, low: colors.ink2 } as const;
+  const toneWord = { good: t('admin.ov.onTrack'), mid: t('admin.ov.close'), low: t('admin.ov.far') } as const;
+
+  const openHelp = help.filter((h) => !h.resolved_at).length;
+  const waiting = vans.filter((v) => !v.verified_at).length;
+  const fresh = leads.filter((l) => !l.contacted_at).length;
+  const todo = [
+    openHelp ? { n: openHelp, text: t('admin.ov.todoHelp', { n: openHelp }), to: '#sec-switches', urgent: true } : null,
+    waiting ? { n: waiting, text: t('admin.ov.todoCheck', { n: waiting }), to: '#sec-ops', urgent: false } : null,
+    fresh ? { n: fresh, text: t('admin.ov.todoLeads', { n: fresh }), to: '#sec-people', urgent: false } : null,
+    speed ? { n: speed, text: t('admin.ov.todoSpeed', { n: speed }), to: '#sec-ops', urgent: false } : null,
+    stats && stats.alertsFailed ? { n: stats.alertsFailed, text: t('admin.ov.todoFailed', { n: stats.alertsFailed }), to: '#sec-ops', urgent: false } : null,
+    rev && rev.grace ? { n: rev.grace, text: t('admin.ov.todoGrace', { n: rev.grace }), to: '#sec-money', urgent: false } : null,
+    rev && rev.bonusDue ? { n: -1, text: t('admin.ov.todoBonus', { n: rev.bonusDue }), to: '#sec-money', urgent: false } : null,
+  ].filter((x): x is { n: number; text: string; to: string; urgent: boolean } => !!x);
+
+  const taps = (g?.site.click_testers?.week ?? 0) + (g?.site.click_play?.week ?? 0) + (g?.site.click_apk?.week ?? 0);
+  const funnel = [
+    { label: t('admin.ov.fVisitors'), n: visitors },
+    { label: t('admin.ov.fTaps'), n: taps },
+    { label: t('admin.ov.fSignups'), n: signups },
+    { label: t('admin.ov.fAccounts'), n: g?.people.accounts?.week ?? 0 },
+    { label: t('admin.ov.fVans'), n: vansUp },
+    { label: t('admin.ov.fWorking'), n: vansWorking },
+  ];
+  const top = Math.max(1, ...funnel.map((f) => f.n));
+  const num: CSSProperties = { fontFamily: 'var(--font-latin), sans-serif', fontVariantNumeric: 'tabular-nums', direction: 'ltr', unicodeBidi: 'isolate' };
+
+  return (
+    <section id="sec-overview" data-testid="admin-overview" style={{ display: 'grid', gap: 16 }}>
+      <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
+        {kpis.map((k) => (
+          <div key={k.id} data-testid={k.id} style={{ ...card, display: 'grid', gap: 4, borderTop: `6px solid ${toneColor[k.tone]}` }}>
+            <span style={{ color: colors.ink2, fontWeight: 600, fontSize: 15 }}>{k.label}</span>
+            <span style={{ ...num, fontSize: 40, fontWeight: 800, color: colors.neel, lineHeight: 1.1 }}>{k.value}</span>
+            <span style={{ fontSize: 15 }}>{k.sub}</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: toneColor[k.tone] === colors.ink2 ? colors.ink2 : k.tone === 'mid' ? colors.kesarText : colors.zamurradOnTint }}>{toneWord[k.tone]}</span>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
+        <div style={{ ...card, display: 'grid', gap: 10, alignContent: 'start' }} data-testid="admin-todo">
+          <h2 style={{ margin: 0, fontSize: 20 }}>{t('admin.ov.todoTitle')}</h2>
+          {todo.length === 0 ? <p style={{ margin: 0, color: colors.zamurradOnTint, fontWeight: 700 }}>{t('admin.ov.clear')}</p> : null}
+          {todo.map((x) => (
+            <a key={x.text} href={x.to} style={{ display: 'flex', alignItems: 'center', gap: 12, minHeight: 48, padding: '8px 12px', borderRadius: 14, textDecoration: 'none', color: colors.siyahi, background: x.urgent ? colors.shingarfTint : colors.ghee }}>
+              <span style={{ ...num, minWidth: 34, height: 34, borderRadius: 17, display: 'grid', placeItems: 'center', fontWeight: 800, color: colors.white, background: x.urgent ? colors.shingarf : colors.neel }}>{x.n < 0 ? 'Rs' : x.n > 99 ? '99+' : x.n}</span>
+              <span style={{ flex: 1, fontWeight: 600 }}>{x.text}</span>
+              <span aria-hidden="true" style={{ color: colors.link }}>→</span>
+            </a>
+          ))}
+        </div>
+        <div style={{ ...card, display: 'grid', gap: 8, alignContent: 'start' }} data-testid="admin-funnel">
+          <h2 style={{ margin: 0, fontSize: 20 }}>{t('admin.ov.funnelTitle')}</h2>
+          <p style={{ margin: 0, color: colors.ink2, fontSize: 15 }}>{t('admin.ov.funnelHint')}</p>
+          {funnel.map((f, i) => {
+            const prev = i > 0 ? funnel[i - 1]!.n : 0;
+            return (
+              <div key={f.label} style={{ display: 'grid', gap: 2 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, fontSize: 15 }}>
+                  <span>{f.label}</span>
+                  <span style={num}><b>{f.n}</b>{i > 0 && prev > 0 ? <span style={{ color: colors.ink2 }}>{`  ·  ${pct(f.n, prev)}%`}</span> : null}</span>
+                </div>
+                <div style={{ height: 12, borderRadius: 6, background: colors.ghee, overflow: 'hidden' }}>
+                  <div style={{ width: `${Math.max(f.n ? 3 : 0, (f.n / top) * 100)}%`, height: '100%', borderRadius: 6, background: i < 2 ? colors.neel : i < 4 ? colors.kesar : colors.zamurrad }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const NAV = ['overview', 'ops', 'people', 'growth', 'money', 'switches'] as const;
+function SectionNav({ t }: { t: (k: MessageKey, v?: Vars) => string }) {
+  return (
+    <nav aria-label={t('admin.ov.nav')} style={{ position: 'sticky', top: 0, zIndex: 5, display: 'flex', gap: 8, overflowX: 'auto', padding: '10px 0', background: colors.ghee }}>
+      {NAV.map((n) => (
+        <a key={n} href={`#sec-${n}`} style={{ flex: 'none', minHeight: 44, display: 'inline-flex', alignItems: 'center', padding: '0 16px', borderRadius: 999, background: colors.white, boxShadow: shadow.card, color: colors.neel, fontWeight: 700, textDecoration: 'none' }}>{t(`admin.nav.${n}` as MessageKey)}</a>
+      ))}
+    </nav>
+  );
+}
+function SectionHead({ id, title, hint }: { id: string; title: string; hint?: string }) {
+  return (
+    <div id={id} style={{ scrollMarginTop: 72, borderTop: `2px solid ${colors.line}`, paddingTop: 18, marginTop: 8 }}>
+      <h2 style={{ margin: 0, fontSize: 26, color: colors.neel }}>{title}</h2>
+      {hint ? <p style={{ margin: '4px 0 0', color: colors.ink2 }}>{hint}</p> : null}
+    </div>
+  );
+}
+
 function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; session: Session; url: string; t: (k: MessageKey, v?: Vars) => string }) {
   const [stats, setStats] = useState<Stats | null>(null);
   const [vans, setVans] = useState<VanRow[]>([]);
@@ -326,8 +464,8 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
         <button type="button" style={btn(colors.white, colors.neel)} onClick={load}>{t('admin.refresh')}</button>
       </div>
       {error ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{t('admin.error')}</p> : null}
-      <GrowthPanel supabase={supabase} t={t} />
-      <MoneyPanel supabase={supabase} vans={vans} t={t} />
+      <SectionNav t={t} />
+      <Overview supabase={supabase} stats={stats} vans={vans} t={t} />
       {stats ? (
         <section style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
           <Stat testId="stat-tracked" label={t('admin.stat.tracked')} value={`${pct(stats.tripsTracked, stats.trips)}%`} sub={<><bdi dir="ltr">{`${stats.tripsTracked} / ${stats.trips}`}</bdi> · {t('admin.stat.trackedHint')}</>} />
@@ -337,10 +475,7 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
         </section>
       ) : null}
 
-      <V12 supabase={supabase} vans={vans} api={api} t={t} />
-      <Stage2 supabase={supabase} vans={vans} t={t} />
-      <Interested supabase={supabase} t={t} />
-
+      <SectionHead id="sec-ops" title={t('admin.nav.ops')} hint={t('admin.ov.opsHint')} />
       <h2 style={sectionTitle}>{t('admin.queue.title')}</h2>
       <p style={{ margin: 0, color: colors.ink2 }}>{t('admin.queue.hint')}</p>
       {queue.length === 0 ? <p style={{ margin: 0 }}>{t('admin.queue.empty')}</p> : null}
@@ -382,6 +517,19 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
           </button>
         </div>
       ))}
+      <V12 supabase={supabase} vans={vans} api={api} t={t} />
+
+      <SectionHead id="sec-people" title={t('admin.nav.people')} hint={t('admin.ov.peopleHint')} />
+      <Interested supabase={supabase} t={t} />
+
+      <SectionHead id="sec-growth" title={t('admin.nav.growth')} />
+      <GrowthPanel supabase={supabase} t={t} />
+
+      <SectionHead id="sec-money" title={t('admin.nav.money')} />
+      <MoneyPanel supabase={supabase} vans={vans} t={t} />
+
+      <SectionHead id="sec-switches" title={t('admin.nav.switches')} hint={t('admin.ov.switchesHint')} />
+      <Stage2 supabase={supabase} vans={vans} t={t} />
     </div>
   );
 }
