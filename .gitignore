@@ -15,3 +15,8 @@ coverage/
 .DS_Store
 next-env.d.ts
 expo-env.d.ts
+
+# video render outputs (the final pohnch-ad-v1-sound.mp4 is committed)
+design/video/*/frames/
+design/video/*/pohnch-ad-v1.mp4
+design/video/*/soundtrack.wav
