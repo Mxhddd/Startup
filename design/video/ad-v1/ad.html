@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pohnch, hand-drawn ad v1</title>
+<!-- A fully animated 9:16 ad, pencil on sketchpad paper. Rendered frame by frame to MP4 by render.cjs:
+     the GSAP timeline is paused and stepped with window.seek(t). Fonts: Caveat (handwriting), Gulzar (Urdu). -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Gulzar&display=swap">
+<script src="../../../node_modules/gsap/dist/gsap.min.js"></script>
+<script src="../../../node_modules/gsap/dist/MotionPathPlugin.min.js"></script>
+<style>
+  html,body{margin:0;background:#F4EEE1}
+  svg{display:block}
+  .ink{fill:none;stroke:#23284A;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+  .thin{stroke-width:4}
+  .hand{font-family:Caveat,cursive;font-weight:700;fill:#23284A}
+  .urdu{font-family:Gulzar,serif;fill:#1F2A5C}
+</style>
+</head>
+<body>
+<svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%">
+      <feTurbulence id="pt" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="4.5"/>
+    </filter>
+    <filter id="wash" x="-10%" y="-10%" width="120%" height="120%">
+      <feTurbulence id="wt" type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="3" result="n"/>
+      <feDisplacementMap in="SourceGraphic" in2="n" scale="14" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="1.2"/>
+    </filter>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0.35  0 0 0 0 0.3  0 0 0 0 0.22  0 0 0 0.09 0"/></filter>
+    <pattern id="dots" width="44" height="44" patternUnits="userSpaceOnUse"><circle cx="22" cy="22" r="2.2" fill="#D8CDB6"/></pattern>
+    <radialGradient id="vig" cx="50%" cy="45%" r="75%"><stop offset="70%" stop-color="#000" stop-opacity="0"/><stop offset="100%" stop-color="#5a4a2a" stop-opacity="0.16"/></radialGradient>
+  </defs>
+
+  <!-- paper -->
+  <rect width="1080" height="1920" fill="#F4EEE1"/>
+  <rect width="1080" height="1920" fill="url(#dots)"/>
+  <rect width="1080" height="1920" filter="url(#grain)"/>
+  <line x1="120" y1="0" x2="120" y2="1920" stroke="#E7B9A6" stroke-width="2.5" opacity="0.7"/>
+
+  <!-- S1: morning -->
+  <g id="s1">
+    <text id="t712" class="hand" x="540" y="330" font-size="132" text-anchor="middle">7:12 am</text>
+    <circle id="sunWash" cx="770" cy="760" r="92" fill="#E8A33D" opacity="0" filter="url(#wash)"/>
+    <g filter="url(#pencil)">
+      <circle class="ink draw" cx="770" cy="760" r="92"/>
+      <path class="ink draw" d="M70 1060 L70 930 L170 930 L170 990 L230 990 L230 840 L330 840 L330 950 L380 950 L380 880 L470 880 L470 1060 M470 1000 L560 1000 L560 760 L580 720 L600 760 L600 1000 L660 1000 L660 900 L760 900 L760 960 L850 960 L850 870 L930 870 L930 1060"/>
+      <path class="ink draw thin" d="M260 870 L300 870 M260 910 L300 910 M410 910 L440 910 M690 930 L730 930 M880 900 L905 900"/>
+      <path class="ink draw" d="M40 1100 L1040 1100"/>
+      <path class="ink draw thin" d="M80 1180 L180 1180 M260 1180 L360 1180 M440 1180 L540 1180 M620 1180 L720 1180 M800 1180 L900 1180"/>
+      <path class="ink draw" d="M40 1260 L1040 1260"/>
+    </g>
+    <text id="tWait" class="hand" x="540" y="1460" font-size="76" text-anchor="middle">a small bag waits by the door</text>
+  </g>
+
+  <!-- S2: the call -->
+  <g id="s2" opacity="0">
+    <g id="phone">
+      <g filter="url(#pencil)">
+        <rect class="ink draw" x="300" y="520" width="480" height="880" rx="64"/>
+        <path class="ink draw thin" d="M500 560 L580 560"/>
+        <circle class="ink draw" cx="540" cy="760" r="78"/>
+        <path class="ink draw thin" d="M505 745 a35 35 0 0 1 70 0 M490 820 q50 -38 100 0"/>
+        <circle class="ink draw" cx="430" cy="1250" r="54"/>
+        <circle class="ink draw" cx="650" cy="1250" r="54"/>
+      </g>
+      <circle id="hang" cx="650" cy="1250" r="50" fill="#A8321F" opacity="0" filter="url(#wash)"/>
+      <circle id="pick" cx="430" cy="1250" r="50" fill="#17705A" opacity="0" filter="url(#wash)"/>
+      <text id="tUncle" class="hand" x="540" y="930" font-size="80" text-anchor="middle">Van Uncle</text>
+      <text id="tCalling" class="hand" x="540" y="1010" font-size="56" text-anchor="middle" fill="#4A4F66">calling...</text>
+    </g>
+    <g filter="url(#pencil)">
+      <path class="ink thin ring" d="M250 700 q-40 60 0 120"/><path class="ink thin ring" d="M210 670 q-60 90 0 180"/>
+      <path class="ink thin ring" d="M830 700 q40 60 0 120"/><path class="ink thin ring" d="M870 670 q60 90 0 180"/>
+    </g>
+    <text id="tNo1" class="hand" x="170" y="470" font-size="68" fill="#A8321F" transform="rotate(-8 170 470)">no answer</text>
+    <text id="tNo2" class="hand" x="610" y="1530" font-size="68" fill="#A8321F" transform="rotate(6 610 1530)">again?</text>
+    <text id="tNo3" class="hand" x="150" y="1620" font-size="68" fill="#A8321F" transform="rotate(-4 150 1620)">3rd time...</text>
+  </g>
+
+  <!-- S3: the question -->
+  <g id="s3" opacity="0">
+    <text id="tUrdu" class="urdu" x="540" y="900" font-size="176" text-anchor="middle" direction="rtl">وین کہاں ہے؟</text>
+    <text id="tWhere" class="hand" x="540" y="1130" font-size="124" text-anchor="middle">Where's the van?</text>
+    <path id="squig" class="ink draw" filter="url(#pencil)" style="stroke:#E8A33D;stroke-width:12" d="M250 1185 q40 -30 80 0 t80 0 t80 0 t80 0 t80 0 t80 0 t80 0"/>
+    <text id="tEvery" class="hand" x="540" y="1380" font-size="70" text-anchor="middle" fill="#4A4F66">every parent, every morning</text>
+  </g>
+
+  <!-- S4: the map -->
+  <g id="s4" opacity="0">
+    <text id="tNow" class="hand" x="540" y="290" font-size="96" text-anchor="middle">Now you can see it.</text>
+    <g filter="url(#pencil)">
+      <rect class="ink draw" x="90" y="380" width="900" height="1180" rx="56"/>
+      <path class="ink draw thin" opacity="0.55" d="M90 700 C300 680 500 760 990 720 M90 1000 C340 1040 620 960 990 1010 M90 1320 C360 1300 640 1360 990 1300 M330 380 C310 700 380 1100 330 1560 M720 380 C760 760 690 1160 740 1560"/>
+    </g>
+    <path id="route" d="M230 1420 C330 1250 260 1120 420 1040 C600 950 520 820 650 740 C760 670 800 620 840 560" fill="none" stroke="#1F2A5C" stroke-width="12" stroke-linecap="round" stroke-dasharray="2 26" filter="url(#pencil)" class="drawDash"/>
+    <g id="home" opacity="0" filter="url(#pencil)">
+      <path class="ink" d="M170 1470 L230 1410 L290 1470 L290 1530 L170 1530 Z M215 1530 L215 1490 L245 1490 L245 1530"/>
+      <rect x="168" y="1468" width="124" height="64" fill="#17705A" opacity="0.35" filter="url(#wash)"/>
+    </g>
+    <text id="tHome" class="hand" x="310" y="1520" font-size="54">home</text>
+    <g id="school" opacity="0" filter="url(#pencil)">
+      <path class="ink" d="M780 600 L780 520 L900 520 L900 600 Z M840 520 L840 440 M840 440 L900 458 L840 476"/>
+      <path d="M842 442 L898 458 L842 474 Z" fill="#E8A33D"/>
+    </g>
+    <text id="tSchool" class="hand" x="740" y="660" font-size="54" text-anchor="end">school</text>
+    <g id="van">
+      <g filter="url(#pencil)">
+        <rect x="-74" y="-44" width="148" height="76" rx="20" fill="#FBF7EF" stroke="#23284A" stroke-width="6"/>
+        <path d="M-74 4 L74 4" stroke="#E8A33D" stroke-width="10"/>
+        <rect x="-56" y="-32" width="40" height="26" rx="6" fill="none" stroke="#23284A" stroke-width="4"/>
+        <rect x="-8" y="-32" width="40" height="26" rx="6" fill="none" stroke="#23284A" stroke-width="4"/>
+        <circle cx="-40" cy="36" r="15" fill="#23284A"/><circle cx="40" cy="36" r="15" fill="#23284A"/>
+        <path d="M52 -26 l5 5 7 0 0 7 5 5 -5 5 0 7 -7 0 -5 5 -5 -5 -7 0 0 -7 -5 -5 5 -5 0 -7 7 0 Z" fill="#E8A33D" transform="translate(-4 4) scale(0.7)"/>
+      </g>
+    </g>
+    <g id="eta">
+      <rect x="130" y="415" width="280" height="104" rx="52" fill="#1F2A5C" filter="url(#pencil)"/>
+      <text id="etaText" x="270" y="487" font-size="72" text-anchor="middle" fill="#FBF7EF" style="font-family:Caveat;font-weight:700">6 min</text>
+    </g>
+    <g id="note1" opacity="0">
+      <rect x="140" y="1600" width="800" height="150" rx="40" fill="#FFFDF8" stroke="#23284A" stroke-width="5" filter="url(#pencil)"/>
+      <circle cx="225" cy="1675" r="42" fill="#17705A" filter="url(#wash)"/>
+      <path class="ink tick1" style="stroke:#FFFDF8;stroke-width:9" d="M205 1676 L222 1693 L250 1658"/>
+      <text class="hand" x="290" y="1695" font-size="66">Ayesha is in the van</text>
+    </g>
+    <g id="note2" opacity="0">
+      <rect x="140" y="1600" width="800" height="150" rx="40" fill="#FFFDF8" stroke="#23284A" stroke-width="5" filter="url(#pencil)"/>
+      <path d="M225 1633 l12 12 17 0 0 17 12 12 -12 12 0 17 -17 0 -12 12 -12 -12 -17 0 0 -17 -12 -12 12 -12 0 -17 17 0 Z" fill="#E8A33D" filter="url(#wash)"/>
+      <text class="hand" x="290" y="1695" font-size="66">Reached school</text>
+    </g>
+    <g id="burst" transform="translate(840 560)"></g>
+  </g>
+
+  <!-- S5: the driver -->
+  <g id="s5" opacity="0">
+    <text id="tDrv" class="hand" x="540" y="520" font-size="90" text-anchor="middle">For drivers: one tap per child</text>
+    <circle id="btnWash" cx="540" cy="1040" r="210" fill="#17705A" opacity="0" filter="url(#wash)"/>
+    <circle class="ink draw" cx="540" cy="1040" r="210" filter="url(#pencil)"/>
+    <text id="tAy" class="hand" x="540" y="1010" font-size="96" text-anchor="middle" fill="#FBF7EF" opacity="0">Ayesha</text>
+    <path id="tick2" class="ink" style="stroke:#FBF7EF;stroke-width:16" d="M470 1080 L520 1130 L620 1030" filter="url(#pencil)"/>
+    <circle class="rip" cx="540" cy="1040" r="210" fill="none" stroke="#17705A" stroke-width="6" opacity="0"/>
+    <circle class="rip" cx="540" cy="1040" r="210" fill="none" stroke="#17705A" stroke-width="6" opacity="0"/>
+    <text id="tWheel" class="hand" x="540" y="1460" font-size="84" text-anchor="middle">No more calls at the wheel.</text>
+  </g>
+
+  <!-- S6: the promises -->
+  <g id="s6" opacity="0">
+    <g transform="translate(150 760)"><path class="ink draw c1" style="stroke:#17705A;stroke-width:10" d="M0 0 L22 22 L58 -22" filter="url(#pencil)"/><text id="p1" class="hand" x="100" y="20" font-size="84">See the van live</text></g>
+    <g transform="translate(150 960)"><path class="ink draw c2" style="stroke:#17705A;stroke-width:10" d="M0 0 L22 22 L58 -22" filter="url(#pencil)"/><text id="p2" class="hand" x="100" y="20" font-size="84">An alert when they get in</text></g>
+    <g transform="translate(150 1160)"><path class="ink draw c3" style="stroke:#17705A;stroke-width:10" d="M0 0 L22 22 L58 -22" filter="url(#pencil)"/><text id="p3" class="hand" x="100" y="20" font-size="84">Free in the pilot</text></g>
+    <text id="tTag" class="urdu" x="540" y="1460" font-size="104" text-anchor="middle" direction="rtl">فکر کم، خبر پوری</text>
+  </g>
+
+  <!-- S7: the mark -->
+  <g id="s7" opacity="0">
+    <path id="dotPath" d="M140 1500 C260 1500 300 1240 420 1180 S560 1120 600 980" fill="none"/>
+    <circle class="rdot" r="16" fill="#E8A33D"/><circle class="rdot" r="16" fill="#E8A33D"/><circle class="rdot" r="16" fill="#E8A33D"/>
+    <image id="mark" href="../../logo/pohnch-mark-urdu.svg" x="290" y="520" width="500" height="622" opacity="0"/>
+    <image id="word" href="../../logo/pohnch-wordmark.svg" x="290" y="1230" width="500" height="150" opacity="0"/>
+    <text id="tUrl" class="hand" x="540" y="1520" font-size="80" text-anchor="middle">pohnch.pk</text>
+    <text id="tPilot" class="hand" x="540" y="1610" font-size="58" text-anchor="middle" fill="#4A4F66">free pilot in Karachi</text>
+  </g>
+</svg>
+<script>
+gsap.registerPlugin(MotionPathPlugin);
+const $ = (q) => document.querySelector(q), $$ = (q) => [...document.querySelectorAll(q)];
+const tl = gsap.timeline({ paused: true });
+window.DURATION = 34;
+let clipN = 0;
+
+// a pencil line drawing itself
+function draw(el, at, dur = 0.8) {
+  const els = typeof el === 'string' ? $$(el) : [el];
+  els.forEach((e) => { const L = e.getTotalLength(); gsap.set(e, { strokeDasharray: L, strokeDashoffset: L }); tl.to(e, { strokeDashoffset: 0, duration: dur, ease: 'power1.inOut' }, at); });
+}
+// handwriting: the text is revealed in its writing direction
+function write(id, at, dur = 0.9, rtl = false) {
+  const t = $(id), b = t.getBBox(), cp = document.createElementNS('http://www.w3.org/2000/svg', 'clipPath');
+  cp.id = 'c' + (++clipN);
+  const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+  r.setAttribute('y', b.y - 40); r.setAttribute('height', b.height + 80);
+  r.setAttribute('x', rtl ? b.x + b.width + 20 : b.x - 20); r.setAttribute('width', 0);
+  cp.appendChild(r); $('defs').appendChild(cp); t.setAttribute('clip-path', `url(#${cp.id})`);
+  tl.to(r, rtl ? { attr: { x: b.x - 20, width: b.width + 40 }, duration: dur, ease: 'none' } : { attr: { width: b.width + 40 }, duration: dur, ease: 'none' }, at);
+}
+const show = (id, at, d = 0.4) => tl.to(id, { opacity: 1, duration: d }, at);
+const hide = (id, at, d = 0.4) => tl.to(id, { opacity: 0, duration: d }, at);
+
+function build() {
+  // S1 morning (0 - 3.6)
+  write('#t712', 0.3, 0.9);
+  draw('#s1 .draw', 0.6, 1.4);
+  tl.to('#sunWash', { opacity: 0.85, duration: 0.8 }, 1.5);
+  write('#tWait', 2.0, 1.1);
+  tl.to('#s1', { y: -260, opacity: 0, duration: 0.6, ease: 'power2.in' }, 3.5);
+
+  // S2 the call (3.8 - 8.6)
+  show('#s2', 3.8, 0.01);
+  draw('#phone .draw', 3.8, 0.9);
+  write('#tUncle', 4.5, 0.6);
+  write('#tCalling', 5.0, 0.5);
+  tl.to('#pick', { opacity: 0.8, duration: 0.3 }, 4.9);
+  tl.to('#hang', { opacity: 0.8, duration: 0.3 }, 5.0);
+  $$('#s2 .ring').forEach((r, i) => { draw(r, 5.2 + (i % 2) * 0.15, 0.3); tl.to(r, { opacity: 0.2, repeat: 7, yoyo: true, duration: 0.18 }, 5.6); });
+  tl.to('#phone', { rotation: 2.5, transformOrigin: '540px 960px', repeat: 13, yoyo: true, duration: 0.1, ease: 'sine.inOut' }, 5.4);
+  write('#tNo1', 5.8, 0.6); write('#tNo2', 6.6, 0.5); write('#tNo3', 7.4, 0.6);
+  tl.to('#s2', { scale: 0.85, opacity: 0, transformOrigin: '540px 960px', duration: 0.5, ease: 'power2.in' }, 8.5);
+
+  // S3 the question (9.0 - 12.4)
+  show('#s3', 9.0, 0.01);
+  write('#tUrdu', 9.0, 1.4, true);
+  write('#tWhere', 10.4, 0.9);
+  draw('#squig', 11.2, 0.6);
+  write('#tEvery', 11.5, 0.8);
+  tl.to('#s3', { y: -200, opacity: 0, duration: 0.5, ease: 'power2.in' }, 12.5);
+
+  // S4 the map (13.0 - 21.0)
+  show('#s4', 13.0, 0.01);
+  write('#tNow', 13.0, 0.8);
+  draw('#s4 .draw', 13.1, 1.2);
+  const route = $('#route'), RL = route.getTotalLength();
+  gsap.set(route, { strokeDasharray: `2 26`, opacity: 0 });
+  tl.to(route, { opacity: 1, duration: 0.6 }, 14.0);
+  show('#home', 14.2, 0.3); write('#tHome', 14.3, 0.4);
+  show('#school', 14.4, 0.3); write('#tSchool', 14.5, 0.4);
+  gsap.set('#van', { x: 230, y: 1420, opacity: 0 });
+  tl.to('#van', { opacity: 1, duration: 0.2 }, 14.9);
+  const prog = { p: 0 };
+  tl.to('#van', { motionPath: { path: '#route', align: '#route', alignOrigin: [0.5, 0.6] }, duration: 4.4, ease: 'power1.inOut' }, 15.0);
+  tl.to(prog, { p: 1, duration: 4.4, ease: 'power1.inOut', onUpdate: () => { $('#etaText').textContent = prog.p >= 0.98 ? 'arrived' : `${Math.max(1, Math.ceil(6 * (1 - prog.p)))} min`; } }, 15.0);
+  tl.fromTo('#note1', { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'back.out(1.6)' }, 16.0);
+  draw('#note1 .tick1', 16.3, 0.4);
+  tl.to('#note1', { opacity: 0, y: 40, duration: 0.4 }, 18.6);
+  // reached school: a burst of kesar stars
+  const star = 'M0 -24 l8 8 12 0 0 12 8 8 -8 8 0 12 -12 0 -8 8 -8 -8 -12 0 0 -12 -8 -8 8 -8 0 -12 12 0 Z';
+  for (let i = 0; i < 9; i++) {
+    const p = document.createElementNS('http://www.w3.org/2000/svg', 'path'); p.setAttribute('d', star); p.setAttribute('fill', '#E8A33D'); p.setAttribute('opacity', 0); $('#burst').appendChild(p);
+    const a = (i / 9) * Math.PI * 2, d = 120 + (i % 3) * 30;
+    tl.fromTo(p, { x: 0, y: 0, scale: 0.2, opacity: 1 }, { x: Math.cos(a) * d, y: Math.sin(a) * d, scale: 0.7 + (i % 2) * 0.4, opacity: 0, rotation: 90, duration: 1.1, ease: 'power2.out' }, 19.4);
+  }
+  tl.fromTo('#note2', { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: 'back.out(1.6)' }, 19.6);
+  tl.to('#s4', { opacity: 0, duration: 0.5 }, 20.9);
+
+  // S5 the driver (21.4 - 24.8)
+  show('#s5', 21.4, 0.01);
+  write('#tDrv', 21.4, 1.0);
+  draw('#s5 .draw', 21.6, 0.8);
+  tl.to('#btnWash', { opacity: 0.9, duration: 0.5 }, 22.2);
+  show('#tAy', 22.4, 0.3);
+  $$('#s5 .rip').forEach((r, i) => tl.fromTo(r, { attr: { r: 210 }, opacity: 0.8 }, { attr: { r: 330 }, opacity: 0, duration: 0.8, ease: 'power1.out' }, 22.9 + i * 0.25));
+  hide('#tAy', 23.0, 0.2);
+  draw('#tick2', 23.1, 0.5);
+  write('#tWheel', 23.7, 0.9);
+  tl.to('#s5', { opacity: 0, y: -160, duration: 0.5, ease: 'power2.in' }, 24.9);
+
+  // S6 the promises (25.4 - 28.9)
+  show('#s6', 25.4, 0.01);
+  draw('#s6 .c1', 25.4, 0.3); write('#p1', 25.6, 0.7);
+  draw('#s6 .c2', 26.3, 0.3); write('#p2', 26.5, 0.8);
+  draw('#s6 .c3', 27.3, 0.3); write('#p3', 27.5, 0.6);
+  write('#tTag', 28.0, 1.0, true);
+  tl.to('#s6', { opacity: 0, duration: 0.5 }, 29.3);
+
+  // S7 the mark (29.8 - 34)
+  show('#s7', 29.8, 0.01);
+  $$('.rdot').forEach((d, i) => tl.fromTo(d, { opacity: 1 }, { motionPath: { path: '#dotPath', align: '#dotPath', alignOrigin: [0.5, 0.5] }, duration: 1.0, ease: 'power2.in' }, 29.8 + i * 0.12));
+  tl.to('.rdot', { opacity: 0, duration: 0.15 }, 31.0);
+  tl.fromTo('#mark', { opacity: 0, scale: 0.9, transformOrigin: '540px 830px' }, { opacity: 1, scale: 1, duration: 0.7, ease: 'back.out(1.4)' }, 30.9);
+  tl.fromTo('#word', { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5 }, 31.5);
+  write('#tUrl', 32.0, 0.7); write('#tPilot', 32.6, 0.7);
+  tl.to({}, { duration: 0.1 }, 33.9);
+}
+
+window.seek = (t) => {
+  tl.seek(t, false);
+  // line boil: the pencil wobbles a little, 8 times a second, like drawn frames
+  const s = Math.floor(t * 8) % 6 + 1;
+  $('#pt').setAttribute('seed', s); $('#wt').setAttribute('seed', s + 2);
+};
+window.ready = document.fonts.ready.then(() => new Promise((r) => setTimeout(r, 300))).then(() => { build(); window.seek(0); return true; });
+</script>
+</body>
+</html>
