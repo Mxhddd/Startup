@@ -8,7 +8,7 @@
 // Data: family members come from my_family_members (a database function that shows only my families);
 // adding, removing and deleting go through the "app" Edge Function, which checks who is asking.
 import { deleteMyAccount, parent } from '@pohnch/client';
-import { ApiError, normalisePkMobile, PILOT_WHATSAPP } from '@pohnch/core';
+import { ApiError, normalisePkMobile, PILOT_WHATSAPP, PRICES } from '@pohnch/core';
 import { childColors, colors, radius, space, useLang } from '@pohnch/ui';
 import { AppText, ArchAvatar, ArchShape, EditSheet, Group, GroupRow, Icon, Niche, PressableScale, RowIcon, SectionCaption, Shimmer, TapButton, TextField, useArchWipe, type IconName } from '@pohnch/ui/native';
 import { router } from 'expo-router';
@@ -183,9 +183,10 @@ export default function Menu() {
       <Section title={t('parent.menu.van')}>
         <Group foil>
           <MenuRow icon="route" title={t('parent.join')} onPress={() => router.push('/join')} testID="menu-join" />
+          {/* Pricing v2: Pohnch Plus is listed whatever the stage; the plans screen says when there's nothing to pay yet. */}
+          <MenuRow icon="star" iconTint={{ tint: colors.kesarTint, ink: colors.onKesar }} title={t('plus.title')} line={t('plus.menuLine', { price: PRICES.intro })} onPress={() => router.push('/plans')} testID="menu-plus" />
           {s2 ? (
             <>
-              <MenuRow icon="star" iconTint={{ tint: colors.kesarTint, ink: colors.onKesar }} title={t('s2.live.title')} line={t('s2.live.free')} onPress={() => router.push('/plans')} testID="menu-live" />
               <MenuRow icon="search" title={t('s2.find.title')} onPress={() => router.push('/find')} testID="menu-find" />
               <MenuRow icon="plus" title={t('s2.req.title')} onPress={() => router.push('/request')} testID="menu-request" />
               {p.membership?.status === 'approved' ? <MenuRow icon="wallet" iconTint={{ tint: colors.zamurradTint, ink: colors.zamurradOnTint }} title={t('s2.fees.title')} onPress={() => router.push('/fees')} testID="menu-fees" /> : null}

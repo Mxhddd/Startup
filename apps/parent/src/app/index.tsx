@@ -14,6 +14,7 @@ import Animated, { ZoomIn, ZoomOut, useAnimatedStyle, useSharedValue } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandMap } from '../components/BrandMap';
 import { LivePill } from '../components/LivePill';
+import { PlusNudge } from '../components/PlusNudge';
 import { TopBar } from '../components/TopBar';
 import { TripSheet } from '../components/TripSheet';
 import { useParent } from '../state/ParentStore';
@@ -81,6 +82,7 @@ export default function ParentHome() {
           </PressableScale>
         </Animated.View>
       ) : null}
+      {!live && p.membership?.status === 'approved' ? <PlusNudge childId={p.child?.id ?? null} top={insets.top + 76} /> : null}
       {live ? <LivePill top={insets.top} clock={karachiClock(new Date(p.now))} staleSeconds={p.signal?.stale ? p.signal.secondsAgo : null} /> : null}
       </Animated.View>
 

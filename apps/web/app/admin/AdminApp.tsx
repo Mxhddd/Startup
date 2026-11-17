@@ -327,6 +327,7 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
       </div>
       {error ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{t('admin.error')}</p> : null}
       <GrowthPanel supabase={supabase} t={t} />
+      <MoneyPanel supabase={supabase} vans={vans} t={t} />
       {stats ? (
         <section style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))' }}>
           <Stat testId="stat-tracked" label={t('admin.stat.tracked')} value={`${pct(stats.tripsTracked, stats.trips)}%`} sub={<><bdi dir="ltr">{`${stats.tripsTracked} / ${stats.trips}`}</bdi> · {t('admin.stat.trackedHint')}</>} />
@@ -453,6 +454,100 @@ type FlagRow = { key: string; van_id: string | null; van_name: string | null; en
 type HelpRow = { id: string; van_name: string; driver_name: string; lat: number | null; lng: number | null; created_at: string; resolved_at: string | null };
 type RequestRow = { school_name: string; children: number; lat: number; lng: number; oldest: string };
 
+type Revenue = { paying: number; grace: number; byPlan: Record<string, number>; monthly: number; introStarted: number; introPaid: number; bonusDue: number };
+type RiderPlan = { child_id: string; first_name: string; plan: string | null; paid_until: string | null };
+/** Pricing v2 choices for the team's form: plan, price in rupees, days paid. Never Rs 0. */
+const PAY_CHOICES = [
+  { plan: 'intro', price: 99, days: 30 }, { plan: 'founding', price: 199, days: 30 }, { plan: 'monthly', price: 249, days: 30 },
+  { plan: 'monthly', price: 349, days: 30 }, { plan: 'monthly', price: 449, days: 30 }, { plan: 'term', price: 1499, days: 150 }, { plan: 'year', price: 2999, days: 365 },
+] as const;
+
+/**
+ * Pricing v2 (Pohnch Plus): the money numbers, the billing switch (everyone or one van; off = the pilot
+ * as before, on = alerts only for paid children), and the form to record a payment taken outside the
+ * app (pilot: cash or bank transfer). Bonuses due to drivers are in the numbers.
+ */
+function MoneyPanel({ supabase, vans, t }: { supabase: SupabaseClient; vans: VanRow[]; t: (k: MessageKey, v?: Vars) => string }) {
+  const [rev, setRev] = useState<Revenue | null>(null);
+  const [flags, setFlags] = useState<FlagRow[]>([]);
+  const [van, setVan] = useState('');
+  const [riders, setRiders] = useState<RiderPlan[]>([]);
+  const [child, setChild] = useState('');
+  const [choice, setChoice] = useState(0);
+  const [msg, setMsg] = useState<string | null>(null);
+  const [error, setError] = useState(false);
+  const load = useCallback(async () => {
+    const [r, f] = await Promise.all([supabase.rpc('admin_revenue'), supabase.rpc('admin_flags')]);
+    setError(!!r.error);
+    if (!r.error && r.data && typeof r.data === 'object' && !Array.isArray(r.data)) setRev(r.data as Revenue);
+    setFlags(((f.data ?? []) as FlagRow[]).filter((x) => x.key === 'billing'));
+  }, [supabase]);
+  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    setChild('');
+    if (!van) return setRiders([]);
+    void supabase.rpc('admin_van_riders', { p_van: van }).then((r) => setRiders((r.data ?? []) as RiderPlan[]));
+  }, [supabase, van]);
+  const isOn = (id: string | null) => flags.some((f) => f.van_id === id && f.enabled);
+  const setFlag = async (id: string | null, on: boolean) => { await supabase.rpc('admin_set_flag', { p_key: 'billing', p_van: id, p_on: on }); await load(); };
+  const record = async () => {
+    setMsg(null);
+    const c = PAY_CHOICES[choice];
+    if (!child || !c) return;
+    const r = await supabase.rpc('admin_record_payment', { p_child: child, p_plan: c.plan, p_price: c.price, p_days: c.days });
+    if (r.error) return setMsg(r.error.message.startsWith('intro_used') ? t('admin.money.introUsed') : t('admin.error'));
+    setMsg(t('admin.money.saved', { date: String(r.data) }));
+    void load();
+    void supabase.rpc('admin_van_riders', { p_van: van }).then((x) => setRiders((x.data ?? []) as RiderPlan[]));
+  };
+  const field: CSSProperties = { minHeight: 48, padding: '8px 12px', borderRadius: 12, border: `1px solid ${colors.line}`, fontSize: 16, background: colors.white };
+  return (
+    <section style={{ ...card, display: 'grid', gap: 14 }} data-testid="admin-money">
+      <div>
+        <h2 style={{ margin: 0, fontSize: 22 }}>{t('admin.money.title')}</h2>
+        <p style={{ margin: '4px 0 0', color: colors.ink2, fontSize: 15 }}>{t('admin.money.hint')}</p>
+      </div>
+      {error ? <p role="alert" style={{ margin: 0, color: colors.dangerText }}>{t('admin.error')}</p> : null}
+      {rev ? (
+        <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))' }}>
+          <Stat testId="money-paying" label={t('admin.money.paying')} value={rev.paying} sub={t('admin.money.grace', { n: rev.grace })} />
+          <Stat testId="money-monthly" label={t('admin.money.monthly')} value={`Rs ${rev.monthly}`} />
+          <Stat testId="money-intro" label={t('admin.money.intro')} value={`${rev.introPaid} / ${rev.introStarted}`} />
+          <Stat testId="money-bonus" label={t('admin.money.bonus')} value={`Rs ${rev.bonusDue}`} />
+        </div>
+      ) : null}
+      <h3 style={{ margin: '4px 0 0', fontSize: 18 }}>{t('admin.money.switch')}</h3>
+      <div data-testid="billing-switch" style={{ display: 'grid', gap: 10 }}>
+        {[{ id: null as string | null, name: t('admin.s2.everyone') }, ...vans.filter((v) => v.verified_at).map((v) => ({ id: v.van_id as string | null, name: v.van_name }))].map((row) => (
+          <div key={row.id ?? 'all'} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <strong style={{ flex: 1 }}>{row.name}</strong>
+            <span style={{ color: isOn(row.id) ? colors.zamurradOnTint : colors.ink2 }}>{isOn(row.id) ? t('admin.s2.on') : t('admin.s2.off')}</span>
+            <button type="button" style={btn(isOn(row.id) ? colors.white : colors.neel, isOn(row.id) ? colors.neel : colors.white)} onClick={() => setFlag(row.id, !isOn(row.id))}>
+              {isOn(row.id) ? t('admin.s2.turnOff') : t('admin.s2.turnOn')}
+            </button>
+          </div>
+        ))}
+      </div>
+      <h3 style={{ margin: '4px 0 0', fontSize: 18 }}>{t('admin.money.record')}</h3>
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10, alignItems: 'center' }}>
+        <select aria-label={t('admin.money.van')} style={field} value={van} onChange={(e) => setVan(e.target.value)} data-testid="money-van">
+          <option value="">{t('admin.money.van')}</option>
+          {vans.map((v) => <option key={v.van_id} value={v.van_id}>{v.van_name}</option>)}
+        </select>
+        <select aria-label={t('admin.money.child')} style={field} value={child} onChange={(e) => setChild(e.target.value)} data-testid="money-child">
+          <option value="">{t('admin.money.child')}</option>
+          {riders.map((r) => <option key={r.child_id} value={r.child_id}>{r.first_name}{r.paid_until ? ` · ${r.plan} → ${r.paid_until}` : ''}</option>)}
+        </select>
+        <select aria-label={t('admin.money.plan')} style={field} value={choice} onChange={(e) => setChoice(Number(e.target.value))} data-testid="money-plan">
+          {PAY_CHOICES.map((c, i) => <option key={i} value={i}>{`${c.plan} · Rs ${c.price} · ${c.days}d`}</option>)}
+        </select>
+        <button type="button" style={btn(colors.zamurrad, colors.white)} disabled={!child} onClick={record} data-testid="money-save">{t('admin.money.save')}</button>
+      </div>
+      {msg ? <p role="status" style={{ margin: 0 }}>{msg}</p> : null}
+    </section>
+  );
+}
+
 /**
  * v10 stage 2 for the team: emergency help alerts first (with a map link to the van's last position),
  * the stage 2 switch (everyone, or one van at a time; off until gate 1), and open requests for a new
@@ -464,7 +559,7 @@ function Stage2({ supabase, vans, t }: { supabase: SupabaseClient; vans: VanRow[
   const [reqs, setReqs] = useState<RequestRow[]>([]);
   const load = useCallback(async () => {
     const [f, h, r] = await Promise.all([supabase.rpc('admin_flags'), supabase.rpc('admin_help_alerts'), supabase.rpc('admin_van_requests')]);
-    setFlags((f.data ?? []) as FlagRow[]);
+    setFlags(((f.data ?? []) as FlagRow[]).filter((x) => x.key === 'stage2'));
     setHelp((h.data ?? []) as HelpRow[]);
     setReqs((r.data ?? []) as RequestRow[]);
   }, [supabase]);

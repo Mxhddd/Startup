@@ -1,6 +1,17 @@
 # Design decisions
 
-## Round 5 (current): map-first native apps, no captain, new pricing
+## Round 6 (current for pricing): Pohnch Plus, nothing free for families
+
+November 2026. The builder found two holes in round 5's pricing: alerts were free while the live map was paid (but alerts are what parents use; few pay to watch a dot), and the free first month invites people to use it and leave. Round 6 replaces round 5's pricing table and every "first month free" or "free in the pilot" below:
+
+- **Pohnch Plus** is the one family plan: every alert, the live van, the Live Activity, aaj chutti, family phones. **No free tier.** Rs 349 a child a month (siblings Rs 199, term Rs 1,499, year Rs 2,999); **first month Rs 99, never Rs 0**, once per phone and per seat; pilot founding families Rs 199, kept 12 months.
+- **Drivers never pay**, and earn Rs 40 per child on Plus when 80% of their trips are tracked: the driver becomes the person who asks families to join.
+- **Pohnch Collect** (fees in the app) 5% at launch, 7% once Pohnch guarantees the payout on the 5th; **Pohnch Routes** 12% for a family's first 12 months; **schools** Rs 200 a rider with Plus included.
+- **Gates:** gate 1 is 80% of trips tracked and 30% of families paying after their first month; gate 2 is 40 vans on Collect.
+
+The numbers and the build are in `docs/PRICING.md`.
+
+## Round 5 (map-first; its pricing is replaced by round 6): map-first native apps, no captain, new pricing
 
 The builder asked for real iOS and Android apps instead of a web app joined through WhatsApp links, a Careem-like flow (choose a child, home and school, see the vans on that route, pick one), a women-only side (Pohnch Amaan), a "request a van" button, a school partnership, a live map with the van as a moving pointer, higher prices, and clear roles. All of it is on the canvas page **v5 · Map-first app (current)**; its first board, "The grand scheme", is the summary. Where round 5 and an earlier round disagree, round 5 wins.
 

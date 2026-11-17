@@ -3,10 +3,10 @@
 // Removing a child from the van opens a sheet with a hold, so it never happens by accident.
 // Data: memberships via the "app" Edge Function (membership.decide, rider.remove); the invite link
 // goes straight to the share sheet and is never shown or logged.
-import { driver } from '@pohnch/client';
+import { driver, plans, type BonusMonth } from '@pohnch/client';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
 import { AppText, ApprovalCard, ChoiceChip, EditSheet, InviteCard, PressableScale, TapButton } from '@pohnch/ui/native';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Share, View } from 'react-native';
 import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { Screen } from '../components/Screen';
@@ -21,6 +21,18 @@ export default function Families() {
   const [error, setError] = useState(false);
   const [removing, setRemoving] = useState<{ membershipId: string; name: string } | null>(null);
   const [decided, setDecided] = useState<string[]>([]);
+  // Pricing v2: with billing on for the van, which riders' families are on Pohnch Plus, and the bonus.
+  const [paid, setPaid] = useState<Record<string, boolean>>({});
+  const [bonus, setBonus] = useState<BonusMonth | null>(null);
+  const vanId = d.van?.id;
+  useEffect(() => {
+    if (!vanId) return;
+    plans.billingOn().then((on) => {
+      if (!on) return;
+      plans.vanPaidChildren(vanId).then(setPaid).catch(() => {});
+      plans.myBonus().then((b) => setBonus(b.find((x) => x.open) ?? null)).catch(() => {});
+    });
+  }, [vanId]);
   const decidedRef = decided;
   const requests = d.requests.filter((r) => !decided.includes(r.membershipId));
   if (!d.van) return null;
@@ -88,6 +100,15 @@ export default function Families() {
       {van.verified_at ? <InviteCard onShare={share} /> : <AppText variant="secondary">{t('driver.families.needsCheck')}</AppText>}
       {requests.length === 0 ? <AppText variant="secondary">{t('driver.families.none')}</AppText> : null}
 
+      {bonus ? (
+        <View testID="bonus-card" style={{ backgroundColor: colors.white, borderRadius: 24, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.lg, gap: 4 }}>
+          <AppText variant="headline">{t('plus.drv.title')}</AppText>
+          <AppText bold style={{ fontSize: 18 }}>{t('plus.drv.amount', { amount: bonus.amount })}</AppText>
+          <AppText color={colors.ink2}>{bonus.trackedPct === null ? t('plus.drv.noPct') : t('plus.drv.line', { n: bonus.payingChildren, pct: bonus.trackedPct })}</AppText>
+          <AppText variant="small" color={colors.ink2}>{t('plus.drv.rule')}</AppText>
+        </View>
+      ) : null}
+
       <Animated.View layout={layout} style={{ gap: space.sm }}>
         <AppText variant="headline">{t('driver.families.riders', { n: riders.length })}</AppText>
         {riders.length > 0 ? (
@@ -103,6 +124,7 @@ export default function Families() {
                   <View style={{ flex: 1 }}>
                     <AppText bold style={{ fontSize: 18 }}>{r.firstName}</AppText>
                     <AppText variant="small" color={colors.ink2}>{stop?.label ?? '—'}</AppText>
+                    {paid[r.childId] === false ? <AppText variant="small" bold color={colors.kesarText} testID={`rider-unpaid-${i}`}>{t('plus.drv.not')}</AppText> : null}
                   </View>
                   <PressableScale accessibilityRole="button" accessibilityLabel={`${t('driver.families.remove')} ${r.firstName}`} scaleTo="chip"
                     onPress={() => r.membershipId && setRemoving({ membershipId: r.membershipId, name: r.firstName })} testID={`rider-remove-${i}`}

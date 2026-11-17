@@ -31,20 +31,23 @@ The old "captain" is gone: setting up the van is the driver's job (or any parent
 
 ## Stages
 
-1. **Stage 1, now to March 2027: showcase and pilot, 3–5 real vans.** Both apps and the website; live map, taps, Live Activity, aaj chutti, practice run, help with late reasons. Free during the pilot. **Gate 1:** 80% of trips tracked end to end over 20 school days, and 40% of families keep Pohnch Live after the free month.
-2. **Stage 2, 2027: marketplace, 20 to 60 vans.** Find a van on your route (choose a child, home and school, see vans whose route passes nearby), book a seat with a one-week trial, fees paid in the app, request a van (opens at 4 children, Pohnch brings a verified van at 8), ratings, driver profiles, help alert with location. **Gate 2:** 40 paying vans.
+1. **Stage 1, now to March 2027: showcase and pilot, 3–5 real vans.** Both apps and the website; live map, taps, Live Activity, aaj chutti, practice run, help with late reasons. Drivers free; pilot families pay a founding price (Rs 199 a month), recorded by the team until in-app payment exists. **Gate 1:** 80% of trips tracked end to end over 20 school days, and 30% of families paying after their first month.
+2. **Stage 2, 2027: marketplace, 20 to 60 vans.** Find a van on your route (choose a child, home and school, see vans whose route passes nearby), book a seat with a one-week trial, fees paid in the app, request a van (opens at 4 children, Pohnch brings a verified van at 8), ratings, driver profiles, help alert with location. **Gate 2:** 40 vans on Pohnch Collect.
 3. **Stage 3, 2028: schools and Pohnch Amaan.** Pohnch for Schools (fleet map, boarding register, gate handover, reports). Pohnch Amaan: women drivers and women helpers, its own tab and filter, five checks and training, once a training partner and women staff are in place.
 
-## Pricing (estimates the pilot tests)
+## Pricing v2 (November 2026; the pilot tests the monthly price)
+
+The rule: **nothing is free for families, not even for a month** (free months get used and dropped). The first month is discounted, never Rs 0. **Drivers never pay.** Alerts are the product, so they are what families pay for.
 
 | Line | Price | Who pays |
 | --- | --- | --- |
-| Pohnch Live | Rs 599 per child a month (sibling Rs 299, yearly Rs 5,990, first month free); basic alerts stay free | parent |
-| Van fees in the app | 7% of fees paid through Pohnch | driver's side; the fare is not raised |
-| Pohnch Routes (request a van) | 12% of fees on routes Pohnch forms | driver's side |
-| Pohnch for Schools | Rs 300 per rider a month, billed yearly | school |
+| Pohnch Plus | Rs 349 per child a month; each brother or sister Rs 199; school term (5 months) Rs 1,499; year Rs 2,999. **First month Rs 99**, once per phone number and once per seat (child + van + stop). Pilot vans' founding families: Rs 199 a month, kept for 12 months. **No free tier:** without Plus a family gets no alerts, no live van and no Live Activity | parent |
+| Driver bonus | Rs 40 a month for each child on Plus, in months when the van tracks 80% of its trips | paid **to** the driver by Pohnch |
+| Pohnch Collect (van fees in the app) | 5% at launch; 7% with "guaranteed by the 5th" (Pohnch carries late payers) | driver's side; the fare is not raised |
+| Pohnch Routes (vans Pohnch fills) | 12% for each family Pohnch brought, for 12 months | driver's side |
+| Pohnch for Schools | Rs 200 per rider a month, billed per term; Plus included for every family in the school's vans | school |
 
-One 12-child van at Rs 5,500 a child, with half the families on Live, leaves Pohnch about Rs 7,300 a month; about 37 vans cover Rs 270,000 a month of fixed cost. The pilot offers Live at Rs 499, 599 or 799 and keeps the highest price 40% of families take.
+Per 12-child van (fee Rs 6,000, Play's fee about 15%, the bonus and SMS about Rs 45 per paying child): Plus alone nets about Rs 756 a month at 30% of children paying and Rs 1,260 at 50%; with Collect at 5% on 30% of fees, about Rs 2,081; at 7% on 60% of fees, about Rs 3,766. Lean running costs (Rs 40,000 a month) need 19 to 53 vans; a small team (Rs 270,000) needs 72 to 357. One school of 300 riders adds about Rs 58,000 a month. Plus proves families pay and brings drivers in; Collect and schools are the business. The pilot tests Rs 249, 349 or 449 **by van** (never two prices in one van) and keeps the highest where 30% of families still pay after the first month. The full plan with the numbers: `docs/PRICING.md`.
 
 ## Stack
 

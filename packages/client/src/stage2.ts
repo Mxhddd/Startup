@@ -23,16 +23,6 @@ export async function stage2On(): Promise<boolean> {
   }
 }
 
-export type LiveStatus = { status: 'none' | 'trial' | 'active' | 'ended'; trialEnds: string | null; daysLeft: number };
-export async function liveStatus(): Promise<LiveStatus> {
-  const rows = check(await db().supabase.rpc('live_status')) as { status: LiveStatus['status']; trial_ends: string | null; days_left: number }[];
-  const r = rows?.[0];
-  return { status: r?.status ?? 'none', trialEnds: r?.trial_ends ?? null, daysLeft: r?.days_left ?? 0 };
-}
-export async function startLiveTrial(): Promise<string> {
-  return check(await db().supabase.rpc('start_live_trial')) as string;
-}
-
 export type NearVan = {
   van_id: string; van_name: string; driver_name: string; school_name: string; same_school: boolean; walk_m: number;
   reliability: number | null; rating: number | null; ratings: number; monthly_fee: number | null; seats_left: number | null;

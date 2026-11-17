@@ -12,8 +12,8 @@ Working documents on claude.ai. They are private until you share each one from i
 ## The short version
 
 1. Build both apps and the website (B0 to B9 in `BUILD_PROMPTS.md`), about 12–16 weeks part-time.
-2. Pilot with 3–5 vans in one school area for 20 school days, free.
-3. Gate 1: 80% of trips tracked end to end, and 40% of families keep Pohnch Live (tested at Rs 499, 599 and 799).
+2. Pilot with 3–5 vans in one school area for 20 school days. Drivers free; families pay the founding price (Rs 199 a month, first month Rs 99). No free month.
+3. Gate 1: 80% of trips tracked end to end, and 30% of families paying after their first month (Plus tested at Rs 249, 349 and 449, by van).
 4. Register the company, NTN, bank and wallet accounts before taking money; move hosting to paid plans.
 5. Apply for free help and grants with the pilot numbers (NIC Karachi, your university's incubation center and the HEC Innovator Seed Fund, Hult Prize).
 6. Stage 2 marketplace to 40 paying vans (gate 2), then schools and Pohnch Amaan; investors only after gate 2.

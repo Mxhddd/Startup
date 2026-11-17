@@ -32,6 +32,9 @@ async function fakeSupabase(ctx: BrowserContext, opts: { loggedIn: boolean; admi
     if (u.pathname === '/functions/v1/app/admin.verify') return json({ ok: true });
     // v10 stage 2
     if (u.pathname === '/rest/v1/rpc/admin_flags') return json([]);
+    if (u.pathname === '/rest/v1/rpc/admin_revenue') return json({ paying: 6, grace: 1, byPlan: { intro: 2, monthly: 4 }, monthly: 1594, introStarted: 4, introPaid: 2, bonusDue: 240 });
+    if (u.pathname === '/rest/v1/rpc/admin_van_riders') return json([{ child_id: 'c1', first_name: 'Ali', plan: null, paid_until: null }]);
+    if (u.pathname === '/rest/v1/rpc/admin_record_payment') return json('2026-12-17');
     if (u.pathname === '/rest/v1/rpc/admin_growth') return json({ site: { visitor: { today: 5, week: 47, total: 60 } }, signups: { parent: { today: 1, week: 3, total: 3 } }, people: {}, vans: { set_up: 1, tracked_week: 0 },
       series: [{ day: '2026-11-17', views: 64, visitors: 47, signups: 1 }], pages: [{ page: '/', views: 33 }], installs: {} });
     // v12
@@ -116,4 +119,18 @@ test('v20: when the login code cannot be sent by SMS, the page says so plainly',
   await page.locator('#phone').fill('03001234567');
   await page.getByTestId('admin-login').getByRole('button').click();
   await expect(page.getByTestId('admin-login').getByRole('alert')).toContainText(/SMS/);
+});
+
+test('pricing v2: the team sees the money, switches billing per van, and records a payment', async ({ context, page }) => {
+  const calls = await fakeSupabase(context, { loggedIn: true, admin: true });
+  await page.goto('/admin');
+  await expect(page.getByTestId('money-paying')).toContainText('6');
+  await expect(page.getByTestId('money-bonus')).toContainText('Rs 240');
+  await page.getByTestId('billing-switch').getByRole('button').first().click();
+  await expect.poll(() => calls.includes('/rest/v1/rpc/admin_set_flag')).toBe(true);
+  await page.getByTestId('money-van').selectOption({ index: 1 });
+  await page.getByTestId('money-child').selectOption('c1');
+  await page.getByTestId('money-save').click();
+  await expect.poll(() => calls.includes('/rest/v1/rpc/admin_record_payment')).toBe(true);
+  await expect(page.getByRole('status')).toContainText('2026-12-17');
 });

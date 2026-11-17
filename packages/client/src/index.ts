@@ -7,5 +7,7 @@ export type { Van, Stop, Request as JoinRequest, Trip, Signal, FoundItem as Driv
 export * as parent from './parent';
 export type { Child, Membership, ParentVan, MyStop, ParentTrip, Position, SignalKind, Notice, FoundItem } from './parent';
 export * as stage2 from './stage2';
-export type { NearVan, LiveStatus, FeeMonth, VanFee } from './stage2';
+export * as plans from './plans';
+export type { ChildPlan, BonusMonth } from './plans';
+export type { NearVan, FeeMonth, VanFee } from './stage2';
 export { rainNow, useRain } from './weather';

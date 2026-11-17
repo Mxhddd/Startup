@@ -410,7 +410,7 @@ On the user's instruction, the stage 2 pieces exist in code but are **off for ev
 | Piece | Server (`20261104000400_stage2.sql`, pgTAP 160) | Apps |
 | --- | --- | --- |
 | The switch | `app_flags`, `flag_on`, `admin_set_flag`, `admin_flags` | `useStage2()` in both apps; admin page "Stage 2 switch" |
-| Pohnch Live | `live_entitlements`, `start_live_trial` (once per family), `live_status` | `plans.tsx`. A free month only: no payment until the company, NTN and bank accounts exist |
+| Pohnch Plus (pricing v2, its own `billing` switch) | `20261118000100_plans_v2.sql` (pgTAP 193): `subscriptions`, `intro_claims` (hashes only), `price_tests`, `driver_bonus`, `my_plans`, `admin_record_payment`, `billing_record_payment` (server only), `van_paid_children`, `my_bonus`, `admin_revenue`; `private.alerts_for` gates pushes, Live Activities and `private.follows` | `plans.tsx`, `PlusNudge` (parent), the bonus card and "not on Pohnch" mark on `families.tsx` (driver), the Money panel (admin). The old free month (`live_entitlements`) is gone |
 | Find a van, ask for a seat | `vans_near` (verified vans with a stop near the home pin; driver's first name, reliability from tracked runs, rating from 5 up, fee, seats left; never riders' names or phones), `request_seat` (waiting membership, `trial_until` + 7 days) | `find.tsx` |
 | Request a van | `van_requests`, `request_van`, `request_progress` (same school within 2 km), `withdraw_van_request`, `admin_van_requests` (counts only) | `request.tsx`; admin list |
 | Ratings | `ratings` (one per family per van per month), `rate_van`; averages only from 5 | "Rate the van" on `fees.tsx` |

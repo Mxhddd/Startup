@@ -1,14 +1,13 @@
 -- v10 stage 2 behind a switch: off means nothing changes; on, each piece checks who is asking and
 -- never shows a child's name or a phone number to anyone who couldn't see it already.
 begin;
-select plan(42);
+select plan(37);
 select tests.seed_world();
 
 -- ---- The switch is off: stage 2 refuses.
 select tests.as_user(tests.id('pa'));
 select is(public.flag_on('stage2'), false, 'stage 2 starts off');
 select throws_ok($$select * from public.vans_near(tests.id('ali'))$$, 'P0001', 'stage2_off', 'off: find a van refuses');
-select throws_ok($$select public.start_live_trial()$$, 'P0001', 'stage2_off', 'off: Live refuses');
 select throws_ok($$select public.admin_set_flag('stage2', null, true)$$, 'P0001', 'not_admin', 'a parent cannot switch it on');
 select is((select count(*)::int from public.app_flags), 0, 'a parent cannot read the switches');
 
@@ -58,11 +57,7 @@ select tests.as_user(tests.id('pa'));
 select throws_ok($$select public.request_seat(tests.id('v1'), tests.id('nadia'))$$, 'P0001', 'child_already_on_a_van', 'only one van at a time');
 select throws_ok($$select public.request_seat(tests.id('v3'), tests.id('ali'))$$, 'P0001', 'van_not_open', 'not on an unverified van');
 
--- ---- Pohnch Live: a free month, once.
-select is(public.start_live_trial(), private.karachi_today() + 30, 'the free month starts');
-select is((select status from public.live_status()), 'trial', 'Live is on trial');
-select is((select days_left from public.live_status()), 30, 'thirty days left');
-select throws_ok($$select public.start_live_trial()$$, 'P0001', 'trial_used', 'one free month per family');
+
 
 -- ---- Ratings: only riders' families, shown from 5 up.
 select lives_ok($$select public.rate_van(tests.id('v1'), 5, array['on_time','kind'])$$, 'Parent A rates V1');

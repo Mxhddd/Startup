@@ -79,7 +79,7 @@ When a new build comes out, the same steps install it over the old one; nothing 
 | Maps | USD 0 | OpenFreeMap; a donation is fair once it's in daily use |
 | Login SMS | about USD 10-60 | about 120 codes in the first month; Twilio is about USD 0.52 each to Pakistan, a local gateway much less |
 | Drivers' data top-ups | Rs 2,500 | Rs 500 each (the app uses about 40-60 MB a month; estimate until measured) |
-| Website (Vercel Hobby) | USD 0 | while the pilot is free |
+| Website (Vercel Hobby) | USD 0 | until Pohnch takes payments; then Vercel Pro (Hobby is non-commercial) |
 | Domain pohnch.pk | yearly fee | PKNIC |
 | Apple Developer | USD 99 a year | only for iPhone parents |
 
