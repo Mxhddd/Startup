@@ -1707,5 +1707,8 @@
   "admin.nav.people": "سائن اپ",
   "admin.nav.growth": "ویب سائٹ اور انسٹال",
   "admin.nav.money": "پیسے",
-  "admin.nav.switches": "مدد اور سوئچ"
+  "admin.nav.switches": "مدد اور سوئچ",
+  "admin.growth.sync": "گوگل پلے سے لائیں",
+  "admin.growth.synced": "گوگل پلے سے اپ ڈیٹ ہو گیا (پلے کے نمبر ایک دو دن پیچھے ہوتے ہیں)۔",
+  "admin.growth.syncFailed": "ابھی گوگل پلے تک رسائی نہیں ہوئی۔ شاید پلے کی چابی ابھی نہیں لگی۔"
 }

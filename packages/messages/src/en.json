@@ -1707,5 +1707,8 @@
   "admin.nav.people": "Sign-ups",
   "admin.nav.growth": "Website and installs",
   "admin.nav.money": "Money",
-  "admin.nav.switches": "Help and switches"
+  "admin.nav.switches": "Help and switches",
+  "admin.growth.sync": "Sync from Google Play",
+  "admin.growth.synced": "Updated from Google Play (Play's numbers are a day or two behind).",
+  "admin.growth.syncFailed": "Couldn't reach Google Play yet. The Play key may not be set up."
 }

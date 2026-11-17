@@ -188,7 +188,8 @@ function Stat({ label, value, sub, testId }: { label: string; value: ReactNode; 
  *  sign-ups from the join form; app numbers from the accounts and vans; Play installs are typed in from Play Console. */
 const PLAY_CONSOLE = 'https://play.google.com/console';
 
-function GrowthPanel({ supabase, t }: { supabase: SupabaseClient; t: (k: MessageKey, v?: Vars) => string }) {
+function GrowthPanel({ supabase, t, sync }: { supabase: SupabaseClient; t: (k: MessageKey, v?: Vars) => string; sync?: () => Promise<boolean> }) {
+  const [syncState, setSyncState] = useState<'idle' | 'busy' | 'done' | 'error'>('idle');
   const [g, setG] = useState<Growth | null>(null);
   const [error, setError] = useState(false);
   const [typed, setTyped] = useState<{ parent: string; driver: string }>({ parent: '', driver: '' });
@@ -273,7 +274,14 @@ function GrowthPanel({ supabase, t }: { supabase: SupabaseClient; t: (k: Message
             })}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <button type="button" style={btn(colors.neel, colors.white)} onClick={save} data-testid="installs-save">{t('admin.growth.save')}</button>
+              {sync ? (
+                <button type="button" style={btn(colors.white, colors.neel)} disabled={syncState === 'busy'} data-testid="installs-sync"
+                  onClick={async () => { setSyncState('busy'); const ok = await sync(); setSyncState(ok ? 'done' : 'error'); if (ok) void load(); }}>
+                  {syncState === 'busy' ? t('common.loading') : t('admin.growth.sync')}
+                </button>
+              ) : null}
               {saved ? <span role="status">{t('admin.growth.saved')}</span> : null}
+              {syncState === 'done' ? <span role="status">{t('admin.growth.synced')}</span> : syncState === 'error' ? <span role="alert" style={{ color: colors.dangerText }}>{t('admin.growth.syncFailed')}</span> : null}
             </div>
           </div>
         </>
@@ -523,7 +531,12 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
       <Interested supabase={supabase} t={t} />
 
       <SectionHead id="sec-growth" title={t('admin.nav.growth')} />
-      <GrowthPanel supabase={supabase} t={t} />
+      <GrowthPanel supabase={supabase} t={t} sync={async () => {
+        try {
+          const r = await fetch(`${url.replace(/\/$/, '')}/functions/v1/play-stats`, { method: 'POST', headers: { authorization: `Bearer ${session.access_token}` } });
+          return r.ok;
+        } catch { return false; }
+      }} />
 
       <SectionHead id="sec-money" title={t('admin.nav.money')} />
       <MoneyPanel supabase={supabase} vans={vans} t={t} />
