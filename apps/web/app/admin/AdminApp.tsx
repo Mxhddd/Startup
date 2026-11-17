@@ -11,6 +11,7 @@ import { createClient, type Session, type SupabaseClient } from '@supabase/supab
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Turnstile } from '../_lib/Turnstile';
 import { growthRows, type Growth } from './growth';
+import { welcomeLink } from './whatsapp';
 
 type Stats = { days: number; trips: number; tripsTracked: number; familiesActive: number; familiesWithAlerts: number; alertsSent: number; alertsFailed: number };
 type VanRow = { van_id: string; van_name: string; school_name: string; plate: string | null; driver_name: string; driver_phone: string | null; verified_at: string | null; switched_off_at: string | null; riders: number; waiting: number };
@@ -553,7 +554,8 @@ function Interested({ supabase, t }: { supabase: SupabaseClient; t: (k: MessageK
           {r.kids ? <span>{t('admin.interest.kids', { n: r.kids })}</span> : null}
           {r.driver_phone ? <span>{t(`admin.interest.phone.${r.driver_phone}` as MessageKey)}</span> : null}
           <span style={{ color: colors.ink2 }}><bdi dir="ltr">{new Date(r.created_at).toLocaleDateString('en-GB', { timeZone: 'Asia/Karachi', day: 'numeric', month: 'short' })}</bdi></span>
-          {r.whatsapp ? <a href={`https://wa.me/${r.whatsapp.replace('+', '')}`} rel="noreferrer" style={{ color: colors.neel, fontWeight: 700 }}><bdi dir="ltr">{r.whatsapp}</bdi></a> : null}
+          {r.whatsapp ? <a href={welcomeLink(r) ?? undefined} target="_blank" rel="noreferrer" title={t('admin.interest.openWa')} aria-label={`${t('admin.interest.openWa')}: ${r.whatsapp}`}
+            onClick={() => { if (!r.contacted_at) void mark(r.id); }} style={{ color: colors.neel, fontWeight: 700 }}><bdi dir="ltr">{r.whatsapp}</bdi> ↗</a> : null}
           {r.contacted_at ? <span>{t('admin.interest.contacted')}</span> : <button type="button" style={btn(colors.white, colors.neel)} onClick={() => mark(r.id)}>{t('admin.interest.mark')}</button>}
         </div>
       ))}

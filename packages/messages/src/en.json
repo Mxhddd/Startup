@@ -1618,5 +1618,16 @@
   "admin.growth.notEntered": "not entered yet",
   "admin.growth.save": "Save",
   "admin.growth.saved": "Saved",
-  "admin.growth.openPlay": "Open Play Console"
+  "admin.growth.openPlay": "Open Play Console",
+  "admin.wa.hello": "Assalam o alaikum! I'm Mohammad Hassan from Pohnch (pohnch.pk). Thank you for joining the pilot.",
+  "admin.wa.youSaid": "You signed up from {area}{school}",
+  "admin.wa.kids.one": ", for 1 child",
+  "admin.wa.kids.many": ", for {n} children",
+  "admin.wa.phone.yes": " Good to know your van driver has a smartphone.",
+  "admin.wa.phone.no": " No problem that your van driver has no smartphone yet; we can help with that.",
+  "admin.wa.next.parent": "Next step: please send me your van driver's name and number. We'll set up the van with them for free (about 10 minutes). Then you'll see the van live on the map and get an alert when your child gets in.\n\nYou can install the parent app now: pohnch.pk/app",
+  "admin.wa.next.driver": "Next step: we'll set up your van in the free Pohnch Driver app together (about 10 minutes). When is a good time for a quick call?\n\nYou can install the driver app now: pohnch.pk/app",
+  "admin.wa.next.school": "Could we book a 15-minute call or visit to show you how it works for your families? It's free in the pilot.",
+  "admin.wa.bye": "Shukriya!\nMohammad Hassan, Pohnch",
+  "admin.interest.openWa": "Reply on WhatsApp (message written for you)"
 }
