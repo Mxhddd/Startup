@@ -35,6 +35,8 @@ const nextConfig: NextConfig = {
       // v16: English moved from /en to the root (Urdu is now under /ur). Old links keep working.
       { source: '/en', destination: '/', permanent: true },
       { source: '/en/:path*', destination: '/:path*', permanent: true },
+      // v22: the launch ad, shareable as pohnch.pk/ad (investor emails, WhatsApp).
+      { source: '/ad', destination: '/media/pohnch-ad.mp4', permanent: false },
     ];
   },
   async rewrites() {
