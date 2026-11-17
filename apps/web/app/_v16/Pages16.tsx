@@ -179,6 +179,42 @@ export function AppPage16({ lang }: { lang: Lang }) {
   );
 }
 
+/** v22 /links: the standee's QR code lands here. Every Pohnch link in one list, the app first. */
+export const SOCIAL = { instagram: 'https://www.instagram.com/pohnch.pk/', tiktok: 'https://www.tiktok.com/@pohnch.pk' } as const;
+export function LinksPage16({ lang }: { lang: Lang }) {
+  const items: { key: string; href: string; sub?: string; main?: boolean; ext?: boolean }[] = [
+    { key: 'links.app', sub: 'links.appSub', href: href(lang, '/app'), main: true },
+    { key: 'links.join', sub: 'links.joinSub', href: `${href(lang, '/')}#join` },
+    { key: 'links.wa', sub: 'links.waSub', href: wa, ext: true },
+    { key: 'links.ad', sub: 'links.adSub', href: '/ad', ext: true },
+    { key: 'links.site', sub: 'links.siteSub', href: href(lang, '/') },
+    { key: 'links.drivers', sub: 'links.driversSub', href: href(lang, '/drivers') },
+    { key: 'links.ig', href: SOCIAL.instagram, ext: true },
+    { key: 'links.tt', href: SOCIAL.tiktok, ext: true },
+    { key: 'links.privacy', href: href(lang, '/privacy') },
+  ];
+  return (
+    <Shell16 lang={lang} path="/links">
+      <section className="pwrap joinpage">
+        <div className="module joincard linkhub">
+          <p className="kick">{w(lang, 'links.kick')}</p>
+          <h1>{w(lang, 'links.title')}</h1>
+          <p className="lead">{w(lang, 'links.lead')}</p>
+          <ul>
+            {items.map((i) => (
+              <li key={i.key}>
+                <a className={i.main ? 'btn big' : 'btn ghost'} href={i.href} {...(i.ext ? { target: '_blank', rel: 'noreferrer' } : {})} data-testid={`link-${i.key.slice(6)}`}>
+                  <b>{w(lang, i.key)}</b>{i.sub ? <small>{w(lang, i.sub)}</small> : null}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    </Shell16>
+  );
+}
+
 /** Long text pages (privacy, terms): a short summary, then the sections with a table of contents. */
 function Doc({ lang, sections, summary }: { lang: Lang; sections: { id: string; title: string; body: string }[]; summary?: ReactNode }) {
   return (

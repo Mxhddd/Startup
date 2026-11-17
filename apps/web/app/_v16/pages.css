@@ -262,3 +262,10 @@
 .v16p .joinapp .whobtn .appicon b { font-size: 24px; }
 .v16p .joinfoot .num { white-space: nowrap; }
 .v16p .joinfoot .link { line-height: 1.5; }
+
+/* v22 /links: one tall list of links, the app first */
+.v16p .linkhub ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.v16p .linkhub li .btn { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 2px; width: 100%; min-height: 64px; padding: 12px 20px; box-sizing: border-box; text-align: start; text-decoration: none; }
+.v16p .linkhub li .btn.ghost { background: var(--ivory); color: var(--ink); box-shadow: inset 0 0 0 1px var(--hair); }
+.v16p .linkhub li .btn b { font-size: 18px; }
+.v16p .linkhub li .btn small { font-size: 15px; font-weight: 500; opacity: .85; }
