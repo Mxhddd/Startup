@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Van Uncle ep 1: Types of Van Uncles</title>
+<!-- Van Uncle, episode 1 (9:16, about 22 s): "Types of Van Uncles". Pencil on sketchbook paper like the
+     ad; five uncles, each with one gag; it ends on the quiz, pohnch.pk/van-uncle. Rendered frame by frame
+     by ../ad-v1/render.cjs style: the GSAP timeline is paused and stepped with window.seek(t). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Gulzar&display=swap">
+<script src="../../../node_modules/gsap/dist/gsap.min.js"></script>
+<style>
+  html,body{margin:0;background:#F4EEE1}
+  svg{display:block}
+  .ink{fill:none;stroke:#23284A;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+  .hand{font-family:Caveat,cursive;font-weight:700;fill:#23284A}
+  .urdu{font-family:Gulzar,serif;fill:#1F2A5C}
+</style>
+</head>
+<body>
+<svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="pt" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1"/><feDisplacementMap in="SourceGraphic" scale="4.5"/></filter>
+    <filter id="wash" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="3"/><feDisplacementMap in="SourceGraphic" scale="14"/></filter>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0.35  0 0 0 0 0.3  0 0 0 0 0.22  0 0 0 0.09 0"/></filter>
+    <pattern id="dots" width="44" height="44" patternUnits="userSpaceOnUse"><circle cx="22" cy="22" r="2.2" fill="#D8CDB6"/></pattern>
+    <!-- the van, drawn once -->
+    <g id="van">
+      <ellipse cx="0" cy="190" rx="300" ry="20" fill="#23284A" opacity=".14"/>
+      <g filter="url(#pencil)">
+        <path d="M-280 170V-30a36 36 0 0 1 36-36h360c26 0 44 10 58 28l98 128a30 30 0 0 1 8 20v60Z" fill="#E8A33D" stroke="#23284A" stroke-width="9" stroke-linejoin="round"/>
+        <path d="M-245 -40h96v76h-96ZM-130 -40h96v76h-96ZM-15 -40h96v76h-96ZM100 -40h28c13 0 22 5 29 14l44 62H100Z" fill="#DDE6F2" stroke="#23284A" stroke-width="7" stroke-linejoin="round"/>
+        <circle cx="152" cy="0" r="22" fill="#F3D2B0" stroke="#23284A" stroke-width="5"/>
+        <path d="M132 -8c6-14 34-14 40 0" fill="#23284A"/>
+        <path d="M-276 70H318" stroke="#23284A" stroke-width="6"/>
+        <rect x="-276" y="74" width="594" height="22" fill="#C2185B"/>
+        <circle cx="-150" cy="172" r="42" fill="#23284A"/><circle cx="-150" cy="172" r="15" fill="#E8A33D"/>
+        <circle cx="190" cy="172" r="42" fill="#23284A"/><circle cx="190" cy="172" r="15" fill="#E8A33D"/>
+      </g>
+    </g>
+  </defs>
+
+  <rect width="1080" height="1920" fill="#F4EEE1"/>
+  <rect width="1080" height="1920" fill="url(#dots)"/>
+  <rect width="1080" height="1920" filter="url(#grain)"/>
+  <line x1="120" y1="0" x2="120" y2="1920" stroke="#E7B9A6" stroke-width="2.5" opacity="0.7"/>
+
+  <g id="cam">
+    <!-- title -->
+    <g id="title">
+      <text class="urdu" x="540" y="760" text-anchor="middle" font-size="150">وین انکل</text>
+      <text class="hand" x="540" y="900" text-anchor="middle" font-size="96">Types of Van Uncles</text>
+      <path id="tline" class="ink" d="M250 940 C420 960 660 925 830 945" filter="url(#pencil)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+      <text class="hand" x="540" y="1060" text-anchor="middle" font-size="60" fill="#7A5410" style="fill:#7A5410">which one is yours?</text>
+    </g>
+
+    <!-- one scene each, built by script -->
+    <g id="scenes"></g>
+
+    <!-- end card -->
+    <g id="end" opacity="0">
+      <text class="hand" x="540" y="700" text-anchor="middle" font-size="110">Which one is</text>
+      <text class="hand" x="540" y="830" text-anchor="middle" font-size="140" style="fill:#C2185B">YOURS?</text>
+      <rect x="170" y="930" width="740" height="150" rx="40" fill="#E8A33D" stroke="#23284A" stroke-width="7" filter="url(#pencil)"/>
+      <text class="hand" x="540" y="1028" text-anchor="middle" font-size="76">take the quiz</text>
+      <text x="540" y="1180" text-anchor="middle" font-family="Caveat" font-weight="700" font-size="84" fill="#1F2A5C">pohnch.pk/van-uncle</text>
+      <text class="urdu" x="540" y="1420" text-anchor="middle" font-size="120">پہنچ</text>
+      <text class="hand" x="540" y="1500" text-anchor="middle" font-size="54">see your school van, live</text>
+    </g>
+  </g>
+</svg>
+<script>
+const U = [
+  { id: 'toofan', n: 1, ur: 'طوفان میل انکل', en: 'Toofan Mail Uncle', line: "here before you've found your other shoe" },
+  { id: 'paanch', n: 2, ur: 'پانچ منٹ والے انکل', en: 'Paanch Minute Wale Uncle', line: '"5 minute" since 2019' },
+  { id: 'dj', n: 3, ur: 'ڈی جے انکل', en: 'DJ Uncle', line: 'the van is a moving concert' },
+  { id: 'gayab', n: 4, ur: 'غائب انکل', en: 'Gayab Uncle', line: 'has never picked up. not once.' },
+  { id: 'farishta', n: 5, ur: 'فرشتہ انکل', en: 'Farishta Uncle', line: 'never late. protect at all costs.' },
+];
+const NS = 'http://www.w3.org/2000/svg';
+const el = (tag, attrs, parent, text) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (text != null) e.textContent = text; parent.appendChild(e); return e; };
+const scenes = document.getElementById('scenes');
+for (const u of U) {
+  const g = el('g', { id: 'sc-' + u.id, opacity: 0 }, scenes);
+  el('circle', { cx: 540, cy: 330, r: 78, fill: '#1F2A5C', filter: 'url(#wash)' }, g);
+  el('text', { x: 540, y: 362, 'text-anchor': 'middle', 'font-size': 96, class: 'hand', style: 'fill:#FBF7EF' }, g, String(u.n));
+  // props behind/around the van
+  const props = el('g', { id: 'pr-' + u.id }, g);
+  if (u.id === 'toofan') for (let i = 0; i < 5; i++) el('path', { class: 'ink sl', d: `M${120 + (i % 2) * 40} ${820 + i * 60}h${180 - i * 14}`, 'stroke-width': 7, filter: 'url(#pencil)' }, props);
+  if (u.id === 'paanch') {
+    el('rect', { x: 640, y: 560, width: 300, height: 150, rx: 40, fill: '#FFFDF8', stroke: '#23284A', 'stroke-width': 7, filter: 'url(#pencil)' }, props);
+    el('path', { d: 'M700 708l-20 46 60-46', fill: '#FFFDF8', stroke: '#23284A', 'stroke-width': 7, 'stroke-linejoin': 'round' }, props);
+    el('text', { x: 790, y: 662, 'text-anchor': 'middle', 'font-size': 84, class: 'hand' }, props, '5 min');
+    el('text', { id: 'year', x: 300, y: 650, 'text-anchor': 'middle', 'font-size': 110, class: 'hand', style: 'fill:#C2185B' }, props, '2019');
+  }
+  if (u.id === 'dj') for (let i = 0; i < 6; i++) el('text', { class: 'hand note', x: 300 + i * 100, y: 760, 'font-size': 90 + (i % 3) * 20, style: 'fill:#1F2A5C' }, props, i % 2 ? '♫' : '♪');
+  if (u.id === 'gayab') {
+    const ph = el('g', { id: 'phone' }, props);
+    el('rect', { x: 380, y: 470, width: 320, height: 300, rx: 40, fill: '#FFFDF8', stroke: '#23284A', 'stroke-width': 7, filter: 'url(#pencil)' }, ph);
+    el('text', { x: 540, y: 570, 'text-anchor': 'middle', 'font-size': 64, class: 'hand' }, ph, 'Van Uncle');
+    el('text', { id: 'calls', x: 540, y: 660, 'text-anchor': 'middle', 'font-size': 56, class: 'hand', style: 'fill:#4A4F66' }, ph, 'calling (1)...');
+    el('text', { id: 'qm', x: 820, y: 640, 'text-anchor': 'middle', 'font-size': 200, class: 'hand', style: 'fill:#C2185B' }, props, '?');
+  }
+  if (u.id === 'farishta') {
+    el('circle', { cx: 540, cy: 1000, r: 380, fill: '#F6C46E', opacity: 0.35, filter: 'url(#wash)', id: 'glow' }, props);
+    for (let i = 0; i < 4; i++) el('path', { class: 'spark', d: 'M0 -34L9 -9 34 0 9 9 0 34 -9 9 -34 0 -9 -9Z', fill: '#E8A33D', transform: `translate(${220 + i * 210} ${620 + (i % 2) * 90})` }, props);
+  }
+  const pos = el('g', { transform: 'translate(540 930) scale(1.15)' }, g);
+  const vg = el('g', { id: 'v-' + u.id }, pos);
+  const inner = el('g', { class: 'vin' }, vg);
+  el('use', { href: '#van' }, inner);
+  if (u.id === 'farishta') el('ellipse', { id: 'halo', cx: 152, cy: -48, rx: 40, ry: 12, fill: 'none', stroke: '#E8A33D', 'stroke-width': 9 }, inner);
+  el('text', { x: 540, y: 1430, 'text-anchor': 'middle', 'font-size': 120, class: 'urdu' }, g, u.ur);
+  el('text', { x: 540, y: 1550, 'text-anchor': 'middle', 'font-size': 84, class: 'hand' }, g, u.en);
+  el('text', { x: 540, y: 1660, 'text-anchor': 'middle', 'font-size': 64, class: 'hand', style: 'fill:#4A4F66' }, g, u.line);
+}
+
+const tl = gsap.timeline({ paused: true });
+const T0 = 2.6, SC = 3.3;
+window.DURATION = T0 + U.length * SC + 3.2;
+function build() {
+  // title
+  tl.from('#title text', { opacity: 0, y: 30, stagger: 0.25, duration: 0.6, ease: 'back.out(2)' }, 0.1)
+    .to('#tline', { strokeDashoffset: 0, duration: 0.8, ease: 'power2.out' }, 0.7)
+    .to('#title', { opacity: 0, y: -60, duration: 0.35, ease: 'power2.in' }, T0 - 0.35);
+  U.forEach((u, i) => {
+    const s = T0 + i * SC, sc = '#sc-' + u.id, v = '#v-' + u.id;
+    tl.set(sc, { opacity: 1 }, s)
+      .from(sc + ' > circle, ' + sc + ' > text', { opacity: 0, scale: 0.6, transformOrigin: '50% 50%', stagger: 0.08, duration: 0.4, ease: 'back.out(2.4)' }, s)
+      .fromTo(v, { x: -700 }, { x: 0, duration: u.id === 'toofan' ? 0.28 : 0.6, ease: u.id === 'toofan' ? 'power4.out' : 'back.out(1.6)' }, s + 0.1);
+    if (u.id === 'toofan') {
+      tl.from(sc + ' .sl', { scaleX: 0, transformOrigin: '100% 50%', stagger: 0.04, duration: 0.25 }, s + 0.2)
+        .to('#cam', { x: 14, y: -8, duration: 0.05, repeat: 9, yoyo: true, ease: 'none' }, s + 0.35).set('#cam', { x: 0, y: 0 }, s + 0.9);
+    }
+    if (u.id === 'paanch') {
+      const yr = { y: 2019 };
+      tl.to(yr, { y: 2026, duration: 1.8, ease: 'steps(7)', onUpdate: () => { document.getElementById('year').textContent = String(Math.round(yr.y)); } }, s + 0.8);
+      tl.from(sc + ' rect, ' + sc + ' path', { scale: 0, transformOrigin: '50% 100%', duration: 0.35, ease: 'back.out(2)' }, s + 0.4);
+    }
+    if (u.id === 'dj') {
+      tl.to(v + ' .vin', { y: -26, duration: 0.18, repeat: 13, yoyo: true, ease: 'sine.inOut' }, s + 0.6)
+        .from(sc + ' .note', { y: 80, opacity: 0, stagger: 0.15, duration: 0.6, ease: 'power2.out' }, s + 0.5)
+        .to(sc + ' .note', { y: -120, rotation: 20, stagger: 0.15, duration: 1.4, ease: 'none' }, s + 1.1);
+    }
+    if (u.id === 'gayab') {
+      const n = { c: 1 };
+      tl.from('#phone', { scale: 0, transformOrigin: '540px 620px', duration: 0.35, ease: 'back.out(2)' }, s + 0.3)
+        .to('#phone', { rotation: 4, transformOrigin: '540px 620px', duration: 0.06, repeat: 15, yoyo: true }, s + 0.7)
+        .to(n, { c: 4, duration: 1.4, ease: 'steps(3)', onUpdate: () => { document.getElementById('calls').textContent = `calling (${Math.round(n.c)})...`; } }, s + 0.7)
+        .from('#qm', { scale: 0, rotation: -30, transformOrigin: '50% 50%', duration: 0.4, ease: 'back.out(3)' }, s + 2.1);
+    }
+    if (u.id === 'farishta') {
+      tl.from('#glow', { scale: 0, transformOrigin: '540px 1000px', opacity: 0, duration: 0.8, ease: 'power2.out' }, s + 0.3)
+        .from('#halo', { y: -60, opacity: 0, duration: 0.5, ease: 'back.out(2)' }, s + 0.8)
+        .from(sc + ' .spark', { scale: 0, rotation: 90, transformOrigin: '50% 50%', stagger: 0.12, duration: 0.4, ease: 'back.out(3)' }, s + 0.9);
+    }
+    tl.to(v, { x: 900, duration: 0.3, ease: 'power3.in' }, s + SC - 0.35).to(sc, { opacity: 0, duration: 0.2 }, s + SC - 0.2);
+  });
+  const e = T0 + U.length * SC;
+  tl.to('#end', { opacity: 1, duration: 0.3 }, e)
+    .from('#end text, #end rect', { y: 40, opacity: 0, stagger: 0.12, duration: 0.45, ease: 'back.out(2)' }, e)
+    .to('#end rect', { scale: 1.04, transformOrigin: '540px 1005px', duration: 0.4, repeat: 3, yoyo: true, ease: 'sine.inOut' }, e + 1.2);
+  // the pencil line "boils" a little, like hand-drawn animation
+  tl.to('#pt', { attr: { seed: 9 }, duration: window.DURATION, ease: 'steps(' + Math.round(window.DURATION * 8) + ')' }, 0);
+}
+window.seek = (t) => { tl.seek(Math.min(t, window.DURATION), false); };
+window.ready = document.fonts.ready.then(() => new Promise((r) => setTimeout(r, 300))).then(() => { build(); window.seek(0); return true; });
+</script>
+</body>
+</html>
