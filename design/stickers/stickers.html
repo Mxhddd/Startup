@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pohnch WhatsApp stickers</title>
+<!-- 8 WhatsApp stickers (512 x 512, transparent). Each <svg class="st"> is screenshotted on its own by
+     render.cjs, then saved as WebP under 100 KB. The white "sticker" outline comes from the #edge filter. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Gulzar&family=Noto+Sans+Arabic:wght@800&display=swap">
+<style>
+  html,body{margin:0;background:transparent}
+  body{display:flex;flex-wrap:wrap;gap:0;width:2048px}
+  .st{width:512px;height:512px;display:block}
+  .hand{font-family:Caveat,cursive;font-weight:700}
+  .urdu{font-family:Gulzar,serif}
+  .ur2{font-family:'Noto Sans Arabic',sans-serif;font-weight:800}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <!-- white die-cut border plus a soft shadow, like a real sticker -->
+    <filter id="edge" x="-10%" y="-10%" width="120%" height="120%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="12" result="d"/>
+      <feFlood flood-color="#FFFFFF"/><feComposite in2="d" operator="in" result="w"/>
+      <feGaussianBlur in="d" stdDeviation="6" result="b"/><feOffset in="b" dy="6" result="o"/>
+      <feFlood flood-color="#0E1022" flood-opacity=".28"/><feComposite in2="o" operator="in" result="s"/>
+      <feMerge><feMergeNode in="s"/><feMergeNode in="w"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="pen" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence type="fractalNoise" baseFrequency="0.04" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="3"/></filter>
+    <g id="van">
+      <g filter="url(#pen)">
+        <path d="M-150 90V-20a20 20 0 0 1 20-20h196c14 0 24 6 32 16l52 70a16 16 0 0 1 4 11v33Z" fill="#E8A33D" stroke="#0E1022" stroke-width="7" stroke-linejoin="round"/>
+        <path d="M-130 -26h52v42h-52ZM-68 -26h52v42h-52ZM-6 -26h52v42h-52ZM56 -26h14c7 0 12 3 16 8l24 34H56Z" fill="#DDE6F2" stroke="#0E1022" stroke-width="5" stroke-linejoin="round"/>
+        <circle cx="84" cy="-4" r="12" fill="#F3D2B0" stroke="#0E1022" stroke-width="4"/>
+        <rect x="-148" y="38" width="328" height="13" fill="#C2185B"/>
+        <circle cx="-82" cy="92" r="24" fill="#0E1022"/><circle cx="-82" cy="92" r="9" fill="#E8A33D"/>
+        <circle cx="106" cy="92" r="24" fill="#0E1022"/><circle cx="106" cy="92" r="9" fill="#E8A33D"/>
+      </g>
+    </g>
+  </defs>
+</svg>
+
+<!-- 1 وین کہاں ہے؟ -->
+<svg class="st" id="st1" viewBox="0 0 512 512"><g filter="url(#edge)">
+  <use href="#van" transform="translate(256 300) scale(.95)"/>
+  <rect x="64" y="40" width="384" height="140" rx="40" fill="#1F2A5C"/>
+  <text class="urdu" x="256" y="150" text-anchor="middle" font-size="76" fill="#FBF7EF">وین کہاں ہے؟</text>
+</g></svg>
+
+<!-- 2 بس 5 منٹ -->
+<svg class="st" id="st2" viewBox="0 0 512 512"><g filter="url(#edge)">
+  <use href="#van" transform="translate(236 360) scale(.85)"/>
+  <path d="M120 60h300a40 40 0 0 1 40 40v90a40 40 0 0 1-40 40H230l-50 50 10-50h-70a40 40 0 0 1-40-40v-90a40 40 0 0 1 40-40Z" fill="#FFFDF8" stroke="#0E1022" stroke-width="7" stroke-linejoin="round"/>
+  <text class="ur2" x="270" y="172" text-anchor="middle" font-size="68" fill="#141A33">بس 5 منٹ</text>
+</g></svg>
+
+<!-- 3 calling (4)... -->
+<svg class="st" id="st3" viewBox="0 0 512 512"><g filter="url(#edge)" transform="rotate(-6 256 256)">
+  <rect x="136" y="56" width="240" height="400" rx="44" fill="#FFFDF8" stroke="#0E1022" stroke-width="8"/>
+  <text class="hand" x="256" y="200" text-anchor="middle" font-size="62" fill="#141A33">Van Uncle</text>
+  <text class="hand" x="256" y="260" text-anchor="middle" font-size="50" fill="#4A4F66">calling (4)...</text>
+  <circle cx="256" cy="370" r="42" fill="#17705A"/><path d="M236 362c8 16 22 26 36 30l8-10-14-8-6 6c-6-3-10-8-12-13l6-6-8-14Z" fill="#FFFDF8"/>
+  <text class="hand" x="420" y="150" text-anchor="middle" font-size="150" fill="#C2185B">?</text>
+</g></svg>
+
+<!-- 4 پہنچ گئے ✓ -->
+<svg class="st" id="st4" viewBox="0 0 512 512"><g filter="url(#edge)">
+  <circle cx="256" cy="210" r="140" fill="#17705A"/>
+  <path d="M186 212l50 50 96-104" fill="none" stroke="#FFFDF8" stroke-width="34" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="96" y="372" width="320" height="100" rx="30" fill="#1F2A5C"/>
+  <text class="urdu" x="256" y="452" text-anchor="middle" font-size="64" fill="#FBF7EF">پہنچ گئے</text>
+</g></svg>
+
+<!-- 5 آج چھٹی (sleeping van) -->
+<svg class="st" id="st5" viewBox="0 0 512 512"><g filter="url(#edge)">
+  <use href="#van" transform="translate(256 290) scale(.95)"/>
+  <text class="hand" x="380" y="140" font-size="70" fill="#1F2A5C">z</text><text class="hand" x="420" y="100" font-size="56" fill="#1F2A5C">z</text><text class="hand" x="452" y="66" font-size="44" fill="#1F2A5C">z</text>
+  <rect x="96" y="388" width="320" height="96" rx="30" fill="#E8A33D"/>
+  <text class="urdu" x="256" y="466" text-anchor="middle" font-size="62" fill="#141A33">آج چھٹی</text>
+</g></svg>
+
+<!-- 6 Toofan Mail -->
+<svg class="st" id="st6" viewBox="0 0 512 512"><g filter="url(#edge)">
+  <g stroke="#1F2A5C" stroke-width="12" stroke-linecap="round"><path d="M20 230h70M10 270h80M30 310h60"/></g>
+  <use href="#van" transform="translate(280 270) scale(.9) skewX(-8)"/>
+  <rect x="80" y="380" width="352" height="96" rx="30" fill="#C2185B"/>
+  <text class="hand" x="256" y="448" text-anchor="middle" font-size="64" fill="#FFFDF8">TOOFAN MAIL</text>
+</g></svg>
+
+<!-- 7 DJ Uncle -->
+<svg class="st" id="st7" viewBox="0 0 512 512"><g filter="url(#edge)">
+  <use href="#van" transform="translate(256 290) scale(.95) rotate(-4)"/>
+  <text class="hand" x="110" y="150" font-size="110" fill="#1F2A5C">♪</text><text class="hand" x="230" y="110" font-size="90" fill="#C2185B">♫</text><text class="hand" x="350" y="160" font-size="100" fill="#17705A">♪</text>
+  <rect x="116" y="388" width="280" height="96" rx="30" fill="#1F2A5C"/>
+  <text class="hand" x="256" y="456" text-anchor="middle" font-size="64" fill="#E8A33D">DJ UNCLE</text>
+</g></svg>
+
+<!-- 8 Pohnch star (tray icon too) -->
+<svg class="st" id="st8" viewBox="0 0 512 512"><g filter="url(#edge)">
+  <rect x="56" y="56" width="400" height="400" rx="90" fill="#1F2A5C"/>
+  <path transform="translate(256 210) scale(2.4) translate(-32 -32)" d="M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z" fill="#E8A33D"/>
+  <circle cx="256" cy="210" r="22" fill="#1F2A5C"/>
+  <text class="urdu" x="256" y="420" text-anchor="middle" font-size="80" fill="#FBF7EF">پہنچ</text>
+</g></svg>
+</body>
+</html>
