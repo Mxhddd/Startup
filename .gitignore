@@ -20,3 +20,6 @@ expo-env.d.ts
 design/video/*/frames/
 design/video/*/pohnch-ad-v1.mp4
 design/video/*/soundtrack.wav
+design/video/*/still-*.png
+design/video/van-uncle-ep1/van-uncle-ep1.mp4
+design/stickers/png/
