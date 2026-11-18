@@ -76,7 +76,7 @@ export function resetInterestCaches() { summaryCache = null; doubtHits.clear(); 
 /** v22: what the Growth panel counts. 'visitor' is sent once a day per browser; 'click_*' when a download link is tapped. */
 export const SITE_EVENTS = ['view', 'visitor', 'click_testers', 'click_play', 'click_apk'] as const;
 /** The website's pages, by name. Any other address is counted as 'other', and an invite link never shows its token. */
-const SITE_PAGES = ['/', '/app', '/links', '/download', '/drivers', '/safety', '/schools', '/story', '/progress', '/privacy', '/terms', '/delete-account', '/invite'];
+const SITE_PAGES = ['/', '/app', '/links', '/download', '/drivers', '/safety', '/schools', '/story', '/progress', '/privacy', '/terms', '/delete-account', '/invite', '/van-uncle'];
 /** Turns an address into the page name the panel shows ('/ur/app' stays '/ur/app'; '/i/<token>' becomes '/i'). */
 export function sitePage(raw: unknown): string | null {
   if (typeof raw !== 'string' || raw.length > 300 || !raw.startsWith('/')) return null;

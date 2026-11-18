@@ -11,7 +11,8 @@ import { chamakTile, jhalarTile, parrot, svgSrc, svgUri } from './truckartSvg';
 import './tokens.css';
 import './links.css';
 
-export const SOCIAL = { instagram: 'https://www.instagram.com/pohnch.pk/', tiktok: 'https://www.tiktok.com/@pohnch.pk' } as const;
+import { SOCIAL } from '../_lib/social';
+export { SOCIAL };
 const w = (lang: Lang, key: string) => t(lang, `web.links.${key}` as MessageKey);
 const bird = (flip: boolean) => svgSrc(`<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="-40 -66 80 80">${parrot(0, 6, 64, flip)}</svg>`);
 const STAR = 'M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z';
