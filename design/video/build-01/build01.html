@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Building Pohnch, part 1</title>
+<!-- "Building Pohnch" part 1 (9:16, about 22 s): a founder's sketchbook diary, in the ad's pencil style.
+     Only true facts: Habib University student; parent app, driver app and website built; 27 schools
+     emailed; brochures being printed; next: the first van. Rendered like ep1 (window.seek(t)). -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Gulzar&display=swap">
+<script src="../../../node_modules/gsap/dist/gsap.min.js"></script>
+<style>
+  html,body{margin:0;background:#F4EEE1}
+  svg{display:block}
+  .ink{fill:none;stroke:#23284A;stroke-width:6;stroke-linecap:round;stroke-linejoin:round}
+  .hand{font-family:Caveat,cursive;font-weight:700;fill:#23284A}
+  .urdu{font-family:Gulzar,serif;fill:#1F2A5C}
+</style>
+</head>
+<body>
+<svg id="s" width="1080" height="1920" viewBox="0 0 1080 1920" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="pencil" x="-5%" y="-5%" width="110%" height="110%"><feTurbulence id="pt" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1"/><feDisplacementMap in="SourceGraphic" scale="4.5"/></filter>
+    <filter id="wash" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" seed="3"/><feDisplacementMap in="SourceGraphic" scale="14"/></filter>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0.35  0 0 0 0 0.3  0 0 0 0 0.22  0 0 0 0.09 0"/></filter>
+    <pattern id="lines" width="1080" height="72" patternUnits="userSpaceOnUse"><line x1="0" y1="71" x2="1080" y2="71" stroke="#C9D6E8" stroke-width="2"/></pattern>
+  </defs>
+  <rect width="1080" height="1920" fill="#F4EEE1"/>
+  <rect width="1080" height="1920" fill="url(#lines)"/>
+  <rect width="1080" height="1920" filter="url(#grain)"/>
+  <line x1="140" y1="0" x2="140" y2="1920" stroke="#E7B9A6" stroke-width="3"/>
+  <g fill="#D8CDB6"><circle cx="70" cy="300" r="22"/><circle cx="70" cy="960" r="22"/><circle cx="70" cy="1620" r="22"/></g>
+
+  <!-- 1 title -->
+  <g id="p1">
+    <text class="hand" x="200" y="560" font-size="70" style="fill:#7A5410">day 1</text>
+    <text class="hand" x="200" y="700" font-size="112">building a startup</text>
+    <text class="hand" x="200" y="830" font-size="112">in Karachi</text>
+    <path id="u1" class="ink" d="M200 860 C420 880 700 845 900 868" filter="url(#pencil)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" style="stroke:#C2185B"/>
+    <g id="note" transform="translate(640 1060) rotate(4)"><rect width="320" height="210" fill="#F6C46E" filter="url(#pencil)"/><text class="hand" x="160" y="90" text-anchor="middle" font-size="52">Habib Uni</text><text class="hand" x="160" y="150" text-anchor="middle" font-size="52">student 🙋</text></g>
+  </g>
+
+  <!-- 2 the problem -->
+  <g id="p2" opacity="0">
+    <text class="hand" x="200" y="420" font-size="80" style="fill:#7A5410">the problem:</text>
+    <g id="ph2" transform="translate(540 900)">
+      <rect x="-170" y="-280" width="340" height="560" rx="50" fill="#FFFDF8" stroke="#23284A" stroke-width="8" filter="url(#pencil)"/>
+      <text class="hand" x="0" y="-120" text-anchor="middle" font-size="64">Van Uncle</text>
+      <text id="calls2" class="hand" x="0" y="-40" text-anchor="middle" font-size="54" style="fill:#4A4F66">calling (1)...</text>
+      <circle cx="0" cy="160" r="56" fill="#17705A"/>
+    </g>
+    <text class="hand" x="540" y="1340" text-anchor="middle" font-size="72">every morning,</text>
+    <text class="hand" x="540" y="1430" text-anchor="middle" font-size="72">every parent.</text>
+  </g>
+
+  <!-- 3 so I built -->
+  <g id="p3" opacity="0">
+    <text class="hand" x="200" y="420" font-size="80" style="fill:#7A5410">so I built</text>
+    <text class="urdu" x="760" y="440" text-anchor="middle" font-size="130">پہنچ</text>
+    <g transform="translate(540 960)">
+      <rect x="-200" y="-330" width="400" height="660" rx="56" fill="#FFFDF8" stroke="#23284A" stroke-width="8" filter="url(#pencil)"/>
+      <path id="route3" d="M-130 230 C-120 80 120 120 110 -30 C100 -150 -90 -120 -100 -250" fill="none" stroke="#1F2A5C" stroke-width="10" stroke-linecap="round" stroke-dasharray="2 22"/>
+      <circle cx="-100" cy="-250" r="20" fill="#E8A33D"/>
+      <g id="van3"><rect x="-34" y="-20" width="68" height="40" rx="10" fill="#E8A33D" stroke="#23284A" stroke-width="5"/><circle cx="-16" cy="22" r="8" fill="#23284A"/><circle cx="16" cy="22" r="8" fill="#23284A"/></g>
+      <g id="alert3"><rect x="-180" y="-310" width="360" height="90" rx="26" fill="#FFFFFF" stroke="#23284A" stroke-width="5"/><circle cx="-130" cy="-265" r="24" fill="#17705A"/><text class="hand" x="20" y="-250" text-anchor="middle" font-size="44">in the van ✓</text></g>
+    </g>
+    <text class="hand" x="540" y="1440" text-anchor="middle" font-size="64">the van, live. an alert at every step.</text>
+  </g>
+
+  <!-- 4 progress -->
+  <g id="p4" opacity="0">
+    <text class="hand" x="200" y="420" font-size="80" style="fill:#7A5410">so far:</text>
+    <g class="item"><text class="hand" x="200" y="600" font-size="80">☑ parent app</text></g>
+    <g class="item"><text class="hand" x="200" y="740" font-size="80">☑ driver app</text></g>
+    <g class="item"><text class="hand" x="200" y="880" font-size="80">☑ website</text></g>
+    <g class="item"><text class="hand" x="200" y="1020" font-size="80">☑ emailed 27 schools</text></g>
+    <g class="item"><text class="hand" x="200" y="1160" font-size="80">☑ 2,000 brochures printing</text></g>
+    <g class="item"><text class="hand" x="200" y="1300" font-size="80" style="fill:#C2185B">☐ first van on the road</text></g>
+    <path id="arr4" class="ink" d="M880 1420 C860 1360 840 1330 790 1310 M790 1310 l40 -6 M790 1310 l18 34" filter="url(#pencil)" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1" style="stroke:#C2185B"/>
+    <text id="tw4" class="hand" x="900" y="1470" text-anchor="middle" font-size="58" style="fill:#C2185B">this week</text>
+  </g>
+
+  <!-- 5 the hard part -->
+  <g id="p5" opacity="0">
+    <text class="hand" x="200" y="420" font-size="80" style="fill:#7A5410">the hard part:</text>
+    <text class="hand" x="540" y="700" text-anchor="middle" font-size="88">finding van drivers</text>
+    <text class="hand" x="540" y="800" text-anchor="middle" font-size="88">who'll try it</text>
+    <g id="gate5" transform="translate(540 1150)" filter="url(#pencil)">
+      <path class="ink" d="M-300 160V-60h600v220M-300 -60l300-90 300 90" />
+      <g transform="translate(-170 120)"><rect x="-90" y="-50" width="180" height="90" rx="16" fill="#E8A33D" stroke="#23284A" stroke-width="5"/><circle cx="-50" cy="44" r="14" fill="#23284A"/><circle cx="50" cy="44" r="14" fill="#23284A"/></g>
+      <g transform="translate(150 120)"><rect x="-90" y="-50" width="180" height="90" rx="16" fill="#E8A33D" stroke="#23284A" stroke-width="5"/><circle cx="-50" cy="44" r="14" fill="#23284A"/><circle cx="50" cy="44" r="14" fill="#23284A"/></g>
+    </g>
+    <text class="hand" x="540" y="1480" text-anchor="middle" font-size="64">next stop: the school gate.</text>
+  </g>
+
+  <!-- 6 follow -->
+  <g id="p6" opacity="0">
+    <text class="hand" x="540" y="760" text-anchor="middle" font-size="110">follow along</text>
+    <text class="hand" x="540" y="880" text-anchor="middle" font-size="90" style="fill:#1F2A5C">@pohnch.pk</text>
+    <rect x="200" y="980" width="680" height="140" rx="40" fill="#E8A33D" stroke="#23284A" stroke-width="7" filter="url(#pencil)"/>
+    <text class="hand" x="540" y="1072" text-anchor="middle" font-size="66">part 2: my first school gate</text>
+    <text class="urdu" x="540" y="1340" text-anchor="middle" font-size="120">پہنچ</text>
+  </g>
+</svg>
+<script>
+const tl = gsap.timeline({ paused: true });
+const P = [0, 3.2, 7, 11.2, 15.6, 19.2]; // page start times
+window.DURATION = 22.4;
+function page(id, s, e) { tl.set(id, { opacity: 1 }, s); if (e) tl.to(id, { opacity: 0, x: -80, duration: 0.3, ease: 'power2.in' }, e - 0.3); }
+function build() {
+  page('#p1', 0, P[1]); page('#p2', P[1], P[2]); page('#p3', P[2], P[3]); page('#p4', P[3], P[4]); page('#p5', P[4], P[5]); page('#p6', P[5]);
+  tl.from('#p1 text', { opacity: 0, y: 30, stagger: 0.3, duration: 0.5, ease: 'back.out(2)' }, 0.1)
+    .to('#u1', { strokeDashoffset: 0, duration: 0.6 }, 1.1)
+    .from('#note', { scale: 0, rotation: -20, transformOrigin: '160px 105px', duration: 0.5, ease: 'back.out(2)' }, 1.6);
+  const c = { n: 1 };
+  tl.from('#p2 > text', { opacity: 0, y: 30, stagger: 0.3, duration: 0.45 }, P[1] + 0.1)
+    .from('#ph2', { scale: 0.4, opacity: 0, transformOrigin: '540px 900px', duration: 0.4, ease: 'back.out(2)' }, P[1] + 0.3)
+    .to('#ph2', { rotation: 3, transformOrigin: '540px 900px', duration: 0.06, repeat: 23, yoyo: true }, P[1] + 0.8)
+    .to(c, { n: 4, duration: 2.1, ease: 'steps(3)', onUpdate: () => { document.getElementById('calls2').textContent = `calling (${Math.round(c.n)})...`; } }, P[1] + 0.8);
+  const prog = { p: 0 };
+  const path = document.getElementById('route3'), van = document.getElementById('van3'), len = path.getTotalLength();
+  const place = () => { const pt = path.getPointAtLength(len * prog.p); van.setAttribute('transform', `translate(${pt.x} ${pt.y})`); };
+  tl.from('#p3 > text', { opacity: 0, y: 30, stagger: 0.25, duration: 0.45 }, P[2] + 0.1)
+    .to(prog, { p: 1, duration: 3, ease: 'power1.inOut', onUpdate: place, onStart: place }, P[2] + 0.4)
+    .from('#alert3', { y: -120, opacity: 0, duration: 0.45, ease: 'back.out(2)' }, P[2] + 1.6);
+  tl.from('#p4 > text:not(#tw4)', { opacity: 0, duration: 0.3 }, P[3])
+    .from('#p4 .item', { opacity: 0, x: -40, stagger: 0.42, duration: 0.35, ease: 'power2.out' }, P[3] + 0.3)
+    .to('#arr4', { strokeDashoffset: 0, duration: 0.5 }, P[3] + 3)
+    .from('#tw4', { opacity: 0, duration: 0.3 }, P[3] + 3.3);
+  tl.from('#p5 > text', { opacity: 0, y: 30, stagger: 0.3, duration: 0.45 }, P[4] + 0.1)
+    .from('#gate5', { opacity: 0, y: 60, duration: 0.5, ease: 'power2.out' }, P[4] + 0.9);
+  tl.from('#p6 text, #p6 rect', { opacity: 0, y: 40, stagger: 0.15, duration: 0.45, ease: 'back.out(2)' }, P[5] + 0.1)
+    .to('#p6 rect', { scale: 1.04, transformOrigin: '540px 1050px', duration: 0.4, repeat: 3, yoyo: true }, P[5] + 1.2);
+  tl.to('#pt', { attr: { seed: 9 }, duration: window.DURATION, ease: 'steps(' + Math.round(window.DURATION * 8) + ')' }, 0);
+  place();
+}
+window.seek = (t) => { tl.seek(Math.min(t, window.DURATION), false); };
+window.ready = document.fonts.ready.then(() => new Promise((r) => setTimeout(r, 300))).then(() => { build(); window.seek(0); return true; });
+</script>
+</body>
+</html>
