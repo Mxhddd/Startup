@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Pohnch reels</title>
+<!-- Pohnch reels v2 (9:16, 1080 x 1920): short, relatable, meme-paced. One engine, many scripts: open
+     reel.html#<id> and the script for that id (in reels.js) is built into one paused GSAP timeline, stepped
+     frame by frame by render.cjs (node render.cjs <id>). Everything important stays inside the 4:5 band
+     (y 285 to 1635) so a still makes a feed post, and clear of the top 220 px and bottom 380 px where the
+     app's own buttons sit. -->
+<style>
+  @font-face{font-family:Caveat;font-weight:700;src:url(fonts/Caveat-wght-700.woff2)}
+  @font-face{font-family:Manrope;font-weight:500;src:url(fonts/Manrope-wght-500.woff2)}
+  @font-face{font-family:Manrope;font-weight:600 700;src:url(fonts/Manrope-wght-700.woff2)}
+  @font-face{font-family:Manrope;font-weight:800;src:url(fonts/Manrope-wght-800.woff2)}
+  @font-face{font-family:'Noto Sans Arabic';font-weight:600;src:url(fonts/NotoSansArabic-600.ttf)}
+  @font-face{font-family:'Noto Sans Arabic';font-weight:800;src:url(fonts/NotoSansArabic-800.ttf)}
+  @font-face{font-family:Gulzar;src:url(fonts/Gulzar.ttf)}
+</style>
+<script src="../../../node_modules/gsap/dist/gsap.min.js"></script>
+<style>
+  :root{--neel:#1F2A5C;--kesar:#E8A33D;--zam:#17705A;--ghee:#FBF7EF;--paper:#F4EEE1;--ink:#23284A;--siyahi:#141A33;--red:#C2185B;--soft:#5A5F73}
+  html,body{margin:0;background:var(--paper)}
+  #stage{position:relative;width:1080px;height:1920px;overflow:hidden;font-family:Manrope,'Noto Color Emoji',sans-serif;color:var(--siyahi);
+    background:radial-gradient(circle at 22px 22px,#D8CDB6 2.2px,transparent 2.6px) 0 0/44px 44px,var(--paper)}
+  #stage::before{content:"";position:absolute;left:120px;top:0;bottom:0;border-left:2.5px solid rgba(231,185,166,.7)}
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+  .hand{font-family:Caveat,cursive;font-weight:700}
+  .ur{font-family:'Noto Sans Arabic',sans-serif;direction:rtl}
+  .gul{font-family:Gulzar,serif}
+  .emo{font-family:'Noto Color Emoji'}
+
+  /* top caption: the TikTok-style hook that stays on screen */
+  #cap{opacity:0;position:absolute;left:90px;right:90px;top:250px;display:flex;justify-content:center;z-index:20;pointer-events:none}
+  #cap span{display:inline-block;background:#fff;color:#111;font-weight:800;font-size:58px;line-height:1.22;padding:18px 30px;border-radius:22px;text-align:center;box-shadow:0 10px 0 rgba(20,26,51,.12);max-width:900px}
+
+  /* hook / big statement */
+  .hook{padding:0 110px;text-align:center}
+  .hook .k{font-size:44px;font-weight:800;color:#7A5410;letter-spacing:.04em;text-transform:uppercase;margin-bottom:28px}
+  .hook .t{font-size:104px;font-weight:800;line-height:1.08;letter-spacing:-2px}
+  .hook .t .w{display:inline-block;margin:0 .12em}
+  .hook .s{font-family:Caveat,cursive;font-weight:700;font-size:84px;color:var(--neel);margin-top:36px}
+  .big{background:var(--neel);color:var(--ghee)}
+  .big .t{color:var(--ghee)}
+  .big .s{color:var(--kesar)}
+
+  /* phone */
+  .phone{position:relative;width:760px;height:1220px;border-radius:84px;background:#0D1024;padding:18px;box-shadow:0 40px 80px rgba(20,26,51,.35);margin-top:120px}
+  .screen{position:relative;width:100%;height:100%;border-radius:68px;overflow:hidden;background:#EFE7DD}
+  .sbar{position:absolute;inset:0 0 auto;height:70px;display:flex;justify-content:space-between;align-items:center;padding:6px 52px 0;font-size:30px;font-weight:800;z-index:5}
+  .isl{position:absolute;top:18px;left:50%;width:190px;height:52px;margin-left:-95px;border-radius:26px;background:#05060F;z-index:6}
+
+  /* chat */
+  .chead{position:absolute;inset:0 0 auto;height:200px;background:#1F5E54;color:#fff;display:flex;align-items:flex-end;gap:22px;padding:0 32px 26px;z-index:3}
+  .chead .av{width:84px;height:84px;border-radius:50%;background:#D9E7E2;display:grid;place-items:center;font-size:46px}
+  .chead b{display:block;font-size:38px}
+  .chead small{display:block;font-size:26px;opacity:.85;font-weight:600}
+  .chead .unread{margin-left:auto;background:#25D366;color:#073B2C;font-weight:800;font-size:30px;border-radius:30px;padding:6px 18px;margin-bottom:18px}
+  .cbody{position:absolute;left:0;right:0;top:200px;bottom:0;overflow:hidden}
+  .msgs{position:absolute;left:0;right:0;bottom:26px;display:flex;flex-direction:column;gap:16px;padding:0 26px}
+  .msg{align-self:flex-start;max-width:78%;background:#fff;border-radius:8px 30px 30px 30px;padding:14px 24px 12px;box-shadow:0 2px 0 rgba(0,0,0,.08)}
+  .msg.me{align-self:flex-end;background:#D9FDD3;border-radius:30px 8px 30px 30px}
+  .msg .n{font-size:26px;font-weight:800;margin-bottom:2px}
+  .msg .x{font-size:38px;font-weight:600;line-height:1.3}
+  .msg .tm{font-size:22px;color:#8A8F9C;text-align:right;margin-top:2px;font-weight:600}
+
+  /* call */
+  .call{background:linear-gradient(180deg,#2B3550,#10152B);color:#fff;display:flex;flex-direction:column;align-items:center;padding-top:190px}
+  .call .cav{width:250px;height:250px;border-radius:50%;background:var(--kesar);display:grid;place-items:center;font-size:140px;box-shadow:0 0 0 0 rgba(232,163,61,.5)}
+  .call .cn{font-size:66px;font-weight:800;margin-top:44px}
+  .call .cs{font-size:38px;opacity:.8;margin-top:10px;font-weight:600}
+  .call .cc{margin-top:40px;font-size:40px;font-weight:800;background:rgba(255,255,255,.12);padding:12px 30px;border-radius:40px}
+  .call .no{position:absolute;top:640px;left:50%;transform:translateX(-50%) rotate(-6deg);background:var(--red);color:#fff;font-weight:800;font-size:64px;padding:12px 36px;border-radius:18px;opacity:0;white-space:nowrap}
+  .call .btns{position:absolute;bottom:120px;left:0;right:0;display:flex;justify-content:center;gap:180px}
+  .call .btns i{width:130px;height:130px;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:60px}
+
+  /* lock screen */
+  .lock{background:linear-gradient(170deg,#1F2A5C 0%,#3B3F7A 55%,#E8A33D 140%);color:#fff;display:flex;flex-direction:column;align-items:center}
+  .lock .d{margin-top:150px;font-size:34px;font-weight:700;opacity:.9}
+  .lock .tm{font-size:200px;font-weight:800;letter-spacing:-6px;line-height:1}
+  .lock .ns{position:absolute;left:26px;right:26px;top:520px;display:flex;flex-direction:column;gap:20px}
+  .note{display:flex;gap:22px;align-items:center;background:rgba(250,248,243,.92);color:var(--siyahi);border-radius:40px;padding:24px 28px;box-shadow:0 18px 40px rgba(0,0,0,.25)}
+  .note .ic{width:86px;height:86px;border-radius:22px;background:var(--neel);display:grid;place-items:center;flex:none}
+  .note .meta{display:flex;justify-content:space-between;font-size:24px;font-weight:700;color:#666B7D}
+  .note b{display:block;font-size:36px;line-height:1.25;margin-top:2px}
+  .note span{display:block;font-size:28px;font-weight:600;color:#555A6E}
+
+  /* dictionary / versus / list */
+  .board{width:900px;display:flex;flex-direction:column;gap:30px;margin-top:140px}
+  .btitle{font-family:Caveat,cursive;font-weight:700;font-size:110px;color:var(--neel);text-align:center;line-height:1;margin-bottom:20px}
+  .row{display:flex;flex-direction:column;gap:6px;background:#FFFDF8;border:5px solid var(--ink);border-radius:30px;padding:26px 34px;box-shadow:8px 10px 0 var(--ink)}
+  .row .a{font-size:52px;font-weight:800}
+  .row .a s{text-decoration-thickness:6px;text-decoration-color:var(--red)}
+  .row .b{font-family:Caveat,cursive;font-weight:700;font-size:66px;color:var(--zam);line-height:1.05}
+  .vs{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .vs .h{font-size:90px;font-weight:800;text-align:center;color:var(--neel)}
+  .vs .c{background:#FFFDF8;border:5px solid var(--ink);border-radius:26px;padding:22px;font-size:40px;font-weight:700;text-align:center;line-height:1.25;box-shadow:6px 8px 0 var(--ink);display:grid;place-items:center;min-height:150px}
+  .li{display:flex;gap:26px;align-items:center;font-size:50px;font-weight:800;line-height:1.2}
+  .li .n{flex:none;width:96px;height:96px;border-radius:50%;background:var(--kesar);border:5px solid var(--ink);display:grid;place-items:center;font-family:Caveat,cursive;font-size:68px}
+  .li .e{font-size:58px}
+
+  /* route doodle */
+  .map{position:relative;width:900px;height:900px;margin-top:120px}
+  .map svg{position:absolute;inset:0}
+  .ctr{position:absolute;left:0;right:0;bottom:-170px;text-align:center}
+  .ctr b{display:block;font-size:150px;font-weight:800;color:var(--red);letter-spacing:-4px;line-height:1}
+  .ctr span{font-family:Caveat,cursive;font-weight:700;font-size:70px;color:var(--neel)}
+
+  /* end card */
+  .end{background:var(--neel);color:var(--ghee);text-align:center}
+  .end .star{width:240px;height:240px}
+  .end .u{font-family:Gulzar,serif;font-size:190px;color:var(--kesar);line-height:1.5;margin-top:10px}
+  .end .l{font-size:62px;font-weight:800;margin-top:-10px}
+  .end .url{margin-top:56px;background:var(--kesar);color:var(--siyahi);font-size:66px;font-weight:800;border-radius:999px;padding:22px 60px}
+  .end .bio{font-family:Caveat,cursive;font-weight:700;font-size:64px;color:#C9D0E6;margin-top:36px}
+</style>
+</head>
+<body>
+<div id="stage"><div id="cap"><span></span></div></div>
+<script src="reels.js"></script>
+<script>
+const STAR='M32 4 L40.2 12.2 L51.8 12.2 L51.8 23.8 L60 32 L51.8 40.2 L51.8 51.8 L40.2 51.8 L32 60 L23.8 51.8 L12.2 51.8 L12.2 40.2 L4 32 L12.2 23.8 L12.2 12.2 L23.8 12.2 Z';
+const icon=(s)=>`<svg width="${s}" height="${s}" viewBox="0 0 64 64"><path d="${STAR}" fill="#E8A33D"/><circle cx="32" cy="32" r="7" fill="#1F2A5C"/></svg>`;
+const esc=(s)=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+const hhmm=(m)=>Math.floor(m/60)+':'+String(Math.floor(m%60)).padStart(2,'0');
+const stage=document.getElementById('stage');
+const tl=gsap.timeline({paused:true});
+const id=(location.hash||'#gate').slice(1);
+const R=REELS[id];
+let t=0;
+
+function mk(html,cls){const d=document.createElement('div');d.className='scene '+(cls||'');d.innerHTML=html;stage.appendChild(d);return d;}
+function phone(inner,dark){return `<div class="phone"><div class="screen" style="${dark?'background:#10152B':''}"><div class="isl"></div><div class="sbar" style="color:${dark?'#fff':'#111'}"><span class="clk">7:10</span><span>▮▮▮ ▭</span></div>${inner}</div></div>`;}
+function setCap(text,at){ // swap the top caption
+  tl.call(()=>{document.querySelector('#cap span').textContent=text||'';document.getElementById('cap').style.opacity=text?1:0;},null,at);
+  if(text)tl.fromTo('#cap span',{scale:.7,rotation:-3},{scale:1,rotation:0,duration:.28,ease:'back.out(3)',immediateRender:false},at);
+}
+function enter(el,at,dur){gsap.set(el,{opacity:0});tl.fromTo(el,{opacity:0},{opacity:1,duration:.18,immediateRender:false},at);tl.fromTo(el,{opacity:1},{opacity:0,duration:.15,immediateRender:false},at+dur-.15);}
+
+const S={
+  hook(s,el,at){el.classList.add('hook');if(s.dark)el.classList.add('big');
+    el.innerHTML=(s.kick?`<div class="k">${esc(s.kick)}</div>`:'')+`<div class="t">${s.text.split(' ').map(w=>`<span class="w">${esc(w)}</span>`).join('')}</div>`+(s.sub?`<div class="s">${esc(s.sub)}</div>`:'');
+    tl.from(el.querySelectorAll('.w'),{y:60,opacity:0,stagger:Math.min(.12,(s.dur*.45)/Math.max(1,el.querySelectorAll('.w').length)),duration:.3,ease:'back.out(2.5)'},at+.05);
+    if(s.sub)tl.from(el.querySelector('.s'),{y:30,opacity:0,duration:.35,ease:'power2.out'},at+s.dur*.5);
+    if(s.kick)tl.from(el.querySelector('.k'),{opacity:0,duration:.25},at);
+  },
+  chat(s,el,at){
+    el.innerHTML=phone(`<div class="chead"><span class="av">${s.avatar||'👩‍👧'}</span><div><b>${esc(s.group)}</b><small>${esc(s.members||'Ayesha, Sana, Hina, Rabia, you')}</small></div><span class="unread">0</span></div><div class="cbody"><div class="msgs"></div></div>`);
+    const box=el.querySelector('.msgs'), un=el.querySelector('.unread'), clk=el.querySelector('.clk');
+    const per=(s.dur-0.8)/s.msgs.length; let shown=0;
+    s.msgs.forEach((m,i)=>{const d=document.createElement('div');d.className='msg'+(m[0]==='You'?' me':'');
+      d.innerHTML=(m[0]==='You'?'':`<div class="n" style="color:${m[2]||'#C2185B'}">${esc(m[0])}</div>`)+`<div class="x">${esc(m[1])}</div><div class="tm">${hhmm((s.from||430)+i*((s.to||442)-(s.from||430))/s.msgs.length)}</div>`;
+      box.appendChild(d); d.style.display='none';
+      const at2=at+0.35+i*per;
+      tl.set(d,{display:'block'},at2).from(d,{scale:.6,opacity:0,transformOrigin:m[0]==='You'?'100% 100%':'0% 100%',duration:.22,ease:'back.out(2)'},at2);
+    });
+    const c={u:0,m:s.from||430};
+    tl.to(c,{u:s.unread||47,m:s.to||442,duration:s.dur-0.5,ease:'none',onUpdate:()=>{un.textContent=Math.round(c.u);clk.textContent=hhmm(c.m);}},at+.3);
+    tl.from(el.querySelector('.phone'),{y:300,rotation:4,duration:.45,ease:'power3.out'},at);
+  },
+  call(s,el,at){
+    el.innerHTML=phone(`<div class="call" style="position:absolute;inset:0"><div class="cav">🚐</div><div class="cn">${esc(s.name||'Van Uncle')}</div><div class="cs">calling…</div><div class="cc">Call #1</div><div class="no">NO ANSWER</div><div class="btns"><i style="background:#E5484D">✕</i><i style="background:#2FB36B">✆</i></div></div>`,true);
+    const cc=el.querySelector('.cc'), no=el.querySelector('.no'), clk=el.querySelector('.clk'), cav=el.querySelector('.cav');
+    const n=s.calls||7, per=(s.dur-0.6)/n;
+    for(let i=0;i<n;i++){const a=at+0.4+i*per;
+      tl.call(()=>{cc.textContent='Call #'+(i+1);},null,a).from(cc,{scale:1.4,duration:.2},a)
+        .to(cav,{boxShadow:'0 0 0 60px rgba(232,163,61,0)',duration:per*.6,ease:'power1.out'},a).set(cav,{boxShadow:'0 0 0 0 rgba(232,163,61,.5)'},a+per*.62)
+        .set(no,{opacity:1},a+per*.65).from(no,{scale:1.6,duration:.15},a+per*.65).set(no,{opacity:0},a+per*.97);}
+    const c={m:s.from||430};tl.to(c,{m:s.to||447,duration:s.dur,ease:'none',onUpdate:()=>clk.textContent=hhmm(c.m)},at);
+    tl.from(el.querySelector('.phone'),{y:300,duration:.45,ease:'power3.out'},at);
+  },
+  lock(s,el,at){
+    el.innerHTML=phone(`<div class="lock" style="position:absolute;inset:0"><div class="d">${esc(s.day||'Monday, 24 November')}</div><div class="tm">${esc(s.time||'7:12')}</div><div class="ns"></div></div>`,true);
+    el.querySelector('.clk').textContent=s.time||'7:12';
+    const ns=el.querySelector('.ns'); const per=(s.dur-0.6)/s.notes.length;
+    s.notes.forEach((n,i)=>{const d=document.createElement('div');d.className='note';d.innerHTML=`<div class="ic">${icon(58)}</div><div style="flex:1"><div class="meta"><span>POHNCH</span><span>now</span></div><b>${esc(n[0])}</b><span>${esc(n[1]||'')}</span></div>`;
+      ns.insertBefore(d,ns.firstChild); d.style.display='none'; const a=at+0.3+i*per;
+      tl.set(d,{display:'flex'},a).from(d,{y:-160,opacity:0,scale:.9,duration:.4,ease:'back.out(1.6)'},a);});
+    tl.from(el.querySelector('.phone'),{y:300,duration:.45,ease:'power3.out'},at);
+  },
+  dict(s,el,at){
+    el.innerHTML=`<div class="board">${s.title?`<div class="btitle">${esc(s.title)}</div>`:''}${s.rows.map(r=>`<div class="row"><div class="a">${s.strike===false?esc(r[0]):'<s>'+esc(r[0])+'</s>'}</div><div class="b">${esc(r[1])}</div></div>`).join('')}</div>`;
+    const rows=el.querySelectorAll('.row'), per=(s.dur-0.4)/rows.length;
+    if(s.title)tl.from(el.querySelector('.btitle'),{y:-40,opacity:0,duration:.3},at);
+    rows.forEach((r,i)=>{const a=at+0.25+i*per; tl.from(r,{x:i%2?400:-400,rotation:i%2?4:-4,opacity:0,duration:.35,ease:'back.out(1.4)'},a).from(r.querySelector('.b'),{opacity:0,y:20,duration:.25},a+per*.45);});
+  },
+  vs(s,el,at){
+    el.innerHTML=`<div class="board"><div class="vs"><div class="h">${esc(s.left)}</div><div class="h">${esc(s.right)}</div>${s.rows.map(r=>`<div class="c">${esc(r[0])}</div><div class="c">${esc(r[1])}</div>`).join('')}</div></div>`;
+    const cs=el.querySelectorAll('.c'), per=(s.dur-0.4)/s.rows.length;
+    tl.from(el.querySelectorAll('.h'),{y:-40,opacity:0,stagger:.1,duration:.3},at);
+    for(let i=0;i<s.rows.length;i++){const a=at+0.3+i*per;tl.from(cs[i*2],{scale:.5,opacity:0,duration:.25,ease:'back.out(2)'},a).from(cs[i*2+1],{scale:.5,opacity:0,duration:.25,ease:'back.out(2)'},a+per*.45);}
+  },
+  list(s,el,at){
+    el.innerHTML=`<div class="board">${s.title?`<div class="btitle" style="font-size:96px">${esc(s.title)}</div>`:''}${s.items.map((it,i)=>`<div class="li"><span class="n">${i+1}</span><span style="flex:1">${esc(it[1])}</span><span class="e">${it[0]}</span></div>`).join('')}</div>`;
+    const li=el.querySelectorAll('.li'), per=(s.dur-0.4)/li.length;
+    if(s.title)tl.from(el.querySelector('.btitle'),{y:-40,opacity:0,duration:.3},at);
+    li.forEach((l,i)=>tl.from(l,{x:-300,opacity:0,duration:.3,ease:'back.out(1.8)'},at+0.3+i*per));
+  },
+  route(s,el,at){
+    const d='M150 760 C 60 600 220 560 160 420 S 300 160 460 220 S 760 120 760 330 S 560 470 640 600 S 860 760 720 820 S 420 700 380 820';
+    el.innerHTML=`<div class="map"><svg viewBox="0 0 900 900" width="900" height="900"><path d="${d}" fill="none" stroke="#C9BFA8" stroke-width="18" stroke-linecap="round"/><path id="rp" d="${d}" fill="none" stroke="#1F2A5C" stroke-width="12" stroke-linecap="round" stroke-dasharray="6 26"/>
+      ${[[150,760,'🏠'],[160,420,'🏠'],[460,220,'🏠'],[760,330,'🏠'],[640,600,'🏠'],[720,820,'🏠']].map(p=>`<text x="${p[0]}" y="${p[1]+18}" font-size="56" text-anchor="middle" font-family="Noto Color Emoji">${p[2]}</text>`).join('')}
+      <text x="380" y="860" font-size="80" text-anchor="middle" font-family="Noto Color Emoji">🏫</text>
+      <g id="vdot"><text x="0" y="20" font-size="76" text-anchor="middle" font-family="Noto Color Emoji">🚐</text></g></svg>
+      <div class="ctr"><b class="mins">0 min</b><span>${esc(s.sub||'in the van, every morning')}</span></div></div>`;
+    const path=el.querySelector('#rp'), L=path.getTotalLength(), v=el.querySelector('#vdot'), mins=el.querySelector('.mins'), o={p:0};
+    tl.to(o,{p:1,duration:s.dur-0.6,ease:'none',onUpdate:()=>{const q=path.getPointAtLength(o.p*L);v.setAttribute('transform',`translate(${q.x} ${q.y})`);mins.textContent=Math.round(o.p*(s.mins||85))+' min';}},at+0.3);
+  },
+  end(s,el,at){el.classList.add('end');
+    el.innerHTML=`<svg class="star" viewBox="0 0 64 64"><path d="${STAR}" fill="#E8A33D"/><circle cx="32" cy="32" r="7" fill="#1F2A5C"/></svg><div class="u">پہنچ</div><div class="l">${esc(s.line||'Know the moment your child is in the van.')}</div><div class="url">pohnch.pk</div><div class="bio">${esc(s.bio||'link in bio · free for drivers')}</div>`;
+    tl.from(el.querySelector('.star'),{scale:0,rotation:-90,duration:.5,ease:'back.out(2)'},at+.05).from(el.querySelectorAll('.u,.l,.url,.bio'),{y:50,opacity:0,stagger:.12,duration:.35,ease:'back.out(2)'},at+.2)
+      .to(el.querySelector('.url'),{scale:1.06,duration:.35,repeat:3,yoyo:true,ease:'sine.inOut'},at+1.1);
+  }
+};
+
+R.scenes.forEach((s)=>{const el=mk('',''); S[s.t](s,el,t); enter(el,t,s.dur); setCap(s.cap,t); t+=s.dur;});
+window.DURATION=t;
+window.seek=(x)=>tl.seek(Math.min(x,t-0.001),false);
+window.ready=Promise.all(['700 40px Caveat','800 40px Manrope','700 40px Manrope','500 40px Manrope','800 40px "Noto Sans Arabic"','40px Gulzar','40px "Noto Color Emoji"'].map(f=>document.fonts.load(f,'Aa پہنچ 🚐'))).then(()=>document.fonts.ready).then(()=>new Promise(r=>setTimeout(r,400))).then(()=>{window.seek(0);return true;});
+</script>
+</body>
+</html>

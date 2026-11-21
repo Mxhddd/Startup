@@ -24,3 +24,8 @@ design/video/*/still-*.png
 design/video/van-uncle-ep1/van-uncle-ep1.mp4
 design/stickers/png/
 design/video/build-01/build-01.mp4
+
+# reel engine output (the published copies live in apps/web/public/media/v2)
+design/video/reels/out/
+design/video/reels/frames-*/
+design/social/posts-v2/png/
