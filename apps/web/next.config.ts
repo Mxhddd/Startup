@@ -11,11 +11,13 @@ const TURNSTILE = 'https://challenges.cloudflare.com';
 const LOCAL = process.env.VERCEL ? '' : ' http://127.0.0.1:9 http://localhost:54321';
 const csp = (scripts: string) => [
   "default-src 'self'",
-  `script-src 'self' 'unsafe-inline' ${scripts}`.trim(),
+  // 'wasm-unsafe-eval': the web copies of the apps at /try draw with Skia, which is WebAssembly.
+  `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' ${scripts}`.trim(),
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob:",
   "font-src 'self'",
-  `connect-src 'self' ${SUPA} ${SUPA.replace(/^https:/, 'wss:')} ${TURNSTILE}${LOCAL}`,
+  // open-meteo: the apps' rain mode (the web copies at /try) checks Karachi's weather.
+  `connect-src 'self' ${SUPA} ${SUPA.replace(/^https:/, 'wss:')} ${TURNSTILE} https://api.open-meteo.com${LOCAL}`,
   `frame-src ${TURNSTILE}`,
   "frame-ancestors 'none'",
   "object-src 'none'",
@@ -46,6 +48,9 @@ const nextConfig: NextConfig = {
     return [
       // Every invite link shows the same static page; the server never handles the token itself.
       { source: '/i/:token', destination: '/invite' },
+      // The web copies of the two apps (scripts/build-try.sh): every screen address loads the app, which routes itself.
+      { source: '/try/parent/:path*', destination: '/try/parent/index.html' },
+      { source: '/try/driver/:path*', destination: '/try/driver/index.html' },
       { source: '/.well-known/apple-app-site-association', destination: '/api/app-links/apple' },
       { source: '/.well-known/assetlinks.json', destination: '/api/app-links/android' },
     ];

@@ -54,7 +54,8 @@ const config: ExpoConfig = {
     ],
     ['expo-splash-screen', { backgroundColor: '#141A33', image: './assets/splash-icon.png', imageWidth: 180 }],
   ],
-  experiments: { typedRoutes: true },
+  // EXPO_WEB_BASE: the web copy served at pohnch.pk/try/<app> (scripts/build-try.sh) lives under that path.
+  experiments: { typedRoutes: true, ...(process.env.EXPO_WEB_BASE ? { baseUrl: process.env.EXPO_WEB_BASE } : {}) },
   extra: {
     eas: { projectId: '906c7599-1e80-42a2-bbbc-bf3f414409fd' },
   },
