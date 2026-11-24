@@ -67,3 +67,4 @@ export { useGlide } from './native/useGlide';
 export { PlacePicker, type PlaceResult } from './native/PlacePicker';
 export { SchoolPicker } from './native/SchoolPicker';
 export { ShareLink } from './native/ShareLink';
+export { EtaTag, TripTrack } from './native/TripTrack';

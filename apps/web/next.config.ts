@@ -14,10 +14,11 @@ const csp = (scripts: string) => [
   // 'wasm-unsafe-eval': the web copies of the apps at /try draw with Skia, which is WebAssembly.
   `script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval' ${scripts}`.trim(),
   "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob:",
+  // v24: drivers' paper previews on the admin page come from our Supabase storage (2-minute links).
+  `img-src 'self' data: blob: ${SUPA}`,
   "font-src 'self'",
   // open-meteo: the apps' rain mode (the web copies at /try) checks Karachi's weather.
-  `connect-src 'self' ${SUPA} ${SUPA.replace(/^https:/, 'wss:')} ${TURNSTILE} https://api.open-meteo.com${LOCAL}`,
+  `connect-src 'self' ${SUPA} ${SUPA.replace(/^https:/, 'wss:')} ${TURNSTILE} https://api.open-meteo.com https://tiles.openfreemap.org https://photon.komoot.io${LOCAL}`,
   `frame-src ${TURNSTILE}`,
   "frame-ancestors 'none'",
   "object-src 'none'",

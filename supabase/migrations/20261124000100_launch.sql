@@ -469,3 +469,32 @@ language sql stable security definer set search_path = '' as $$
 $$;
 revoke all on function public.admin_doc_path_ok(uuid, text) from public, anon, authenticated;
 grant execute on function public.admin_doc_path_ok(uuid, text) to service_role;
+
+-- The team's school list work: schools people added (to check, rename, or give a short link and a pilot goal).
+create or replace function public.admin_schools_pending()
+returns table (id uuid, name text, area text, added_at timestamptz, children int)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  if not private.is_admin() then raise exception 'not_admin'; end if;
+  return query select s.id, s.name, s.area, s.created_at, (select count(*)::int from public.children c where c.school_id = s.id)
+    from public.schools s where not s.verified order by s.created_at desc;
+end $$;
+create or replace function public.admin_save_school(p_id uuid, p_name text, p_area text, p_verified boolean, p_short text default null, p_goal int default null) returns void
+language plpgsql security definer set search_path = '' as $$
+begin
+  if not private.is_admin() then raise exception 'not_admin'; end if;
+  update public.schools set name = btrim(p_name), area = nullif(btrim(coalesce(p_area, '')), ''), verified = p_verified,
+    short = nullif(lower(btrim(coalesce(p_short, ''))), ''), pilot_goal = p_goal
+  where id = p_id;
+end $$;
+-- Every school with a pilot goal or a short link, and where its count stands (the admin's school pilots).
+create or replace function public.admin_school_pilots()
+returns table (short text, name text, goal int, families int)
+language plpgsql stable security definer set search_path = '' as $$
+begin
+  if not private.is_admin() then raise exception 'not_admin'; end if;
+  return query select s.short, p.name, p.goal, p.families from public.schools s, lateral public.school_progress(s.short) p
+    where s.short is not null and s.verified order by p.families desc;
+end $$;
+revoke all on function public.admin_schools_pending(), public.admin_save_school(uuid, text, text, boolean, text, int), public.admin_school_pilots() from public, anon;
+grant execute on function public.admin_schools_pending(), public.admin_save_school(uuid, text, text, boolean, text, int), public.admin_school_pilots() to authenticated;

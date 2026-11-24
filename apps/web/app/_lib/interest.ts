@@ -64,3 +64,14 @@ export function countHit(ev: SiteEvent, page: string): void {
     /* counting is best effort */
   }
 }
+
+/** v24: a school's pilot count for pohnch.pk/s/<short> (server side, cached a minute). Null when unknown. */
+export async function schoolProgress(short: string): Promise<{ name: string; goal: number; families: number } | null> {
+  try {
+    const r = await fetch(`${base()}?school=${encodeURIComponent(short)}`, { next: { revalidate: 60 } } as RequestInit);
+    if (!r.ok) return null;
+    return (await r.json()) as { name: string; goal: number; families: number };
+  } catch {
+    return null;
+  }
+}

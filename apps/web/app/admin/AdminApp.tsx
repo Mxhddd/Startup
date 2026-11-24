@@ -12,6 +12,7 @@ import { useCallback, useEffect, useMemo, useState, type CSSProperties, type Rea
 import { Turnstile } from '../_lib/Turnstile';
 import { asGrowth, growthRows, type Growth } from './growth';
 import { welcomeLink } from './whatsapp';
+import { DriverPapers, Pipeline, SchoolPilots, SchoolsQueue } from './Launch';
 
 type Stats = { days: number; trips: number; tripsTracked: number; familiesActive: number; familiesWithAlerts: number; alertsSent: number; alertsFailed: number };
 type VanRow = { van_id: string; van_name: string; school_name: string; plate: string | null; driver_name: string; driver_phone: string | null; verified_at: string | null; switched_off_at: string | null; riders: number; waiting: number };
@@ -484,6 +485,7 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
       ) : null}
 
       <SectionHead id="sec-ops" title={t('admin.nav.ops')} hint={t('admin.ov.opsHint')} />
+      <DriverPapers supabase={supabase} t={t} api={(a, b) => api(a as never, b)} onVerified={load} />
       <h2 style={sectionTitle}>{t('admin.queue.title')}</h2>
       <p style={{ margin: 0, color: colors.ink2 }}>{t('admin.queue.hint')}</p>
       {queue.length === 0 ? <p style={{ margin: 0 }}>{t('admin.queue.empty')}</p> : null}
@@ -528,6 +530,9 @@ function Dashboard({ supabase, session, url, t }: { supabase: SupabaseClient; se
       <V12 supabase={supabase} vans={vans} api={api} t={t} />
 
       <SectionHead id="sec-people" title={t('admin.nav.people')} hint={t('admin.ov.peopleHint')} />
+      <SchoolPilots supabase={supabase} t={t} />
+      <Pipeline supabase={supabase} t={t} />
+      <SchoolsQueue supabase={supabase} t={t} />
       <Interested supabase={supabase} t={t} />
 
       <SectionHead id="sec-growth" title={t('admin.nav.growth')} />

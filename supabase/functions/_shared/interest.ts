@@ -1,4 +1,5 @@
 // The `interest` Edge Function's logic (website "Join the pilot"), kept free of Deno so it can be tested.
+//  GET  ?school=bcp          -> { name, goal, families } (a school's pilot count, v24)
 //  GET  ?summary=1           -> { areas: {gulshan: 12}, meter: {gulshan: {f,d,s,m}}, proof: null | {vans, trips, alerts} } (cached 5 min)
 //  POST {kind:'join', ...}    -> 200 {ok:true} | 400 {error:field} | 403 {error:'human'} | 429 {error:'limited'} | 503 {error:'busy'}
 //  POST {kind:'doubt', n}     -> 200 {ok:true} (counts one opening of honest answer n)
@@ -95,6 +96,15 @@ export async function handleInterest(method: string, url: URL, headers: Headers,
   const reply = (status: number, body: unknown, extra: Record<string, string> = {}): Reply => ({ status, body, headers: { ...cors, ...extra } });
   if (method === 'OPTIONS') return reply(204, null);
   const now = (deps.now ?? Date.now)();
+  // v24: a school's pilot count for pohnch.pk/s/<short>: its name, the goal and families so far (a number only).
+  if (method === 'GET' && url.searchParams.has('school')) {
+    const short = (url.searchParams.get('school') ?? '').toLowerCase();
+    if (!/^[a-z0-9-]{2,20}$/.test(short)) return reply(400, { error: 'bad_school' });
+    const { data, error } = await deps.rpc('school_progress', { p_short: short });
+    const row = (data as { name: string; goal: number; families: number }[] | null)?.[0];
+    if (error || !row) return reply(404, { error: 'no_school' });
+    return reply(200, row, { 'cache-control': 'public, max-age=60' });
+  }
   if (method === 'GET' && url.searchParams.has('summary')) {
     if (!summaryCache || now - summaryCache.at > SUMMARY_MS) {
       const { data, error } = await deps.rpc('interest_summary');

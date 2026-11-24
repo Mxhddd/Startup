@@ -10,7 +10,7 @@
 // - When a step happens while you watch, its moment plays in the head (a ring or a star burst).
 import { ApiError, arrivalClock, childPlace, homeState, newMoment, waitClock, type MomentStep } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
-import { AbsentChip, AppText, RouteRibbon, StarSpinner, ArchAvatar, ArchShape, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
+import { AbsentChip, AppText, RouteRibbon, StarSpinner, ArchAvatar, ArchShape, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, SectionCaption, Shimmer, TapButton, TimelineEvent, EtaTag, TripTrack } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { View } from 'react-native';
@@ -194,22 +194,39 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
   // v9: how far along the road to your stop the van is (the same measure as the lock-screen bar).
   const startedAt = p.running ? Date.parse(p.running.started_at) : 0;
   const route = p.eta === 'door' ? 1 : typeof p.eta === 'number' && startedAt ? Math.min(1, Math.max(0.04, (p.now - startedAt) / (p.now + p.eta * 60_000 - startedAt))) : 0;
-  const full = counting ? (
-    <View style={{ gap: 10 }}>
-      {/* v12: tap the minutes to hear them. */}
-      <PressableScale accessibilityRole="button" accessibilityLabel={t('eta.hear')} haptic="tick" scaleTo="chip" testID="hear-eta"
-        onPress={() => sayAloud(p.eta === 'door' ? t('eta.say.door', { name }) : t('eta.say', { name, min: p.eta as number }), lang)}>
-        <EtaPill minutes={p.eta as number | 'door'} to="home" stale={stale} lead={t(`parent.place.${place}`, { name })} clock={typeof p.eta === 'number' && !stale ? arrivalClock(p.now, p.eta) : undefined} />
-      </PressableScale>
-      <LiquidProgress value={route} color={stale ? colors.ink2 : colors.neel} testID="route-progress" />
+  // v24 (the Beaconhouse demo look): one line from home to school with the van on it, and the big kesar
+  // minutes tag. Before pick-up the van rides towards home (the first 40%); after, towards school.
+  const pickedAt = items.find((i) => i.step === childStep && i.at)?.at;
+  const atSchool = items.some((i) => i.step === 'reached_school' && i.at);
+  const sinceUp = pickedAt ? Math.max(0, p.now - Date.parse(pickedAt)) : 0;
+  const toSchool = atSchool ? 1 : pickedAt && typeof p.schoolEta === 'number' ? Math.min(0.97, sinceUp / (sinceUp + p.schoolEta * 60_000)) : 0.05;
+  const track = !live ? 0 : childDone ? (p.kind === 'morning' ? 0.4 + 0.6 * toSchool : 1) : 0.4 * route;
+  const head = (title: string, sub: string | null, tag: { value: string; label?: string; done?: boolean } | null) => (
+    <View style={{ gap: 6 }}>
+      <View style={{ flexDirection: row, alignItems: 'flex-start', gap: 12 }}>
+        <View style={{ flex: 1 }}>
+          <AppText variant="title" style={{ fontSize: 24, lineHeight: 34 }} numberOfLines={2}>{title}</AppText>
+          {sub ? <AppText bold color={colors.ink2} numberOfLines={1}>{sub}</AppText> : null}
+        </View>
+        {tag ? <EtaTag value={tag.value} label={tag.label} done={tag.done} /> : null}
+      </View>
+      {live ? <TripTrack progress={track} stale={stale} /> : null}
     </View>
+  );
+  const by = [p.driverName ?? p.van?.name, p.van?.plate].filter(Boolean).join(' · ');
+  const full = counting ? (
+    <PressableScale accessibilityRole="button" accessibilityLabel={t('eta.hear')} haptic="tick" scaleTo="chip" testID="hear-eta"
+      onPress={() => sayAloud(p.eta === 'door' ? t('eta.say.door', { name }) : t('eta.say', { name, min: p.eta as number }), lang)}>
+      {head(t(`parent.place.${place}`, { name }), by || null, p.eta === 'door' ? { value: t('eta.door') } : { value: `${p.eta as number}`, label: t('min.short') })}
+    </PressableScale>
+  ) : live ? (
+    head(t(`parent.place.${place}`, { name }), by || null, atSchool ? { value: '✓', done: true } : typeof p.schoolEta === 'number' ? { value: `${p.schoolEta}`, label: t('min.short') } : null)
   ) : (
     <View>
-      <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{live ? t('parent.timeline.title') : name}</AppText>
-      <AppText variant="display" style={{ fontSize: 30 }}>{live ? t(`parent.place.${place}`, { name }) : offToday ? t('parent.dayOff.today') : t('parent.idle.title')}</AppText>
-      {live && p.schoolEta !== null ? <AppText bold color={colors.ink2}>{t('parent.schoolEta', { n: p.schoolEta })}</AppText> : null}
-      {!live && offToday ? <AppText bold color={colors.kesarText}>{offBy}</AppText> : !live && nextLine ? <AppText variant="secondary">{nextLine}</AppText> : null}
-      {!live && offNote ? <AppText bold color={colors.kesarText}>{offNote}</AppText> : null}
+      <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{name}</AppText>
+      <AppText variant="display" style={{ fontSize: 30 }}>{offToday ? t('parent.dayOff.today') : t('parent.idle.title')}</AppText>
+      {offToday ? <AppText bold color={colors.kesarText}>{offBy}</AppText> : nextLine ? <AppText variant="secondary">{nextLine}</AppText> : null}
+      {offNote ? <AppText bold color={colors.kesarText}>{offNote}</AppText> : null}
     </View>
   );
 
