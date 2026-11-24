@@ -293,7 +293,7 @@ export function RunScreen(p: RunScreenProps) {
             <AppText variant="small" bold color={colors.ink2}>{t('driver.trip.later')}</AppText>
             <ScrollView style={{ flexGrow: 0 }} contentContainerStyle={{ gap: 8, paddingBottom: 4 }}>
               {rest.map((g, i) => (
-                <ChildRow key={g.stopId ?? `none-${i}`} index={i} testID={`stop-${p.groups.indexOf(g)}`} names={g.children.map((c) => c.firstName)} stop={g.stopId ? g.label : t('driver.trip.noStop')}
+                <ChildRow key={g.stopId ?? `none-${i}`} index={i} order={stopOf(g.stopId)?.position} testID={`stop-${p.groups.indexOf(g)}`} names={g.children.map((c) => c.firstName)} stop={g.stopId ? g.label : t('driver.trip.noStop')}
                   step={step} state={g.state} onTap={() => tapGroup(g)} />
               ))}
             </ScrollView>

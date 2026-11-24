@@ -3,7 +3,7 @@
 // with how far it is. The count rolls when a stop is done; the live dot breathes.
 import { useEffect } from 'react';
 import { View } from 'react-native';
-import Animated, { Easing, FadeInUp, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
+import Animated, { LinearTransition, Easing, FadeInUp, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { useLang } from '../lang';
 import { durations } from '../motion';
 import { colors, radius } from '../theme';
@@ -105,6 +105,10 @@ export function TripHeader({
           {t('trip.progress', { done, total })}
         </AppText>
       )}
+      {/* v24 (the demo): how much of the run is done, a kesar bar on the neel card. */}
+      <View testID="trip-progress" style={{ height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.15)', overflow: 'hidden', marginTop: 4, flexDirection: row }}>
+        <Animated.View layout={LinearTransition.springify().damping(22).stiffness(200)} style={{ width: `${total > 0 ? Math.round((done / total) * 100) : 0}%`, backgroundColor: colors.kesar, borderRadius: 3 }} />
+      </View>
     </Animated.View>
   );
 }
