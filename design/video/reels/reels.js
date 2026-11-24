@@ -155,4 +155,26 @@ const REELS = {
     ] },
     { t: 'end', dur: 2.6 },
   ] },
+  // v3 fast cuts (24 Nov analytics: people left at 4-7 s, before the payoff). The answer is on screen from
+  // the first frame, every caption is there from frame 1, and each reel is under 10 seconds.
+  gate_fast: { title: 'Class group at 7 AM (fast cut)', scenes: [
+    { t: 'chat', dur: 4.4, cap: 'every class group at 7 AM 😭', group: 'Class 3-B Ammis 💛', unread: 47, from: 430, to: 438, msgs: [
+      ['Ayesha', 'Van aa gayi kisi ki?', '#C2185B'], ['Sana', 'Nahi abhi tak 😩', '#1F5E54'], ['Hina', 'Uncle phone nahi utha rahe', '#7A5410'],
+      ['Rabia', 'Kal bhi late thi 🙃', '#3B3F9A'], ['Sana', '5 minute = 25 minute 😂', '#1F5E54'],
+    ] },
+    { t: 'lock', dur: 2.6, cap: 'or… just this 👇', time: '7:12', notes: [["Sara got in the van ✓", '7:12 · Van 1'], ['Sara reached school', '7:41']] },
+    { t: 'end', dur: 2.0, bio: 'link in bio · pohnch.pk' },
+  ] },
+  calling_fast: { title: 'Calling Van Uncle (fast cut)', scenes: [
+    { t: 'call', dur: 3.8, cap: 'calling Van Uncle at 7:10 AM 📵', name: 'Van Uncle 🚐', calls: 5, from: 430, to: 440 },
+    { t: 'lock', dur: 2.6, cap: 'he tapped once. you got this 👇', time: '7:12', notes: [['Hamza got in the van ✓', 'Uncle tapped once, at the stop']] },
+    { t: 'end', dur: 2.0, line: 'Van Uncle taps once. You stop calling.', bio: 'free for drivers · link in bio' },
+  ] },
+  dict_fast: { title: 'Van Uncle dictionary (fast cut)', scenes: [
+    { t: 'dict', dur: 5.6, cap: 'Van Uncle dictionary 📖 save this', rows: [
+      ['"5 minute"', '25 minute'], ['"Bas nikal gaya"', 'chai ka aakhri ghoont'], ['"Raste mein hoon"', 'abhi ghar pe hai'],
+    ] },
+    { t: 'lock', dur: 2.2, cap: 'real minutes, live 👇', time: '7:06', notes: [['The van is 12 min away', 'live on the map · Van 1']] },
+    { t: 'end', dur: 2.0, bio: 'tag the uncle who says "5 minute" 😂' },
+  ] },
 };

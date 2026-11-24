@@ -137,3 +137,32 @@ them (privacy, almost certainly), and what you changed. Real, specific lessons d
 - Reply to every comment in the first hour.
 - DM 5 Karachi meme or mom pages a week offering a free Collab Reel ("Van Uncle dictionary" works for
   any of them).
+
+## 8. Week 1 results (pulled 24 Nov evening)
+
+| Target (for 5 Dec) | Now | On track? |
+|---|---|---|
+| A Reel above 5,000 views | best new Reel 289 views (chutti) | No |
+| 300 Instagram followers | 50 (was 51) | No |
+| 100 sign-ups on /app or /bcp | /app 18 visits, /bcp under 3 | No |
+
+What the numbers say:
+- **The new animated Reels reach 128–207 people each and bring 0 follows.** The 17 Nov launch Reel still leads
+  (889 reach, 12 follows): it was the account's first post, longer (34 s) and had music people know.
+- **People leave at 4–7 seconds of a 16–17 second Reel** (24–41% watched), before Pohnch appears. Fix: the
+  answer on screen from the first frame and under 10 seconds. Fast cuts made: `gate_fast`, `calling_fast`,
+  `dict_fast` (pohnch.pk/media/v2/).
+- **Distribution, not content, is the gap.** Instagram bio link taps: 0 (the bio still says pohnch.pk, not
+  pohnch.pk/links). Facebook Page: 0 followers, image posts 0 views. TikTok: nothing posted from the phone.
+  WhatsApp Status and parent-group shares: not done.
+- **LinkedIn personal is steady** (~400 impressions a week) and is the right channel for schools.
+
+Changes from 25 Nov:
+1. Every Reel under 10 s, payoff first. Replace the queued long Reels with fast cuts as they come up.
+2. Two phone-shot Reels a week by you (no acting): the school gate at 7:10, a van passing, your own
+   voice-over or just text. Real footage beats animation for a 50-follower account.
+3. Post Reels from the Instagram app on your phone (not the computer) so you can add a trending sound
+   and use "Trial reels" (shown only to non-followers).
+4. The Beaconhouse circular is now the biggest lever: 50 families there = a pilot. Every post should point to
+   pohnch.pk/bcp once the school has shared it (not before: don't name the school publicly without its OK).
+5. Stop posting images to the Facebook Page; share Reels from your own profile and into parent groups.
