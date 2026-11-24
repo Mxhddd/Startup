@@ -4,7 +4,7 @@
 // 3. Call the matching database function, which checks their role (supabase/migrations/..._actions.sql).
 // Logs say only which action ran and how it ended: never tokens, phone numbers or children's names.
 import { BadInput, bool, date, email, isoTime, num, oneOf, optionalUuid, phone, uuid, uuids } from './validate.ts';
-import { byteaHex, hashToken, isInviteToken, newInviteToken } from './tokens.ts';
+import { byteaHex, hashToken, isInviteToken, newInviteCode, newInviteToken, normalizeInviteCode } from './tokens.ts';
 import type { DayOffJob, DriverJob, NoticePush, NotifyJob } from './notify.ts';
 import type { PushStep } from './push.ts';
 
@@ -26,6 +26,10 @@ export type Deps = {
   /** Tells the van's families about a whole-van day off (notify.ts). Optional, like notify. */
   dayOff?: (job: DayOffJob) => Promise<void>;
   live?: (job: { tripId: string; step: PushStep | null; van: { lat: number; lng: number; speed: number | null } | null }) => Promise<void>;
+  /** v24: a short-lived link to one of a driver's papers (private bucket), and deleting them after verification. */
+  signedDocUrl?: (path: string) => Promise<string>;
+  removeDocs?: (paths: string[]) => Promise<void>;
+  newCode?: () => string;
 };
 
 type Body = Record<string, unknown>;
@@ -61,10 +65,20 @@ async function call(deps: Deps, fn: string, args: Record<string, unknown>): Prom
   return data;
 }
 
-async function inviteLink(deps: Deps, make: (hashHex: string) => Promise<unknown>): Promise<{ url: string }> {
+async function inviteLink(deps: Deps, make: (hashHex: string, codeHashHex: string) => Promise<unknown>): Promise<{ url: string; code: string }> {
   const token = (deps.newToken ?? newInviteToken)();
-  await make(byteaHex(await hashToken(token)));
-  return { url: `${deps.siteUrl.replace(/\/$/, '')}/i/${token}` };
+  const code = (deps.newCode ?? newInviteCode)();
+  await make(byteaHex(await hashToken(token)), byteaHex(await hashToken(code)));
+  // The code is shown as ABCD-EFGH; typing it with or without the dash works.
+  return { url: `${deps.siteUrl.replace(/\/$/, '')}/i/${token}`, code: `${code.slice(0, 4)}-${code.slice(4)}` };
+}
+
+/** The stored hash for an invite given as a link token or a typed code. */
+async function inviteHash(body: Record<string, unknown>): Promise<string> {
+  if (isInviteToken(body.token)) return byteaHex(await hashToken(body.token));
+  const code = normalizeInviteCode(body.code);
+  if (code) return byteaHex(await hashToken(code));
+  throw new BadInput('token');
 }
 
 export const actions: Record<string, Action> = {
@@ -123,25 +137,29 @@ export const actions: Record<string, Action> = {
   },
   'invite.van': async ({ actor, body, deps }) => {
     const van = uuid(body, 'vanId');
-    return inviteLink(deps, (hash) => call(deps, 'create_van_invite', { p_actor: actor, p_van: van, p_token_hash: hash }));
+    return inviteLink(deps, (hash, codeHash) => call(deps, 'create_van_invite', { p_actor: actor, p_van: van, p_token_hash: hash, p_code_hash: codeHash }));
   },
   'invite.driver': async ({ actor, body, deps }) => {
     const child = uuid(body, 'childId');
-    return inviteLink(deps, (hash) => call(deps, 'create_driver_invite', { p_actor: actor, p_child: child, p_token_hash: hash }));
+    return inviteLink(deps, (hash, codeHash) => call(deps, 'create_driver_invite', { p_actor: actor, p_child: child, p_token_hash: hash, p_code_hash: codeHash }));
+  },
+  // v24: a typed code: is it a van's invite (a parent joins) or a parent's "invite my driver"?
+  'invite.kind': async ({ body, deps }) => {
+    const kind = (await call(deps, 'invite_kind_of', { p_hash: await inviteHash(body) })) as string | null;
+    if (!kind) throw new DbError('invite_invalid');
+    return { kind };
   },
   // A parent joins a van with one child, or a driver takes a parent's request into their van.
   // v9: what a van invite is for (van, school, driver's name, verified), before joining it.
   'invite.peek': async ({ body, deps }) => {
-    if (!isInviteToken(body.token)) throw new BadInput('token');
-    const rows = (await call(deps, 'peek_van_invite', { p_token_hash: byteaHex(await hashToken(body.token)) })) as
+    const rows = (await call(deps, 'peek_van_invite', { p_token_hash: await inviteHash(body) })) as
       { van_name: string; school_name: string; driver_name: string; verified: boolean }[] | null;
     const r = rows?.[0];
     if (!r) throw new DbError('invite_invalid');
     return { vanName: r.van_name, schoolName: r.school_name, driverName: r.driver_name, verified: r.verified };
   },
   'invite.accept': async ({ actor, body, deps }) => {
-    if (!isInviteToken(body.token)) throw new BadInput('token');
-    const hash = byteaHex(await hashToken(body.token));
+    const hash = await inviteHash(body);
     const child = optionalUuid(body, 'childId');
     if (child) {
       const membershipId = (await call(deps, 'accept_van_invite', { p_actor: actor, p_token_hash: hash, p_child: child })) as string;
@@ -226,8 +244,22 @@ export const actions: Record<string, Action> = {
   'admin.verify': async ({ actor, body, deps }) => {
     const vanId = uuid(body, 'vanId');
     await call(deps, 'verify_van', { p_actor: actor, p_van: vanId });
+    // v24: the papers have done their job; delete the files and forget where they were.
+    const paths = ((await call(deps, 'van_document_paths', { p_van: vanId })) as string[] | null) ?? [];
+    if (paths.length && deps.removeDocs) {
+      await deps.removeDocs(paths);
+      await call(deps, 'forget_van_documents', { p_van: vanId });
+    }
     if (deps.notifyDriver) await deps.notifyDriver({ what: 'verified', vanId });
     return { ok: true };
+  },
+  // v24: a short-lived link (2 minutes) to one of a driver's papers, for the team's check.
+  'admin.docUrl': async ({ actor, body, deps }) => {
+    const path = typeof body.path === 'string' && /^[0-9a-f-]{36}\/[a-z_]+-[0-9a-f-]{36}\.(jpg|jpeg|png|webp|pdf)$/.test(body.path) ? body.path : null;
+    if (!path) throw new BadInput('path');
+    if (!(await call(deps, 'admin_doc_path_ok', { p_actor: actor, p_path: path }))) throw new DbError('not_admin');
+    if (!deps.signedDocUrl) throw new DbError('unavailable');
+    return { url: await deps.signedDocUrl(path) };
   },
   'admin.endTrip': async ({ actor, body, deps }) => {
     await call(deps, 'admin_end_trip', { p_actor: actor, p_trip: uuid(body, 'tripId') });
@@ -255,7 +287,8 @@ const DAY = 86400;
 export const LIMITS: Record<string, [max: number, windowS: number]> = {
   position: [1500, HOUR], tap: [600, HOUR], 'tap.undo': [200, HOUR], late: [30, HOUR],
   'trip.start': [20, HOUR], 'trip.end': [40, HOUR],
-  'invite.van': [20, DAY], 'invite.driver': [20, DAY], 'invite.accept': [30, HOUR], 'invite.peek': [60, HOUR],
+  'invite.van': [20, DAY], 'invite.driver': [20, DAY], 'invite.accept': [30, HOUR], 'invite.peek': [60, HOUR], 'invite.kind': [30, HOUR],
+  'admin.docUrl': [600, HOUR],
   'membership.decide': [200, HOUR], 'absence.set': [60, HOUR], 'absence.clear': [60, HOUR], 'dayoff.set': [30, DAY],
   'family.add': [10, DAY], 'family.removeMember': [20, DAY], 'account.delete': [5, DAY], 'van.leave': [20, HOUR], 'rider.remove': [60, HOUR],
   'admin.verify': [300, HOUR], 'admin.switchOff': [300, HOUR], 'admin.endTrip': [300, HOUR],
@@ -277,18 +310,32 @@ export function jwtAal(jwt: string): string | null {
   }
 }
 
-const json = (status: number, body: unknown) =>
-  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store' } });
+// v24: the website (pohnch.pk/try, the admin page) calls this from the browser, so it answers with CORS
+// headers for our own sites only. Phones don't send an Origin and aren't affected.
+const ORIGINS = /^https:\/\/(www\.)?pohnch\.pk$|^https:\/\/[a-z0-9-]+\.vercel\.app$|^http:\/\/localhost(:\d+)?$/;
+export function corsHeaders(origin: string | null): Record<string, string> {
+  if (!origin || !ORIGINS.test(origin)) return {};
+  return {
+    'access-control-allow-origin': origin,
+    'access-control-allow-methods': 'POST, OPTIONS',
+    'access-control-allow-headers': 'authorization, content-type, apikey, x-client-info',
+    'access-control-max-age': '86400',
+    vary: 'origin',
+  };
+}
+const json = (status: number, body: unknown, extra: Record<string, string> = {}) =>
+  new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...extra } });
 
 /** POST /app/<action> with a JSON body and "Authorization: Bearer <login token>". */
 export async function handle(req: Request, deps: Deps): Promise<Response> {
   const name = new URL(req.url).pathname.split('/').filter(Boolean).pop() ?? '';
   const action = actions[name];
+  const cors = corsHeaders(req.headers.get('origin'));
   const done = (status: number, body: unknown) => {
     deps.log(`app ${action ? name : 'unknown'} ${status}`);
-    return json(status, body);
+    return json(status, body, cors);
   };
-  if (req.method === 'OPTIONS') return new Response(null, { status: 204 });
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
   if (req.method !== 'POST') return done(405, { error: 'method_not_allowed' });
   if (!action) return done(404, { error: 'unknown_action' });
 

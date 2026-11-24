@@ -4,7 +4,7 @@
 import { karachiDate, type EventRow, type RiderRow, type StopRow } from '@pohnch/core';
 import { backend } from './backend';
 
-export type Van = { id: string; name: string; school_name: string; plate: string | null; verified_at: string | null; switched_off_at: string | null };
+export type Van = { id: string; name: string; school_name: string | null; plate: string | null; verified_at: string | null; switched_off_at: string | null };
 export type Stop = StopRow & { lat: number; lng: number; morning_time: string | null; afternoon_time: string | null };
 export type Request = { membershipId: string; childId: string; firstName: string; lat: number | null; lng: number | null };
 export type Trip = { id: string; kind: 'morning' | 'afternoon'; status: 'running' | 'ended' | 'cancelled'; is_practice: boolean; started_at: string };
@@ -35,14 +35,49 @@ export async function myVan(): Promise<Van | null> {
   return check(await supabase.from('vans').select('id, name, school_name, plate, verified_at, switched_off_at').eq('driver_id', uid).maybeSingle()) as Van | null;
 }
 
-export async function createVan(v: { name: string; schoolName: string; plate: string | null }): Promise<Van> {
+/** v24: a van is its name and plate; its schools come from its school stops (a van can serve several). */
+export async function createVan(v: { name: string; plate: string }): Promise<Van> {
   const { supabase } = db();
   const uid = (await supabase.auth.getUser()).data.user?.id;
-  return check(await supabase.from('vans').insert({ driver_id: uid, name: v.name, school_name: v.schoolName, plate: v.plate }).select().single()) as Van;
+  return check(await supabase.from('vans').insert({ driver_id: uid, name: v.name, plate: v.plate }).select().single()) as Van;
 }
 
-export async function updateVan(id: string, v: { name: string; schoolName: string; plate: string | null }): Promise<void> {
-  check(await db().supabase.from('vans').update({ name: v.name, school_name: v.schoolName, plate: v.plate }).eq('id', id));
+export async function updateVan(id: string, v: { name: string; plate: string }): Promise<void> {
+  check(await db().supabase.from('vans').update({ name: v.name, plate: v.plate }).eq('id', id));
+}
+
+/** A school drop-off stop; the school joins the van's list. */
+export async function addSchoolStop(vanId: string, s: { schoolId: string; lat: number; lng: number }): Promise<void> {
+  check(await db().supabase.rpc('add_school_stop', { p_van: vanId, p_school: s.schoolId, p_lat: s.lat, p_lng: s.lng }));
+}
+
+/** The schools this van serves. */
+export async function vanSchools(vanId: string): Promise<{ id: string; name: string }[]> {
+  const rows = check(await db().supabase.from('van_schools').select('school_id, schools(name)').eq('van_id', vanId)) as unknown as { school_id: string; schools: { name: string } | null }[];
+  return rows.map((r) => ({ id: r.school_id, name: r.schools?.name ?? '' }));
+}
+
+export type DocKind = 'cnic_front' | 'cnic_back' | 'licence' | 'van_registration';
+export const DOC_KINDS: DocKind[] = ['cnic_front', 'cnic_back', 'licence', 'van_registration'];
+export type DriverDoc = { kind: DocKind; status: 'pending' | 'approved' | 'rejected'; note: string | null; uploaded_at: string };
+
+/** The papers this driver has sent, and what the team said. */
+export async function myDocuments(vanId: string): Promise<DriverDoc[]> {
+  return (check(await db().supabase.from('driver_documents').select('kind, status, note, uploaded_at').eq('van_id', vanId)) ?? []) as DriverDoc[];
+}
+
+/** Uploads one paper to the private bucket (the driver's own folder) and tells the server. `file` is a
+ *  Blob (web) or the bytes read from the picked photo (phone). */
+export async function uploadDocument(vanId: string, kind: DocKind, file: Blob | ArrayBuffer, mime: string): Promise<void> {
+  const { supabase } = db();
+  const uid = (await supabase.auth.getUser()).data.user?.id;
+  if (!uid) throw Object.assign(new Error('not_logged_in'), { kind: 'auth' });
+  const ext = mime === 'application/pdf' ? 'pdf' : mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg';
+  const id = globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(16).padStart(8, '0')}-0000-4000-8000-${Math.random().toString(16).slice(2, 14).padEnd(12, '0')}`;
+  const path = `${uid}/${kind}-${id}.${ext}`;
+  const up = await supabase.storage.from('driver-docs').upload(path, file, { contentType: mime, upsert: false });
+  if (up.error) throw up.error;
+  check(await supabase.rpc('submit_driver_document', { p_van: vanId, p_kind: kind, p_path: path }));
 }
 
 export async function stopsOf(vanId: string): Promise<Stop[]> {
@@ -148,9 +183,11 @@ export const driverApi = {
   endTrip: (tripId: string) => db().api('trip.end', { tripId }),
   late: (tripId: string, reason: 'traffic' | 'breakdown' | 'roadClosed', clientId: string) => db().api('late', { tripId, reason, clientId }),
   undo: (clientId: string) => db().api('tap.undo', { clientId }),
-  inviteLink: (vanId: string) => db().api<{ url: string }>('invite.van', { vanId }),
-  /** A parent's "invite my driver" link: their child's request joins this driver's van. */
-  acceptFamilyInvite: (token: string, vanId: string) => db().api<{ membershipId: string }>('invite.accept', { token, vanId }),
+  /** v24: the link and a short code to type (for someone who installs the app first). */
+  inviteLink: (vanId: string) => db().api<{ url: string; code: string }>('invite.van', { vanId }),
+  /** A parent's "invite my driver" link or code: their child's request joins this driver's van. */
+  acceptFamilyInvite: (tokenOrCode: { token: string } | { code: string }, vanId: string) =>
+    db().api<{ membershipId: string }>('invite.accept', { ...tokenOrCode, vanId }),
   decide: (membershipId: string, approve: boolean, stopId: string | null) => db().api('membership.decide', { membershipId, approve, stopId }),
   dayOff: (vanId: string, date: string, off: boolean) => db().api('dayoff.set', { vanId, date, off }),
   removeRider: (membershipId: string) => db().api('rider.remove', { membershipId }),

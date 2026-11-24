@@ -292,3 +292,48 @@ describe('v20 security in the app function', () => {
     expect((await post('tap', tok('aal1'), {})).status).not.toBe(503);
   });
 });
+
+describe('v24: invite codes, CORS and drivers\' papers', () => {
+  it('an invite also gets a typed code; only its hash is stored, and it is never logged', async () => {
+    const { post, rpc, logs, deps } = setup({ data: 'invite-id' });
+    deps.newCode = () => 'ABCDEFGH';
+    const res = await post('invite.van', { vanId: VAN });
+    const body = (await res.json()) as { url: string; code: string };
+    expect(body.code).toBe('ABCD-EFGH');
+    const args = rpc.mock.calls.find(([fn]) => fn === 'create_van_invite')?.[1] as { p_code_hash: string };
+    expect(args.p_code_hash).toBe('\\x' + (await hashToken('ABCDEFGH')));
+    expect(logs.join(' ')).not.toContain('ABCD');
+  });
+
+  it('a typed code works with a dash, spaces or lower case', async () => {
+    const { post, rpc } = setup({ data: 'van' });
+    const res = await post('invite.kind', { code: 'abcd- efgh' });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ kind: 'van' });
+    const args = rpc.mock.calls.find(([fn]) => fn === 'invite_kind_of')?.[1] as { p_hash: string };
+    expect(args.p_hash).toBe('\\x' + (await hashToken('ABCDEFGH')));
+    expect((await setup().post('invite.kind', { code: 'O0O0' })).status).toBe(400);
+  });
+
+  it('answers our own websites with CORS headers, and nobody else', async () => {
+    const { deps } = setup();
+    const pre = await handle(new Request('https://x.supabase.co/functions/v1/app/invite.van', { method: 'OPTIONS', headers: { origin: 'https://www.pohnch.pk' } }), deps);
+    expect(pre.status).toBe(204);
+    expect(pre.headers.get('access-control-allow-origin')).toBe('https://www.pohnch.pk');
+    const evil = await handle(new Request('https://x.supabase.co/functions/v1/app/invite.van', { method: 'OPTIONS', headers: { origin: 'https://evil.example' } }), deps);
+    expect(evil.headers.get('access-control-allow-origin')).toBeNull();
+  });
+
+  it('verifying a van deletes the driver\'s papers', async () => {
+    const { deps, rpc } = setup();
+    rpc.mockImplementation(async (fn: string) => (fn === 'rate_hit' ? { data: true, error: null } : fn === 'van_document_paths' ? { data: ['a/licence-b.jpg'], error: null } : { data: null, error: null }));
+    const removed: string[][] = [];
+    deps.removeDocs = async (p) => { removed.push(p); };
+    const jwt = 'x.' + btoa(JSON.stringify({ aal: 'aal2' })) + '.y';
+    deps.userFromToken = async () => DRIVER;
+    const res = await handle(new Request('https://x.supabase.co/functions/v1/app/admin.verify', { method: 'POST', headers: { authorization: `Bearer ${jwt}` }, body: JSON.stringify({ vanId: VAN }) }), deps);
+    expect(res.status).toBe(200);
+    expect(removed).toEqual([['a/licence-b.jpg']]);
+    expect(rpc.mock.calls.some(([fn]) => fn === 'forget_van_documents')).toBe(true);
+  });
+});

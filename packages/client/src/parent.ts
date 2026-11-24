@@ -36,17 +36,17 @@ export async function myChildren(): Promise<Child[]> {
   ) as Child[];
 }
 
-export async function addChild(c: { firstName: string; schoolName: string; lat: number; lng: number }): Promise<string> {
+export async function addChild(c: { firstName: string; schoolName: string; schoolId?: string | null; lat: number; lng: number }): Promise<string> {
   const { supabase } = db();
   const familyId = await ensureFamily();
-  const row = check(await supabase.from('children').insert({ family_id: familyId, first_name: c.firstName, school_name: c.schoolName }).select('id').single()) as { id: string };
+  const row = check(await supabase.from('children').insert({ family_id: familyId, first_name: c.firstName, school_name: c.schoolName, school_id: c.schoolId ?? null }).select('id').single()) as { id: string };
   await setHomePin(row.id, c.lat, c.lng);
   return row.id;
 }
 
 /** Renames a child or changes their school (row-level security: only their family can). */
-export async function updateChild(id: string, c: { firstName: string; schoolName: string }): Promise<void> {
-  check(await db().supabase.from('children').update({ first_name: c.firstName, school_name: c.schoolName }).eq('id', id));
+export async function updateChild(id: string, c: { firstName: string; schoolName: string; schoolId?: string | null }): Promise<void> {
+  check(await db().supabase.from('children').update({ first_name: c.firstName, school_name: c.schoolName, ...(c.schoolId !== undefined ? { school_id: c.schoolId } : {}) }).eq('id', id));
 }
 
 /** Removes a child and everything about them (their van place, chutti days and trip steps go too). */
@@ -187,13 +187,21 @@ export function watchVan(vanId: string, tripId: string | null, onChange: (what: 
   };
 }
 
+/** A 43-character link token, or else a typed code. */
+const inviteRef = (tokenOrCode: string, extra: Record<string, unknown> = {}) =>
+  /^[A-Za-z0-9_-]{43}$/.test(tokenOrCode) ? { token: tokenOrCode, ...extra } : { code: tokenOrCode, ...extra };
+
 export const parentApi = {
   setAbsence: (childId: string, date: string) => db().api('absence.set', { childId, date }),
   clearAbsence: (childId: string, date: string) => db().api('absence.clear', { childId, date }),
-  joinVan: (token: string, childId: string) => db().api<{ membershipId: string }>('invite.accept', { token, childId }),
-  /** v9: the van behind an invite link (name, school, driver, verified), for the join card. */
-  peekInvite: (token: string) => db().api<{ vanName: string; schoolName: string; driverName: string; verified: boolean }>('invite.peek', { token }),
-  inviteDriver: (childId: string) => db().api<{ url: string }>('invite.driver', { childId }),
+  /** Join with the link's token, or (v24) the short code typed in the app. */
+  joinVan: (token: string, childId: string) => db().api<{ membershipId: string }>('invite.accept', inviteRef(token, { childId })),
+  /** v9: the van behind an invite link or code (name, school, driver, verified), for the join card. */
+  peekInvite: (token: string) => db().api<{ vanName: string; schoolName: string; driverName: string; verified: boolean }>('invite.peek', inviteRef(token)),
+  /** v24: the link to send, and a short code the driver can type in their app. */
+  inviteDriver: (childId: string) => db().api<{ url: string; code: string }>('invite.driver', { childId }),
+  /** v24: is a typed code a van's invite or someone's "invite my driver"? */
+  inviteKind: (code: string) => db().api<{ kind: 'van' | 'driver' }>('invite.kind', { code }),
   /** v21: a mobile number, or a Gmail address (someone who signs in with Google). */
   addFamilyMember: (who: string) => db().api('family.add', who.includes('@') ? { email: who.trim() } : { phone: who }),
   leaveVan: (childId: string) => db().api('van.leave', { childId }),

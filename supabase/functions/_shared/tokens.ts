@@ -21,6 +21,21 @@ export function isInviteToken(s: unknown): s is string {
   return typeof s === 'string' && /^[A-Za-z0-9_-]{43}$/.test(s);
 }
 
+// v24 invite codes: 8 letters/digits a person can type after installing the app (the link is lost through
+// the Play Store). No 0/O/1/I so it reads cleanly aloud. Stored only as its SHA-256, like the token.
+const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+export function newInviteCode(): string {
+  const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  return [...bytes].map((b) => CODE_ALPHABET[b % 32]).join(''); // 256 is a multiple of 32: every letter equally likely
+}
+/** "abcd-efgh " -> "ABCDEFGH"; returns null unless it is a well-formed code. */
+export function normalizeInviteCode(s: unknown): string | null {
+  if (typeof s !== 'string') return null;
+  const c = s.toUpperCase().replace(/[\s-]/g, '');
+  return /^[A-HJ-NP-Z2-9]{8}$/.test(c) ? c : null;
+}
+
 function toBase64Url(bytes: Uint8Array): string {
   let bin = '';
   for (const b of bytes) bin += String.fromCharCode(b);

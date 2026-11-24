@@ -11,3 +11,6 @@ export * as plans from './plans';
 export type { ChildPlan, BonusMonth } from './plans';
 export type { NearVan, FeeMonth, VanFee } from './stage2';
 export { rainNow, useRain } from './weather';
+export * as places from './places';
+export type { School, Place, LinkedInterest } from './places';
+export { DOC_KINDS, type DocKind, type DriverDoc } from './driver';

@@ -40,6 +40,12 @@ Deno.serve((req) =>
     notifyDriver: (job) => notifyDriver(job, { rpc, fetch, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined, log }),
     dayOff: (job) => notifyDayOff(job, { rpc, fetch, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined, log }),
     notifyNotice: (n) => notifyNotice(n, { rpc, fetch, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined, log }),
+    signedDocUrl: async (path) => {
+      const { data, error } = await server.storage.from('driver-docs').createSignedUrl(path, 120);
+      if (error || !data) throw new Error('sign_failed');
+      return data.signedUrl;
+    },
+    removeDocs: async (paths) => { await server.storage.from('driver-docs').remove(paths); },
     live: (job) => updateLiveActivities(job, { rpc, fetch, apns, log, expoAccessToken: Deno.env.get('EXPO_ACCESS_TOKEN') ?? undefined }),
   }),
 );
