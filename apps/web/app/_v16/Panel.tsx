@@ -28,6 +28,9 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
   const [area, setArea] = useState('');
   useEffect(() => { if (initialArea) setArea((cur) => cur || initialArea); }, [initialArea]);
   const [school, setSchool] = useState('');
+  // A school's own link (pohnch.pk/bcp) arrives as ?school=…, so every family from that circular counts
+  // toward that school's pilot; the parent can still edit it.
+  useEffect(() => { const q = new URLSearchParams(window.location.search).get('school'); if (q) setSchool((cur) => cur || q.slice(0, 80)); }, []);
   const [kids, setKids] = useState(1);
   const [driverPhone, setDriverPhone] = useState<'yes' | 'no' | 'unknown'>('unknown');
   const [whatsapp, setWhatsapp] = useState('');

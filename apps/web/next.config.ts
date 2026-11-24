@@ -37,6 +37,9 @@ const nextConfig: NextConfig = {
       { source: '/en/:path*', destination: '/:path*', permanent: true },
       // v22: the launch ad, shareable as pohnch.pk/ad (investor emails, WhatsApp).
       { source: '/ad', destination: '/media/pohnch-ad.mp4', permanent: false },
+      // Nov 2026: Beaconhouse PECHS's parent circular; the sign-up form opens with the school filled in.
+      { source: '/bcp', destination: '/?school=Beaconhouse%20PECHS#join', permanent: false },
+      { source: '/ur/bcp', destination: '/ur?school=Beaconhouse%20PECHS#join', permanent: false },
     ];
   },
   async rewrites() {
