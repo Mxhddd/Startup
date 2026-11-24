@@ -6,6 +6,29 @@ Decided November 2026; replaces "Pohnch Live, Rs 599, first month free, basic al
 - Built: the plan rules, prices and tests; the `billing` switch (everyone or one van); the server gate (no pushes, Live Activities or van data for unpaid children while billing is on); the Rs 99 first month once per phone and per seat (hashes only); the team's form to record payments taken outside the app; the driver's bonus and "not on Pohnch" mark; the money numbers.
 - Left (needs you first): register the company (SECP), NTN, bank account, Play Console payments profile; then Play Billing in the parent app (`expo-iap`) and a `billing` Edge Function that verifies purchases and calls `billing_record_payment`. Until then, keep `billing` off, or switch it on for one pilot van and record founding payments by hand.
 
+## Launch price (24 Nov 2026): Rs 199 for founding families
+
+The pilot schools' families (Beaconhouse PECHS first) and everyone at launch pay the **founding price: Rs 199 a month per child, locked for 12 months; brothers and sisters Rs 99**. The first month is the same Rs 199 (subsidised, never free). Set it per van on the admin Money panel (`founding` plan); the normal price stays Rs 349.
+
+What one child costs us each month, and what Rs 199 leaves:
+
+| | Rs a month |
+|---|---|
+| Login SMS (local gateway, about 2 codes) | about 5 |
+| Push, maps (Expo, OpenFreeMap) | 0 |
+| Driver bonus (only when 80% of trips are tracked) | 40 |
+| Payment fee (JazzCash/Easypaisa by hand, about 2%) | 4 |
+| **Left from Rs 199** | **about 145** |
+
+Fixed costs are about Rs 14,000 a month (Supabase Pro about Rs 7,000, Vercel about Rs 5,600, SMS minimum and domain about Rs 1,500), so about **95 paying children** cover them. 50 Beaconhouse families with about 60 children bring about Rs 8,700 a month.
+
+| Price | Left per child | Children to cover fixed costs |
+|---|---|---|
+| Rs 99 | about 47 | about 300 |
+| **Rs 199** | **about 145** | **about 95** |
+| Rs 249 | about 194 | about 70 |
+| Rs 349 (Play Billing, 15% fee) | about 247 | about 57 |
+
 ## Context
 
 The current model (`BRIEF.md`, and the stage 2 code in `supabase/migrations/20261104000400_stage2.sql` plus `apps/parent/src/app/plans.tsx`) works like this:

@@ -31,7 +31,7 @@ Out: GPS hardware, location outside a trip, location from the parent app, chat, 
 ## Stack
 
 - One repo (pnpm workspaces): `apps/parent` and `apps/driver` (Expo, React Native, Expo Router, TypeScript strict), `apps/web` (Next.js App Router), `packages/ui`, `packages/core` (shared logic and types), `packages/messages` (ur.json, en.json), `supabase/` (migrations, Edge Functions).
-- Maps: `react-native-maps`, brand-styled; the van marker animates between positions.
+- Maps: MapLibre (`@maplibre/maplibre-react-native` on phones, `maplibre-gl` on the web) with OpenFreeMap tiles, no API key, brand-styled; the van marker animates between positions. Address search by typing (Photon, OpenStreetMap), never the phone's location.
 - Driver location: `expo-location` background task (Android foreground service), every 5 s while moving, 30 s when stopped, nothing outside a trip.
 - Live Activity and widget: `expo-widgets` on iOS; an ongoing progress notification on Android.
 - Push: Expo push (APNs and FCM).

@@ -41,12 +41,13 @@ When a new build comes out, the same steps install it over the old one; nothing 
 ## The first visit to a driver (about 30 minutes, at pick-up or home time)
 
 1. Install the driver app together; log in with their number.
-2. Van: name ("Rafiq bhai ki van"), school, plate.
-3. Stops: walk through the route together and tap each stop on the map in order; rename them ("Block 13 gate").
-4. Check papers: CNIC, licence, van registration. Then mark the van verified (admin page, or in Supabase SQL: `update vans set verified_at = now() where id = '...'`).
-5. **Practice run** (Today > Practice): pretend children, nothing is sent. Let the driver tap every stop, undo once, and hold "reached school". Repeat until it feels easy.
-6. Families: tap "Share link" and send it to the van's WhatsApp group. Approve each family as requests come in, picking their stop.
-7. The first real trip the next morning: you ride along if you can, or watch the admin page.
+2. Van: name ("Rafiq bhai ki van") and number plate (required).
+3. Stops: walk through the route together; search the area or tap the map for each home stop, in order, and add each school as a school stop (a van can serve several schools).
+4. Papers: in the app, Get verified: photos of CNIC (both sides), licence and van registration, plus a WhatsApp number. Check them on the admin page (Driver papers) and approve; that marks the van verified and deletes the photos. Families can ask to join before this, but the driver approves them only after.
+5. Price: for Beaconhouse PECHS and other launch vans, set the founding price (Rs 199 a month, locked for 12 months, siblings Rs 99) on the admin page's Money panel for that van.
+6. **Practice run** (Today > Practice): pretend children, nothing is sent. Let the driver tap every stop, undo once, and hold "reached school". Repeat until it feels easy.
+7. Families: Invite families shows the link (Copy, WhatsApp, Share) and an 8-letter code; send both to the van's WhatsApp group. A parent who installs from the Play Store after tapping the link types the code. Approve each family as requests come in, picking their stop.
+8. The first real trip the next morning: you ride along if you can, or watch the admin page.
 
 ## Every school day
 

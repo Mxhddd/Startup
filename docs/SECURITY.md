@@ -7,6 +7,8 @@ What protects Pohnch, in plain words, and what to do if something goes wrong.
 - **Nobody logged out** can read anything from the database. Every table has row-level security; anonymous access is revoked everywhere.
 - **A parent** sees only their own children and their own van's trip. **A driver** sees only their van.
 - **The Pohnch team** (rows in `public.admins`) sees the admin data, but only from a session that passed **two steps**: the phone code and a code from an authenticator app (`private.is_admin()` requires `aal = 'aal2'`, migration `20261113000200_admin_two_step.sql`). Team actions through the `app` function need the same (`admin.*` actions return `needs_second_step`).
+- **Drivers' papers** (CNIC, licence, van registration) are in the private storage bucket `driver-docs`: each driver reads and writes only their own folder, and the team opens them through short-lived signed links (`admin.docUrl`, two-step login). They are deleted when the team verifies the van; only the verified date is kept.
+- **WhatsApp numbers** of Google sign-in accounts are in `contact_phones`: only the person and the team can read them, never a van's parents or driver.
 - **The website's public numbers** (`interest_summary()`) show only areas with **3 or more families**, as bands ("3–9", "10+"), never exact counts.
 
 ## The website (pohnch.pk)

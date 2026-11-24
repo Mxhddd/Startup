@@ -9,6 +9,7 @@ import { loadTextSize } from '../textSize';
 import { ArchWipeProvider, LaunchReveal, MorphProvider, setOrnament, useScreenOptions } from '@pohnch/ui/native';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
+import { AfterLogin } from '../components/AfterLogin';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { Fragment, useEffect, useState } from 'react';
@@ -104,6 +105,7 @@ function RootLayout() {
             <TripNotifications signedIn={configured && !!session} />
             <LocalAlerts signedIn={configured && !!session} />
           </ParentProvider>
+          <AfterLogin userId={configured ? (session?.user.id ?? null) : null} />
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
           <LaunchReveal />
         </LangProvider>

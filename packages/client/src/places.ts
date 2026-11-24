@@ -59,3 +59,14 @@ export async function linkMyInterest(): Promise<LinkedInterest | null> {
   const rows = check(await db().supabase.rpc('link_my_interest')) as LinkedInterest[] | null;
   return rows?.[0] ?? null;
 }
+
+/** Run once after each login: link any website sign-up with the same number (never blocks the app), and
+ *  say whether the team has a way to reach this person. Google sign-in accounts have no phone number,
+ *  so they are asked for a WhatsApp number once. */
+export async function afterLogin(): Promise<{ needsPhone: boolean }> {
+  await linkMyInterest().catch(() => null);
+  const { data } = await db().supabase.auth.getUser();
+  if (data.user?.phone) return { needsPhone: false };
+  const contact = await myContactPhone().catch(() => 'unknown');
+  return { needsPhone: !contact };
+}

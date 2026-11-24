@@ -8,6 +8,7 @@ import { LangProvider } from '@pohnch/ui';
 import { LaunchReveal, useScreenOptions } from '@pohnch/ui/native';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments } from 'expo-router';
+import { AfterLogin } from '../components/AfterLogin';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useSyncExternalStore } from 'react';
@@ -83,6 +84,7 @@ function RootLayout() {
             <Screens key={sun ? 'sun' : 'day'} />
           </DriverProvider>
           <DriverAlerts signedIn={configured && !!session} />
+          <AfterLogin userId={configured ? (session?.user.id ?? null) : null} />
           <AuthGate ready={ready} signedIn={!!session} configured={configured} />
           <LaunchReveal />
         </LangProvider>
