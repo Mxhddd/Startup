@@ -73,7 +73,7 @@ function WeekScore({ tracked, done }: { tracked: number; done: number }) {
 }
 
 export default function DriverToday() {
-  const { t, dir } = useLang();
+  const { t, dir, lang } = useLang();
   const insets = useSafeAreaInsets();
   const { configured } = useSession();
   const d = useDriver();
@@ -111,6 +111,10 @@ export default function DriverToday() {
   const childCount = d.riders.length;
   const offCount = d.run.groups.reduce((n, g) => n + g.children.filter((c) => c.state === 'absent').length, 0);
   const stopById = new Map(d.stops.map((s) => [s.id, s]));
+  const firstGroup = d.run.groups.find((g) => g.state === 'waiting') ?? null;
+  const firstStop = firstGroup?.stopId ? stopById.get(firstGroup.stopId) : undefined;
+  const firstTime = (d.run.kind === 'morning' ? firstStop?.morning_time : firstStop?.afternoon_time)?.slice(0, 5).replace(/^0/, '');
+  const doneCount = d.run.groups.filter((g) => g.state === 'done').length;
   const hasMap = !!(configured && d.van && d.stops.length > 0);
   const canStart = configured && d.van && d.van.verified_at && !d.dayOff && childCount > 0;
 
@@ -200,6 +204,17 @@ export default function DriverToday() {
               <SignalsCard d={d} />
               <TimeCard d={d} />
 
+              {/* v24 (the demo): the first stop of the next run on a neel card, with the run's progress bar. */}
+              {!d.dayOff && firstGroup ? (
+                <Animated.View entering={FadeInDown.springify().damping(22).stiffness(300)} testID="today-next" style={{ backgroundColor: colors.neel, borderRadius: 24, borderCurve: 'continuous', paddingHorizontal: 16, paddingTop: 14, paddingBottom: 16, gap: 2, boxShadow: elevation.e2 }}>
+                  <AppText bold color={colors.mutedOnDark} style={{ fontSize: 14 }}>{t('driver.trip.nextHere')}</AppText>
+                  <AppText bold color={colors.onBrand} style={{ fontSize: 28, lineHeight: 40 }} numberOfLines={1}>{firstGroup.label}</AppText>
+                  <AppText bold color={colors.mutedOnDark} style={{ fontSize: 15 }}>{[firstGroup.children.map((c) => c.firstName).join(lang === 'ur' ? '، ' : ', '), firstTime].filter(Boolean).join(' · ')}</AppText>
+                  <View style={{ height: 6, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.15)', marginTop: 10, overflow: 'hidden' }}>
+                    <View style={{ width: `${Math.round((doneCount / Math.max(1, d.run.groups.length)) * 100)}%`, height: 6, backgroundColor: colors.kesar, borderRadius: 3 }} />
+                  </View>
+                </Animated.View>
+              ) : null}
               {!d.dayOff && childCount === 0 ? (
                 <AppText variant="secondary">{t('driver.today.noRiders')}</AppText>
               ) : !d.dayOff ? (
