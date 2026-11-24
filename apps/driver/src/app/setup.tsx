@@ -1,10 +1,12 @@
-// Van details: name, school, plate. Parents see these. Verification is done by the Pohnch team, not here.
+// Van details: name and number plate (v24: the plate is required; the schools are not asked here any more:
+// they are the van's school drop-off stops, so a van can serve several). Parents see the name and plate.
+// Verification is done by the Pohnch team from the papers the driver sends (verify.tsx).
 import { driver } from '@pohnch/client';
-import { colors, radius, shadow, space, useLang } from '@pohnch/ui';
-import { AppText, PohnchMap, TapButton, TextField } from '@pohnch/ui/native';
+import { normalisePlate } from '@pohnch/core';
+import { colors, useLang } from '@pohnch/ui';
+import { AppText, TapButton, TextField } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { View } from 'react-native';
 import { Screen } from '../components/Screen';
 import { useDriver } from '../state/DriverStore';
 
@@ -12,22 +14,26 @@ export default function Setup() {
   const { t } = useLang();
   const d = useDriver();
   const [name, setName] = useState(d.van?.name ?? '');
-  const [school, setSchool] = useState(d.van?.school_name ?? '');
   const [plate, setPlate] = useState(d.van?.plate ?? '');
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [plateError, setPlateError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
   const save = async () => {
-    if (!name.trim() || !school.trim()) return setError(true);
+    const p = normalisePlate(plate);
+    setPlateError(p ? null : t('driver.van.plateBad'));
+    if (!name.trim()) return setError(t('error.generic'));
+    if (!p) return;
     setBusy(true);
+    setError(null);
     try {
-      const v = { name: name.trim(), schoolName: school.trim(), plate: plate.trim() || null };
+      const v = { name: name.trim(), plate: p };
       if (d.van) await driver.updateVan(d.van.id, v);
       else await driver.createVan(v);
       await d.actions.refresh();
       router.replace(d.van ? '/' : '/stops');
     } catch {
-      setError(true);
+      setError(t('error.generic'));
     } finally {
       setBusy(false);
     }
@@ -37,23 +43,10 @@ export default function Setup() {
     <Screen title={t('driver.setup.title')}>
       <AppText variant="secondary">{t('driver.setup.hint')}</AppText>
       <TextField label={t('driver.van.name')} placeholder={t('driver.van.namePlaceholder')} value={name} onChange={setName} maxLength={40} testID="van-name" />
-      <TextField label={t('driver.van.school')} value={school} onChange={setSchool} maxLength={80} testID="van-school" />
-      <TextField label={t('driver.van.plate')} value={plate} onChange={(v) => setPlate(v.toUpperCase())} ltr maxLength={16} testID="van-plate" />
-      {error ? <AppText color={colors.dangerText}>{t('error.generic')}</AppText> : null}
+      <TextField label={t('driver.van.plate')} value={plate} onChange={(v) => setPlate(v.toUpperCase())} onBlur={() => plate && setPlateError(normalisePlate(plate) ? null : t('driver.van.plateBad'))} error={plateError} ltr maxLength={16} testID="van-plate" />
+      <AppText variant="secondary">{t('driver.setup.schoolsHint')}</AppText>
+      {error ? <AppText color={colors.dangerText}>{error}</AppText> : null}
       <TapButton size="next" tone="left" label={t('driver.save')} disabled={busy} onConfirm={save} testID="van-save" />
-      {d.van ? (
-        // v8: the school on the map. Families then see "school in 24 min" after pick-up, and the trip
-        // screen points at "reached school" when the van gets there.
-        <View style={{ gap: space.sm, marginTop: space.lg }}>
-          <AppText variant="headline">{t('driver.school.title')}</AppText>
-          <AppText variant="secondary">{d.school ? t('driver.school.placed') : t('driver.school.hint')}</AppText>
-          <View style={{ height: 280, borderRadius: radius.big, borderCurve: 'continuous', overflow: 'hidden', boxShadow: shadow.card }}>
-            <PohnchMap testID="school-map" accessibilityLabel={t('driver.school.title')}
-              pins={d.school ? [{ id: 'school', kind: 'school', lat: d.school.lat, lng: d.school.lng }] : d.stops.map((x) => ({ id: x.id, kind: 'number' as const, n: x.position, lat: x.lat, lng: x.lng }))}
-              onPress={({ lat, lng }) => driver.setSchoolPin(d.van!.id, lat, lng).then(d.actions.refresh).catch(() => setError(true))} style={{ flex: 1 }} />
-          </View>
-        </View>
-      ) : null}
     </Screen>
   );
 }

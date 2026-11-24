@@ -1,6 +1,6 @@
 // Join a van with a driver's link: the link (pasted, or opened from WhatsApp) and which child.
 import { parent } from '@pohnch/client';
-import { ApiError, tokenFromInviteLink } from '@pohnch/core';
+import { ApiError, normaliseInviteCode, tokenFromInviteLink } from '@pohnch/core';
 import { colors, radius, space, useLang } from '@pohnch/ui';
 import { AppText, ChoiceChip, SectionCaption, TapButton, TextField } from '@pohnch/ui/native';
 import { router } from 'expo-router';
@@ -21,8 +21,9 @@ export function JoinForm({ initialToken }: { initialToken?: string }) {
   const [busy, setBusy] = useState(false);
 
   const send = async () => {
-    const token = tokenFromInviteLink(link);
-    if (!token) return setMsg({ ok: false, text: t('parent.join.bad') });
+    // v24: the driver's link, or the 8-letter code typed after installing the app.
+    const token = tokenFromInviteLink(link) ?? normaliseInviteCode(link);
+    if (!token) return setMsg({ ok: false, text: t(/^[\s\w-]{8,10}$/.test(link.trim()) ? 'parent.join.codeBad' : 'parent.join.bad') });
     // v21: replace, not push, so /join is never stacked twice (the child screen comes back here once)
     if (!childId) return router.replace('/child');
     setBusy(true);
@@ -34,7 +35,7 @@ export function JoinForm({ initialToken }: { initialToken?: string }) {
       void p.actions.refresh();
       router.replace('/');
     } catch (e) {
-      setMsg({ ok: false, text: e instanceof ApiError && e.code === 'invite_invalid' ? t('parent.join.bad') : t('error.generic') });
+      setMsg({ ok: false, text: e instanceof ApiError && (e.code === 'invite_invalid' || e.code === 'bad_input') ? t('parent.join.bad') : t('error.generic') });
     } finally {
       setBusy(false);
     }
@@ -43,6 +44,7 @@ export function JoinForm({ initialToken }: { initialToken?: string }) {
   return (
     <View style={{ gap: space.lg }}>
       <TextField label={t('parent.join.paste')} value={link} onChange={setLink} ltr maxLength={300} testID="join-link" />
+      <AppText variant="small" color={colors.ink2}>{t('parent.join.code')}</AppText>
       {p.children.length > 0 ? (
         <View style={{ gap: 8 }}>
           <SectionCaption>{t('parent.join.which')}</SectionCaption>

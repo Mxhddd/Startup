@@ -13,7 +13,7 @@ import { colors, radius, space, useLang } from '@pohnch/ui';
 import { AbsentChip, AppText, RouteRibbon, StarSpinner, ArchAvatar, ArchShape, CircleAction, EtaPill, Icon, LineArt, LiquidProgress, MomentBanner, PressableScale, RollingNumber, SectionCaption, Shimmer, TapButton, TimelineEvent } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { Share, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { FadeIn, FadeInDown, LinearTransition, interpolate, useAnimatedStyle, type SharedValue } from 'react-native-reanimated';
 import { parent as data } from '@pohnch/client';
 import { useParent } from '../state/ParentStore';
@@ -104,12 +104,8 @@ export function TripSheet({ onOpenTrip, expanded, progress, onMoment }: {
     });
   };
   const toggleChutti = () => attempt(() => p.actions.toggleChutti(p.today));
-  const inviteDriver = () =>
-    attempt(async () => {
-      if (!p.child) return;
-      const { url } = await data.parentApi.inviteDriver(p.child.id);
-      await Share.share({ message: `${t('parent.inviteDriver.message')}\n${url}` });
-    });
+  // v24: the invite lives on the join screen, where it shows the link and code with Copy and WhatsApp.
+  const inviteDriver = () => router.push('/join');
 
   if (p.phase === 'notConfigured' || p.phase === 'error') {
     return (

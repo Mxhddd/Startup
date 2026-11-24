@@ -11,18 +11,20 @@
   "dependencies": {
     "@pohnch/core": "workspace:*",
     "@pohnch/messages": "workspace:*",
-    "@shopify/react-native-skia": "2.14.0"
+    "@shopify/react-native-skia": "2.14.0",
+    "maplibre-gl": "^5.24.1"
   },
   "peerDependencies": {
     "@maplibre/maplibre-react-native": "*",
     "expo-blur": "*",
+    "expo-clipboard": "*",
     "expo-haptics": "*",
+    "expo-sensors": "*",
     "react": "*",
     "react-native": "*",
     "react-native-gesture-handler": "*",
     "react-native-reanimated": "*",
-    "react-native-svg": "*",
-    "expo-sensors": "*"
+    "react-native-svg": "*"
   },
   "devDependencies": {
     "@types/react": "~19.3.0",

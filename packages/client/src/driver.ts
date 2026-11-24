@@ -5,7 +5,7 @@ import { karachiDate, type EventRow, type RiderRow, type StopRow } from '@pohnch
 import { backend } from './backend';
 
 export type Van = { id: string; name: string; school_name: string | null; plate: string | null; verified_at: string | null; switched_off_at: string | null };
-export type Stop = StopRow & { lat: number; lng: number; morning_time: string | null; afternoon_time: string | null };
+export type Stop = StopRow & { lat: number; lng: number; morning_time: string | null; afternoon_time: string | null; kind?: 'home' | 'school'; school_id?: string | null };
 export type Request = { membershipId: string; childId: string; firstName: string; lat: number | null; lng: number | null };
 export type Trip = { id: string; kind: 'morning' | 'afternoon'; status: 'running' | 'ended' | 'cancelled'; is_practice: boolean; started_at: string };
 

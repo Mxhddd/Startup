@@ -41,6 +41,8 @@ export type PohnchMapProps = {
   ahead?: { lat: number; lng: number }[];
   /** Force one map mood (dark mode uses 'night'); otherwise it follows the time of day in Karachi. */
   mood?: MapMood;
+  /** v24: fly to a place (a search result or an area) whenever `key` changes, without placing a pin. */
+  focus?: { lat: number; lng: number; zoom?: number; key: number } | null;
 };
 
 // The flowing dashes: the same dash pattern shifted a little each frame (the MapLibre way to animate a line).
@@ -119,7 +121,7 @@ function DropIn({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false, onFollowChange, recenterKey = 0, trail, ahead, mood: fixedMood }: PohnchMapProps) {
+export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, testID, bottomInset = 0, topInset = 0, interactive = true, follow = false, onFollowChange, recenterKey = 0, trail, ahead, mood: fixedMood, focus }: PohnchMapProps) {
   // At night (a dark phone, parent app) the map is the night mood; otherwise it follows the clock.
   const mood = useMood(fixedMood ?? (colorScheme() === 'dark' ? 'night' : undefined));
   const [mapStyle, setMapStyle] = useState<MapStyleJson | string | null>(styled[mood] ?? null);
@@ -133,6 +135,13 @@ export function PohnchMap({ accessibilityLabel, pins = [], van, onPress, style, 
       live = false;
     };
   }, [mood]);
+
+  // v24: a search result or an area chip moves the map there.
+  useEffect(() => {
+    if (!focus) return;
+    framed.current = true;
+    camera.current?.flyTo({ center: [focus.lng, focus.lat], zoom: focus.zoom ?? 16, duration: 900 });
+  }, [focus?.key]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Frame what matters once it first appears: the van, your stop and your home.
   useEffect(() => {

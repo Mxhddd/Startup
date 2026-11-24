@@ -41,6 +41,12 @@ const config: ExpoConfig = {
     ['expo-notifications', { color: '#1F2A5C', defaultChannel: 'driver', icon: './assets/android-icon-monochrome.png' }],
     // The map: MapLibre with free OpenFreeMap tiles (no Google key needed).
     '@maplibre/maplibre-react-native',
+    // v24: photos of the driver's papers for verification (CNIC, licence, van registration).
+    ['expo-image-picker', {
+      photosPermission: 'Pohnch uses the photos you choose of your CNIC, licence and van papers, for the team to verify your van. پہنچ آپ کے منتخب کردہ کاغذات کی تصویریں وین کی تصدیق کے لیے استعمال کرتا ہے۔',
+      cameraPermission: 'Take a photo of your CNIC, licence or van papers for the Pohnch team to verify your van. وین کی تصدیق کے لیے کاغذات کی تصویر کھینچیں۔',
+      microphonePermission: false,
+    }],
     [
       'expo-location',
       {

@@ -20,7 +20,7 @@ export default function FamilyInvite() {
   const accept = async () => {
     if (!d.van || !valid) return;
     try {
-      await driver.driverApi.acceptFamilyInvite(token, d.van.id);
+      await driver.driverApi.acceptFamilyInvite({ token }, d.van.id);
       await d.actions.refresh();
       setMsg({ ok: true, text: t('driver.invite.done') });
       setTimeout(() => router.replace('/families'), 300);

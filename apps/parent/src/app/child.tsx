@@ -4,26 +4,29 @@
 // child and everything about them.
 // Data: children (row-level security: only the child's family can change or remove them); the pin goes
 // through set_home_pin; taking a child off a van goes through the "app" Edge Function (van.leave).
-import { parent } from '@pohnch/client';
+import { parent, places, type School } from '@pohnch/client';
 import { colors, space, useLang } from '@pohnch/ui';
-import { AppText, ArchAvatar, FlowSteps, Icon, MorphTarget, SectionCaption, TapButton, TextField } from '@pohnch/ui/native';
+import { AppText, ArchAvatar, FlowSteps, Icon, MorphTarget, PlacePicker, SchoolPicker, SectionCaption, TapButton, TextField } from '@pohnch/ui/native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { useWindowDimensions, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { FadeInDown, ZoomIn } from 'react-native-reanimated';
-import { BrandMap } from '../components/BrandMap';
 import { Page } from '../components/Page';
 import { useParent } from '../state/ParentStore';
 import { takeInvite } from '../state/pendingInvite';
 
 export default function ChildPage() {
-  const screenH = useWindowDimensions().height;
   const { t, dir } = useLang();
   const p = useParent();
   const { id } = useLocalSearchParams<{ id?: string }>();
   const existing = id ? p.children.find((c) => c.id === id) ?? null : null;
   const [name, setName] = useState(existing?.first_name ?? '');
-  const [school, setSchool] = useState(existing?.school_name ?? '');
+  // v24: the school comes from Pohnch's list (one spelling per school); an old free-text name is kept until changed.
+  const [school, setSchool] = useState<{ id: string; name: string } | null>(existing ? { id: '', name: existing.school_name } : null);
+  const [schools, setSchools] = useState<School[]>([]);
+  useEffect(() => {
+    places.listSchools().then(setSchools).catch(() => setSchools([]));
+  }, []);
   const [pin, setPin] = useState<{ lat: number; lng: number } | null>(existing?.lat != null && existing?.lng != null ? { lat: existing.lat, lng: existing.lng } : null);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -32,7 +35,7 @@ export default function ChildPage() {
   useEffect(() => {
     if (!existing) return;
     setName((v) => v || existing.first_name);
-    setSchool((v) => v || existing.school_name);
+    setSchool((v) => v ?? { id: '', name: existing.school_name });
     setPin((v) => v ?? (existing.lat != null && existing.lng != null ? { lat: existing.lat, lng: existing.lng } : null));
   }, [existing]);
 
@@ -61,9 +64,9 @@ export default function ChildPage() {
   };
 
   const save = () => {
-    if (!name.trim() || !school.trim()) return setError(t('parent.child.needed'));
+    if (!name.trim() || !school?.name.trim()) return setError(t('parent.child.needed'));
     if (!pin) return setError(t('parent.child.pinNeeded'));
-    const c = { firstName: name.trim(), schoolName: school.trim() };
+    const c = { firstName: name.trim(), schoolName: school.name.trim(), ...(school.id ? { schoolId: school.id } : {}) };
     if (!existing) {
       // v9 guided path: back to a waiting invite card, or on to joining a van if this is the first child.
       const first = p.children.length === 0;
@@ -94,15 +97,11 @@ export default function ChildPage() {
       ) : null}>
       {!existing && p.children.length === 0 ? <FlowSteps step={2} total={3} label={t('parent.flow.label', { n: 2, of: 3 })} /> : null}
       <TextField label={t('parent.child.firstName')} value={name} onChange={setName} maxLength={30} testID="child-name" />
-      <TextField label={t('parent.child.school')} value={school} onChange={setSchool} maxLength={80} testID="child-school" />
+      <SchoolPicker schools={schools} value={school?.name ? school : null} onChange={setSchool} onAdd={(n) => places.addSchool(n)} testID="child-school" />
       <View style={{ gap: 8 }}>
         <SectionCaption>{t('parent.child.pin')}</SectionCaption>
-        {/* v10: the map runs edge to edge and fades into the page, never framed in a card. */}
-        <View style={{ height: Math.round(Math.min(280, Math.max(200, screenH * 0.32))), marginHorizontal: -18 }}>
-          <BrandMap accessibilityLabel={t('parent.child.pin')} home={pin} onPress={setPin} style={{ flex: 1 }} />
-          <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, top: 0, height: 36, experimental_backgroundImage: `linear-gradient(180deg, ${colors.ghee}, transparent)` }} />
-          <View pointerEvents="none" style={{ position: 'absolute', left: 0, right: 0, bottom: 0, height: 36, experimental_backgroundImage: `linear-gradient(0deg, ${colors.ghee}, transparent)` }} />
-        </View>
+        {/* v24: search the area or street (or tap an area), the map flies there, then tap the gate. */}
+        <PlacePicker pin={pin} onPin={setPin} search={places.searchPlaces} testID="child-place" />
         <View style={{ flexDirection: dir === 'rtl' ? 'row-reverse' : 'row', alignItems: 'center', gap: 6, paddingHorizontal: 6 }}>
           <Icon name="shield" size={16} color={colors.zamurrad} />
           <AppText variant="small" color={colors.ink2} style={{ flex: 1 }}>{t('parent.child.pinHint')}</AppText>

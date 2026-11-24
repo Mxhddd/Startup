@@ -4,16 +4,15 @@
 // press, hold and drag (DragList). Remove a stop with the cross.
 // Every control is at least 64 px tall (the driver rule).
 // Data: stops (row-level security lets only the van's driver change them); times are saved as HH:MM.
-import { driver, type Stop } from '@pohnch/client';
+import { driver, places, type School, type Stop } from '@pohnch/client';
 import { bestOrder, nudgeTime, shortTime } from '@pohnch/core';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
-import { AppText, EditSheet, Icon, PressableScale, TapButton, type IconName } from '@pohnch/ui/native';
+import { AppText, EditSheet, Icon, PlacePicker, PressableScale, SchoolPicker, TapButton, type IconName } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { TextInput, View } from 'react-native';
 import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { DragList } from '../components/DragList';
-import { DriverMap } from '../components/DriverMap';
 import { Screen } from '../components/Screen';
 import { useDriver } from '../state/DriverStore';
 
@@ -88,6 +87,14 @@ export default function Stops() {
   const [reordering, setReordering] = useState(false);
   const [order, setOrder] = useState<string[] | null>(null);
   const [ghosts, setGhosts] = useState<{ lat: number; lng: number }[]>([]);
+  // v24: school drop-offs are stops too (a van can serve several schools): pick the school, place its gate.
+  const [mode, setMode] = useState<'home' | 'school'>('home');
+  const [schools, setSchools] = useState<School[]>([]);
+  const [school, setSchool] = useState<{ id: string; name: string } | null>(null);
+  const [schoolPin, setSchoolPin] = useState<{ lat: number; lng: number } | null>(null);
+  useEffect(() => {
+    places.listSchools().then(setSchools).catch(() => setSchools([]));
+  }, []);
   useEffect(() => setLabels(Object.fromEntries(d.stops.map((s) => [s.id, s.label]))), [d.stops]);
   if (!d.van) return null;
   const van = d.van;
@@ -104,6 +111,18 @@ export default function Stops() {
   const add = ({ lat, lng }: { lat: number; lng: number }) => {
     setGhosts((g) => [...g, { lat, lng }]);
     attempt(() => driver.addStop(van.id, { label: t('driver.stops.default', { n: d.stops.length + 1 + ghosts.length }), lat, lng }));
+  };
+  const addSchool = () => {
+    if (!school || !schoolPin) return;
+    const pin = schoolPin;
+    attempt(async () => {
+      await driver.addSchoolStop(van.id, { schoolId: school.id, lat: pin.lat, lng: pin.lng });
+      // The first school also becomes the van's school point ("reached school" on the trip screen).
+      if (!d.school) await driver.setSchoolPin(van.id, pin.lat, pin.lng);
+    });
+    setSchool(null);
+    setSchoolPin(null);
+    setMode('home');
   };
   // Reordering: drag in a compact list, then "Done" saves the new order once (if it changed).
   const finishReorder = () => {
@@ -125,7 +144,36 @@ export default function Stops() {
   return (
     <Screen title={t('driver.stops.title')}>
       <AppText variant="secondary">{t('driver.stops.hint')}</AppText>
-      <DriverMap pins={[...d.stops.map((s) => ({ id: s.id, lat: s.lat, lng: s.lng, n: s.position })), ...ghosts.map((g, i) => ({ id: `ghost-${i}`, lat: g.lat, lng: g.lng, n: d.stops.length + i + 1 }))]} onPress={add} />
+      <View style={{ flexDirection: row, gap: space.sm }}>
+        {(['home', 'school'] as const).map((m) => (
+          <PressableScale key={m} accessibilityRole="button" accessibilityState={{ selected: mode === m }} onPress={() => setMode(m)} scaleTo="chip" style={{ flex: 1 }} testID={`stops-mode-${m}`}
+            faceStyle={{ minHeight: 64, borderRadius: 20, borderCurve: 'continuous', backgroundColor: mode === m ? colors.neel : colors.sand, flexDirection: row, alignItems: 'center', justifyContent: 'center', gap: 8, paddingHorizontal: space.sm }}>
+            <Icon name={m === 'home' ? 'pin' : 'reachedSchool'} size={20} color={mode === m ? colors.ghee : colors.siyahi} />
+            <AppText bold color={mode === m ? colors.ghee : colors.siyahi} style={{ fontSize: 15 }} numberOfLines={2}>{t(m === 'home' ? 'driver.stops.addHome' : 'driver.stops.addSchool')}</AppText>
+          </PressableScale>
+        ))}
+      </View>
+      {mode === 'home' ? (
+        <PlacePicker pin={null} onPin={add} pinKind="stop" search={places.searchPlaces} testID="stops-place"
+          otherPins={[...d.stops.map((s) => ({ id: s.id, kind: 'number' as const, n: s.position, lat: s.lat, lng: s.lng })), ...ghosts.map((g, i) => ({ id: `ghost-${i}`, kind: 'number' as const, n: d.stops.length + i + 1, lat: g.lat, lng: g.lng }))]} />
+      ) : (
+        <View style={{ gap: space.md }}>
+          <AppText variant="headline">{t('driver.stops.pickSchool')}</AppText>
+          <SchoolPicker schools={schools} value={school} onChange={(s) => {
+            setSchool(s);
+            const known = schools.find((x) => x.id === s.id);
+            if (known?.lat != null && known.lng != null) setSchoolPin({ lat: known.lat, lng: known.lng });
+          }} onAdd={(n) => places.addSchool(n)} testID="stops-school" />
+          {school ? (
+            <>
+              <AppText variant="secondary">{t('driver.stops.schoolPin')}</AppText>
+              <PlacePicker pin={schoolPin} onPin={setSchoolPin} pinKind="school" search={places.searchPlaces} testID="stops-school-place"
+                otherPins={d.stops.map((s) => ({ id: s.id, kind: 'number' as const, n: s.position, lat: s.lat, lng: s.lng }))} />
+              <TapButton size="next" tone="reachedSchool" icon="check" label={t('driver.stops.addSchool')} disabled={!schoolPin} onConfirm={addSchool} testID="stops-school-add" />
+            </>
+          ) : null}
+        </View>
+      )}
       {failed ? <AppText color={colors.dangerText}>{t('error.offline')}</AppText> : null}
       {d.stops.length === 0 ? <AppText variant="secondary">{t('driver.stops.empty')}</AppText> : <AppText bold color={colors.ink2} style={{ fontSize: 15 }}>{t('driver.stops.timesHint')}</AppText>}
       {d.stops.length > 1 ? (
@@ -155,8 +203,8 @@ export default function Stops() {
             <Animated.View key={s.id} testID={`stop-row-${i}`} entering={FadeInDown.delay(i * 40).springify().damping(22).stiffness(300)} layout={layout}
               style={{ backgroundColor: colors.white, borderRadius: 24, borderCurve: 'continuous', boxShadow: elevation.e1, padding: space.md, gap: space.sm }}>
               <View style={{ flexDirection: row, alignItems: 'center', gap: space.sm }}>
-                <View style={{ width: 36, height: 36, borderRadius: 18, borderCurve: 'continuous', backgroundColor: colors.neel, alignItems: 'center', justifyContent: 'center' }}>
-                  <AppText variant="number" color={colors.white} style={{ fontSize: 16, lineHeight: 20 }}>{String(s.position)}</AppText>
+                <View style={{ width: 36, height: 36, borderRadius: 18, borderCurve: 'continuous', backgroundColor: s.kind === 'school' ? colors.kesar : colors.neel, alignItems: 'center', justifyContent: 'center' }}>
+                  {s.kind === 'school' ? <Icon name="reachedSchool" size={18} color={colors.siyahi} /> : <AppText variant="number" color={colors.white} style={{ fontSize: 16, lineHeight: 20 }}>{String(s.position)}</AppText>}
                 </View>
                 <View style={{ flex: 1 }}>
                   <TextInput

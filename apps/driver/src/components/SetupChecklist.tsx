@@ -12,14 +12,15 @@ import Animated, { FadeInDown, FadeOutUp, LinearTransition } from 'react-native-
 import type { useDriver } from '../state/DriverStore';
 
 export const PRACTICED = 'pohnch.driver.practiced.v1';
-type Href = '/setup' | '/stops' | '/families' | '/practice';
+type Href = '/setup' | '/stops' | '/families' | '/practice' | '/verify';
 
 export function setupSteps(d: ReturnType<typeof useDriver>, practiced: boolean): { key: string; done: boolean; href: Href }[] {
   return [
     { key: 'van', done: !!d.van, href: '/setup' },
     { key: 'stops', done: d.stops.length > 0, href: '/stops' },
     { key: 'times', done: d.stops.length > 0 && d.stops.every((s) => s.morning_time), href: '/stops' },
-    { key: 'school', done: !!d.school, href: '/setup' },
+    { key: 'school', done: !!d.school || d.stops.some((s) => s.kind === 'school'), href: '/stops' },
+    { key: 'verify', done: !!d.van?.verified_at, href: '/verify' },
     { key: 'families', done: d.riders.length + d.requests.length > 0, href: '/families' },
     { key: 'practice', done: practiced, href: '/practice' },
   ];

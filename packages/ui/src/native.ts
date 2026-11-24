@@ -64,3 +64,6 @@ export { EmptyScene } from './native/EmptyScene';
 export { StarBurst } from './native/StarBurst';
 export { TruckBand, ChamakStrip, Rose, setOrnament, ornamentOn } from './native/TruckArt';
 export { useGlide } from './native/useGlide';
+export { PlacePicker, type PlaceResult } from './native/PlacePicker';
+export { SchoolPicker } from './native/SchoolPicker';
+export { ShareLink } from './native/ShareLink';

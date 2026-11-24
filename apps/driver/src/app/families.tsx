@@ -5,9 +5,10 @@
 // goes straight to the share sheet and is never shown or logged.
 import { driver, plans, type BonusMonth } from '@pohnch/client';
 import { colors, elevation, space, useLang } from '@pohnch/ui';
-import { AppText, ApprovalCard, ChoiceChip, EditSheet, InviteCard, PressableScale, TapButton } from '@pohnch/ui/native';
+import { AppText, ApprovalCard, ChoiceChip, EditSheet, InviteCard, PressableScale, TapButton, TextField } from '@pohnch/ui/native';
+import { ApiError, normaliseInviteCode } from '@pohnch/core';
 import { useEffect, useState } from 'react';
-import { Share, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 import { Screen } from '../components/Screen';
 import { useDriver } from '../state/DriverStore';
@@ -21,6 +22,9 @@ export default function Families() {
   const [error, setError] = useState(false);
   const [removing, setRemoving] = useState<{ membershipId: string; name: string } | null>(null);
   const [decided, setDecided] = useState<string[]>([]);
+  const [link, setLink] = useState<{ url: string; code: string } | null>(null);
+  const [code, setCode] = useState('');
+  const [codeMsg, setCodeMsg] = useState<string | null>(null);
   // Pricing v2: with billing on for the van, which riders' families are on Pohnch Plus, and the bonus.
   const [paid, setPaid] = useState<Record<string, boolean>>({});
   const [bonus, setBonus] = useState<BonusMonth | null>(null);
@@ -42,11 +46,25 @@ export default function Families() {
   const riders = [...d.riders].filter((r) => !r.membershipId || !decidedRef.includes(r.membershipId)).sort((a, b) => position(a.stopId) - position(b.stopId) || a.firstName.localeCompare(b.firstName));
 
   const share = async () => {
+    setError(false);
     try {
-      const { url } = await driver.driverApi.inviteLink(van.id);
-      await Share.share({ message: `${van.name} · ${t('app.parent.name')}\n${url}` });
+      setLink(await driver.driverApi.inviteLink(van.id));
     } catch {
       setError(true);
+    }
+  };
+  // v24: a parent's "invite my driver" code, typed here (the link may not reach the app after installing).
+  const addByCode = async () => {
+    const c = normaliseInviteCode(code);
+    if (!c) return setCodeMsg(t('parent.join.codeBad'));
+    setCodeMsg(null);
+    try {
+      await driver.driverApi.acceptFamilyInvite({ code: c }, van.id);
+      setCode('');
+      setCodeMsg(t('driver.invite.done'));
+      void d.actions.refresh();
+    } catch (e) {
+      setCodeMsg(e instanceof ApiError && e.code === 'invite_invalid' ? t('driver.invite.bad') : t('error.generic'));
     }
   };
   // v21: the card leaves the list on the tap; the reload follows. If the server says no, it comes back.
@@ -97,7 +115,14 @@ export default function Families() {
         </Animated.View>
       ) : null}
 
-      {van.verified_at ? <InviteCard onShare={share} /> : <AppText variant="secondary">{t('driver.families.needsCheck')}</AppText>}
+      {/* v24: families can ask to join before the papers are checked; approving waits for the check. */}
+      <InviteCard onShare={share} link={link} message={`${van.name} · ${t('app.parent.name')}`} note={van.verified_at ? null : t('driver.invite.beforeCheck')} />
+      <View style={{ gap: space.sm }}>
+        <AppText variant="headline">{t('driver.code.title')}</AppText>
+        <TextField label={t('parent.join.codeLabel')} value={code} onChange={setCode} ltr maxLength={12} testID="driver-code" />
+        {codeMsg ? <AppText bold color={codeMsg === t('driver.invite.done') ? colors.zamurradOnTint : colors.dangerText}>{codeMsg}</AppText> : null}
+        <TapButton icon="plus" label={t('driver.code.go')} disabled={!code.trim()} onConfirm={addByCode} testID="driver-code-go" />
+      </View>
       {requests.length === 0 ? <AppText variant="secondary">{t('driver.families.none')}</AppText> : null}
 
       {bonus ? (
