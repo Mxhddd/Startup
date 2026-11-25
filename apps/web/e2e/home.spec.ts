@@ -110,6 +110,9 @@ test('joining the pilot sends the form and says thank you', async ({ page }) => 
   await page.getByPlaceholder('03XX XXXXXXX').fill('0300 1234567');
   await page.getByTestId('join-send').click();
   await expect(page.getByTestId('join-sent')).toBeVisible();
+  // v24: straight on to the app, and the browser copy for iPhones.
+  await expect(page.getByTestId('join-getapp').getByRole('link', { name: 'Get the app now' })).toHaveAttribute('href', '/app#parent');
+  await expect(page.getByTestId('join-tryweb')).toHaveAttribute('href', '/try/parent');
   const sent = JSON.parse(seen.find((s) => s.includes('"kind":"join"'))!);
   expect(sent).toMatchObject({ kind: 'join', role: 'parent', area: 'gulshan', whatsapp: '+923001234567', website: '' });
 });

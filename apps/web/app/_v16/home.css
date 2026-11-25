@@ -485,7 +485,8 @@ html:has(.v16), body:has(.v16) { background: #EDE3D0; }
 .v16 .send .msg { margin: 0; font-size: 15px; color: var(--dangerOnNight); }
 .v16 .send .msg a { color: var(--onNight); font-weight: 700; }
 .v16 .joined { position: relative; display: grid; gap: 12px; animation: rise .8s var(--calm); }
-.v16 .joined h3 { font-size: 32px; } .v16 .joined a { color: var(--kesar); }
+.v16 .joined h3 { font-size: 32px; }
+.v16 .joinapp { display: grid; gap: 8px; justify-items: start; } .v16 .joinapp p { margin: 0; } .v16 .joined a { color: var(--kesar); }
 .v16 .joinmeter { margin: 4px 0 0; font-size: 16px; line-height: 1.6; }
 .v16 .joinmeter b { display: block; color: var(--onNight); }
 .v16 .kiteburst { position: absolute; inset: -40px 0 auto 0; height: 200px; pointer-events: none; }

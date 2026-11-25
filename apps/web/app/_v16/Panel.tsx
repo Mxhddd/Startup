@@ -58,6 +58,12 @@ export function JoinForm({ w, lang, areas, role, setRole, onJoined, wa, initialA
         <span className="kiteburst" aria-hidden="true">{['#E8A33D', '#C46A8A', '#A7D47E', '#FAF6EE', '#17705A'].map((c, k) => <i key={c} style={{ ['--k' as string]: k, ['--c' as string]: c }} />)}</span>
         <h3>{w['join.sent']}</h3>
         {area && area !== 'other' && meterStatus === 'ready' && <p className="joinmeter" data-testid="join-meter"><b>{(w['meter.thanks'] ?? '').replace('{area}', areas.find((a) => a.id === area)?.label ?? '')}</b> {meterLine(w, areas.find((a) => a.id === area)?.label ?? '', meter?.[area])}</p>}
+        {/* v24: straight on to the app (the /app page knows whether Play is public or still for testers). */}
+        <div className="joinapp" data-testid="join-getapp">
+          <a className="btn" href={`${lang === 'ur' ? '/ur' : ''}/app#${role}`}>{role === 'driver' ? w['join.driverApp'] : w['join.getApp']}</a>
+          <p>{w['join.getAppSub']}</p>
+          {role === 'parent' ? <a href="/try/parent" data-testid="join-tryweb">{w['join.tryWeb']}</a> : null}
+        </div>
         <p>{w['join.sentB']} <a href={wa} rel="noreferrer">WhatsApp</a></p>
       </div>
     );
