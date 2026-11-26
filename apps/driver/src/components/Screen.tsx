@@ -1,8 +1,8 @@
-// A driver screen (v8, v10): the same neel header as Today (back, title, language switch, with a gentle
-// light from the top) whose bottom edge curves softly, then the content on ghee. High contrast, no
+// A driver screen (v24, the Beaconhouse demo look): a plain paper header (back, a big dark title, language
+// switch) over the content on ghee, the same as Today. It was a neel band before v24. High contrast, no
 // pattern, arch or frames (the driver app stays plain). The header settles in
 // from the top and the content rises under it, so moving between screens feels like one place.
-import { colors, shadow, space, useLang } from '@pohnch/ui';
+import { colorScheme, colors, space, useLang } from '@pohnch/ui';
 import { AppText, Icon, LangSwitch, PressableScale } from '@pohnch/ui/native';
 import { router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -26,21 +26,21 @@ export function Screen({ title, children, back = true, scroll = true, footer }: 
   const body = <Animated.View entering={FadeInDown.delay(40).springify().damping(22).stiffness(300)} style={{ gap: space.lg, paddingBottom: space.xxl, width: '100%', maxWidth: 560, alignSelf: 'center' }}>{children}</Animated.View>;
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
-      <StatusBar style="light" />
+      <StatusBar style={colorScheme() === 'dark' ? 'light' : 'dark'} />
       <Animated.View entering={FadeInUp.springify().damping(22).stiffness(300)}
-        style={[{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + space.md, paddingBottom: space.xl, paddingHorizontal: space.xl, flexDirection: row, alignItems: 'center', gap: space.md, boxShadow: shadow.card, borderBottomLeftRadius: 36, borderBottomRightRadius: 36, zIndex: 2 }, fold]}>
+        style={[{ backgroundColor: colors.ghee, paddingTop: insets.top + space.md, paddingBottom: space.xl, paddingHorizontal: space.xl, flexDirection: row, alignItems: 'center', gap: space.md, borderBottomWidth: 1, borderBottomColor: colors.hairline, zIndex: 2 }, fold]}>
         {back ? (
           <PressableScale accessibilityRole="button" accessibilityLabel={t('common.back')} scaleTo="chip" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))} hitSlop={8}
-            faceStyle={{ width: 48, height: 48, borderRadius: 24, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.glassDark }}>
+            faceStyle={{ width: 48, height: 48, borderRadius: 24, borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: colors.white, boxShadow: '0px 2px 10px rgba(20,26,51,0.10)' }}>
             <View style={{ transform: [{ scaleX: dir === 'rtl' ? 1 : -1 }] }}>
-              <Icon name="arrow" size={22} color={colors.ghee} />
+              <Icon name="arrow" size={22} color={colors.neel} />
             </View>
           </PressableScale>
         ) : null}
         <Animated.View style={[{ flex: 1, transformOrigin: dir === 'rtl' ? 'right' : 'left' }, titleFold]}>
-          <AppText variant="title" color={colors.ghee} numberOfLines={1}>{title}</AppText>
+          <AppText variant="title" color={colors.siyahi} numberOfLines={1}>{title}</AppText>
         </Animated.View>
-        <LangSwitch tone="dark" />
+        <LangSwitch />
       </Animated.View>
       {scroll ? (
         <Animated.ScrollView onScroll={onScroll} scrollEventThrottle={16} contentContainerStyle={{ paddingHorizontal: space.xl, paddingTop: space.xl, paddingBottom: insets.bottom + 140 }} keyboardShouldPersistTaps="handled">

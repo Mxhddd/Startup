@@ -4,7 +4,7 @@
 // In development builds, a long press on the greeting opens the component gallery.
 import { useSession } from '@pohnch/client';
 import { karachiDayParts } from '@pohnch/core';
-import { colors, elevation, radius, radius10, space, useLang } from '@pohnch/ui';
+import { colorScheme, colors, elevation, radius, radius10, space, useLang } from '@pohnch/ui';
 import { AppText, ChildRow, Icon, LangSwitch, PohnchMap, PressableScale, Shimmer, TapButton, VanBadge, type IconName } from '@pohnch/ui/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Redirect, router } from 'expo-router';
@@ -122,20 +122,21 @@ export default function DriverToday() {
   return (
     <View style={{ flex: 1, backgroundColor: colors.ghee }}>
       {/* Header */}
-      <StatusBar style="light" />
-      <Animated.View entering={FadeInUp.springify().damping(22).stiffness(300)} style={{ backgroundColor: colors.neel, experimental_backgroundImage: `linear-gradient(180deg, ${colors.neelRaised}, ${colors.neel})`, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 58 : 30, gap: 10, borderBottomLeftRadius: 36, borderBottomRightRadius: 36 }}>
+      <StatusBar style={colorScheme() === 'dark' ? 'light' : 'dark'} />
+      {/* v24 (the demo): a plain paper header, a big dark greeting, the date and van under it. */}
+      <Animated.View entering={FadeInUp.springify().damping(22).stiffness(300)} style={{ backgroundColor: colors.ghee, paddingTop: insets.top + 18, paddingHorizontal: space.xl, paddingBottom: hasMap ? 16 : 12, gap: 6 }}>
         <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
           <Animated.View style={[{ flex: 1, transformOrigin: dir === 'rtl' ? 'right' : 'left' }, greet]}>
           <Pressable style={{ flex: 1 }} onLongPress={__DEV__ ? () => router.push('/gallery') : undefined}>
-            <AppText variant="display" color={colors.ghee} style={{ fontSize: 30 }} testID="today-title" numberOfLines={2}>
+            <AppText bold color={colors.siyahi} style={{ fontSize: 26, lineHeight: 38 }} testID="today-title" numberOfLines={2}>
               {d.name ? t('driver.hello', { name: d.name }) : t('driver.hello.plain')}
             </AppText>
           </Pressable>
           </Animated.View>
-          <LangSwitch tone="dark" />
+          <LangSwitch />
         </View>
         <View style={{ flexDirection: row, alignItems: 'center', gap: 10 }}>
-          <AppText color={colors.mutedOnDark} style={{ flex: 1, fontSize: 15 }} numberOfLines={1}>
+          <AppText bold color={colors.ink2} style={{ flex: 1, fontSize: 15 }} numberOfLines={1}>
             {[dateText, d.van?.name].filter(Boolean).join(' · ')}
           </AppText>
           {d.requests.length > 0 ? (
@@ -158,7 +159,7 @@ export default function DriverToday() {
       >
         {hasMap ? (
           // The route as a raised card that overlaps the header, so the screen has depth.
-          <Animated.View entering={FadeInDown.delay(120).springify().damping(22).stiffness(300)} style={{ height: 196, marginTop: -38, marginHorizontal: space.gutter, borderRadius: 28, borderCurve: 'continuous', overflow: 'hidden', boxShadow: elevation.e3, backgroundColor: colors.white }}>
+          <Animated.View entering={FadeInDown.delay(120).springify().damping(22).stiffness(300)} style={{ height: 196, marginTop: 4, marginHorizontal: space.gutter, borderRadius: 28, borderCurve: 'continuous', overflow: 'hidden', boxShadow: elevation.e3, backgroundColor: colors.white }}>
             <PohnchMap
               testID="today-map"
               accessibilityLabel={t('driver.nav.stops')}
